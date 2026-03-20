@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阜矿集团 — 物料编码体系设计</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    color: white; padding: 36px 40px; text-align: center;
+  }
+  .header h1 { font-size: 26px; font-weight: 700; letter-spacing: 2px; }
+  .header p { margin-top: 8px; color: #90cdf4; font-size: 13px; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 28px 16px; }
+
+  .section {
+    background: white; border-radius: 12px; padding: 28px;
+    margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .sec-title {
+    font-size: 18px; font-weight: 700; color: #0f3460;
+    border-left: 4px solid #e94560; padding-left: 12px;
+    margin-bottom: 22px;
+  }
+  .sec-sub { font-size: 14px; font-weight: 600; color: #2d3748; margin: 20px 0 10px; }
+
+  /* 编码结构可视化 */
+  .code-visual {
+    display: flex; align-items: stretch; gap: 0;
+    border-radius: 10px; overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin: 16px 0;
+  }
+  .code-seg {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 14px 8px; text-align: center;
+    border-right: 2px solid rgba(255,255,255,0.3);
+    position: relative;
+  }
+  .code-seg:last-child { border-right: none; }
+  .code-seg .seg-bits { font-size: 22px; font-weight: 900; letter-spacing: 4px; }
+  .code-seg .seg-label { font-size: 11px; margin-top: 6px; font-weight: 600; opacity: 0.9; }
+  .code-seg .seg-name { font-size: 10px; margin-top: 3px; opacity: 0.75; }
+
+  .s1 { background: #2b6cb0; color: white; }
+  .s2 { background: #2f855a; color: white; }
+  .s3 { background: #c05621; color: white; }
+  .s4 { background: #6b46c1; color: white; }
+  .s5 { background: #c53030; color: white; }
+
+  /* 示例编码 */
+  .code-example {
+    font-family: 'Courier New', monospace;
+    font-size: 28px; font-weight: 900; letter-spacing: 6px;
+    text-align: center; padding: 18px;
+    background: #1a1a2e; color: #90cdf4;
+    border-radius: 8px; margin: 12px 0;
+  }
+  .code-example span.s1 { color: #90cdf4; background: transparent; }
+  .code-example span.s2 { color: #9ae6b4; background: transparent; }
+  .code-example span.s3 { color: #fbd38d; background: transparent; }
+  .code-example span.s4 { color: #d6bcfa; background: transparent; }
+  .code-example span.s5 { color: #fc8181; background: transparent; }
+  .code-example span.dot { color: #4a5568; background: transparent; }
+
+  /* 分类表格 */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: #1a1a2e; color: white; }
+  thead th { padding: 10px 12px; text-align: left; font-weight: 600; }
+  tbody tr { border-bottom: 1px solid #f0f0f0; }
+  tbody tr:hover { background: #f7fafc; }
+  tbody td { padding: 9px 12px; }
+  .tag {
+    display: inline-block; padding: 2px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .tag-blue { background: #ebf8ff; color: #2b6cb0; }
+  .tag-green { background: #f0fff4; color: #276749; }
+  .tag-orange { background: #fffaf0; color: #c05621; }
+  .tag-purple { background: #faf5ff; color: #6b46c1; }
+  .tag-red { background: #fff5f5; color: #c53030; }
+  .tag-gray { background: #f7fafc; color: #4a5568; }
+  .tag-teal { background: #e6fffa; color: #234e52; }
+
+  /* 编码示例卡片 */
+  .example-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .ex-card {
+    border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 14px;
+    transition: box-shadow 0.2s;
+  }
+  .ex-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .ex-code {
+    font-family: 'Courier New', monospace;
+    font-size: 18px; font-weight: 900; letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+  .ex-name { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+  .ex-breakdown { 
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;
+  }
+  .ex-seg {
+    font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600;
+  }
+  .ex-attr { font-size: 12px; color: #718096; margin-top: 6px; border-top: 1px dashed #e2e8f0; padding-top: 6px; }
+
+  /* 规则说明 */
+  .rule-list { list-style: none; }
+  .rule-list li {
+    padding: 10px 14px; border-left: 3px solid #e2e8f0;
+    margin-bottom: 8px; background: #f7fafc; border-radius: 0 6px 6px 0;
+    font-size: 13px;
+  }
+  .rule-list li strong { color: #0f3460; }
+  .rule-list li.warn { border-left-color: #f6ad55; background: #fffaf0; }
+  .rule-list li.good { border-left-color: #48bb78; background: #f0fff4; }
+  .rule-list li.info { border-left-color: #63b3ed; background: #ebf8ff; }
+
+  /* 流程 */
+  .proc-row { display: flex; align-items: center; gap: 0; margin: 12px 0; flex-wrap: wrap; }
+  .proc-node {
+    padding: 10px 16px; border-radius: 8px;
+    font-size: 12px; font-weight: 600; text-align: center;
+    min-width: 90px;
+  }
+  .proc-arr { color: #a0aec0; font-size: 20px; padding: 0 6px; }
+
+  .note {
+    background: #fffbf0; border-left: 4px solid #f6ad55;
+    padding: 12px 16px; border-radius: 0 8px 8px 0;
+    margin-top: 14px; font-size: 13px; color: #744210;
+    line-height: 1.7;
+  }
+  .note-blue {
+    background: #ebf8ff; border-left: 4px solid #63b3ed;
+    padding: 12px 16px; border-radius: 0 8px 8px 0;
+    margin-top: 14px; font-size: 13px; color: #2c5282;
+    line-height: 1.7;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  @media (max-width: 640px) {
+    .two-col, .example-grid { grid-template-columns: 1fr; }
+    .code-visual { flex-wrap: wrap; }
+    .code-seg { flex: 0 0 33%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📦 物料编码体系设计</h1>
+  <p>阜矿集团物资管理系统 · 基础数据规范 · 2025年12月</p>
+</div>
+
+<div class="container">
+
+  <!-- 设计原则 -->
+  <div class="section">
+    <div class="sec-title">一、编码设计原则</div>
+    <ul class="rule-list">
+      <li class="good"><strong>唯一性：</strong>每种物料有且只有一个编码，一码对应一种物料，杜绝"一物多码""多物一码"</li>
+      <li class="good"><strong>稳定性：</strong>编码一旦启用不得修改，停用物料保留编码仅标记状态为"已停用"</li>
+      <li class="info"><strong>可扩展：</strong>各分类预留足够顺序号空间，支持新增物料品类而不重构体系</li>
+      <li class="info"><strong>可读性：</strong>编码带有明显分类含义，人工核对时可快速判断物料归属大类</li>
+      <li class="warn"><strong>统一性：</strong>全集团统一编码标准，各矿禁止自行编码，由物资公司统一维护主数据</li>
+    </ul>
+  </div>
+
+  <!-- 编码结构 -->
+  <div class="section">
+    <div class="sec-title">二、编码结构设计（共12位）</div>
+
+    <div class="code-visual">
+      <div class="code-seg s1">
+        <div class="seg-bits">XX</div>
+        <div class="seg-label">大类码</div>
+        <div class="seg-name">2位字母</div>
+      </div>
+      <div class="code-seg s2">
+        <div class="seg-bits">XX</div>
+        <div class="seg-label">中类码</div>
+        <div class="seg-name">2位数字</div>
+      </div>
+      <div class="code-seg s3">
+        <div class="seg-bits">XX</div>
+        <div class="seg-label">小类码</div>
+        <div class="seg-name">2位数字</div>
+      </div>
+      <div class="code-seg s4">
+        <div class="seg-bits">XXXX</div>
+        <div class="seg-label">顺序码</div>
+        <div class="seg-name">4位数字</div>
+      </div>
+      <div class="code-seg s5">
+        <div class="seg-bits">XX</div>
+        <div class="seg-label">规格特征码</div>
+        <div class="seg-name">2位字母/数字</div>
+      </div>
+    </div>
+
+    <div class="code-example">
+      <span class="s1">CJ</span><span class="dot">·</span><span class="s2">02</span><span class="dot">·</span><span class="s3">01</span><span class="dot">·</span><span class="s4">0023</span><span class="dot">·</span><span class="s5">A1</span>
+    </div>
+
+    <div class="two-col" style="margin-top:16px;">
+      <div>
+        <table>
+          <thead><tr><th>位段</th><th>说明</th><th>示例</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag tag-blue">大类码（2位字母）</span></td><td>对应8个一级分类</td><td>CJ = 采掘类</td></tr>
+            <tr><td><span class="tag tag-green">中类码（2位数字）</span></td><td>大类下的二级分类</td><td>02 = 截齿类</td></tr>
+            <tr><td><span class="tag tag-orange">小类码（2位数字）</span></td><td>中类下的三级分类</td><td>01 = 采煤机截齿</td></tr>
+            <tr><td><span class="tag tag-purple">顺序码（4位数字）</span></td><td>同小类内唯一流水号</td><td>0023 = 第23号</td></tr>
+            <tr><td><span class="tag tag-red">规格特征码（2位）</span></td><td>区分同品种不同规格</td><td>A1 = 规格型号A1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="note-blue">
+          <strong>读法示例：</strong><br>
+          <code style="font-size:15px;font-weight:700;letter-spacing:2px;">CJ·02·01·0023·A1</code><br><br>
+          → <strong>采掘类</strong> / <strong>截齿类</strong> / <strong>采煤机截齿</strong> / 第23号 / A1规格<br><br>
+          即：镐型截齿（适用于MG500采煤机，齿柄直径38mm）
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 大类分类表 -->
+  <div class="section">
+    <div class="sec-title">三、大类分类体系</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>大类码</th><th>大类名称</th><th>含义说明</th><th>中类数量</th><th>典型物资</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:#2b6cb0;font-size:15px;font-family:monospace;">CJ</strong></td>
+          <td><span class="tag tag-blue">采掘类</span></td>
+          <td>直接用于煤矿掘进、采煤作业的消耗性物资</td>
+          <td>8个中类</td>
+          <td>截齿、钻头、钻杆、刮板、圆环链</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#276749;font-size:15px;font-family:monospace;">ZH</strong></td>
+          <td><span class="tag tag-green">支护类</span></td>
+          <td>用于巷道、工作面支护的各类材料</td>
+          <td>6个中类</td>
+          <td>锚杆、锚索、工字钢、铁网、方木、液压支柱</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#6b46c1;font-size:15px;font-family:monospace;">JD</strong></td>
+          <td><span class="tag tag-purple">机电类</span></td>
+          <td>机械设备配件、电气元件及电缆</td>
+          <td>10个中类</td>
+          <td>电机、开关、电缆、轴承、油封、皮带</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#c53030;font-size:15px;font-family:monospace;">BB</strong></td>
+          <td><span class="tag tag-red">爆破类</span></td>
+          <td>爆破作业所需物资（专项管控）</td>
+          <td>4个中类</td>
+          <td>炸药、雷管、导爆管、炮泥</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#c05621;font-size:15px;font-family:monospace;">AQ</strong></td>
+          <td><span class="tag tag-orange">安全类</span></td>
+          <td>安全生产所需防护设备和检测仪器</td>
+          <td>5个中类</td>
+          <td>瓦斯检测仪、防尘面具、安全绳、应急灯</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#234e52;font-size:15px;font-family:monospace;">LB</strong></td>
+          <td><span class="tag tag-teal">劳保类</span></td>
+          <td>个人劳动防护用品</td>
+          <td>4个中类</td>
+          <td>安全帽、矿灯、工作服、防水靴、手套</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#553c9a;font-size:15px;font-family:monospace;">BP</strong></td>
+          <td><span class="tag tag-purple">备品备件类</span></td>
+          <td>设备大修、技改备用零配件</td>
+          <td>按设备系列分类</td>
+          <td>采煤机备件、综掘机备件、提升机备件</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#4a5568;font-size:15px;font-family:monospace;">GY</strong></td>
+          <td><span class="tag tag-gray">辅助用品类</span></td>
+          <td>生产辅助、办公、清洁等通用物资</td>
+          <td>5个中类</td>
+          <td>润滑油、焊条、办公用品、工具、清洗剂</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">💡 爆破类（BB）受国家专项管控，系统需对该类物资设置独立台账、双人核销、出库须上传审批文件，可与公安部门信息平台对接。</div>
+  </div>
+
+  <!-- 中类/小类示例展开 -->
+  <div class="section">
+    <div class="sec-title">四、分类体系展开示例（以CJ采掘类为例）</div>
+
+    <table>
+      <thead>
+        <tr><th>大类</th><th>中类码</th><th>中类名称</th><th>小类码</th><th>小类名称</th><th>示例物资</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td rowspan="12"><span class="tag tag-blue">CJ 采掘类</span></td>
+          <td rowspan="3">01</td>
+          <td rowspan="3">截割类</td>
+          <td>01</td><td>采煤机截齿</td><td>镐型截齿、扁型截齿</td>
+        </tr>
+        <tr><td>02</td><td>掘进机截齿</td><td>综掘机截齿、岩石截齿</td></tr>
+        <tr><td>03</td><td>滚筒附件</td><td>截齿座、螺栓、齿环</td></tr>
+
+        <tr>
+          <td rowspan="3">02</td>
+          <td rowspan="3">钻探类</td>
+          <td>01</td><td>煤岩钻头</td><td>一字钻头、十字钻头</td>
+        </tr>
+        <tr><td>02</td><td>钻杆</td><td>中空钻杆（各规格）</td></tr>
+        <tr><td>03</td><td>取芯工具</td><td>取芯管、岩芯管</td></tr>
+
+        <tr>
+          <td rowspan="3">03</td>
+          <td rowspan="3">刮板输送类</td>
+          <td>01</td><td>圆环链</td><td>34×126圆环链、42×146圆环链</td>
+        </tr>
+        <tr><td>02</td><td>刮板</td><td>中部槽刮板、联接刮板</td></tr>
+        <tr><td>03</td><td>链轮</td><td>主链轮、过渡链轮</td></tr>
+
+        <tr>
+          <td rowspan="3">04</td>
+          <td rowspan="3">皮带输送类</td>
+          <td>01</td><td>输送皮带</td><td>ST/S型钢绳芯皮带、织物芯皮带</td>
+        </tr>
+        <tr><td>02</td><td>皮带扣</td><td>机械皮带扣（各型号）</td></tr>
+        <tr><td>03</td><td>托辊</td><td>槽形托辊、平形托辊、缓冲托辊</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:#718096;margin-top:8px;">* 完整体系包含CJ下8个中类、约40+个小类，其他大类同理展开，此处仅展示采掘类前4个中类</p>
+  </div>
+
+  <!-- 规格特征码 -->
+  <div class="section">
+    <div class="sec-title">五、规格特征码设计</div>
+    <p style="font-size:13px;color:#4a5568;margin-bottom:16px;">同一品种物资因规格、型号、材质不同而有不同编码，规格特征码是区分关键。</p>
+
+    <div class="two-col">
+      <div>
+        <table>
+          <thead><tr><th>规格特征码</th><th>含义</th><th>适用场景</th></tr></thead>
+          <tbody>
+            <tr><td><code>A1~A9</code></td><td>型号序列A，规格1~9</td><td>截齿、钻头等</td></tr>
+            <tr><td><code>B1~B9</code></td><td>型号序列B，规格1~9</td><td>不同厂家同类型</td></tr>
+            <tr><td><code>S1~S9</code></td><td>小规格（Small）</td><td>螺栓、垫片等</td></tr>
+            <tr><td><code>M1~M9</code></td><td>中规格（Medium）</td><td>轴承、链轮等</td></tr>
+            <tr><td><code>L1~L9</code></td><td>大规格（Large）</td><td>皮带、圆环链</td></tr>
+            <tr><td><code>XL</code></td><td>超大规格</td><td>重型备件</td></tr>
+            <tr><td><code>00</code></td><td>规格不区分</td><td>通用型物资</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="note-blue">
+          <strong>示例说明：</strong><br><br>
+          <code>ZH·01·02·0015·M2</code><br>
+          → 支护类 / 锚杆类 / 树脂锚杆 / 第15号 / 中号规格2<br>
+          → 树脂锚杆 φ22×2400mm（M2规格）<br><br>
+          <code>ZH·01·02·0015·L1</code><br>
+          → 同品种，φ22×2800mm（L1规格）<br><br>
+          <strong>注：规格不同 = 不同编码，库存分开管理</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编码示例卡片 -->
+  <div class="section">
+    <div class="sec-title">六、完整编码示例</div>
+    <div class="example-grid">
+
+      <div class="ex-card">
+        <div class="ex-code" style="color:#2b6cb0;">CJ·01·01·0008·A2</div>
+        <div class="ex-name">镐型截齿（采煤机用）</div>
+        <div class="ex-breakdown">
+          <span class="ex-seg tag-blue">CJ 采掘</span>
+          <span class="ex-seg tag-blue">01 截割</span>
+          <span class="ex-seg tag-blue">01 采煤机截齿</span>
+          <span class="ex-seg tag-purple">0008 序号</span>
+          <span class="ex-seg tag-red">A2 规格</span>
+        </div>
+        <div class="ex-attr">齿体直径：38mm / 适用：MG500 / 单位：个</div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-code" style="color:#276749;">ZH·02·01·0031·M1</div>
+        <div class="ex-name">矿用工字钢（11#）</div>
+        <div class="ex-breakdown">
+          <span class="ex-seg tag-green">ZH 支护</span>
+          <span class="ex-seg tag-green">02 型钢</span>
+          <span class="ex-seg tag-green">01 工字钢</span>
+          <span class="ex-seg tag-purple">0031 序号</span>
+          <span class="ex-seg tag-orange">M1 规格</span>
+        </div>
+        <div class="ex-attr">规格：11# × 6m / 材质：Q345 / 单位：根</div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-code" style="color:#6b46c1;">JD·03·02·0124·B3</div>
+        <div class="ex-name">矿用橡套电缆</div>
+        <div class="ex-breakdown">
+          <span class="ex-seg tag-purple">JD 机电</span>
+          <span class="ex-seg tag-purple">03 电缆</span>
+          <span class="ex-seg tag-purple">02 橡套电缆</span>
+          <span class="ex-seg tag-purple">0124 序号</span>
+          <span class="ex-seg tag-blue">B3 规格</span>
+        </div>
+        <div class="ex-attr">规格：MVV 3×35+1×16 / 电压：660V / 单位：米</div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-code" style="color:#c53030;">BB·01·01·0002·00</div>
+        <div class="ex-name">煤矿许用乳化炸药</div>
+        <div class="ex-breakdown">
+          <span class="ex-seg tag-red">BB 爆破</span>
+          <span class="ex-seg tag-red">01 炸药</span>
+          <span class="ex-seg tag-red">01 乳化炸药</span>
+          <span class="ex-seg tag-purple">0002 序号</span>
+          <span class="ex-seg tag-gray">00 通用</span>
+        </div>
+        <div class="ex-attr">规格：φ35×400mm / 重量：300g/卷 / 单位：kg ⚠️专项管控</div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-code" style="color:#234e52;">LB·01·01·0001·S3</div>
+        <div class="ex-name">矿用安全帽</div>
+        <div class="ex-breakdown">
+          <span class="ex-seg tag-teal">LB 劳保</span>
+          <span class="ex-seg tag-teal">01 头部防护</span>
+          <span class="ex-seg tag-teal">01 安全帽</span>
+          <span class="ex-seg tag-purple">0001 序号</span>
+          <span class="ex-seg tag-gray">S3 规格</span>
+        </div>
+        <div class="ex-attr">颜色：黄色 / 标准：GB2811 / 单位：顶</div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-code" style="color:#553c9a;">BP·02·03·0056·A1</div>
+        <div class="ex-name">综采液压支架密封件</div>
+        <div class="ex-breakdown">
+          <span class="ex-seg tag-purple">BP 备件</span>
+          <span class="ex-seg tag-purple">02 综采设备</span>
+          <span class="ex-seg tag-purple">03 液压支架</span>
+          <span class="ex-seg tag-purple">0056 序号</span>
+          <span class="ex-seg tag-blue">A1 规格</span>
+        </div>
+        <div class="ex-attr">适用型号：ZY6800 / 件号：MZ-Y210 / 单位：套</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 编码管理规范 -->
+  <div class="section">
+    <div class="sec-title">七、编码申请与维护规范</div>
+
+    <div class="sec-sub">7.1 新增物料编码申请流程</div>
+    <div class="proc-row">
+      <div class="proc-node" style="background:#ebf8ff;color:#2b6cb0;border:1.5px solid #bee3f8;">业务部门<br>填写申请表</div>
+      <div class="proc-arr">→</div>
+      <div class="proc-node" style="background:#f0fff4;color:#276749;border:1.5px solid #9ae6b4;">供应科<br>初审分类</div>
+      <div class="proc-arr">→</div>
+      <div class="proc-node" style="background:#fffaf0;color:#c05621;border:1.5px solid #fbd38d;">物资公司<br>主数据管理员</div>
+      <div class="proc-arr">→</div>
+      <div class="proc-node" style="background:#faf5ff;color:#6b46c1;border:1.5px solid #d6bcfa;">分配编码<br>录入系统</div>
+      <div class="proc-arr">→</div>
+      <div class="proc-node" style="background:#1a1a2e;color:white;">通知申请<br>部门启用</div>
+    </div>
+
+    <div class="two-col" style="margin-top:18px;">
+      <div>
+        <div class="sec-sub">7.2 禁止行为</div>
+        <ul class="rule-list">
+          <li class="warn"><strong>禁止</strong>各矿、各区队自行创建编码</li>
+          <li class="warn"><strong>禁止</strong>修改已启用编码的任何位段</li>
+          <li class="warn"><strong>禁止</strong>将同一物料以不同名称重复申请</li>
+          <li class="warn"><strong>禁止</strong>停用编码后重新分配给新物料</li>
+        </ul>
+      </div>
+      <div>
+        <div class="sec-sub">7.3 主数据字段说明</div>
+        <table>
+          <thead><tr><th>字段</th><th>是否必填</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>物料编码</td><td>✅ 必填</td><td>系统自动生成</td></tr>
+            <tr><td>物料名称</td><td>✅ 必填</td><td>标准规范名称</td></tr>
+            <tr><td>规格型号</td><td>✅ 必填</td><td>详细技术参数</td></tr>
+            <tr><td>计量单位</td><td>✅ 必填</td><td>个/米/吨/套</td></tr>
+            <tr><td>安全库存量</td><td>✅ 必填</td><td>触发预警阈值</td></tr>
+            <tr><td>供应商</td><td>✅ 必填</td><td>关联供应商档案</td></tr>
+            <tr><td>参考单价</td><td>○ 选填</td><td>历史含税均价</td></tr>
+            <tr><td>存储要求</td><td>○ 选填</td><td>温湿度/防爆等</td></tr>
+            <tr><td>是否危险品</td><td>✅ 必填</td><td>BB类必须标Y</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 与系统对接 -->
+  <div class="section" style="background:linear-gradient(135deg,#1a1a2e,#0f3460);color:white;">
+    <div class="sec-title" style="color:#e94560;border-color:#e94560;">八、物料编码与各模块的关系</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px;">
+      <div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:14px;">
+        <div style="font-size:13px;font-weight:700;color:#90cdf4;margin-bottom:8px;">📋 采购计划</div>
+        <div style="font-size:12px;color:#a0aec0;">申报时必须填入物料编码，杜绝用文字描述带来的歧义；系统自动带出物料名称、单位、参考单价</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:14px;">
+        <div style="font-size:13px;font-weight:700;color:#9ae6b4;margin-bottom:8px;">📦 库存管理</div>
+        <div style="font-size:12px;color:#a0aec0;">以物料编码为唯一键管理库存，支持条码/二维码扫描入出库，编码 = 物料身份证</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:14px;">
+        <div style="font-size:13px;font-weight:700;color:#fbd38d;margin-bottom:8px;">💰 财务管理</div>
+        <div style="font-size:12px;color:#a0aec0;">成本核算按物料编码归集，可精确统计各矿、各区队物资消耗结构</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:14px;">
+        <div style="font-size:13px;font-weight:700;color:#d6bcfa;margin-bottom:8px;">🏭 供应商管理</div>
+        <div style="font-size:12px;color:#a0aec0;">供应商对应其可供物料编码清单，采购时自动匹配合格供应商</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:14px;">
+        <div style="font-size:13px;font-weight:700;color:#fc8181;margin-bottom:8px;">📊 数据分析</div>
+        <div style="font-size:12px;color:#a0aec0;">按编码统计消耗趋势、价格波动、库存周转率，支撑决策</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:14px;">
+        <div style="font-size:13px;font-weight:700;color:#81e6d9;margin-bottom:8px;">🔧 检修计划</div>
+        <div style="font-size:12px;color:#a0aec0;">检修工单关联备件编码，系统自动检查库存是否充足，不足则触发采购</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;padding:14px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:13px;color:#a0aec0;line-height:1.8;">
+      ⬆️ <strong style="color:white;">下一步建议：</strong>在物料编码体系确定后，进入各模块功能清单设计，或直接做UI原型（库存看板、编码查询界面、出入库单）
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阜矿集团物资管理系统 — 设计方案</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+  
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white; padding: 40px;
+    text-align: center;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: 2px; }
+  .header p { margin-top: 10px; color: #a0aec0; font-size: 14px; }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+
+  .section { background: white; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .section-title {
+    font-size: 20px; font-weight: 700; color: #0f3460;
+    border-left: 4px solid #e94560; padding-left: 12px;
+    margin-bottom: 24px;
+  }
+  .section-subtitle { font-size: 15px; font-weight: 600; color: #2d3748; margin: 20px 0 12px; }
+
+  /* 架构图 */
+  .arch-layer {
+    display: flex; align-items: center; margin-bottom: 8px;
+  }
+  .arch-label {
+    width: 90px; flex-shrink: 0;
+    font-size: 12px; font-weight: 600; color: #718096;
+    text-align: right; padding-right: 12px;
+  }
+  .arch-boxes { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+  .arch-box {
+    padding: 10px 16px; border-radius: 8px;
+    font-size: 13px; font-weight: 600; text-align: center;
+    min-width: 110px; flex: 1;
+  }
+  .layer-user { background: #ebf8ff; color: #2b6cb0; border: 1.5px solid #bee3f8; }
+  .layer-front { background: #f0fff4; color: #276749; border: 1.5px solid #9ae6b4; }
+  .layer-biz { background: #fff5f5; color: #c53030; border: 1.5px solid #fed7d7; }
+  .layer-data { background: #faf5ff; color: #6b46c1; border: 1.5px solid #d6bcfa; }
+  .layer-hw { background: #fffaf0; color: #c05621; border: 1.5px solid #fbd38d; }
+
+  .arch-arrow { text-align: center; color: #cbd5e0; font-size: 20px; margin: 2px 0 2px 102px; }
+
+  /* 模块关系图 */
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    position: relative;
+  }
+  .module-card {
+    border-radius: 10px; padding: 16px;
+    text-align: center; position: relative;
+  }
+  .module-card.core {
+    grid-column: 2; grid-row: 2;
+    background: linear-gradient(135deg, #0f3460, #e94560);
+    color: white;
+  }
+  .module-card .mod-icon { font-size: 24px; margin-bottom: 6px; }
+  .module-card .mod-name { font-size: 14px; font-weight: 700; }
+  .module-card .mod-desc { font-size: 11px; margin-top: 4px; opacity: 0.8; }
+
+  .mod-blue { background: #ebf8ff; color: #2b6cb0; border: 1.5px solid #bee3f8; }
+  .mod-green { background: #f0fff4; color: #276749; border: 1.5px solid #9ae6b4; }
+  .mod-orange { background: #fffaf0; color: #c05621; border: 1.5px solid #fbd38d; }
+  .mod-purple { background: #faf5ff; color: #6b46c1; border: 1.5px solid #d6bcfa; }
+  .mod-teal { background: #e6fffa; color: #234e52; border: 1.5px solid #81e6d9; }
+  .mod-pink { background: #fff5f5; color: #c53030; border: 1.5px solid #fed7d7; }
+  .mod-gray { background: #f7fafc; color: #4a5568; border: 1.5px solid #e2e8f0; }
+
+  /* 流程图 */
+  .flow-container { overflow-x: auto; }
+  .flow-track {
+    display: flex; align-items: flex-start;
+    min-width: 900px; padding: 10px 0;
+  }
+  .flow-step {
+    display: flex; flex-direction: column; align-items: center;
+    min-width: 120px;
+  }
+  .flow-node {
+    width: 90px; padding: 10px;
+    border-radius: 8px; text-align: center;
+    font-size: 12px; font-weight: 600;
+    position: relative;
+  }
+  .flow-role {
+    font-size: 10px; color: #718096; margin-top: 6px; text-align: center;
+  }
+  .flow-arrow {
+    display: flex; align-items: center;
+    padding-top: 20px; color: #cbd5e0; font-size: 22px;
+    flex-shrink: 0; width: 30px; justify-content: center;
+  }
+  .fn-blue { background: #ebf8ff; color: #2b6cb0; border: 2px solid #90cdf4; }
+  .fn-green { background: #f0fff4; color: #276749; border: 2px solid #9ae6b4; }
+  .fn-orange { background: #fffaf0; color: #c05621; border: 2px solid #f6ad55; }
+  .fn-purple { background: #faf5ff; color: #6b46c1; border: 2px solid #d6bcfa; }
+  .fn-red { background: #fff5f5; color: #c53030; border: 2px solid #fc8181; }
+  .fn-teal { background: #e6fffa; color: #234e52; border: 2px solid #81e6d9; }
+  .fn-dark { background: #1a1a2e; color: white; border: 2px solid #0f3460; }
+
+  /* 分支流程 */
+  .flow-branch { margin-top: 20px; }
+  .branch-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+  .branch-tag {
+    font-size: 11px; padding: 3px 10px; border-radius: 20px;
+    font-weight: 600; min-width: 50px; text-align: center;
+  }
+  .tag-pass { background: #c6f6d5; color: #276749; }
+  .tag-fail { background: #fed7d7; color: #c53030; }
+  .branch-text { font-size: 13px; color: #4a5568; }
+
+  /* 角色权限 */
+  .role-flow {
+    display: flex; align-items: center; gap: 0;
+    overflow-x: auto; padding: 10px 0;
+  }
+  .role-node {
+    display: flex; flex-direction: column; align-items: center;
+    flex-shrink: 0;
+  }
+  .role-box {
+    padding: 12px 16px; border-radius: 8px;
+    text-align: center; min-width: 100px;
+  }
+  .role-title { font-size: 13px; font-weight: 700; }
+  .role-sub { font-size: 11px; margin-top: 3px; opacity: 0.8; }
+  .role-arrow { padding: 0 8px; color: #a0aec0; font-size: 22px; flex-shrink: 0; }
+
+  /* 功能点 */
+  .feat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .feat-card { border-radius: 8px; padding: 16px; border: 1.5px solid #e2e8f0; }
+  .feat-head { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .feat-list { list-style: none; }
+  .feat-list li { font-size: 12px; color: #4a5568; padding: 3px 0; border-bottom: 1px dashed #f0f0f0; }
+  .feat-list li:last-child { border: none; }
+  .feat-list li::before { content: "✓ "; color: #48bb78; font-weight: 700; }
+
+  .badge {
+    font-size: 10px; padding: 2px 8px; border-radius: 20px;
+    font-weight: 600; background: #e94560; color: white; margin-left: 6px;
+  }
+
+  .note { background: #fffbf0; border-left: 4px solid #f6ad55; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-top: 16px; font-size: 13px; color: #744210; }
+
+  @media (max-width: 600px) {
+    .feat-grid { grid-template-columns: 1fr; }
+    .module-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>阜矿集团物资管理系统</h1>
+  <p>系统架构设计 · 核心业务流程设计 · 2025年12月</p>
+</div>
+
+<div class="container">
+
+  <!-- ① 系统架构 -->
+  <div class="section">
+    <div class="section-title">① 系统模块架构设计</div>
+
+    <div class="section-subtitle">1.1 技术分层架构</div>
+    <div style="margin-bottom: 24px;">
+      <div class="arch-layer">
+        <div class="arch-label">用户层</div>
+        <div class="arch-boxes">
+          <div class="arch-box layer-user">集团领导</div>
+          <div class="arch-box layer-user">物资公司管理层</div>
+          <div class="arch-box layer-user">供应科人员</div>
+          <div class="arch-box layer-user">矿级管理员</div>
+          <div class="arch-box layer-user">区队使用者</div>
+        </div>
+      </div>
+      <div class="arch-arrow">↕</div>
+      <div class="arch-layer">
+        <div class="arch-label">接入层</div>
+        <div class="arch-boxes">
+          <div class="arch-box layer-front">PC Web 端</div>
+          <div class="arch-box layer-front">手机 App / 小程序</div>
+          <div class="arch-box layer-front">PAD（审批专用）</div>
+        </div>
+      </div>
+      <div class="arch-arrow">↕</div>
+      <div class="arch-layer">
+        <div class="arch-label">业务层</div>
+        <div class="arch-boxes">
+          <div class="arch-box layer-biz">物资库存</div>
+          <div class="arch-box layer-biz">采购计划</div>
+          <div class="arch-box layer-biz">供应商管理</div>
+          <div class="arch-box layer-biz">合同管理</div>
+          <div class="arch-box layer-biz">检修计划</div>
+          <div class="arch-box layer-biz">设备租赁</div>
+          <div class="arch-box layer-biz">财务管理</div>
+        </div>
+      </div>
+      <div class="arch-arrow">↕</div>
+      <div class="arch-layer">
+        <div class="arch-label">支撑层</div>
+        <div class="arch-boxes">
+          <div class="arch-box layer-data">电子签章</div>
+          <div class="arch-box layer-data">工作流引擎</div>
+          <div class="arch-box layer-data">消息推送</div>
+          <div class="arch-box layer-data">数据分析报表</div>
+          <div class="arch-box layer-data">权限管理</div>
+        </div>
+      </div>
+      <div class="arch-arrow">↕</div>
+      <div class="arch-layer">
+        <div class="arch-label">基础设施</div>
+        <div class="arch-boxes">
+          <div class="arch-box layer-hw">私有化部署</div>
+          <div class="arch-box layer-hw">国产数据库（达梦/人大金仓）</div>
+          <div class="arch-box layer-hw">国产服务器</div>
+          <div class="arch-box layer-hw">信创合规</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-subtitle">1.2 七大模块关系图</div>
+    <div class="module-grid">
+      <!-- 第一行 -->
+      <div class="module-card mod-blue">
+        <div class="mod-icon">📋</div>
+        <div class="mod-name">采购计划管理</div>
+        <div class="mod-desc">需求申报 → 审批 → 下达</div>
+      </div>
+      <div class="module-card mod-green">
+        <div class="mod-icon">🏭</div>
+        <div class="mod-name">供应商管理</div>
+        <div class="mod-desc">入库审核 · 履约评价 · 黑名单</div>
+      </div>
+      <div class="module-card mod-orange">
+        <div class="mod-icon">📄</div>
+        <div class="mod-name">合同管理</div>
+        <div class="mod-desc">合同全生命周期 · 帐期提醒</div>
+      </div>
+      <!-- 第二行 -->
+      <div class="module-card mod-teal">
+        <div class="mod-icon">🔧</div>
+        <div class="mod-name">检修计划管理</div>
+        <div class="mod-desc">检修工单 · 物资需求联动</div>
+      </div>
+      <div class="module-card core">
+        <div class="mod-icon">📦</div>
+        <div class="mod-name">物资库存管理</div>
+        <div class="mod-desc">核心枢纽<br>入库·出库·盘点<br>全生命周期追踪</div>
+      </div>
+      <div class="module-card mod-purple">
+        <div class="mod-icon">🚜</div>
+        <div class="mod-name">设备租赁管理</div>
+        <div class="mod-desc">租赁合同 · 使用台账 · 费用核算</div>
+      </div>
+      <!-- 第三行 -->
+      <div class="module-card mod-pink">
+        <div class="mod-icon">💰</div>
+        <div class="mod-name">财务管理</div>
+        <div class="mod-desc">往来账 · 进度款 · 费用归集</div>
+      </div>
+      <div class="module-card mod-gray">
+        <div class="mod-icon" style="font-size:20px">📊</div>
+        <div class="mod-name">数据分析平台</div>
+        <div class="mod-desc">多维报表 · 预警 · 决策看板</div>
+      </div>
+      <div class="module-card mod-gray">
+        <div class="mod-icon" style="font-size:20px">🔐</div>
+        <div class="mod-name">权限 · 基础档案</div>
+        <div class="mod-desc">角色权限 · 物资分类 · 组织架构</div>
+      </div>
+    </div>
+
+    <div class="note">💡 库存管理是核心枢纽，所有模块最终都向库存产生影响；数据分析平台汇聚全模块数据，为集团领导提供决策支持。</div>
+
+    <div class="section-subtitle" style="margin-top: 24px;">1.3 用户角色与权限层级</div>
+    <div class="role-flow">
+      <div class="role-node">
+        <div class="role-box" style="background:#1a1a2e;color:white">
+          <div class="role-title">集团领导</div>
+          <div class="role-sub">数据看板 · 只读</div>
+        </div>
+      </div>
+      <div class="role-arrow">←←</div>
+      <div class="role-node">
+        <div class="role-box" style="background:#0f3460;color:white">
+          <div class="role-title">物资公司</div>
+          <div class="role-sub">最终审批 · 汇总</div>
+        </div>
+      </div>
+      <div class="role-arrow">←←</div>
+      <div class="role-node">
+        <div class="role-box" style="background:#e94560;color:white">
+          <div class="role-title">供应科</div>
+          <div class="role-sub">审核 · 采购执行</div>
+        </div>
+      </div>
+      <div class="role-arrow">←←</div>
+      <div class="role-node">
+        <div class="role-box mod-orange" style="border:2px solid #f6ad55">
+          <div class="role-title">矿级管理</div>
+          <div class="role-sub">矿内审批 · 汇总</div>
+        </div>
+      </div>
+      <div class="role-arrow">←←</div>
+      <div class="role-node">
+        <div class="role-box mod-green" style="border:2px solid #9ae6b4">
+          <div class="role-title">区队班组</div>
+          <div class="role-sub">申报 · 领用</div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:12px;color:#718096;margin-top:8px;">↑ 审批逐级向上，数据全链路向下穿透，实现"最后一公里"数字化</p>
+  </div>
+
+  <!-- ② 核心业务流程 -->
+  <div class="section">
+    <div class="section-title">② 核心业务流程设计</div>
+
+    <!-- 主流程 -->
+    <div class="section-subtitle">2.1 物资采购全流程（主线）</div>
+    <div class="flow-container">
+      <div class="flow-track">
+
+        <div class="flow-step">
+          <div class="flow-node fn-green">需求申报</div>
+          <div class="flow-role">区队班组</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-orange">矿级审核</div>
+          <div class="flow-role">矿长 / 副矿长</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-orange">供应科审批</div>
+          <div class="flow-role">供应科长</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-red">物资公司批准</div>
+          <div class="flow-role">物资公司管理层</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-purple">签订合同</div>
+          <div class="flow-role">合同管理模块</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-blue">入库验收</div>
+          <div class="flow-role">库管员</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-teal">库存更新</div>
+          <div class="flow-role">系统自动</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-dark">财务结算</div>
+          <div class="flow-role">财务人员</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="flow-branch">
+      <div class="branch-row">
+        <span class="branch-tag tag-fail">审批驳回</span>
+        <span class="branch-text">任意审批节点可驳回，系统推送通知至申报人，修改后重新提交流转</span>
+      </div>
+      <div class="branch-row">
+        <span class="branch-tag tag-pass">紧急采购</span>
+        <span class="branch-text">设"紧急通道"，压缩审批层级，但需事后补充说明并存档</span>
+      </div>
+    </div>
+
+    <!-- 出库领用流程 -->
+    <div class="section-subtitle" style="margin-top: 28px;">2.2 物资领用出库流程</div>
+    <div class="flow-container">
+      <div class="flow-track">
+
+        <div class="flow-step">
+          <div class="flow-node fn-green">领用申请</div>
+          <div class="flow-role">区队班组<br>手机端提交</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-orange">班组长审核</div>
+          <div class="flow-role">系统推送<br>手机端审批</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-blue">库管确认出库</div>
+          <div class="flow-role">库管员<br>扫码 / 确认</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-teal">库存自动扣减</div>
+          <div class="flow-role">系统实时更新</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-purple">台账记录</div>
+          <div class="flow-role">物资去向<br>全程可追溯</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-dark">费用归集</div>
+          <div class="flow-role">自动计入<br>成本中心</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 库存预警 -->
+    <div class="section-subtitle" style="margin-top: 28px;">2.3 库存预警触发机制</div>
+    <div class="flow-container">
+      <div class="flow-track">
+
+        <div class="flow-step">
+          <div class="flow-node fn-teal">库存监控<br>（实时）</div>
+          <div class="flow-role">系统自动</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-orange">触发预警<br>（低于安全库存）</div>
+          <div class="flow-role">系统计算</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-red">推送通知</div>
+          <div class="flow-role">供应科 + 库管<br>手机/PC 双端</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-blue">一键发起<br>采购申请</div>
+          <div class="flow-role">供应科</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-green">进入主线<br>采购流程</div>
+          <div class="flow-role">见 2.1</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 合同帐期 -->
+    <div class="section-subtitle" style="margin-top: 28px;">2.4 合同帐期提醒机制（解决现存痛点）</div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-head" style="color:#c05621">⏰ 提醒节点</div>
+        <ul class="feat-list">
+          <li>合同到期前 30 天 — 系统自动提醒</li>
+          <li>合同到期前 7 天 — 升级提醒至物资公司</li>
+          <li>付款到期前 15 天 — 推送财务人员</li>
+          <li>进度款节点达到 — 触发付款流程</li>
+        </ul>
+      </div>
+      <div class="feat-card">
+        <div class="feat-head" style="color:#276749">📋 合同全生命周期</div>
+        <ul class="feat-list">
+          <li>起草 → 内部审批 → 电子签章</li>
+          <li>执行跟踪（收货进度 vs 合同量）</li>
+          <li>结算 → 归档</li>
+          <li>供应商履约评分关联</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 盘点流程 -->
+    <div class="section-subtitle" style="margin-top: 28px;">2.5 周期盘点流程</div>
+    <div class="flow-container">
+      <div class="flow-track">
+
+        <div class="flow-step">
+          <div class="flow-node fn-blue">发起盘点任务</div>
+          <div class="flow-role">供应科 / 库管</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-green">实物盘点<br>（手机扫码）</div>
+          <div class="flow-role">库管员现场</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-orange">系统自动<br>盈亏对比</div>
+          <div class="flow-role">系统账面 vs 实盘</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-red">差异处理</div>
+          <div class="flow-role">调账 / 上报<br>原因说明</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-node fn-dark">盘点报告<br>自动生成</div>
+          <div class="flow-role">管理层查阅</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="note">
+      💡 <strong>关键设计原则：</strong>所有审批节点支持手机端操作 + 电子签章；流程超时自动催办；任何节点数据实时回写库存，消除"数据断层"；基层区队全面接入，解决"最后一公里"管理盲区。
+    </div>
+  </div>
+
+  <!-- 下一步 -->
+  <div class="section" style="background: linear-gradient(135deg, #1a1a2e, #0f3460); color: white;">
+    <div class="section-title" style="color: #e94560; border-color: #e94560;">下一步建议</div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 8px;">
+      <div style="background:rgba(255,255,255,0.08); border-radius: 8px; padding: 16px;">
+        <div style="font-size: 13px; font-weight: 700; color: #90cdf4; margin-bottom: 8px;">③ 功能清单细化</div>
+        <div style="font-size: 12px; color: #a0aec0;">各模块功能点逐一拆解，可直接用于招标文件编写</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08); border-radius: 8px; padding: 16px;">
+        <div style="font-size: 13px; font-weight: 700; color: #9ae6b4; margin-bottom: 8px;">④ UI 界面原型</div>
+        <div style="font-size: 12px; color: #a0aec0;">仪表盘、审批中心、库存看板的页面原型设计</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08); border-radius: 8px; padding: 16px;">
+        <div style="font-size: 13px; font-weight: 700; color: #fbd38d; margin-bottom: 8px;">⑤ 招标文件支撑</div>
+        <div style="font-size: 12px; color: #a0aec0;">需求规格说明书、技术要求清单、评分标准建议</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
