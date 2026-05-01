@@ -68,14 +68,19 @@ def render_mermaid_to_image(mermaid_code: str, output_path: str, format: str = '
         if os.path.exists(npm_global_bin):
             mmdc_cmd = npm_global_bin
         
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as f:
+            json.dump({"args": ["--no-sandbox", "--disable-setuid-sandbox"]}, f)
+            temp_puppeteer_config = f.name
+
         result = subprocess.run(
-            [mmdc_cmd, '-i', temp_mmd, '-o', output_path, '-b', 'white', '-w', '3200', '-s', '3'],
+            [mmdc_cmd, '-i', temp_mmd, '-o', output_path, '-b', 'white', '-w', '3200', '-s', '3', '-p', temp_puppeteer_config],
             capture_output=True,
             text=True,
             timeout=60
         )
         
         os.unlink(temp_mmd)
+        os.unlink(temp_puppeteer_config)
         
         if result.returncode == 0 and os.path.exists(output_path):
             print(f"  ✓ 使用本地 mmdc 渲染成功")
