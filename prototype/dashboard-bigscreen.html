@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>物资综合看板 — 大屏（原型）</title>
+  <meta name="viewport" content="width=1920">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="bigscreen">
+
+  <div class="bs-page">
+    <!-- Header -->
+    <div class="bs-header">
+      <div>
+        <div class="bs-title">辽宁能源 · 阜矿物资供应管理系统</div>
+        <div class="bs-sub">综合监控看板 · 阜新矿业集团 · 全口径数据 · <a href="index.html" style="color:#5eead4;">返回工作台</a></div>
+      </div>
+      <div style="margin-left:auto;text-align:right;">
+        <div class="bs-clock" id="bs-clock">00:00:00</div>
+        <div class="bs-date" id="bs-date">—</div>
+      </div>
+    </div>
+
+    <!-- 主体三列 -->
+    <div class="bs-grid">
+
+      <!-- 左列 -->
+      <div class="bs-col">
+        <!-- 库存分类 -->
+        <div class="bs-card">
+          <div class="bs-card-title">库存价值分布（按大类）</div>
+          <div class="bs-card-content">
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div class="bs-donut">
+                <div class="center">
+                  <div class="v">¥ 419 万</div>
+                  <div class="l">在库总价值</div>
+                </div>
+              </div>
+              <div class="bs-donut-legend">
+                <div><span class="swatch" style="background:#5eead4"></span> 电气设备 29.7%</div>
+                <div><span class="swatch" style="background:#1d4ed8"></span> 电缆 + 安全 42.2%</div>
+                <div><span class="swatch" style="background:#475569"></span> 其他 28.1%</div>
+                <div style="margin-top:8px;font-size:10px;color:rgba(207,225,255,0.5);">截止 5/2 24:00</div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:rgba(207,225,255,0.55);margin-top:10px;line-height:1.7;">
+              · 电缆电线占比 23.5%（高位）<br>
+              · 火工品 1.1%（受专管控制）<br>
+              · 8 大类共 116 SKU
+            </div>
+          </div>
+        </div>
+
+        <!-- 厂矿订单分布 -->
+        <div class="bs-card">
+          <div class="bs-card-title">本月在途订单 · 按厂矿</div>
+          <div class="bs-card-content">
+            <div class="bs-bars">
+              <div class="bar"><div class="col" style="height:75%;"></div><div class="val">¥ 142 万</div><div class="lbl">艾友</div></div>
+              <div class="bar"><div class="col" style="height:55%;"></div><div class="val">¥ 96 万</div><div class="lbl">五龙</div></div>
+              <div class="bar"><div class="col" style="height:88%;"></div><div class="val">¥ 156 万</div><div class="lbl">东梁</div></div>
+              <div class="bar"><div class="col" style="height:30%;"></div><div class="val">¥ 36 万</div><div class="lbl">新邱</div></div>
+              <div class="bar"><div class="col" style="height:18%;"></div><div class="val">¥ 24 万</div><div class="lbl">本部</div></div>
+            </div>
+            <div style="font-size:11px;color:rgba(207,225,255,0.55);margin-top:6px;text-align:center;">
+              合计 <span style="color:#5eead4;font-weight:600;">¥ 454 万</span>，未到货 24 单
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中列 -->
+      <div class="bs-col">
+        <!-- 中央 KPI -->
+        <div class="bs-card" style="flex: 0 0 auto;">
+          <div class="bs-card-title">综合指标</div>
+          <div class="bs-card-content">
+            <div class="bs-mid">
+              <div class="mega">98.2%</div>
+              <div class="mega-lbl">NC 接口推送成功率（今日）</div>
+              <div class="mega-sub">335 / 341 任务 · <span style="color:#fbbf24;">3 单待重推</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bs-card" style="flex: 0 0 auto;">
+          <div class="bs-card-title">关键 KPI（今日 / 本月）</div>
+          <div class="bs-card-content">
+            <div class="bs-hero">
+              <div class="bs-hero-item"><div class="lbl">本月需求计划</div><div class="val">126</div><div class="sub">较上月 ↑ 12%</div></div>
+              <div class="bs-hero-item"><div class="lbl">本月在途订单</div><div class="val">¥ 454 万</div><div class="sub">未到货 24 单</div></div>
+              <div class="bs-hero-item"><div class="lbl">本月资金计划</div><div class="val">¥ 286 万</div><div class="sub">已支付占 17%</div></div>
+              <div class="bs-hero-item"><div class="lbl">在租设备 · 月费</div><div class="val">¥ 19.3 万</div><div class="sub">3 台在用 · 1 台待退租</div></div>
+              <div class="bs-hero-item"><div class="lbl">库存周转</div><div class="val">2.4 次</div><div class="sub">较上月 ↑ 0.3</div></div>
+              <div class="bs-hero-item"><div class="lbl">业务预警</div><div class="val warn">12</div><div class="sub">含 2 项过期 · 5 项付款临期</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 业务流转量 -->
+        <div class="bs-card">
+          <div class="bs-card-title">本月业务单据流转（条）</div>
+          <div class="bs-card-content">
+            <div class="bs-bars" style="height:160px;">
+              <div class="bar"><div class="col" style="height:96%;"></div><div class="val">126</div><div class="lbl">需求</div></div>
+              <div class="bar"><div class="col" style="height:65%;"></div><div class="val">82</div><div class="lbl">订单</div></div>
+              <div class="bar"><div class="col" style="height:78%;"></div><div class="val">98</div><div class="lbl">到货</div></div>
+              <div class="bar"><div class="col" style="height:72%;"></div><div class="val">92</div><div class="lbl">入库</div></div>
+              <div class="bar"><div class="col" style="height:90%;"></div><div class="val">114</div><div class="lbl">领料</div></div>
+              <div class="bar"><div class="col" style="height:42%;"></div><div class="val">54</div><div class="lbl">调拨</div></div>
+              <div class="bar"><div class="col" style="height:18%;"></div><div class="val">22</div><div class="lbl">退料</div></div>
+              <div class="bar"><div class="col" style="height:8%;"></div><div class="val">11</div><div class="lbl">差异</div></div>
+            </div>
+            <div style="font-size:11px;color:rgba(207,225,255,0.55);margin-top:6px;text-align:center;">
+              主流程闭环健康 · 退料 / 差异比例 4.4%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右列 -->
+      <div class="bs-col">
+        <!-- 实时事件 -->
+        <div class="bs-card">
+          <div class="bs-card-title"><span class="bs-pulse"></span>实时事件 · 系统流</div>
+          <div class="bs-card-content">
+            <div class="bs-list" id="bs-events"></div>
+          </div>
+        </div>
+
+        <!-- 高敏感关注 -->
+        <div class="bs-card">
+          <div class="bs-card-title">高敏感与重大关注</div>
+          <div class="bs-card-content">
+            <table class="bs-table">
+              <thead>
+                <tr><th>类别</th><th>对象</th><th>状态</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>火工品</td><td>乳化炸药 B202602-009</td><td><span class="bs-tag danger">已过期</span></td></tr>
+                <tr><td>付款</td><td>HT-2026-0042 节点 2</td><td><span class="bs-tag warn">提前付款</span></td></tr>
+                <tr><td>反结申请</td><td>2026-04 月结</td><td><span class="bs-tag">未发起</span></td></tr>
+                <tr><td>NC 接口</td><td>NC-BIZ-005</td><td><span class="bs-tag danger">3 失败</span></td></tr>
+                <tr><td>设备退租</td><td>ZL-2026-0214</td><td><span class="bs-tag warn">待结算</span></td></tr>
+                <tr><td>紧急采购</td><td>XQ-2026-0423</td><td><span class="bs-tag warn">审中</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="bs-footer">
+      <div>原型演示 · 非真实数据 · 适合 1920×1080 投屏 · 暗色主题</div>
+      <div>对齐文档 V1.0（详设 01–11） · SupplyCore 原型 v0.4</div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script>
+    /* 时钟 */
+    function tick() {
+      var d = new Date();
+      var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+      document.getElementById('bs-clock').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+      document.getElementById('bs-date').textContent =
+        d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+        ' · 星期' + ['日','一','二','三','四','五','六'][d.getDay()];
+    }
+    tick(); setInterval(tick, 1000);
+
+    /* 实时事件 */
+    document.getElementById('bs-events').innerHTML = SC.data.bigScreenAlerts.map(function (e) {
+      return '<div class="row ' + e.level + '"><div class="t">' + e.time + '</div><div class="text">' + e.text + '</div></div>';
+    }).join('');
+  </script>
+</body>
+</html>

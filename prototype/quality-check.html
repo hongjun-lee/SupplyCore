@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>质检 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <!-- 流转条 -->
+        <div class="card">
+          <div class="flow-strip">
+            <div class="node done"><span class="step-num">1</span> 到货登记 (S-03)</div>
+            <div class="node done"><span class="step-num">2</span> 送检申请 (S-04)</div>
+            <div class="node current"><span class="step-num">3</span> 检验执行</div>
+            <div class="node"><span class="step-num">4</span> 判定与处置</div>
+            <div class="node"><span class="step-num">5</span> 入库 / 退货</div>
+            <div class="node"><span class="step-num">6</span> 检验记录归档</div>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi"><div class="label">今日待检</div><div class="value">3</div><div class="trend">含 1 项加急</div></div>
+          <div class="kpi"><div class="label">检验中</div><div class="value">1</div><div class="trend">矿用电缆 抽样 2/12</div></div>
+          <div class="kpi"><div class="label">本月不合格率</div><div class="value" style="color:var(--amber);">3.2%</div><div class="trend down">较上月 ↑ 1.1%</div></div>
+          <div class="kpi"><div class="label">本月退货件数</div><div class="value" style="color:var(--red);">2</div><div class="trend">外壳变形 / 整机不合格</div></div>
+        </div>
+
+        <!-- 列表 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="title">质检任务列表</div>
+            <div class="actions">
+              <button class="btn">导出</button>
+              <button class="btn">检验标准库</button>
+              <button class="btn btn-primary">+ 登记送检</button>
+            </div>
+          </div>
+          <table class="data">
+            <thead>
+              <tr>
+                <th>质检单号</th>
+                <th>关联到货单</th>
+                <th>物料</th>
+                <th>供应商</th>
+                <th>检验方式</th>
+                <th class="num">总数 / 抽样</th>
+                <th>状态<br><span class="muted" style="font-size:11px;font-weight:400;">quality_state</span></th>
+                <th>质检员</th>
+                <th>检验时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="zj-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- 质检详情演示 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="title">质检详情 — <span id="d-code"></span></div>
+            <div class="actions">
+              <span id="d-state-badge"></span>
+              <button class="btn">打印检验报告</button>
+              <button class="btn btn-danger">判定不合格</button>
+              <button class="btn btn-primary">判定合格 / 部分合格</button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="kv mb-12">
+              <div class="k">关联到货单</div><div class="v code" id="d-goods"></div>
+              <div class="k">关联订单</div><div class="v code" id="d-po"></div>
+              <div class="k">物料</div><div class="v" id="d-mname"></div>
+              <div class="k">规格</div><div class="v" id="d-spec"></div>
+              <div class="k">数量 / 检验方式</div><div class="v" id="d-qty"></div>
+              <div class="k">执行标准</div><div class="v" id="d-standard"></div>
+              <div class="k">质检员</div><div class="v" id="d-inspector"></div>
+              <div class="k">送检人 / 时间</div><div class="v" id="d-submitter"></div>
+              <div class="k">检验时间</div><div class="v" id="d-checkedat"></div>
+            </div>
+
+            <div class="text-2 mb-12" style="padding:8px 12px;background:#fafbfd;border-left:3px solid var(--brand);border-radius:0 4px 4px 0;">
+              <strong>检验摘要：</strong><span id="d-summary"></span>
+            </div>
+          </div>
+
+          <div style="padding:0 16px 16px;">
+            <div class="text-2 mb-8" style="font-weight:500;color:var(--text);">检验项目</div>
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>项目编码</th>
+                  <th>检验项目</th>
+                  <th>检验方法</th>
+                  <th>判定标准</th>
+                  <th>实测结果</th>
+                  <th>判定</th>
+                </tr>
+              </thead>
+              <tbody id="items-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- timeline -->
+          <div class="card-body" style="border-top:1px solid var(--border);">
+            <div class="cols-2">
+              <div>
+                <div class="text-2 mb-8" style="font-weight:500;color:var(--text);">检验进度</div>
+                <div class="timeline" id="d-timeline"></div>
+              </div>
+              <div>
+                <div class="text-2 mb-8" style="font-weight:500;color:var(--text);">附件</div>
+                <table class="data">
+                  <tbody>
+                    <tr><td>📎</td><td>检验报告_ZJ-2026-0508.pdf</td><td class="muted">256 KB</td><td><a>下载</a></td></tr>
+                    <tr><td>📎</td><td>外壳变形件照片_3 张.zip</td><td class="muted">1.8 MB</td><td><a>下载</a></td></tr>
+                    <tr><td>📎</td><td>厂家防爆合格证扫描件.pdf</td><td class="muted">512 KB</td><td><a>下载</a></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+            <span class="badge blue dot">规则</span>
+            <div class="text-2">
+              <strong>送检 / 抽检 / 全检 / 免检 由物料分类决定：</strong>火工品、化工品、安全监测设备类目默认送检；通用物资按抽检比例；劳保等小额免检。检验记录与到货单 / 入库单串联，不合格件不得进入库存台账 (S-13)。详见《06》第 2 章。
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'quality-check',
+      crumbs: ['库存实物流转', '质检'],
+      title: '质检',
+      desc: '对齐《06-库存实物流转详细设计 V1.0》— S-04 质检任务 + 检验项目 + 判定与处置',
+      actions: [{ label: '检验标准库' }, { label: '+ 登记送检', primary: true }],
+    });
+
+    /* 列表 */
+    document.getElementById('zj-tbody').innerHTML = SC.data.qualityChecks.map(function (q) {
+      return '<tr>' +
+        '<td class="code">' + q.code + '</td>' +
+        '<td class="code muted">' + q.goods + '</td>' +
+        '<td>' + q.mname + '<div class="muted code" style="font-size:11px;">' + q.mcode + '</div></td>' +
+        '<td>' + q.supplier + '</td>' +
+        '<td><span class="badge ' + (q.kind === '送检' ? 'amber' : q.kind === '抽检' ? 'blue' : q.kind === '全检' ? 'red' : 'gray') + '">' + q.kind + '</span></td>' +
+        '<td class="num">' + SC.fmtNum(q.qty) + ' / ' + q.sampleSize + '</td>' +
+        '<td>' + SC.badge(q.state, q.color, true) + '</td>' +
+        '<td>' + q.inspector + '</td>' +
+        '<td class="muted">' + q.checkedAt + '</td>' +
+        '<td class="actions"><a>详情</a>' + (q.state === '待检验' || q.state === '检验中' ? '<a>登记结果</a>' : '') + '</td>' +
+      '</tr>';
+    }).join('');
+
+    /* 详情 */
+    var d = SC.data.qualityCheckDetail;
+    document.getElementById('d-code').textContent = d.code;
+    document.getElementById('d-state-badge').innerHTML = SC.badge(d.state, d.stateColor, true);
+    document.getElementById('d-goods').textContent = d.goods;
+    document.getElementById('d-po').textContent = d.po;
+    document.getElementById('d-mname').textContent = d.mname + '（' + d.mcode + '）';
+    document.getElementById('d-spec').textContent = d.spec;
+    document.getElementById('d-qty').textContent = d.qty + ' 件 · ' + d.kind + '（抽样 ' + d.qty + ' 件）';
+    document.getElementById('d-standard').textContent = d.standard;
+    document.getElementById('d-inspector').innerHTML = d.inspector + ' <span class="muted">' + d.inspectorOrg + '</span>';
+    document.getElementById('d-submitter').innerHTML = d.submitter + ' <span class="muted">' + d.arriveAt + ' 到货</span>';
+    document.getElementById('d-checkedat').textContent = d.checkedAt;
+    document.getElementById('d-summary').textContent = d.summary;
+
+    document.getElementById('items-tbody').innerHTML = d.items.map(function (it) {
+      return '<tr>' +
+        '<td class="code">' + it.code + '</td>' +
+        '<td>' + it.name + '</td>' +
+        '<td class="muted">' + it.method + '</td>' +
+        '<td class="muted">' + it.spec + '</td>' +
+        '<td>' + it.actual + '</td>' +
+        '<td>' + SC.badge(it.verdict, it.color, true) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('d-timeline').innerHTML = d.timeline.map(function (t) {
+      var cls = t.state === 'done' ? 'done' : t.state === 'current' ? 'current' : '';
+      var comment = t.comment ? '<div class="comment">' + t.comment + '</div>' : '';
+      return '<div class="step ' + cls + '">' +
+        '<div class="title">' + t.title + '</div>' +
+        '<div class="meta">' + t.who + ' · ' + t.time + '</div>' +
+        comment +
+      '</div>';
+    }).join('');
+  </script>
+</body>
+</html>

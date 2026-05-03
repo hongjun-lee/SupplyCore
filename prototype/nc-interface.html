@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>NC 接口监控 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="kpi-grid">
+          <div class="kpi"><div class="label">今日推送任务</div><div class="value">341</div><div class="trend">主数据 98 · 业务 239 · 对账 4</div></div>
+          <div class="kpi"><div class="label">成功 / 失败</div><div class="value">335 / 6</div><div class="trend up">成功率 98.2%</div></div>
+          <div class="kpi"><div class="label">待重推</div><div class="value" style="color:var(--amber)">3</div><div class="trend">采购订单推送 (NC-BIZ-005)</div></div>
+          <div class="kpi"><div class="label">已停用接口</div><div class="value">1</div><div class="trend">NC-BIZ-018 盘盈盘亏 (待 NC 落地)</div></div>
+        </div>
+
+        <div class="cols-2">
+          <!-- 接口清单 -->
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">接口清单（节选 8 / 共 29 项）</div>
+                <div class="actions">
+                  <button class="btn">查看 NC 映射告警</button>
+                  <button class="btn">接口开关 (F-13)</button>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>接口编码</th>
+                    <th>接口名称</th>
+                    <th>分类</th>
+                    <th>状态</th>
+                    <th class="num">今日</th>
+                    <th class="num">成功</th>
+                    <th class="num">失败</th>
+                    <th>最近推送</th>
+                  </tr>
+                </thead>
+                <tbody id="iface-tbody"></tbody>
+              </table>
+            </div>
+
+            <!-- 任务流水 -->
+            <div class="card">
+              <div class="card-header">
+                <div class="title">推送任务流水 (F-03)</div>
+                <div class="actions">
+                  <button class="btn">导出</button>
+                  <button class="btn btn-primary">批量重推 (F-07)</button>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>任务 ID</th>
+                    <th>接口</th>
+                    <th>关联业务</th>
+                    <th>状态<br><span class="muted" style="font-size:11px;font-weight:400;">interface_push_state</span></th>
+                    <th class="num">尝试</th>
+                    <th>最近时间</th>
+                    <th>错误信息</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="tasks-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 右侧：状态分层、运维提示 -->
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">状态分层与字典</div></div>
+              <div class="card-body">
+                <div style="font-size:12px;color:var(--text-2);margin-bottom:8px;">业务状态与接口状态分层显示，避免互相替代：</div>
+                <div class="kv">
+                  <div class="k">业务执行状态</div>
+                  <div class="v">订单 order_state / 入库 purchase_receipt_state / 调拨 transfer_order_state …</div>
+                  <div class="k">接口推送状态</div>
+                  <div class="v"><span class="font-mono">interface_push_state</span> = 待推送 / 推送中 / 推送成功 / 推送失败 / 已重推 / 已关闭</div>
+                  <div class="k">对账状态</div>
+                  <div class="v">对账成功 / 对账差异 / 待复核 / 已封账 …（F-08 / F-12）</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">月结对账（F-12）</div></div>
+              <div class="card-body" style="padding:0;">
+                <table class="data">
+                  <tbody>
+                    <tr><td>2026-04 月结</td><td><span class="badge green dot">已封账</span></td><td class="muted">2026-05-01 09:00</td></tr>
+                    <tr><td>2026-05 月结</td><td><span class="badge gray dot">未发起</span></td><td class="muted">—</td></tr>
+                    <tr><td>反结申请</td><td><span class="badge amber dot">需高敏感审批</span></td><td><a class="btn btn-sm">提交</a></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">NC 未落地阶段三段式策略</div></div>
+              <div class="card-body" style="font-size:12px;color:var(--text-2);">
+                <div class="mb-8">阶段一：<strong>本地落地，不推送</strong> — 状态 = 已关闭，接口任务不入队</div>
+                <div class="mb-8">阶段二：<strong>本地落地 + 模拟推送</strong> — 状态 = 推送成功（mock），用于联调演练</div>
+                <div>阶段三：<strong>正式推送</strong> — NC 上线后切换为真实推送</div>
+                <div class="mt-12 muted">详见 08 第 7 章 / 14-NC 映射与科目配置模板。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'nc-interface',
+      crumbs: ['运维 / 集成', 'NC 接口监控'],
+      title: 'NC 接口监控',
+      desc: '对齐《08-财务与NC接口详细设计 V1.0》F-01 ~ F-14',
+      actions: [{ label: '接口开关 (F-13)' }, { label: '科目规则 (F-12)' }, { label: '触发对账', primary: true }],
+    });
+
+    var ifaceTbody = document.getElementById('iface-tbody');
+    ifaceTbody.innerHTML = SC.data.ncInterfaces.map(function (i) {
+      var stateBadge = i.enabled ?
+        '<span class="badge green dot">启用</span>' :
+        '<span class="badge gray dot">停用</span>';
+      var failColor = i.todayFail > 2 ? 'color:var(--red);font-weight:600;' : i.todayFail > 0 ? 'color:var(--amber);' : '';
+      return '<tr>' +
+        '<td class="code">' + i.code + '</td>' +
+        '<td>' + i.name + '</td>' +
+        '<td><span class="badge ' + (i.cat === '主数据' ? 'blue' : i.cat === '业务' ? 'teal' : 'gray') + '">' + i.cat + '</span></td>' +
+        '<td>' + stateBadge + '</td>' +
+        '<td class="num">' + i.todayTotal + '</td>' +
+        '<td class="num">' + i.todaySuccess + '</td>' +
+        '<td class="num" style="' + failColor + '">' + i.todayFail + '</td>' +
+        '<td class="muted">' + i.lastAt + '</td>' +
+      '</tr>';
+    }).join('');
+
+    var tasksTbody = document.getElementById('tasks-tbody');
+    tasksTbody.innerHTML = SC.data.ncTasks.map(function (t) {
+      return '<tr>' +
+        '<td class="code">' + t.id + '</td>' +
+        '<td class="code muted">' + t.iface + '</td>' +
+        '<td class="code">' + t.biz + '</td>' +
+        '<td>' + SC.badge(t.state, t.color, true) + '</td>' +
+        '<td class="num">' + t.tries + '</td>' +
+        '<td class="muted">' + t.lastAt + '</td>' +
+        '<td style="max-width:240px;color:' + (t.err === '—' ? 'var(--text-3)' : 'var(--red)') + ';font-size:12px;">' + t.err + '</td>' +
+        '<td class="actions">' +
+          (t.state === '推送失败' ? '<a class="btn btn-sm btn-primary">重推</a><a>详情</a>' :
+           t.state === '待推送' ? '<a class="btn btn-sm">立即推送</a><a>详情</a>' :
+           '<a>详情</a>') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

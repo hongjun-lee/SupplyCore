@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>系统管理 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="tabs" id="tabs">
+            <div class="tab active" data-tab="user">用户与 SSO</div>
+            <div class="tab" data-tab="role">角色与权限</div>
+            <div class="tab" data-tab="audit">审计日志</div>
+            <div class="tab" data-tab="ops">运维 / 非功能</div>
+          </div>
+
+          <!-- 用户 -->
+          <div class="tab-pane active" id="tab-user">
+            <div class="card-header">
+              <div class="title">用户列表（Nova SSO 同步）</div>
+              <div class="actions">
+                <span class="badge blue dot">SSO 已对接 Nova Platform</span>
+                <button class="btn">同步日志</button>
+                <button class="btn">单点登录测试</button>
+              </div>
+            </div>
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>用户 ID</th>
+                  <th>姓名</th>
+                  <th>所属组织</th>
+                  <th>本系统角色</th>
+                  <th>身份来源</th>
+                  <th>最近登录</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="user-tbody"></tbody>
+            </table>
+            <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              本系统不维护独立用户密码，全部走 <strong>Nova Platform SSO</strong>；本表为业务角色映射副本，业务角色由本系统配置。详见《10》+ 集团统筹层「统一权限/SSO」。
+            </div>
+          </div>
+
+          <!-- 角色 -->
+          <div class="tab-pane" id="tab-role">
+            <div class="card-header">
+              <div class="title">业务角色与权限矩阵（11 角色）</div>
+              <div class="actions">
+                <button class="btn">导出权限矩阵</button>
+                <button class="btn btn-primary">+ 新增业务角色</button>
+              </div>
+            </div>
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>角色</th>
+                  <th>关键能力</th>
+                  <th>数据范围</th>
+                  <th class="num">用户数</th>
+                  <th>可发起单据</th>
+                  <th>可审批单据</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>业务申请人（区队）</td><td>提报需求、查看本队库存与领料</td><td>本班组</td><td class="num">42</td><td>需求 / 领料</td><td class="muted">—</td></tr>
+                <tr><td>计划员</td><td>需求汇总、采购计划编制</td><td>本厂矿</td><td class="num">8</td><td>采购计划</td><td>需求</td></tr>
+                <tr><td>采购员</td><td>下单、对供应商执行</td><td>集团（按授权）</td><td class="num">6</td><td>采购订单 / 合同</td><td>—</td></tr>
+                <tr><td>仓管员</td><td>验收、入库、出库、盘点</td><td>本仓库</td><td class="num">14</td><td>到货 / 入库 / 出库 / 盘点</td><td>—</td></tr>
+                <tr><td>质检员</td><td>到货质检与判定</td><td>本仓库</td><td class="num">5</td><td>—</td><td>质检结果</td></tr>
+                <tr><td>审批人</td><td>按审批矩阵处理待办</td><td>按节点</td><td class="num">22</td><td>—</td><td>各业务单</td></tr>
+                <tr><td>财务</td><td>付款、对账、月结</td><td>集团</td><td class="num">7</td><td>付款申请</td><td>付款 / 月结</td></tr>
+                <tr><td>安全部门</td><td>火工品 / 危险品会签</td><td>集团</td><td class="num">4</td><td>—</td><td>高敏感操作</td></tr>
+                <tr><td>集团物资管理</td><td>主数据治理 / 重大审核</td><td>集团</td><td class="num">3</td><td>主数据规则</td><td>主数据 / 大额采购 / 处置</td></tr>
+                <tr><td>集团管理层</td><td>看板、报表、AI 助理</td><td>集团（只读）</td><td class="num">9</td><td>—</td><td>—</td></tr>
+                <tr><td>系统管理员</td><td>用户配置、参数、日志</td><td>集团</td><td class="num">3</td><td>—</td><td>—</td></tr>
+              </tbody>
+            </table>
+            <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              数据范围由 <strong>Nova data_scope_grants</strong> + 本系统业务角色叠加计算；审批人通过 <strong>FIXED_USER / FIXED_ROLE / ORG_ROLE</strong> 三种规则解析。
+            </div>
+          </div>
+
+          <!-- 审计 -->
+          <div class="tab-pane" id="tab-audit">
+            <div class="card-header">
+              <div class="title">操作审计日志</div>
+              <div class="actions">
+                <button class="btn">高级筛选</button>
+                <button class="btn">导出（带水印）</button>
+              </div>
+            </div>
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>操作人</th>
+                  <th>动作</th>
+                  <th>对象</th>
+                  <th>结果</th>
+                </tr>
+              </thead>
+              <tbody id="audit-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- 运维 -->
+          <div class="tab-pane" id="tab-ops">
+            <div class="card-header"><div class="title">运维 / 非功能（对齐 11）</div></div>
+            <div class="card-body">
+              <div class="cols-3">
+                <div>
+                  <div class="text-2 mb-8" style="font-weight:500;color:var(--text);">部署</div>
+                  <div class="text-2" style="font-size:12px;line-height:1.8;">
+                    · 私有化 · 信创栈<br>
+                    · DB 独立（PG 兼容 / 瀚高 / 人大金仓）<br>
+                    · 应用与 NC 网络隔离 · 单向接口<br>
+                    · 阶段一：与 Nova 同 IDC，独立 DB
+                  </div>
+                </div>
+                <div>
+                  <div class="text-2 mb-8" style="font-weight:500;color:var(--text);">安全</div>
+                  <div class="text-2" style="font-size:12px;line-height:1.8;">
+                    · 全部走 SSO，本系统不存密码<br>
+                    · 审计 365 天 · 高敏感永久留存<br>
+                    · 导出含水印 + 下载明细<br>
+                    · 反结 / 月结需双人复核
+                  </div>
+                </div>
+                <div>
+                  <div class="text-2 mb-8" style="font-weight:500;color:var(--text);">性能 / 备份</div>
+                  <div class="text-2" style="font-size:12px;line-height:1.8;">
+                    · 列表查询 P95 ≤ 1.5s · 报表 ≤ 8s<br>
+                    · 接口推送队列重试退避<br>
+                    · 全量日备份 + 增量小时备份<br>
+                    · 灾备 RPO ≤ 4h · RTO ≤ 8h
+                  </div>
+                </div>
+              </div>
+
+              <hr class="sep">
+
+              <div class="text-2 mb-8" style="font-weight:500;color:var(--text);">上线切换 / 试运行 / 验收</div>
+              <div class="text-2" style="font-size:12px;">
+                按《11-非功能详细设计 V1.0》分批切换：核心批 → 扩展批 → 全量上线，每个阶段门按《13-并行运行退出条件表》评审通过后才进入下一批。
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'system-admin',
+      crumbs: ['运维 / 集成', '系统管理'],
+      title: '系统管理',
+      desc: '对齐《10-权限审批流详细设计 V1.0》+ 《11-非功能详细设计 V1.0》',
+    });
+
+    /* tabs */
+    document.querySelectorAll('#tabs .tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        document.querySelectorAll('#tabs .tab').forEach(function (x) { x.classList.remove('active'); });
+        document.querySelectorAll('.tab-pane').forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+      });
+    });
+
+    /* 用户 */
+    document.getElementById('user-tbody').innerHTML = SC.data.sysUsers.map(function (u) {
+      return '<tr>' +
+        '<td class="code">' + u.id + '</td>' +
+        '<td>' + u.name + '</td>' +
+        '<td>' + u.org + '</td>' +
+        '<td>' + u.roles + '</td>' +
+        '<td><span class="badge blue">' + u.source + '</span></td>' +
+        '<td class="muted">' + u.last + '</td>' +
+        '<td>' + (u.enabled ? '<span class="badge green dot">启用</span>' : '<span class="badge gray dot">禁用</span>') + '</td>' +
+        '<td class="actions"><a>角色</a><a>权限</a></td>' +
+      '</tr>';
+    }).join('');
+
+    /* 审计 */
+    document.getElementById('audit-tbody').innerHTML = SC.data.sysAudit.map(function (a) {
+      var resultColor = a.result.indexOf('成功') >= 0 || a.result === '通过' ? 'green' :
+                        a.result.indexOf('错误') >= 0 || a.result.indexOf('失败') >= 0 ? 'red' :
+                        a.result.indexOf('待') >= 0 ? 'gray' : 'amber';
+      return '<tr>' +
+        '<td class="muted">' + a.time + '</td>' +
+        '<td>' + a.actor + '</td>' +
+        '<td>' + a.action + '</td>' +
+        '<td>' + a.target + '</td>' +
+        '<td>' + SC.badge(a.result, resultColor, true) + '</td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>AI 写操作完整链路 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+            <span class="badge red dot">关键边界</span>
+            <div class="text-2">
+              本页面演示 <strong>AI 助理协助用户起草新需求</strong> 的完整链路，重点说明<strong>"写操作必须由用户主动确认"</strong>的边界。
+              AI 仅完成对话式收集与字段填充，<strong>不会代替用户提交单据</strong>，提交后仍按既有审批流（A-20 + ORG_ROLE）进行审批。
+              对齐《09-报表预警与AI能力详细设计 V1.0》第 4 章 + 集团统筹层「统一 AI 入口」第 3 条权限要求。
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <!-- 左：对话过程 -->
+          <div>
+            <div class="chat-panel" style="height:auto;min-height:520px;">
+              <div class="chat-head">
+                <div class="ai-mark">AI</div>
+                <div>
+                  <div style="font-weight:600;font-size:13px;">物资 AI 助理 · 写操作完整链路</div>
+                  <div style="font-size:11px;color:var(--text-2);">演示场景：业务申请人通过 AI 提报一份新需求计划</div>
+                </div>
+              </div>
+              <div class="chat-body" id="chat-body" style="max-height:480px;"></div>
+              <div class="chat-input" style="background:#fafbfd;">
+                <input type="text" placeholder="演示已结束，本页用于回放完整对话" disabled>
+                <button class="btn" disabled>发送</button>
+              </div>
+            </div>
+
+            <!-- 写操作能力边界 -->
+            <div class="card">
+              <div class="card-header"><div class="title">AI 写操作能力边界</div></div>
+              <div class="card-body">
+                <div class="rule-list" id="rules-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右：草稿确认面板 + 提交后流程 -->
+          <div>
+            <div class="ai-draft-panel">
+              <div class="draft-title">待提交需求草稿（AI 协助生成）</div>
+              <div id="draft-body"></div>
+              <div style="display:flex;gap:8px;margin-top:14px;">
+                <button class="btn" style="flex:1;">取消 · 不提交</button>
+                <button class="btn" style="flex:1;">编辑后提交</button>
+                <button class="btn btn-primary" style="flex:1.5;font-weight:600;" onclick="alert('已提交。\n\n提交后流程：\n→ 进入审批中心 (A-20)\n→ 矿物资管理审核\n→ 集团物资部复核\n→ 系统在审计日志标注：来源 = AI 协助 · 用户主动确认\n→ 后续完全按现有审批流执行')">✓ 我已确认 · 提交</button>
+              </div>
+              <div class="text-2 mt-12" style="font-size:11px;text-align:center;color:var(--text-3);">
+                AI 不会代替你点击"提交"。任何写操作都需要你在此确认。
+              </div>
+            </div>
+
+            <!-- 提交后路径 -->
+            <div class="card">
+              <div class="card-header"><div class="title">提交后的审计与审批路径</div></div>
+              <div class="card-body">
+                <div class="timeline-vert">
+                  <div class="tv-step done">
+                    <div class="tv-time">用户点击</div>
+                    <div class="tv-dot"></div>
+                    <div class="tv-body">
+                      <span class="tv-title">"我已确认 · 提交" 按钮</span>
+                      <div class="tv-meta">必经 — 不可被 AI 跳过</div>
+                    </div>
+                  </div>
+                  <div class="tv-step done">
+                    <div class="tv-time">系统</div>
+                    <div class="tv-dot"></div>
+                    <div class="tv-body">
+                      <span class="tv-title">写入需求计划单 (P-01)</span>
+                      <div class="tv-meta">request_state = 待审核 · source = AI_ASSISTED</div>
+                    </div>
+                  </div>
+                  <div class="tv-step done">
+                    <div class="tv-time">系统</div>
+                    <div class="tv-dot"></div>
+                    <div class="tv-body">
+                      <span class="tv-title">审计日志记录</span>
+                      <div class="tv-meta">操作人 = 用户本人 · 来源 = AI · 含完整 prompt 摘要</div>
+                    </div>
+                  </div>
+                  <div class="tv-step current">
+                    <div class="tv-time">即时</div>
+                    <div class="tv-dot"></div>
+                    <div class="tv-body">
+                      <span class="tv-title">进入审批中心 (A-20)</span>
+                      <div class="tv-meta">按 ORG_ROLE 解析审批人 · 与人工提交的需求走完全相同流程</div>
+                    </div>
+                  </div>
+                  <div class="tv-step pending">
+                    <div class="tv-time">后续</div>
+                    <div class="tv-dot"></div>
+                    <div class="tv-body">
+                      <span class="tv-title">矿物资 → 集团物资 → 生成采购计划</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 治理小卡 -->
+            <div class="card">
+              <div class="card-body">
+                <div class="text-2 mb-8" style="font-weight:600;color:var(--text);">为什么这样设计？</div>
+                <div class="text-2" style="font-size:12px;">
+                  AI 提升的是<strong>填表 / 检索 / 校验</strong>效率，<strong>不替代</strong>业务责任与流程合规。任何对系统状态产生影响的写操作（提报、审批、付款、入库等），都必须由<strong>有资格的自然人</strong>主动确认；同时审计日志保留 AI 参与痕迹，便于事后追溯与问责。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'ai-write-flow',
+      crumbs: ['决策 / AI', 'AI 写操作（演示）'],
+      title: 'AI 写操作完整链路',
+      desc: '演示 AI 协助 → 用户确认 → 单据写入 → 审计标注 → 审批流，对齐 09 + 集团 AI 接入第 3 条权限要求',
+    });
+
+    var s = SC.data.aiWriteScenario;
+
+    /* 渲染对话 */
+    var draftHtml =
+      '<div class="ai-draft-panel" style="margin-top:8px;background:#fff;">' +
+        '<div class="draft-title">字段识别预览（点编辑可改）</div>' +
+        '<div class="draft-row"><div class="k">物料编码</div><div class="v">' + s.draft.mcode + '</div></div>' +
+        '<div class="draft-row"><div class="k">物料名称</div><div class="v">' + s.draft.mname + '</div></div>' +
+        '<div class="draft-row"><div class="k">规格</div><div class="v">' + s.draft.spec + '</div></div>' +
+        '<div class="draft-row"><div class="k">数量</div><div class="v editable">6 把</div></div>' +
+        '<div class="draft-row"><div class="k">期望到货</div><div class="v editable">2026-05-30</div></div>' +
+      '</div>';
+
+    var chatBody = document.getElementById('chat-body');
+    chatBody.innerHTML = s.chat.map(function (m) {
+      var av = m.who === 'user' ? '我' : 'AI';
+      var tool = m.tool ? '<div><span class="tool-tag">' + m.tool + '</span></div>' : '';
+      var refs = (m.refs && m.refs.length) ? '<div class="refs">引用：' + m.refs.map(function (r) { return '<span class="font-mono">' + r + '</span>'; }).join(' · ') + '</div>' : '';
+      var preview = m.formPreview ? draftHtml : '';
+      var confirmBtn = m.showConfirmButton ?
+        '<div style="margin-top:8px;font-size:11px;color:var(--brand);">→ 请在右侧"待提交需求草稿"面板核对并点击"我已确认 · 提交"</div>' : '';
+      return '<div class="chat-msg ' + m.who + '">' +
+        '<div class="av">' + av + '</div>' +
+        '<div class="chat-bubble">' + m.text + tool + refs + preview + confirmBtn + '</div>' +
+      '</div>';
+    }).join('');
+
+    /* 草稿面板 */
+    var d = s.draft;
+    document.getElementById('draft-body').innerHTML =
+      '<div class="draft-row"><div class="k">申请单位</div><div class="v">' + d.org + '</div></div>' +
+      '<div class="draft-row"><div class="k">提报人</div><div class="v">' + d.requester + '</div></div>' +
+      '<div class="draft-row"><div class="k">物料</div><div class="v">' + d.mname + ' <span class="muted code">(' + d.mcode + ')</span></div></div>' +
+      '<div class="draft-row"><div class="k">规格 / 单位</div><div class="v">' + d.spec + ' · ' + d.unit + '</div></div>' +
+      '<div class="draft-row"><div class="k">数量</div><div class="v editable">' + d.qty + '</div></div>' +
+      '<div class="draft-row"><div class="k">参考单价</div><div class="v">' + SC.fmtMoney(d.refPrice) + ' <span class="muted">(系统自动)</span></div></div>' +
+      '<div class="draft-row"><div class="k">预估金额</div><div class="v" style="color:var(--brand);font-size:14px;">' + SC.fmtMoney(d.amount) + '</div></div>' +
+      '<div class="draft-row"><div class="k">期望到货</div><div class="v editable">' + d.expectDate + '</div></div>' +
+      '<div class="draft-row"><div class="k">事由</div><div class="v editable">' + d.reason + '</div></div>' +
+      '<div class="draft-row"><div class="k">状态</div><div class="v"><span class="badge gray">' + d.requestState + '</span></div></div>';
+
+    /* 规则 */
+    document.getElementById('rules-list').innerHTML = s.rules.map(function (r) {
+      var icon = r.kind === 'allow' ? '✓ 允许' : r.kind === 'deny' ? '✗ 禁止' : '◉ 留痕';
+      return '<div class="rule-item ' + r.kind + '">' +
+        '<span class="icon">' + icon + '</span>' +
+        '<span>' + r.text + '</span>' +
+      '</div>';
+    }).join('');
+  </script>
+</body>
+</html>

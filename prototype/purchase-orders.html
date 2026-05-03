@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>采购订单 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field"><label>订单号</label><input placeholder="CG-2026-…"></div>
+            <div class="form-field"><label>供应商</label><input placeholder="模糊搜索"></div>
+            <div class="form-field"><label>来源需求</label><input placeholder="XQ-2026-…"></div>
+            <div class="form-field"><label>订单状态</label>
+              <select>
+                <option>全部</option>
+                <option>草稿</option><option>已下达</option><option>执行中</option>
+                <option>部分到货</option><option>已完成</option><option>已关闭</option>
+              </select>
+            </div>
+            <div class="form-field"><label>NC 推送状态</label>
+              <select>
+                <option>全部</option>
+                <option>待推送</option><option>推送中</option><option>推送成功</option>
+                <option>推送失败</option><option>已重推</option><option>已关闭</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="title">采购订单列表</div>
+            <div class="actions">
+              <button class="btn">导出</button>
+              <button class="btn">批量重推 NC</button>
+              <button class="btn btn-primary">+ 新建订单</button>
+            </div>
+          </div>
+
+          <table class="data">
+            <thead>
+              <tr>
+                <th><input type="checkbox"></th>
+                <th>订单号</th>
+                <th>供应商</th>
+                <th>来源需求</th>
+                <th class="num">行数</th>
+                <th class="num">订单金额</th>
+                <th>下单日期</th>
+                <th>订单状态<br><span class="muted" style="font-weight:400;font-size:11px;">order_state</span></th>
+                <th>NC 推送<br><span class="muted" style="font-weight:400;font-size:11px;">interface_push_state</span></th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="po-tbody"></tbody>
+          </table>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+            <div>共 <strong>6</strong> 条 · 已选 0 条 · 合计 <strong style="color:var(--text);">¥ 1,034,500.00</strong></div>
+            <div>
+              <button class="btn btn-sm">上一页</button>
+              <span class="muted" style="margin:0 8px;">1 / 1</span>
+              <button class="btn btn-sm">下一页</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 提示 -->
+        <div class="card">
+          <div class="card-body" style="display:flex;gap:12px;align-items:center;">
+            <span class="badge amber dot">提示</span>
+            <div class="text-2">
+              订单状态与 NC 推送状态分层显示：<strong>订单状态</strong> 反映业务执行阶段；<strong>NC 推送状态</strong> 反映与 NC 系统的接口同步进度。两者解耦，不互相替代。
+              详见 <span class="font-mono">04-需求计划与采购协同详细设计 V1.0</span> 与 <span class="font-mono">08-财务与NC接口详细设计 V1.0</span>。
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'purchase-orders',
+      crumbs: ['采购协同', '采购订单'],
+      title: '采购订单',
+      desc: '对齐 04 (S-23 order) + 08 (interface_push_state) — 订单状态与 NC 推送状态分层',
+      actions: [{ label: '导出 Excel' }, { label: '+ 新建订单', primary: true }],
+    });
+
+    var tbody = document.getElementById('po-tbody');
+    tbody.innerHTML = SC.data.purchaseOrders.map(function (o) {
+      return '<tr>' +
+        '<td><input type="checkbox"></td>' +
+        '<td class="code"><a>' + o.code + '</a></td>' +
+        '<td>' + o.supplier + '</td>' +
+        '<td class="code muted">' + o.src + '</td>' +
+        '<td class="num">' + o.lines + '</td>' +
+        '<td class="num">' + SC.fmtMoney(o.amount) + '</td>' +
+        '<td class="muted">' + o.date + '</td>' +
+        '<td>' + SC.badge(o.orderState, o.orderStateColor, true) + '</td>' +
+        '<td>' + SC.badge(o.pushState, o.pushColor, true) +
+          (o.pushState === '推送失败' ? ' <a class="btn btn-sm" style="margin-left:6px;">重推</a>' : '') +
+        '</td>' +
+        '<td class="actions"><a>查看</a>' +
+          (o.orderState === '已下达' || o.orderState === '执行中' || o.orderState === '部分到货' ? '<a href="goods-receipt.html">收货</a>' : '') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>招投标 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="kpi-grid">
+          <div class="kpi"><div class="label">本月招标项目</div><div class="value">4</div><div class="trend">公开 2 / 询比价 1 / 紧急 1</div></div>
+          <div class="kpi"><div class="label">招标预算合计</div><div class="value">¥ 148.7 万</div><div class="trend">含 1 项框架协议</div></div>
+          <div class="kpi"><div class="label">评标完成 · 待公示</div><div class="value" style="color:var(--amber)">1</div><div class="trend">ZB-2026-0044</div></div>
+          <div class="kpi"><div class="label">已中标 · 合同生成中</div><div class="value">1</div><div class="trend">ZB-2026-0045</div></div>
+        </div>
+
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field"><label>项目编号</label><input placeholder="ZB-2026-…"></div>
+            <div class="form-field"><label>项目名称</label><input placeholder="关键词"></div>
+            <div class="form-field"><label>采购方式</label>
+              <select>
+                <option>全部</option><option>公开招标</option><option>邀请招标</option>
+                <option>询比价</option><option>竞争性谈判</option><option>单一来源</option><option>紧急采购</option>
+              </select>
+            </div>
+            <div class="form-field"><label>状态</label>
+              <select>
+                <option>全部</option><option>招标文件准备中</option><option>已发布</option>
+                <option>投标受理中</option><option>开评标</option><option>评标完成</option>
+                <option>中标公示</option><option>合同生成中</option><option>已完成</option><option>流标/废标</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="title">招标项目列表</div>
+            <div class="actions">
+              <button class="btn">招标文件模板库</button>
+              <button class="btn btn-primary">+ 新建招标项目</button>
+            </div>
+          </div>
+          <table class="data">
+            <thead>
+              <tr>
+                <th>项目编号</th>
+                <th>项目名称</th>
+                <th>来源需求</th>
+                <th>采购方式</th>
+                <th class="num">预算</th>
+                <th>负责人</th>
+                <th>截止日期</th>
+                <th class="num">投标 / 接收</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="zb-tbody"></tbody>
+          </table>
+          <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+            <span class="badge blue dot">边界</span>
+            <span style="margin-left:8px;">
+              本系统管理 <strong>招标全流程编排</strong>：招标文件 → 公告导出 → 结果回传 → 合同生成；
+              <strong>开评标过程在能源集团招采平台进行</strong>，本系统不重复实现投标/开标/评标功能，仅以附件 / 结构化字段方式回传归档。
+            </span>
+          </div>
+        </div>
+
+        <!-- 招标项目详情 -->
+        <div class="card">
+          <div class="flow-strip">
+            <div class="node done"><span class="step-num">1</span> 需求批准</div>
+            <div class="node done"><span class="step-num">2</span> 招标文件准备</div>
+            <div class="node done"><span class="step-num">3</span> 公告导出至招采平台</div>
+            <div class="node done"><span class="step-num">4</span> 投标受理（招采平台）</div>
+            <div class="node done"><span class="step-num">5</span> 开评标（招采平台）</div>
+            <div class="node current"><span class="step-num">6</span> 结果回传 + 合同联动</div>
+          </div>
+
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;">
+              <h2 class="mt-0 mb-0" style="font-size:18px;">招标项目 <span class="code" id="t-code"></span></h2>
+              <span id="t-state-badge"></span>
+              <span class="spacer" style="flex:1;"></span>
+              <button class="btn">下载招标文件包</button>
+              <button class="btn">打印评标报告</button>
+              <button class="btn btn-primary">回传结果 → 生成合同</button>
+            </div>
+            <h3 class="mt-0 mb-8" style="font-size:15px;font-weight:500;color:var(--text);" id="t-name"></h3>
+            <div class="kv">
+              <div class="k">来源需求</div><div class="v code"><a href="requirement-list.html" id="t-src"></a></div>
+              <div class="k">采购方式</div><div class="v" id="t-way"></div>
+              <div class="k">预算</div><div class="v" id="t-budget"></div>
+              <div class="k">负责人</div><div class="v" id="t-leader"></div>
+              <div class="k">投标截止</div><div class="v" id="t-deadline"></div>
+              <div class="k">公告</div><div class="v" id="t-notice"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <!-- 投标供应商 + 评标结果 -->
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">投标供应商与评标结果</div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>排名</th>
+                    <th>投标供应商</th>
+                    <th class="num">报价</th>
+                    <th class="num">评分</th>
+                    <th>结果</th>
+                  </tr>
+                </thead>
+                <tbody id="bid-tbody"></tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+                评标结果由集团招采平台导入；本系统仅做归档与合同联动，<strong>不在本系统直接修改评分</strong>。如有异议须在招采平台发起复议。
+              </div>
+            </div>
+          </div>
+
+          <!-- 招标流程 + 文件 -->
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">招标流程</div></div>
+              <div class="card-body">
+                <div class="timeline-vert" id="t-flow"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">招标 / 评标文件</div></div>
+              <table class="data">
+                <tbody id="docs-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'tender',
+      crumbs: ['采购协同', '招投标'],
+      title: '招投标',
+      desc: '一期边界：本系统管理招标全流程编排，开评标在能源集团招采平台执行，结果回传归档',
+      actions: [{ label: '招标文件模板库' }, { label: '+ 新建招标项目', primary: true }],
+    });
+
+    /* 列表 */
+    document.getElementById('zb-tbody').innerHTML = SC.data.tenders.map(function (t) {
+      var wayColor = t.way === '公开招标' ? 'blue' : t.way === '询比价' ? 'teal' : t.way === '紧急采购' ? 'red' : 'gray';
+      return '<tr>' +
+        '<td class="code"><a>' + t.code + '</a></td>' +
+        '<td>' + t.name + '</td>' +
+        '<td class="code muted">' + t.src + '</td>' +
+        '<td><span class="badge ' + wayColor + '">' + t.way + '</span></td>' +
+        '<td class="num">' + SC.fmtMoney(t.budget) + '</td>' +
+        '<td>' + t.leader + '</td>' +
+        '<td class="muted">' + t.deadline + '</td>' +
+        '<td class="num">' + t.bidsReceived + ' / ' + t.bidders + '</td>' +
+        '<td>' + SC.badge(t.state, t.color, true) + '</td>' +
+        '<td class="actions"><a>详情</a></td>' +
+      '</tr>';
+    }).join('');
+
+    /* 详情 */
+    var d = SC.data.tenderDetail;
+    document.getElementById('t-code').textContent = d.code;
+    document.getElementById('t-state-badge').innerHTML = SC.badge(d.state, d.stateColor, true);
+    document.getElementById('t-name').textContent = d.name;
+    document.getElementById('t-src').textContent = d.src;
+    document.getElementById('t-way').innerHTML = '<span class="badge blue">' + d.way + '</span>';
+    document.getElementById('t-budget').textContent = SC.fmtMoney(d.budget);
+    document.getElementById('t-leader').textContent = d.leader;
+    document.getElementById('t-deadline').textContent = d.deadline;
+    document.getElementById('t-notice').textContent = d.notice;
+
+    document.getElementById('bid-tbody').innerHTML = d.bidders.map(function (b) {
+      var rowStyle = b.rank === 1 ? 'background:#f0fdf4;font-weight:500;' : '';
+      return '<tr style="' + rowStyle + '">' +
+        '<td><strong>' + b.rank + '</strong></td>' +
+        '<td>' + b.name + '</td>' +
+        '<td class="num">' + SC.fmtMoney(b.amount) + '</td>' +
+        '<td class="num">' + b.score.toFixed(1) + '</td>' +
+        '<td><span class="badge ' + b.color + '">' + b.lead + '</span></td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('t-flow').innerHTML = d.flow.map(function (f) {
+      return '<div class="tv-step ' + f.state + '">' +
+        '<div class="tv-time">' + f.time + '</div>' +
+        '<div class="tv-dot"></div>' +
+        '<div class="tv-body">' +
+          '<span class="tv-title">' + f.title + '</span>' +
+          '<div class="tv-meta">' + f.who + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    document.getElementById('docs-tbody').innerHTML = d.docs.map(function (doc) {
+      var kindColor = doc.kind === '招标文件' ? 'blue' : doc.kind === '评标结果' ? 'amber' : 'green';
+      return '<tr>' +
+        '<td>📎</td>' +
+        '<td>' + doc.name + '</td>' +
+        '<td><span class="badge ' + kindColor + '">' + doc.kind + '</span></td>' +
+        '<td class="muted">' + doc.size + '</td>' +
+        '<td><a>下载</a></td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

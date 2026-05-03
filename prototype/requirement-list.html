@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>需求计划 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field"><label>需求单号</label><input type="text" placeholder="XQ-2026-…"></div>
+            <div class="form-field"><label>需求标题</label><input type="text" placeholder="关键词"></div>
+            <div class="form-field"><label>申请单位</label>
+              <select>
+                <option>全部</option>
+                <option>艾友矿</option><option>五龙矿</option><option>东梁矿</option><option>新邱矿</option>
+              </select>
+            </div>
+            <div class="form-field"><label>状态</label>
+              <select>
+                <option>全部</option>
+                <option>草稿</option><option>待审核</option><option>审中</option>
+                <option>已批准</option><option>已驳回</option><option>已撤回</option>
+              </select>
+            </div>
+            <div class="form-field"><label>提交日期</label><input type="date" value="2026-04-01"></div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="title">需求计划列表</div>
+            <div class="actions">
+              <button class="btn">导出</button>
+              <button class="btn">批量提交</button>
+              <button class="btn btn-primary">+ 新建需求</button>
+            </div>
+          </div>
+
+          <table class="data">
+            <thead>
+              <tr>
+                <th><input type="checkbox"></th>
+                <th>需求单号</th>
+                <th>需求标题</th>
+                <th>申请单位 / 提报人</th>
+                <th>提交日期</th>
+                <th class="num">行数</th>
+                <th class="num">预估金额</th>
+                <th>状态 (request_state)</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="req-tbody"></tbody>
+          </table>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+            <div>共 <strong>7</strong> 条 · 已选 0 条</div>
+            <div>
+              <button class="btn btn-sm">上一页</button>
+              <span class="muted" style="margin:0 8px;">1 / 1</span>
+              <button class="btn btn-sm">下一页</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'requirement-list',
+      crumbs: ['采购协同', '需求计划', '列表'],
+      title: '需求计划',
+      desc: '对齐《04-需求计划与采购协同详细设计 V1.0》— 实体 P-01 / S-01，状态字段 request_state',
+      actions: [{ label: '导入模板' }, { label: '+ 新建需求', primary: true }],
+    });
+
+    var tbody = document.getElementById('req-tbody');
+    tbody.innerHTML = SC.data.requirements.map(function (r) {
+      var urgent = r.urgent ? '<span class="badge red" style="margin-left:6px;">加急</span>' : '';
+      return '<tr>' +
+        '<td><input type="checkbox"></td>' +
+        '<td class="code"><a href="requirement-detail.html">' + r.code + '</a></td>' +
+        '<td>' + r.title + urgent + '</td>' +
+        '<td>' + r.org + '<div class="muted" style="font-size:11px;">' + r.requester + '</div></td>' +
+        '<td class="muted">' + r.date + '</td>' +
+        '<td class="num">' + r.lines + '</td>' +
+        '<td class="num">' + SC.fmtMoney(r.amount) + '</td>' +
+        '<td><span class="badge ' + r.stateColor + ' dot">' + r.state + '</span></td>' +
+        '<td class="actions">' +
+          '<a href="requirement-detail.html">查看</a>' +
+          (r.state === '草稿' ? '<a href="#">编辑</a><a href="#" style="color:var(--red)">删除</a>' :
+           r.state === '审中' || r.state === '待审核' ? '<a href="#">撤回</a>' :
+           r.state === '已批准' ? '<a href="purchase-orders.html">下单</a>' : '') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

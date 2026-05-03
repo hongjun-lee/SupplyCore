@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>AI 助理 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .ai-layout { display: grid; grid-template-columns: 260px 1fr 280px; gap: 12px; }
+    @media (max-width: 1100px) { .ai-layout { grid-template-columns: 1fr; } }
+    .ai-side { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
+    .ai-side h4 { font-size: 12px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px; font-weight: 500; }
+    .ai-side .item { padding: 8px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; color: var(--text-2); }
+    .ai-side .item:hover { background: var(--gray-50); color: var(--text); }
+    .ai-side .item.active { background: var(--brand-50); color: var(--brand); font-weight: 500; }
+    .ai-side .item .meta { font-size: 11px; color: var(--text-3); }
+    .ai-side .divider { height: 1px; background: var(--border); margin: 10px -12px; }
+    .ai-chat-large { height: calc(100vh - 240px); min-height: 520px; }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="ai-layout">
+          <!-- 左：历史 + 能力 -->
+          <div>
+            <div class="ai-side">
+              <h4>历史会话</h4>
+              <div class="item active">本次会话<div class="meta">刚刚</div></div>
+              <div class="item">东梁矿安全监测设备到货确认<div class="meta">2 小时前</div></div>
+              <div class="item">五龙矿火工品库专项盘点结果<div class="meta">昨天</div></div>
+              <div class="item">4 月合同付款节点回顾<div class="meta">3 天前</div></div>
+              <div class="divider"></div>
+              <h4>权限范围</h4>
+              <div style="font-size:12px;color:var(--text-2);line-height:1.7;">
+                · 当前角色：<strong style="color:var(--text);" id="cur-role">—</strong><br>
+                · 数据范围：阜矿全口径<br>
+                · AI 调用与人工操作<strong>使用同一权限</strong>，不会越权
+              </div>
+            </div>
+          </div>
+
+          <!-- 中：对话 -->
+          <div>
+            <div class="chat-panel ai-chat-large">
+              <div class="chat-head">
+                <div class="ai-mark">AI</div>
+                <div>
+                  <div style="font-weight:600;font-size:13px;">物资 AI 助理 · 互动演示</div>
+                  <div style="font-size:11px;color:var(--text-2);">点击建议问题或在下方输入；预设问答按关键词匹配</div>
+                </div>
+                <span class="spacer" style="flex:1;"></span>
+                <button class="btn btn-sm" id="btn-clear">清空对话</button>
+              </div>
+              <div class="chat-body" id="chat-body"></div>
+
+              <!-- 建议问题 chip -->
+              <div class="ai-suggest" id="ai-suggest"></div>
+
+              <div class="chat-input">
+                <input type="text" id="chat-input" placeholder="输入问题，按回车发送…（演示：仅匹配预设关键词）">
+                <button class="btn btn-primary" id="btn-send">发送</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右：能力清单 + 接入说明 -->
+          <div>
+            <div class="ai-side">
+              <h4>AI Tool 能力</h4>
+              <div id="tools-area"></div>
+              <div class="divider"></div>
+              <h4>接入说明</h4>
+              <div style="font-size:12px;color:var(--text-2);line-height:1.7;">
+                · 纳入 <strong>集团统一 AI 入口</strong>（不作为系统外挂）<br>
+                · 调用任何 Tool 均按当前账号权限执行<br>
+                · 不主动外发数据，不跨二级集团访问<br>
+                · 写操作（如提报需求）<strong>必须用户确认</strong>
+              </div>
+              <div class="divider"></div>
+              <h4>说明</h4>
+              <div style="font-size:11px;color:var(--text-3);line-height:1.6;">
+                本演示按预设关键词回放，不连接任何模型 / 后端。生产实施时通过 12 项业务接口 + 集团统一 AI 入口对接。
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'ai-assistant',
+      crumbs: ['决策 / AI', 'AI 助理'],
+      title: 'AI 助理（互动演示）',
+      desc: '对齐《09》8 类 AI Tool + 集团统筹层「统一 AI 入口」要求',
+    });
+
+    document.getElementById('cur-role').textContent = SC.getRole().label;
+
+    /* 渲染建议问题 */
+    var suggestArea = document.getElementById('ai-suggest');
+    suggestArea.innerHTML = SC.data.aiSuggestQuestions.map(function (s) {
+      return '<span class="chip" data-q="' + s.q.replace(/"/g, '&quot;') + '">' +
+        '<span class="icon">' + s.icon + '</span>' + s.q +
+      '</span>';
+    }).join('');
+
+    /* Tool 列表 */
+    document.getElementById('tools-area').innerHTML = SC.data.aiTools.map(function (t) {
+      return '<div class="item" style="cursor:default;padding:6px 0;">' +
+        '<div style="font-size:12px;color:var(--text);font-weight:500;">' + t.code + ' · ' + t.name + '</div>' +
+        '<div class="meta">' + t.desc + '</div>' +
+      '</div>';
+    }).join('');
+
+    /* 对话 */
+    var chatBody = document.getElementById('chat-body');
+    var input = document.getElementById('chat-input');
+
+    function pushUser(text) {
+      chatBody.insertAdjacentHTML('beforeend',
+        '<div class="chat-msg user">' +
+          '<div class="av">我</div>' +
+          '<div class="chat-bubble">' + text + '</div>' +
+        '</div>');
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function pushAi(text, tool, refs) {
+      var toolHtml = tool ? '<div><span class="tool-tag">' + tool + '</span></div>' : '';
+      var refsHtml = (refs && refs.length) ? '<div class="refs">引用：' + refs.map(function (r) { return '<span class="font-mono">' + r + '</span>'; }).join(' · ') + '</div>' : '';
+      chatBody.insertAdjacentHTML('beforeend',
+        '<div class="chat-msg ai">' +
+          '<div class="av">AI</div>' +
+          '<div class="chat-bubble">' + text + toolHtml + refsHtml + '</div>' +
+        '</div>');
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function answer(q) {
+      var presets = SC.data.aiPresets;
+      for (var key in presets) {
+        if (key === '_default_') continue;
+        var keywords = key.split('|');
+        for (var i = 0; i < keywords.length; i++) {
+          if (q.indexOf(keywords[i]) >= 0) {
+            return presets[key];
+          }
+        }
+      }
+      return presets._default_;
+    }
+
+    function send(text) {
+      text = (text || '').trim();
+      if (!text) return;
+      pushUser(text);
+      input.value = '';
+      setTimeout(function () {
+        var a = answer(text);
+        pushAi(a.text, a.tool, a.refs);
+      }, 500);
+    }
+
+    /* 初始欢迎 */
+    pushAi('您好，我是物资 AI 助理。我可以查询库存、订单进度、合同付款节点、预警、设备租赁、盘点差异等。点下方建议问题快速试试，或直接输入。', '路由器', []);
+
+    /* 绑定 */
+    document.getElementById('btn-send').addEventListener('click', function () { send(input.value); });
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') send(input.value); });
+    suggestArea.addEventListener('click', function (e) {
+      var chip = e.target.closest('.chip');
+      if (chip) send(chip.dataset.q);
+    });
+    document.getElementById('btn-clear').addEventListener('click', function () {
+      chatBody.innerHTML = '';
+      pushAi('已清空。请继续提问。', '路由器', []);
+    });
+  </script>
+</body>
+</html>

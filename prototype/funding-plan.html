@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>资金计划 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="kpi-grid">
+          <div class="kpi accent">
+            <div class="label">5 月资金计划合计</div>
+            <div class="value" id="kpi-total"></div>
+            <div class="trend">阜矿 · 全口径</div>
+          </div>
+          <div class="kpi">
+            <div class="label">已支付</div>
+            <div class="value" id="kpi-paid" style="color:var(--green);"></div>
+            <div class="trend up" id="kpi-paid-pct"></div>
+          </div>
+          <div class="kpi">
+            <div class="label">已批准·待付</div>
+            <div class="value" id="kpi-appr" style="color:var(--brand);"></div>
+            <div class="trend">含 1 项审批通过待付款</div>
+          </div>
+          <div class="kpi">
+            <div class="label">待发起申请</div>
+            <div class="value" id="kpi-pend" style="color:var(--amber);"></div>
+            <div class="trend down">含 5 项需于本月内推进</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="title">月度执行率</div>
+            <div class="actions">
+              <button class="btn">切换至日历视图</button>
+              <button class="btn">切换至按供应商汇总</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="bar"><div class="track"><div class="fill green" id="exec-fill" style="width:17%;"></div></div><div class="pct" id="exec-pct">17%</div></div>
+            <div class="text-2 mt-8" style="font-size:12px;">已支付占比；已批准·待付预计本周内执行；待发起项需在 5/10 前完成审批以保障付款节奏。</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field"><label>月份</label>
+              <select><option>2026-05</option><option>2026-04</option><option>2026-03</option></select>
+            </div>
+            <div class="form-field"><label>供应商</label><input placeholder="模糊搜索"></div>
+            <div class="form-field"><label>合同</label><input placeholder="HT-…"></div>
+            <div class="form-field"><label>状态</label>
+              <select>
+                <option>全部</option><option>待发起</option><option>审批中</option>
+                <option>已批准·待付</option><option>已支付</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="title">按周分布（5 月共 5 周）</div>
+            <div class="actions">
+              <button class="btn">导出 Excel</button>
+              <button class="btn">提交月计划至财务</button>
+            </div>
+          </div>
+
+          <div class="card-body" id="weeks-area"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+            <span class="badge blue dot">说明</span>
+            <div class="text-2">
+              资金计划基于 <span class="font-mono">合同付款节点 (C-04)</span> 和 <span class="font-mono">租赁费用汇总 (E-13)</span> 自动生成，再由财务调整发布；
+              已支付项与 <span class="font-mono">付款执行 (C-07)</span> 双向回写，与 <span class="font-mono">NC 月结对账 (F-12)</span> 联动统计差异。详见《05》第 5 章。
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'funding-plan',
+      crumbs: ['合同与资金', '资金计划'],
+      title: '资金计划（5 月）',
+      desc: '对齐《05》— C-04 付款节点 + C-07 付款执行 + 月度资金视图',
+      actions: [{ label: '导出' }, { label: '提交至财务', primary: true }],
+    });
+
+    var p = SC.data.fundingPlan;
+    document.getElementById('kpi-total').textContent = '¥ ' + (p.totalPlan / 10000).toFixed(1) + ' 万';
+    document.getElementById('kpi-paid').textContent  = '¥ ' + (p.totalPaid / 10000).toFixed(1) + ' 万';
+    document.getElementById('kpi-appr').textContent  = '¥ ' + (p.totalApproved / 10000).toFixed(1) + ' 万';
+    document.getElementById('kpi-pend').textContent  = '¥ ' + (p.totalPending / 10000).toFixed(1) + ' 万';
+    var pct = Math.round(p.totalPaid / p.totalPlan * 100);
+    document.getElementById('exec-fill').style.width = pct + '%';
+    document.getElementById('exec-pct').textContent = pct + '%';
+    document.getElementById('kpi-paid-pct').textContent = '占月计划 ' + pct + '%';
+
+    var weeksArea = document.getElementById('weeks-area');
+    weeksArea.innerHTML = p.weeks.map(function (w) {
+      var weekTotal = w.items.reduce(function (a, b) { return a + b.amount; }, 0);
+      var rows = w.items.map(function (it) {
+        return '<tr>' +
+          '<td class="muted">' + it.date + '</td>' +
+          '<td>' + it.supplier + '</td>' +
+          '<td class="code"><a href="contract-detail.html">' + it.contract + '</a></td>' +
+          '<td class="muted">' + it.node + '</td>' +
+          '<td class="num"><strong>' + SC.fmtMoney(it.amount) + '</strong></td>' +
+          '<td>' + SC.badge(it.state, it.color, true) + '</td>' +
+          '<td class="actions">' +
+            (it.state === '待发起' ? '<a>发起申请</a>' :
+             it.state === '审批中' ? '<a href="payment-request.html">查看</a>' :
+             it.state === '已批准·待付' ? '<a>执行付款</a>' :
+             it.state === '已支付' ? '<a>查凭证</a>' : '<a>查看</a>') +
+          '</td>' +
+        '</tr>';
+      }).join('');
+      return '<div class="week-block">' +
+        '<div class="week-head">' +
+          '<span class="week-name">' + w.week + '</span>' +
+          '<span class="muted">共 ' + w.items.length + ' 项</span>' +
+          '<span class="week-total">本周计划：<strong style="color:var(--text);">' + SC.fmtMoney(weekTotal) + '</strong></span>' +
+        '</div>' +
+        '<div class="week-body">' +
+          '<table class="data"><thead><tr>' +
+            '<th>计划日期</th><th>供应商</th><th>合同</th><th>付款节点</th>' +
+            '<th class="num">金额</th><th>状态</th><th>操作</th>' +
+          '</tr></thead><tbody>' + rows + '</tbody></table>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  </script>
+</body>
+</html>

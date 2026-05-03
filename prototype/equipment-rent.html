@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>设备租赁 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="flow-strip">
+            <div class="node done"><span class="step-num">1</span> 租赁申请 (E-07)</div>
+            <div class="node done"><span class="step-num">2</span> 审批</div>
+            <div class="node current"><span class="step-num">3</span> 租赁登记 (E-08)</div>
+            <div class="node"><span class="step-num">4</span> 起租 (E-09)</div>
+            <div class="node"><span class="step-num">5</span> 续租 / 停租 (E-10/11)</div>
+            <div class="node"><span class="step-num">6</span> 退租 (E-12) → 费用汇总 (E-13)</div>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi"><div class="label">在租设备</div><div class="value">3</div><div class="trend">月度租金 ¥ 192,500</div></div>
+          <div class="kpi"><div class="label">本月新起租</div><div class="value">1</div><div class="trend up">东梁矿掘进机</div></div>
+          <div class="kpi"><div class="label">待起租 / 待退租</div><div class="value">2</div><div class="trend">需协调交接 / 结算</div></div>
+          <div class="kpi"><div class="label">本月费用汇总</div><div class="value">¥ 233,000</div><div class="trend">含续租审中部分</div></div>
+        </div>
+
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field"><label>租赁单号</label><input placeholder="ZL-2026-…"></div>
+            <div class="form-field"><label>设备编号 / 名称</label><input placeholder="EQ- / 关键词"></div>
+            <div class="form-field"><label>承租单位</label>
+              <select>
+                <option>全部</option>
+                <option>艾友矿·综采一队</option><option>艾友矿·综采二队</option>
+                <option>东梁矿·掘进一队</option><option>五龙矿·运输二队</option>
+                <option>新邱矿·通防队</option>
+              </select>
+            </div>
+            <div class="form-field"><label>状态</label>
+              <select>
+                <option>全部</option><option>申请中</option><option>已登记</option>
+                <option>待起租</option><option>已起租</option><option>执行中</option>
+                <option>续租审中</option><option>停租</option><option>已退租</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="title">设备租赁台账</div>
+            <div class="actions">
+              <button class="btn">导出</button>
+              <button class="btn btn-primary">+ 新建租赁申请</button>
+            </div>
+          </div>
+
+          <table class="data">
+            <thead>
+              <tr>
+                <th>租赁单号</th>
+                <th>设备名称 / 编号</th>
+                <th>出租方</th>
+                <th>承租单位</th>
+                <th>租期</th>
+                <th class="num">月租金</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="lease-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- 提示 -->
+        <div class="card">
+          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+            <span class="badge blue dot">边界说明</span>
+            <div class="text-2">
+              <div><strong>设备 / 库存事实源边界：</strong>租赁设备进入施工现场后，<u>不计入库存台账 S-13</u>；仅在设备档案 (E-01) 中标记为「在租使用」状态，相关台账通过设备生命周期表追踪。</div>
+              <div style="margin-top:6px;"><strong>租赁费用与合同付款：</strong>费用汇总 (E-13) 不直接生成付款单，需触达合同模块的付款节点 (C-04) 后由资金计划模块统一发起付款 → NC 推送。</div>
+              <div style="margin-top:6px;">详见《07-设备与设备租赁详细设计 V1.0》第 4 章 — 库存 / 合同 / 付款边界。</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'equipment-rent',
+      crumbs: ['设备', '设备租赁'],
+      title: '设备租赁',
+      desc: '对齐《07-设备与设备租赁详细设计 V1.0》— E-07~E-13 租赁闭环',
+      actions: [{ label: '+ 设备建档' }, { label: '+ 新建租赁申请', primary: true }],
+    });
+
+    var tbody = document.getElementById('lease-tbody');
+    tbody.innerHTML = SC.data.equipmentLeases.map(function (l) {
+      return '<tr>' +
+        '<td class="code">' + l.code + '</td>' +
+        '<td>' + l.equip + '<div class="muted code" style="font-size:11px;">' + l.equipCode + '</div></td>' +
+        '<td>' + l.lessor + '</td>' +
+        '<td>' + l.lessee + '</td>' +
+        '<td class="muted">' + l.startDate + ' ~ ' + l.endDate + '</td>' +
+        '<td class="num">' + SC.fmtMoney(l.monthlyFee) + '</td>' +
+        '<td>' + SC.badge(l.state, l.color, true) + '</td>' +
+        '<td class="actions"><a>查看</a>' +
+          (l.state === '执行中' ? '<a>停租</a><a>续租</a>' : '') +
+          (l.state === '待起租' ? '<a>起租交接</a>' : '') +
+          (l.state === '已起租' ? '<a>登记交接</a>' : '') +
+          (l.state === '续租审中' ? '<a>查审批</a>' : '') +
+          (l.state === '已退租' ? '<a>费用汇总</a>' : '') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

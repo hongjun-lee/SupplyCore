@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>工作台 — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <!-- KPI -->
+        <div class="kpi-grid">
+          <div class="kpi accent">
+            <div class="label">待我处理</div>
+            <div class="value">4</div>
+            <div class="trend">需求 1 · 订单 1 · 设备租赁 1 · 废旧 1</div>
+          </div>
+          <div class="kpi">
+            <div class="label">本月需求计划</div>
+            <div class="value">126</div>
+            <div class="trend up">较上月 ↑ 12%</div>
+          </div>
+          <div class="kpi">
+            <div class="label">在途订单金额</div>
+            <div class="value">¥ 384.7 万</div>
+            <div class="trend">未到货 18 单</div>
+          </div>
+          <div class="kpi">
+            <div class="label">库存周转（30 日）</div>
+            <div class="value">2.4 次</div>
+            <div class="trend up">较上月 ↑ 0.3</div>
+          </div>
+          <div class="kpi">
+            <div class="label">NC 接口异常</div>
+            <div class="value" style="color:var(--red)">3</div>
+            <div class="trend down">采购订单推送失败 · 待重推</div>
+          </div>
+        </div>
+
+        <!-- 左：待办 + 快速入口；右：预警 + 接口 -->
+        <div class="cols-2">
+          <div>
+            <!-- 我的待办 -->
+            <div class="card">
+              <div class="card-header">
+                <div class="title">我的待办</div>
+                <div class="actions">
+                  <a class="btn btn-sm" href="approval-center.html">查看全部</a>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>业务单据</th><th>摘要</th><th class="num">金额</th>
+                    <th>提交人</th><th>提交时间</th><th>SLA</th><th></th>
+                  </tr>
+                </thead>
+                <tbody id="todo-tbody"></tbody>
+              </table>
+            </div>
+
+            <!-- 我经办的需求 / 订单 -->
+            <div class="card">
+              <div class="card-header">
+                <div class="title">最近经办的需求与订单</div>
+                <div class="actions">
+                  <a class="btn btn-sm" href="requirement-list.html">需求计划</a>
+                  <a class="btn btn-sm" href="purchase-orders.html">采购订单</a>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>类型</th><th>编号</th><th>摘要</th><th class="num">金额</th><th>状态</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><span class="badge blue">需求</span></td><td class="code">XQ-2026-0427</td><td>东梁矿掘进机配件</td><td class="num">¥ 64,200.00</td><td><span class="badge amber dot">审中</span></td></tr>
+                  <tr><td><span class="badge blue">需求</span></td><td class="code">XQ-2026-0426</td><td>五龙矿火工品月度补充</td><td class="num">¥ 24,800.00</td><td><span class="badge blue dot">待审核</span></td></tr>
+                  <tr><td><span class="badge teal">订单</span></td><td class="code">CG-2026-0316</td><td>大连华锐重工集团 · 采煤备件</td><td class="num">¥ 248,000.00</td><td><span class="badge amber dot">执行中</span></td></tr>
+                  <tr><td><span class="badge teal">订单</span></td><td class="code">CG-2026-0314</td><td>抚顺矿用电缆厂 · 矿用电缆</td><td class="num">¥ 412,800.00</td><td><span class="badge amber dot">部分到货</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <!-- 业务预警 -->
+            <div class="card">
+              <div class="card-header"><div class="title">业务预警</div></div>
+              <div class="card-body" style="padding:0;">
+                <table class="data">
+                  <tbody>
+                    <tr>
+                      <td><span class="badge red dot">过期</span></td>
+                      <td>五龙矿火工品库 <strong>乳化炸药 II 级</strong> 批次 B202602-009 已过保质期</td>
+                    </tr>
+                    <tr>
+                      <td><span class="badge amber dot">临期</span></td>
+                      <td>五龙矿油料库 <strong>乳化油 N5</strong> 批次 B202603-101 距过期 28 日</td>
+                    </tr>
+                    <tr>
+                      <td><span class="badge amber dot">低于安全</span></td>
+                      <td>艾友矿主仓 <strong>矿用电缆 MYP3*50</strong> 库存 1240 米 / 安全线 1500 米</td>
+                    </tr>
+                    <tr>
+                      <td><span class="badge red dot">合同到期</span></td>
+                      <td>设备租赁 <strong>ZL-2026-0214 乳化液泵站</strong> 已退租 / 待结算</td>
+                    </tr>
+                    <tr>
+                      <td><span class="badge amber dot">逾期未到货</span></td>
+                      <td>采购订单 <strong>CG-2026-0314</strong> 抚顺矿用电缆厂 · 已逾期 2 日</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 接口运行 -->
+            <div class="card">
+              <div class="card-header">
+                <div class="title">NC 接口运行（今日）</div>
+                <div class="actions"><a class="btn btn-sm" href="nc-interface.html">运维入口</a></div>
+              </div>
+              <div class="card-body" style="padding:0;">
+                <table class="data">
+                  <thead>
+                    <tr><th>接口</th><th class="num">成功</th><th class="num">失败</th><th>状态</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>采购订单推送 (NC-BIZ-005)</td><td class="num">38</td><td class="num" style="color:var(--red)">3</td><td><span class="badge red dot">需关注</span></td></tr>
+                    <tr><td>采购入库推送 (NC-BIZ-007)</td><td class="num">55</td><td class="num">1</td><td><span class="badge amber dot">轻微</span></td></tr>
+                    <tr><td>领料出库推送 (NC-BIZ-011)</td><td class="num">124</td><td class="num">0</td><td><span class="badge green dot">正常</span></td></tr>
+                    <tr><td>物料主数据下推 (NC-MD-001)</td><td class="num">84</td><td class="num">2</td><td><span class="badge amber dot">轻微</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'dashboard',
+      crumbs: ['首页', '工作台'],
+      title: '工作台',
+      desc: '当前角色：' + SC.getRole().label + ' · 二级集团：' + SC.data.subGroup.name,
+      actions: [
+        { label: '⬜ 投屏大屏' },
+        { label: '✺ AI 助理' },
+        { label: '+ 提交新需求', primary: true },
+      ],
+    });
+    /* 顶部按钮跳转 */
+    setTimeout(function () {
+      var btns = document.querySelectorAll('.page-header .actions .btn');
+      if (btns[0]) btns[0].onclick = function () { window.open('dashboard-bigscreen.html'); };
+      if (btns[1]) btns[1].onclick = function () { location.href = 'ai-assistant.html'; };
+    }, 0);
+
+    /* 渲染待办 */
+    var tbody = document.getElementById('todo-tbody');
+    tbody.innerHTML = SC.data.approvalTodo.map(function (t) {
+      return '<tr>' +
+        '<td><span class="badge blue">' + t.biz.split(' / ')[0] + '</span><div class="code muted" style="margin-top:2px;">' + t.biz.split(' / ')[1] + '</div></td>' +
+        '<td>' + t.summary + '</td>' +
+        '<td class="num">' + SC.fmtMoney(t.amount) + '</td>' +
+        '<td>' + t.from + '</td>' +
+        '<td class="muted">' + t.submitAt + '</td>' +
+        '<td><span class="badge ' + t.slaColor + ' dot">' + t.sla + '</span></td>' +
+        '<td><a class="btn btn-sm btn-primary" href="approval-center.html">处理</a></td>' +
+        '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

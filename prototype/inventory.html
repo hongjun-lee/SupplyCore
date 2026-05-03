@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>库存查询 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="kpi-grid">
+          <div class="kpi"><div class="label">在库物料种类</div><div class="value">8 类示例</div><div class="trend">演示 8 行 / 全口径 ~12,400 SKU</div></div>
+          <div class="kpi"><div class="label">在库总价值</div><div class="value">¥ 86 万</div><div class="trend">演示口径</div></div>
+          <div class="kpi"><div class="label">临期 / 过期批次</div><div class="value" style="color:var(--amber)">2</div><div class="trend down">需关注：乳化油、乳化炸药</div></div>
+          <div class="kpi"><div class="label">火工品库存</div><div class="value">2 类</div><div class="trend">专管库 · 双人双锁</div></div>
+        </div>
+
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field"><label>物料编码</label><input placeholder="M-…"></div>
+            <div class="form-field"><label>物料名称</label><input placeholder="关键词"></div>
+            <div class="form-field"><label>物料分类</label>
+              <select>
+                <option>全部</option><option>安全监测</option><option>电气设备</option><option>化工油料</option>
+                <option>电缆电线</option><option>火工品</option><option>采掘备件</option><option>劳保用品</option>
+              </select>
+            </div>
+            <div class="form-field"><label>仓库</label>
+              <select>
+                <option>全部</option>
+                <option>艾友矿主仓</option><option>艾友矿设备库</option><option>艾友矿安全器材库</option>
+                <option>五龙矿油料库</option><option>五龙矿火工品库（专管）</option>
+                <option>东梁矿主仓</option>
+              </select>
+            </div>
+            <div class="form-field"><label>批次状态</label>
+              <select>
+                <option>全部</option><option>有效</option><option>临期</option><option>过期</option>
+                <option>冻结</option><option>作废</option>
+              </select>
+              <small class="muted" style="margin-top:2px;">字段：batch_state</small>
+            </div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="title">库存台账（库存唯一事实源 S-13 / 批次账 S-14）</div>
+            <div class="actions">
+              <button class="btn">导出</button>
+              <button class="btn">查看库存事务流水 (S-21)</button>
+            </div>
+          </div>
+
+          <table class="data">
+            <thead>
+              <tr>
+                <th>物料编码</th>
+                <th>物料名称 / 规格</th>
+                <th>分类</th>
+                <th>仓库 / 货位</th>
+                <th>计量单位</th>
+                <th class="num">现存量</th>
+                <th>批次 / 保质期</th>
+                <th>批次状态</th>
+                <th class="num">平均成本</th>
+                <th class="num">价值</th>
+              </tr>
+            </thead>
+            <tbody id="inv-tbody"></tbody>
+          </table>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+            <div>共 <strong>8</strong> 条 · 价值合计 <strong style="color:var(--text);">¥ 860,580.00</strong></div>
+            <div>
+              <button class="btn btn-sm">上一页</button>
+              <span class="muted" style="margin:0 8px;">1 / 1</span>
+              <button class="btn btn-sm">下一页</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 提示 -->
+        <div class="card">
+          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+            <span class="badge blue dot">说明</span>
+            <div class="text-2">
+              <div><strong>库存唯一事实源原则：</strong>所有库存数量与价值以 <span class="font-mono">S-13 库存台账</span> 为准；批次维度信息见 <span class="font-mono">S-14 批次账</span>；任意一笔出入库须在同事务原子写入 <span class="font-mono">S-21 库存事务流水</span>。</div>
+              <div style="margin-top:6px;"><strong>火工品 / 化工品强制批次：</strong>分类前缀 <span class="font-mono">HG/HX</span> 必须按批次维度记账，并支持双人双锁专管库。</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'inventory',
+      crumbs: ['库存实物流转', '库存查询'],
+      title: '库存查询',
+      desc: '对齐《06-库存实物流转详细设计 V1.0》S-13 / S-14 / S-21',
+      actions: [{ label: '导出 Excel' }, { label: '+ 调拨申请' }, { label: '+ 领料申请', primary: true }],
+    });
+
+    var batchColor = { '有效': 'green', '临期': 'amber', '过期': 'red', '冻结': 'gray', '作废': 'gray', '—': 'gray' };
+    var tbody = document.getElementById('inv-tbody');
+    tbody.innerHTML = SC.data.inventory.map(function (i) {
+      var stateBadge = i.batchState === '—' ? '<span class="muted">—</span>' :
+        SC.badge(i.batchState, batchColor[i.batchState] || 'gray', true);
+      return '<tr>' +
+        '<td class="code">' + i.mcode + '</td>' +
+        '<td>' + i.mname + '<div class="muted" style="font-size:11px;">' + i.spec + '</div></td>' +
+        '<td>' + i.cat + '</td>' +
+        '<td>' + i.warehouse + '<div class="muted" style="font-size:11px;">' + i.loc + '</div></td>' +
+        '<td>' + i.unit + '</td>' +
+        '<td class="num">' + SC.fmtNum(i.qty) + '</td>' +
+        '<td>' + i.batch + '<div class="muted" style="font-size:11px;">' + i.life + '</div></td>' +
+        '<td>' + stateBadge + '</td>' +
+        '<td class="num">' + SC.fmtMoney(i.avgCost) + '</td>' +
+        '<td class="num">' + SC.fmtMoney(i.value) + '</td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

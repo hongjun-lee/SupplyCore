@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>物料主数据 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <!-- 生命周期 7 状态机 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="title">物料生命周期 — 7 状态机</div>
+            <div class="actions">
+              <span class="muted">字段：material_state</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="lifecycle" id="lifecycle"></div>
+            <div class="text-2 mt-12" style="font-size:12px;">
+              对齐《03-物料主数据与编码详细设计 V1.0》第 2 章生命周期；HG/HX 类目（火工品/化工品）强制按批次记账，进入"启用"前需完成 NC 映射查找（三阶段过渡）。
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field"><label>物料编码</label><input placeholder="M-…"></div>
+            <div class="form-field"><label>物料名称 / 规格</label><input placeholder="关键词"></div>
+            <div class="form-field"><label>分类</label>
+              <select>
+                <option>全部</option>
+                <option>安全监测</option><option>电气设备</option><option>化工油料</option>
+                <option>电缆电线</option><option>火工品</option><option>采掘备件</option><option>劳保用品</option>
+              </select>
+            </div>
+            <div class="form-field"><label>状态</label>
+              <select>
+                <option>全部</option>
+                <option>草稿</option><option>审核中</option><option>待启用</option>
+                <option>启用</option><option>冻结</option><option>停用</option><option>已作废</option>
+              </select>
+            </div>
+            <div class="form-field"><label>NC 映射</label>
+              <select>
+                <option>全部</option><option>已映射</option><option>未映射</option><option>映射告警</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="title">物料主数据列表</div>
+            <div class="actions">
+              <button class="btn">导入模板</button>
+              <button class="btn">编码查重</button>
+              <button class="btn btn-primary">+ 新增物料申请 (M-17)</button>
+            </div>
+          </div>
+
+          <table class="data">
+            <thead>
+              <tr>
+                <th>物料编码</th>
+                <th>物料名称 / 规格</th>
+                <th>分类</th>
+                <th>计量单位</th>
+                <th>批次管理</th>
+                <th>NC 映射</th>
+                <th>状态<br><span class="muted" style="font-size:11px;font-weight:400;">material_state</span></th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="mat-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- 编码规则 + NC 映射 -->
+        <div class="cols-2">
+          <div class="card">
+            <div class="card-header"><div class="title">物资编码结构（V1.7）</div></div>
+            <div class="card-body" style="font-size:13px;">
+              <div class="kv">
+                <div class="k">编码段</div>
+                <div class="v"><span class="font-mono">M - {大类} - {流水}</span></div>
+                <div class="k">大类前缀</div>
+                <div class="v">AQ 安全监测 / DJ 电机电气 / DL 电缆电线 / RH 化工油料 / HG 火工品 / BJ 采掘备件 / LP 劳保 / TF 通防 / PS 运输 …</div>
+                <div class="k">查重</div>
+                <div class="v">三级查重：① 同义词比对 ② 规格相似度 ③ 历史使用穿透</div>
+                <div class="k">集团扩展</div>
+                <div class="v">辽宁能源集团 GROUP- 段位预留，待集团统一编码方案落地后扩展</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="title">NC 映射（三阶段过渡）</div></div>
+            <div class="card-body" style="font-size:13px;color:var(--text-2);">
+              <div class="mb-8">阶段一：<strong>本地启用，不映射</strong> — NC 未落地，本系统先行使用</div>
+              <div class="mb-8">阶段二：<strong>本地启用 + 映射占位</strong> — 维护本地物料 ↔ NC 编码占位，等待 NC 主数据下发</div>
+              <div class="mb-8">阶段三：<strong>正式映射</strong> — NC 上线后，按 NC-MD-001 物料主数据下推接口同步</div>
+              <div class="mt-12">
+                <span class="badge red">提示</span>
+                <span style="margin-left:8px;">M-NEW-099 当前未映射，启用后将通过映射告警 (F-11) 推送至接口管理员处理。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'material-master',
+      crumbs: ['基础数据', '物料主数据'],
+      title: '物料主数据',
+      desc: '对齐《03-物料主数据与编码详细设计 V1.0》— M-04~M-17 + 编码规范 V1.7',
+      actions: [{ label: '编码规则配置' }, { label: '+ 新增物料申请', primary: true }],
+    });
+
+    /* 生命周期 */
+    var lcColors = { '草稿':'gray', '审核中':'amber', '待启用':'blue', '启用':'green', '冻结':'amber', '停用':'gray', '已作废':'red' };
+    document.getElementById('lifecycle').innerHTML = SC.data.materialLifecycle.map(function (s) {
+      return '<div class="ls-node">' +
+        '<div class="ls-bubble ' + (lcColors[s.state] || '') + '">' +
+          '<strong>' + s.state + '</strong>' +
+          '<small>' + s.desc + '</small>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    /* 列表 */
+    document.getElementById('mat-tbody').innerHTML = SC.data.materials.map(function (m) {
+      return '<tr>' +
+        '<td class="code">' + m.code + '</td>' +
+        '<td>' + m.name + '<div class="muted" style="font-size:11px;">' + m.spec + '</div></td>' +
+        '<td>' + m.cat + '</td>' +
+        '<td>' + m.unit + '</td>' +
+        '<td>' + (m.batchReq ? '<span class="badge amber">强制批次</span>' : '<span class="muted">否</span>') + '</td>' +
+        '<td>' + (m.ncMapped ? '<span class="badge green dot">已映射</span>' : '<span class="badge red dot">未映射</span>') + '</td>' +
+        '<td>' + SC.badge(m.state, m.color, true) + '</td>' +
+        '<td class="actions"><a>查看</a><a>变更状态</a></td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

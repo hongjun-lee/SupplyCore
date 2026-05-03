@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>报表 / AI 助理 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="cols-2">
+          <!-- 左：报表中心 -->
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">报表中心（21 张基础报表 · 节选 9 张）</div>
+                <div class="actions">
+                  <button class="btn">报表配置</button>
+                  <button class="btn">导出审计</button>
+                  <button class="btn btn-primary">+ 自定义报表</button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="reports-grid"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="title">预警规则（12 类）· 今日触发</div>
+                <div class="actions">
+                  <button class="btn">规则配置</button>
+                  <button class="btn">订阅与通知</button>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>规则编码</th>
+                    <th>规则名称</th>
+                    <th>分类</th>
+                    <th>触发条件</th>
+                    <th>状态</th>
+                    <th class="num">今日触发</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="alert-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 右：AI 助理 -->
+          <div>
+            <div class="chat-panel">
+              <div class="chat-head">
+                <div class="ai-mark">AI</div>
+                <div>
+                  <div style="font-weight:600;font-size:13px;">物资 AI 助理</div>
+                  <div style="font-size:11px;color:var(--text-2);">已接入 8 类业务 Tool · 同业务权限隔离 · 集团统一 AI 入口</div>
+                </div>
+                <span class="spacer" style="flex:1;"></span>
+                <a class="btn btn-sm">能力清单</a>
+              </div>
+              <div class="chat-body" id="chat-body"></div>
+              <div class="chat-input">
+                <input type="text" placeholder="比如：东梁矿 5 月安全监测设备到货了多少？">
+                <button class="btn btn-primary">发送</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">AI Tool 能力清单（节选 8 类）</div></div>
+              <table class="data">
+                <thead>
+                  <tr><th>编码</th><th>能力名称</th><th>说明</th><th>权限</th></tr>
+                </thead>
+                <tbody id="ai-tools-tbody"></tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+                <span class="badge blue dot">边界</span>
+                <div class="text-2">
+                  <div><strong>权限隔离：</strong>AI 助理调用任何 Tool 均按发起人当前账号、角色、数据范围执行；不会跨角色越权。</div>
+                  <div class="mt-8"><strong>导出审计：</strong>由 AI 触发的报表导出与人工导出共用 <span class="font-mono">09 导出审计 (R-10)</span> 表，含水印与下载明细。</div>
+                  <div class="mt-8"><strong>对接位置：</strong>纳入集团统一 AI 入口（详见集团统筹层 AI 接入专题），不作为系统外挂。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'reports',
+      crumbs: ['决策 / AI', '报表 / AI 助理'],
+      title: '报表 / AI 助理',
+      desc: '对齐《09-报表预警与AI能力详细设计 V1.0》— 21 张报表 + 12 类预警 + 8 类 AI Tool',
+      actions: [{ label: '导出审计' }, { label: '+ 新建预警规则', primary: true }],
+    });
+
+    var ico = { '库存': '▦', '采购': '⇄', '合同': '◇', '设备': '⚙', '财务': '¥', '管理': '★' };
+    document.getElementById('reports-grid').innerHTML = SC.data.reports.map(function (r) {
+      var href = r.code === 'R-INV-001' ? 'report-detail.html' : '#';
+      return '<a class="report-thumb" href="' + href + '" style="text-decoration:none;color:inherit;">' +
+        '<div class="ico">' + (ico[r.cat] || '☆') + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="name">' + r.name + (r.code === 'R-INV-001' ? ' <span class="badge blue" style="margin-left:4px;">可穿透演示</span>' : '') + '</div>' +
+          '<div class="meta">' + r.cat + ' · ' + r.period + ' · ' + r.viewers + ' 次访问 · ' + r.lastView + '</div>' +
+        '</div>' +
+      '</a>';
+    }).join('');
+
+    document.getElementById('alert-tbody').innerHTML = SC.data.alertRules.map(function (a) {
+      return '<tr>' +
+        '<td class="code">' + a.code + '</td>' +
+        '<td>' + a.name + '</td>' +
+        '<td><span class="badge gray">' + a.cat + '</span></td>' +
+        '<td class="muted">' + a.threshold + '</td>' +
+        '<td>' + (a.enabled ? '<span class="badge green dot">启用</span>' : '<span class="badge gray dot">停用</span>') + '</td>' +
+        '<td class="num" style="' + (a.today > 0 ? 'color:var(--amber);font-weight:600;' : 'color:var(--text-3);') + '">' + a.today + '</td>' +
+        '<td class="actions"><a>查记录</a><a>调整</a></td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('chat-body').innerHTML = SC.data.aiChat.map(function (m) {
+      var av = m.who === 'user' ? '我' : 'AI';
+      var tool = m.tool ? '<div><span class="tool-tag">' + m.tool + '</span></div>' : '';
+      var refs = m.refs ? '<div class="refs">引用：' + m.refs.map(function (r) { return '<span class="font-mono">' + r + '</span>'; }).join(' · ') + '</div>' : '';
+      return '<div class="chat-msg ' + m.who + '">' +
+        '<div class="av">' + av + '</div>' +
+        '<div class="chat-bubble">' + m.text + tool + refs + '</div>' +
+      '</div>';
+    }).join('');
+
+    document.getElementById('ai-tools-tbody').innerHTML = SC.data.aiTools.map(function (t) {
+      return '<tr>' +
+        '<td class="code">' + t.code + '</td>' +
+        '<td>' + t.name + '</td>' +
+        '<td class="muted">' + t.desc + '</td>' +
+        '<td><span class="badge gray">' + t.perm + '</span></td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

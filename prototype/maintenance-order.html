@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>设备维修工单 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="kpi-grid">
+          <div class="kpi"><div class="label">本月工单</div><div class="value">5</div><div class="trend">3 已关单 · 1 检修中 · 1 待派工</div></div>
+          <div class="kpi"><div class="label">本月费用合计</div><div class="value">¥ 28,600</div><div class="trend">仅含已关单工单</div></div>
+          <div class="kpi"><div class="label">平均响应时长</div><div class="value">28 min</div><div class="trend up">报修→派工 ↓ 12%</div></div>
+          <div class="kpi"><div class="label">备件领用</div><div class="value">¥ 13,835</div><div class="trend">3 项备件出库</div></div>
+        </div>
+
+        <!-- 列表 -->
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field"><label>工单号</label><input placeholder="WX-2026-…"></div>
+            <div class="form-field"><label>设备</label><input placeholder="EQ- / 关键词"></div>
+            <div class="form-field"><label>类型</label>
+              <select>
+                <option>全部</option><option>故障报修</option><option>故障维修</option>
+                <option>一级保养</option><option>二级保养</option><option>检修</option>
+              </select>
+            </div>
+            <div class="form-field"><label>状态</label>
+              <select>
+                <option>全部</option><option>待派工</option><option>已派工</option>
+                <option>检修中</option><option>待验收</option><option>已关单</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="title">维修工单列表</div>
+            <div class="actions">
+              <button class="btn">导出</button>
+              <button class="btn btn-primary">+ 新建报修</button>
+            </div>
+          </div>
+
+          <table class="data">
+            <thead>
+              <tr>
+                <th>工单号</th>
+                <th>设备</th>
+                <th>类型</th>
+                <th>调度员 / 维修人</th>
+                <th>报修时间</th>
+                <th>关单时间</th>
+                <th>停机</th>
+                <th class="num">费用</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="wx-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- 详情 -->
+        <div class="card">
+          <div class="flow-strip">
+            <div class="node done"><span class="step-num">1</span> 故障报修</div>
+            <div class="node done"><span class="step-num">2</span> 调度派工</div>
+            <div class="node done"><span class="step-num">3</span> 到达现场</div>
+            <div class="node current"><span class="step-num">4</span> 检修执行</div>
+            <div class="node"><span class="step-num">5</span> 试运行验证</div>
+            <div class="node"><span class="step-num">6</span> 验收 + 关单</div>
+          </div>
+
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;">
+              <h2 class="mt-0 mb-0" style="font-size:18px;">维修工单 <span class="code" id="d-code"></span></h2>
+              <span id="d-state-badge"></span>
+              <span class="badge red">中等故障</span>
+              <span class="spacer" style="flex:1;"></span>
+              <button class="btn">打印工单</button>
+              <button class="btn">领用备件</button>
+              <button class="btn">挂起</button>
+              <button class="btn btn-primary">提交检修结果 → 验收</button>
+            </div>
+
+            <div class="kv mb-12">
+              <div class="k">设备</div><div class="v"><a href="equipment-lifecycle.html" id="d-equip"></a></div>
+              <div class="k">所在位置</div><div class="v" id="d-loc"></div>
+              <div class="k">故障类型</div><div class="v" id="d-kind"></div>
+              <div class="k">严重等级</div><div class="v" id="d-sev"></div>
+              <div class="k">报修人</div><div class="v" id="d-reporter"></div>
+              <div class="k">调度员</div><div class="v" id="d-disp"></div>
+              <div class="k">维修人</div><div class="v" id="d-worker"></div>
+              <div class="k">到场时间</div><div class="v" id="d-arrive"></div>
+            </div>
+
+            <div class="text-2 mb-8" style="padding:8px 12px;background:var(--red-50);border-left:3px solid var(--red);border-radius:0 4px 4px 0;">
+              <strong style="color:var(--red);">故障描述：</strong><span id="d-fault"></span>
+            </div>
+            <div class="text-2" style="padding:8px 12px;background:var(--brand-50);border-left:3px solid var(--brand);border-radius:0 4px 4px 0;">
+              <strong style="color:var(--brand);">现场诊断：</strong><span id="d-diag"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <!-- 备件领用 -->
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">备件领用（联动库存 S-22 领料申请）</div>
+                <div class="actions">
+                  <button class="btn btn-sm">+ 申领备件</button>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>物料编码</th>
+                    <th>名称 / 规格</th>
+                    <th class="num">数量</th>
+                    <th>来源</th>
+                    <th>状态</th>
+                    <th class="num">预估金额</th>
+                  </tr>
+                </thead>
+                <tbody id="parts-tbody"></tbody>
+                <tfoot>
+                  <tr style="background:#fafbfd;font-weight:600;">
+                    <td colspan="5">备件预估合计</td>
+                    <td class="num" id="parts-total"></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <!-- 附件 -->
+            <div class="card">
+              <div class="card-header"><div class="title">现场照片 / 附件</div></div>
+              <table class="data">
+                <tbody id="att-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 维修流程 timeline + 关单回写 -->
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">维修流程</div></div>
+              <div class="card-body">
+                <div class="timeline-vert" id="d-flow"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">关单后自动回写</div></div>
+              <div class="card-body" style="font-size:12px;color:var(--text-2);">
+                工单关单后将自动联动以下：
+                <ul style="margin:8px 0 0 16px;padding:0;">
+                  <li>设备生命周期 (E-01) 增加一条维修事件</li>
+                  <li>设备维修历史 (E-04) 累积统计</li>
+                  <li>备件领用单 (S-22) 关闭并产生库存事务流水 (S-21)</li>
+                  <li>故障如属于厂家保修期内：触发 NC-MD-005 回传保修索赔</li>
+                  <li>停机时长写入设备 OEE 指标，供 09 报表统计</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'maintenance-order',
+      crumbs: ['设备', '设备维修工单'],
+      title: '设备维修工单',
+      desc: '对齐《07-设备与设备租赁详细设计 V1.0》— E-04 维修保养 + S-22 备件领用 + NC-MD-005',
+      actions: [{ label: '+ 新建报修', primary: true }],
+    });
+
+    /* 列表 */
+    document.getElementById('wx-tbody').innerHTML = SC.data.maintenanceOrders.map(function (w) {
+      var kindColor = w.kind === '故障维修' || w.kind === '故障报修' ? 'red' :
+                      w.kind.indexOf('保养') >= 0 ? 'green' : 'gray';
+      return '<tr>' +
+        '<td class="code">' + w.code + '</td>' +
+        '<td>' + w.equip + '<div class="muted code" style="font-size:11px;">' + w.equipCode + '</div></td>' +
+        '<td><span class="badge ' + kindColor + '">' + w.kind + '</span></td>' +
+        '<td>' + w.dispatcher + '<div class="muted" style="font-size:11px;">' + w.worker + '</div></td>' +
+        '<td class="muted">' + w.submitAt + '</td>' +
+        '<td class="muted">' + w.closeAt + '</td>' +
+        '<td>' + w.stop + '</td>' +
+        '<td class="num">' + (w.cost > 0 ? SC.fmtMoney(w.cost) : '<span class="muted">—</span>') + '</td>' +
+        '<td>' + SC.badge(w.state, w.color, true) + '</td>' +
+        '<td class="actions"><a>详情</a>' + (w.state === '待派工' ? '<a>派工</a>' : '') + '</td>' +
+      '</tr>';
+    }).join('');
+
+    /* 详情 */
+    var d = SC.data.maintenanceOrderDetail;
+    document.getElementById('d-code').textContent = d.code;
+    document.getElementById('d-state-badge').innerHTML = SC.badge(d.state, d.stateColor, true);
+    document.getElementById('d-equip').innerHTML = d.equipName + ' <span class="muted code">(' + d.equipCode + ')</span>';
+    document.getElementById('d-loc').textContent = d.location;
+    document.getElementById('d-kind').textContent = d.kind;
+    document.getElementById('d-sev').innerHTML = '<span class="badge amber">' + d.severity + '</span>';
+    document.getElementById('d-reporter').innerHTML = d.reporter + ' <span class="muted">' + d.reporterPhone + '</span> · 报修于 ' + d.reportAt;
+    document.getElementById('d-disp').innerHTML = d.dispatcher + ' · 派工于 ' + d.dispatchAt;
+    document.getElementById('d-worker').textContent = d.worker;
+    document.getElementById('d-arrive').textContent = d.arriveAt;
+    document.getElementById('d-fault').textContent = d.fault;
+    document.getElementById('d-diag').textContent = d.diagnose;
+
+    var partsTotal = 0;
+    document.getElementById('parts-tbody').innerHTML = d.parts.map(function (p) {
+      partsTotal += p.est;
+      var stateColor = p.state.indexOf('已出库') >= 0 ? 'green' : 'amber';
+      return '<tr>' +
+        '<td class="code">' + p.code + '</td>' +
+        '<td>' + p.name + '<div class="muted" style="font-size:11px;">' + p.spec + '</div></td>' +
+        '<td class="num">' + p.qty + ' ' + p.unit + '</td>' +
+        '<td class="muted">' + p.src + '</td>' +
+        '<td>' + SC.badge(p.state, stateColor, true) + '</td>' +
+        '<td class="num">' + SC.fmtMoney(p.est) + '</td>' +
+      '</tr>';
+    }).join('');
+    document.getElementById('parts-total').textContent = SC.fmtMoney(partsTotal);
+
+    document.getElementById('att-tbody').innerHTML = d.attachments.map(function (a) {
+      return '<tr><td>📎</td><td>' + a.name + '</td><td class="muted">' + a.size + '</td><td><a>查看</a></td></tr>';
+    }).join('');
+
+    document.getElementById('d-flow').innerHTML = d.flow.map(function (f) {
+      return '<div class="tv-step ' + f.state + '">' +
+        '<div class="tv-time">' + f.time + '</div>' +
+        '<div class="tv-dot"></div>' +
+        '<div class="tv-body">' +
+          '<span class="tv-title">' + f.title + '</span>' +
+          '<div class="tv-meta">' + f.who + '</div>' +
+          (f.detail ? '<div class="tv-detail">' + f.detail + '</div>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
+  </script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>库存现状汇总报表 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field"><label>截止日期</label><input type="date" value="2026-05-02"></div>
+            <div class="form-field"><label>仓库</label>
+              <select><option>全部仓库</option><option>艾友矿主仓</option><option>五龙矿油料库</option><option>东梁矿主仓</option></select>
+            </div>
+            <div class="form-field"><label>分类粒度</label>
+              <select><option>大类</option><option>中类</option><option>SKU</option></select>
+            </div>
+            <div class="form-field"><label>批次状态</label>
+              <select><option>全部</option><option>有效</option><option>临期</option><option>过期</option></select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn">订阅推送</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="title">报表：<span id="rp-name"></span> · <span class="muted code" id="rp-code"></span></div>
+            <div class="actions">
+              <span class="badge gray dot">截止 <span id="rp-asof"></span></span>
+              <button class="btn">打印</button>
+              <button class="btn">导出 PDF（带水印）</button>
+              <button class="btn btn-primary">导出 Excel</button>
+            </div>
+          </div>
+
+          <!-- KPI -->
+          <div class="card-body">
+            <div class="kpi-grid">
+              <div class="kpi"><div class="label">在库 SKU</div><div class="value" id="k-sku"></div><div class="trend">8 大类 · 116 SKU</div></div>
+              <div class="kpi"><div class="label">在库总价值</div><div class="value" id="k-value"></div><div class="trend up">较昨日 ↑ 1.4%</div></div>
+              <div class="kpi"><div class="label">最大占比类目</div><div class="value">电气设备</div><div class="trend">29.7% · 1 台 / 4.5 万均价</div></div>
+              <div class="kpi"><div class="label">关注项</div><div class="value" style="color:var(--amber);">2</div><div class="trend down">乳化炸药已过期 · 乳化油临期</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 主表 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="title">按大类汇总</div>
+            <div class="actions">
+              <button class="btn">切换图表视图</button>
+              <button class="btn">查看历史趋势</button>
+            </div>
+          </div>
+          <table class="data">
+            <thead>
+              <tr>
+                <th>分类</th>
+                <th class="num">SKU 数</th>
+                <th class="num">在库数量</th>
+                <th class="num">在库价值</th>
+                <th>占比</th>
+                <th>穿透</th>
+              </tr>
+            </thead>
+            <tbody id="rp-tbody"></tbody>
+            <tfoot>
+              <tr style="background:#fafbfd;font-weight:600;">
+                <td>合计</td>
+                <td class="num" id="t-sku"></td>
+                <td class="num" id="t-qty"></td>
+                <td class="num" id="t-value"></td>
+                <td>100%</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- 穿透说明 -->
+        <div class="card">
+          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+            <span class="badge blue dot">穿透</span>
+            <div class="text-2">
+              点击表格中"穿透"列任意按钮可下钻到详细数据：
+              <ul style="margin:6px 0 0 16px;padding:0;">
+                <li><strong>查物料</strong> → 进入<a href="material-master.html">物料主数据</a>过滤该分类</li>
+                <li><strong>查库存</strong> → 进入<a href="inventory.html">库存查询</a>按分类过滤</li>
+                <li><strong>查流水</strong> → 进入库存事务流水（S-21，未来版本）</li>
+              </ul>
+              报表导出由 <span class="font-mono">09 报表导出审计 (R-10)</span> 记录：操作人、IP、时间、范围、PDF 水印 ID。
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    var r = SC.data.reportInventory;
+    SC.layout({
+      page: 'reports',
+      crumbs: ['决策 / AI', '报表中心', r.code],
+      title: '报表穿透：' + r.name,
+      desc: '对齐《09》— 报表 R-INV-001 + 穿透到 物料 / 库存 / 流水 + 导出审计 R-10',
+    });
+
+    document.getElementById('rp-name').textContent = r.name;
+    document.getElementById('rp-code').textContent = r.code;
+    document.getElementById('rp-asof').textContent = r.asof;
+
+    var totalSku = r.rows.reduce(function (a, b) { return a + b.sku; }, 0);
+    var totalQty = r.rows.reduce(function (a, b) { return a + b.qty; }, 0);
+    var totalValue = r.rows.reduce(function (a, b) { return a + b.value; }, 0);
+    document.getElementById('k-sku').textContent = totalSku + ' SKU';
+    document.getElementById('k-value').textContent = '¥ ' + (totalValue / 10000).toFixed(1) + ' 万';
+    document.getElementById('t-sku').textContent = SC.fmtNum(totalSku);
+    document.getElementById('t-qty').textContent = SC.fmtNum(totalQty);
+    document.getElementById('t-value').textContent = SC.fmtMoney(totalValue);
+
+    document.getElementById('rp-tbody').innerHTML = r.rows.map(function (row) {
+      var pct = (row.value / totalValue * 100);
+      var barColor = row.color === 'red' ? 'red' : row.color === 'amber' ? 'amber' : '';
+      return '<tr>' +
+        '<td><span class="badge ' + (row.color || 'gray') + '">' + row.cat + '</span></td>' +
+        '<td class="num">' + SC.fmtNum(row.sku) + '</td>' +
+        '<td class="num">' + SC.fmtNum(row.qty) + '</td>' +
+        '<td class="num">' + SC.fmtMoney(row.value) + '</td>' +
+        '<td><div class="bar ' + barColor + '"><div class="track"><div class="fill" style="width:' + pct.toFixed(1) + '%"></div></div><div class="pct">' + pct.toFixed(1) + '%</div></div></td>' +
+        '<td class="actions"><a href="material-master.html">查物料</a><a href="inventory.html">查库存</a><a>查流水</a></td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

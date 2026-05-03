@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>合同详情 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="flow-strip">
+            <div class="node done"><span class="step-num">1</span> 草稿</div>
+            <div class="node done"><span class="step-num">2</span> 业务会签</div>
+            <div class="node done"><span class="step-num">3</span> 财务/法务会签</div>
+            <div class="node done"><span class="step-num">4</span> 主管审批</div>
+            <div class="node done"><span class="step-num">5</span> 签订</div>
+            <div class="node current"><span class="step-num">6</span> 执行中（按节点付款）</div>
+          </div>
+
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+              <h2 class="mt-0 mb-0" style="font-size:18px;">合同 <span class="code" id="title-code"></span></h2>
+              <span id="state-badge"></span>
+              <span class="spacer" style="flex:1;"></span>
+              <button class="btn">下载合同 PDF</button>
+              <button class="btn">打印</button>
+              <button class="btn btn-primary">+ 发起付款申请</button>
+            </div>
+            <h3 class="mt-0 mb-8" id="title-name" style="font-size:15px;font-weight:500;color:var(--text);"></h3>
+            <div class="kv mb-8">
+              <div class="k">供应商</div><div class="v" id="kv-supplier"></div>
+              <div class="k">统一社会信用</div><div class="v code" id="kv-tax"></div>
+              <div class="k">合同类型</div><div class="v" id="kv-type"></div>
+              <div class="k">合同金额</div><div class="v" id="kv-amount"></div>
+              <div class="k">签订日期</div><div class="v" id="kv-signed"></div>
+              <div class="k">到期日期</div><div class="v" id="kv-expire"></div>
+              <div class="k">合同摘要</div><div class="v" id="kv-summary"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <!-- 付款节点 -->
+            <div class="card">
+              <div class="card-header">
+                <div class="title">付款节点（C-04） · 四层付款控制起点</div>
+                <div class="actions">
+                  <button class="btn btn-sm">导出节点</button>
+                  <button class="btn btn-sm btn-primary">+ 节点付款申请</button>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>节点名称</th>
+                    <th class="num">计划金额</th>
+                    <th class="num">已付</th>
+                    <th>计划日期</th>
+                    <th>实际日期</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="nodes-tbody"></tbody>
+              </table>
+            </div>
+
+            <!-- 关联单据 -->
+            <div class="card">
+              <div class="card-header">
+                <div class="title">关联单据（采购 / 到货 / 付款）</div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr><th>类型</th><th>编号</th><th class="num">金额</th><th>状态</th></tr>
+                </thead>
+                <tbody id="rel-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <!-- 会签 timeline -->
+            <div class="card">
+              <div class="card-header"><div class="title">合同审批进度</div></div>
+              <div class="card-body">
+                <div class="timeline" id="timeline"></div>
+              </div>
+            </div>
+
+            <!-- 三单匹配提示 -->
+            <div class="card">
+              <div class="card-header"><div class="title">三单匹配（C-08）</div></div>
+              <div class="card-body" style="font-size:12px;color:var(--text-2);">
+                付款执行环节按 <strong>合同 ↔ 入库 ↔ 发票</strong> 三单匹配进行控制；当前合同已匹配：
+                <div class="mt-8">
+                  <span class="badge green dot">合同</span>&nbsp; <span class="badge green dot">入库 (DH-2026-0508 部分)</span>&nbsp;
+                  <span class="badge amber dot">发票 待提交</span>
+                </div>
+                <div class="mt-12 muted">详见 05 第 3 章 三单匹配规则。</div>
+              </div>
+            </div>
+
+            <!-- NC 推送 -->
+            <div class="card">
+              <div class="card-header"><div class="title">NC 推送（合同主数据）</div></div>
+              <div class="card-body" style="padding:0;">
+                <table class="data">
+                  <tbody>
+                    <tr><td>合同主数据下推</td><td><span class="badge green dot">推送成功</span></td><td class="muted">2026-03-12 14:25</td></tr>
+                    <tr><td>付款单推送（节点 1）</td><td><span class="badge green dot">推送成功</span></td><td class="muted">2026-03-18 16:08</td></tr>
+                    <tr><td>付款单推送（节点 2）</td><td><span class="badge gray dot">待推送</span></td><td class="muted">付款审批通过后触发</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    var d = SC.data.contractDetail;
+    SC.layout({
+      page: 'contract-list',
+      crumbs: ['合同与资金', '合同管理', d.code],
+      title: d.name,
+      desc: '对齐 05 — C-01 合同 + C-04 付款节点 + C-05 付款计划 + C-08 三单匹配',
+    });
+
+    document.getElementById('title-code').textContent = d.code;
+    document.getElementById('title-name').textContent = d.name;
+    document.getElementById('kv-supplier').textContent = d.supplier;
+    document.getElementById('kv-tax').textContent = d.supplierTax;
+    document.getElementById('kv-type').textContent = d.type;
+    document.getElementById('kv-amount').textContent = SC.fmtMoney(d.amount) + ' (' + d.currency + ')';
+    document.getElementById('kv-signed').textContent = d.signed;
+    document.getElementById('kv-expire').textContent = d.expire;
+    document.getElementById('kv-summary').textContent = d.summary;
+    document.getElementById('state-badge').innerHTML = SC.badge(d.state, d.color, true);
+
+    document.getElementById('nodes-tbody').innerHTML = d.payNodes.map(function (n) {
+      return '<tr>' +
+        '<td>' + n.no + '</td>' +
+        '<td>' + n.name + '</td>' +
+        '<td class="num">' + SC.fmtMoney(n.plan) + '</td>' +
+        '<td class="num">' + (n.paid > 0 ? SC.fmtMoney(n.paid) : '<span class="muted">—</span>') + '</td>' +
+        '<td class="muted">' + n.planDate + '</td>' +
+        '<td class="muted">' + n.actDate + '</td>' +
+        '<td>' + SC.badge(n.state, n.color, true) + '</td>' +
+        '<td class="actions">' +
+          (n.state === '已支付' ? '<a>查凭证</a>' :
+           n.state === '付款申请中' ? '<a href="payment-request.html">查申请</a>' :
+           n.state === '未到付款时间' ? '<a>提前申请</a>' : '<a>查看</a>') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('rel-tbody').innerHTML = d.related.map(function (r) {
+      var href = r.type === '采购订单' ? 'purchase-orders.html' :
+                 r.type === '到货单'   ? 'goods-receipt.html' :
+                 r.type === '付款申请' ? 'payment-request.html' : '#';
+      return '<tr>' +
+        '<td><span class="badge gray">' + r.type + '</span></td>' +
+        '<td class="code"><a href="' + href + '">' + r.code + '</a></td>' +
+        '<td class="num">' + SC.fmtMoney(r.amount) + '</td>' +
+        '<td>' + r.state + '</td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('timeline').innerHTML = d.timeline.map(function (t) {
+      var cls = t.state === 'done' ? 'done' : t.state === 'current' ? 'current' : '';
+      var comment = t.comment ? '<div class="comment">' + t.comment + '</div>' : '';
+      return '<div class="step ' + cls + '">' +
+        '<div class="title">' + t.title + '</div>' +
+        '<div class="meta">' + t.who + ' · ' + t.time + '</div>' +
+        comment +
+      '</div>';
+    }).join('');
+  </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>设备生命周期 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="card-body">
+            <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:280px;">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                  <h2 class="mt-0 mb-0" style="font-size:18px;" id="d-name"></h2>
+                  <span class="code muted" id="d-code"></span>
+                  <span id="d-state-badge"></span>
+                </div>
+                <div class="kv mt-12">
+                  <div class="k">规格型号</div><div class="v" id="d-spec"></div>
+                  <div class="k">设备类别</div><div class="v" id="d-cat"></div>
+                  <div class="k">出厂序列号</div><div class="v code" id="d-serial"></div>
+                  <div class="k">制造商</div><div class="v" id="d-mfr"></div>
+                  <div class="k">所在位置</div><div class="v" id="d-loc"></div>
+                  <div class="k">责任人</div><div class="v" id="d-cust"></div>
+                </div>
+              </div>
+              <div style="flex:1;min-width:280px;">
+                <div class="kpi-grid" style="margin-bottom:0;">
+                  <div class="kpi" style="padding:12px;">
+                    <div class="label">来源</div>
+                    <div class="value" id="k-way" style="font-size:18px;"></div>
+                    <div class="trend" id="k-pdate"></div>
+                  </div>
+                  <div class="kpi" style="padding:12px;">
+                    <div class="label">原值 / 残值</div>
+                    <div class="value" id="k-orig" style="font-size:18px;"></div>
+                    <div class="trend" id="k-orig-note"></div>
+                  </div>
+                  <div class="kpi" style="padding:12px;">
+                    <div class="label">累计运行</div>
+                    <div class="value" style="font-size:18px;">920 h</div>
+                    <div class="trend">投用 60 日</div>
+                  </div>
+                  <div class="kpi" style="padding:12px;">
+                    <div class="label">维修次数</div>
+                    <div class="value" style="font-size:18px;">3 次</div>
+                    <div class="trend">含 1 次故障维修</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <!-- 生命周期 timeline -->
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">设备生命周期</div>
+                <div class="actions">
+                  <button class="btn">导出生命周期</button>
+                  <button class="btn">+ 登记新事件</button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="timeline-vert" id="lc-timeline"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 维修历史 + 关联单据 -->
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">维修与保养记录</div>
+                <div class="actions">
+                  <button class="btn btn-sm">+ 报修</button>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>日期</th>
+                    <th>类型</th>
+                    <th>说明</th>
+                    <th>停机</th>
+                    <th class="num">费用</th>
+                  </tr>
+                </thead>
+                <tbody id="repair-tbody"></tbody>
+                <tfoot>
+                  <tr style="background:#fafbfd;font-weight:600;">
+                    <td colspan="3">合计</td>
+                    <td>34 h</td>
+                    <td class="num" id="repair-total"></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">关联单据</div></div>
+              <table class="data">
+                <thead>
+                  <tr><th>类型</th><th>编号</th><th class="num">金额</th><th>状态</th></tr>
+                </thead>
+                <tbody id="rel-tbody"></tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">边界说明</div></div>
+              <div class="card-body" style="font-size:12px;color:var(--text-2);">
+                <div>· 当前为 <strong>租赁设备</strong>：进入施工现场后不计入库存台账 (S-13)，仅设备档案 (E-01) 标记"在用·在租"</div>
+                <div class="mt-8">· 月度租赁费用通过 <strong>费用汇总 (E-13)</strong> 推送至 <a href="contract-detail.html">合同 HT-2026-0051</a> 付款节点，由 <a href="funding-plan.html">资金计划</a> 统一发起付款</div>
+                <div class="mt-8">· 退场触发 <strong>NC 资产/设备主数据下推 (NC-MD-005)</strong> 状态更新</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    var d = SC.data.equipmentLifecycle;
+    SC.layout({
+      page: 'equipment-lifecycle',
+      crumbs: ['设备', '设备生命周期', d.code],
+      title: '设备生命周期：' + d.name,
+      desc: '对齐《07-设备与设备租赁详细设计 V1.0》— E-01 档案 + E-02 状态变更 + E-03 权属变更 + E-04 维修保养 + E-12 退租',
+    });
+
+    document.getElementById('d-name').textContent = d.name;
+    document.getElementById('d-code').textContent = d.code;
+    document.getElementById('d-state-badge').innerHTML = SC.badge(d.state, d.color, true);
+    document.getElementById('d-spec').textContent = d.spec;
+    document.getElementById('d-cat').textContent = d.cat;
+    document.getElementById('d-serial').textContent = d.serial;
+    document.getElementById('d-mfr').textContent = d.manufacturer;
+    document.getElementById('d-loc').textContent = d.location;
+    document.getElementById('d-cust').textContent = d.custodian;
+
+    document.getElementById('k-way').textContent = d.purchase.way;
+    document.getElementById('k-pdate').textContent = d.purchase.contract + ' · ' + d.purchase.date;
+    document.getElementById('k-orig').textContent = '¥ ' + (d.book.original / 10000).toFixed(0) + ' 万';
+    document.getElementById('k-orig-note').textContent = d.book.residualNote;
+
+    document.getElementById('lc-timeline').innerHTML = d.lifecycle.map(function (e) {
+      return '<div class="tv-step ' + e.state + '">' +
+        '<div class="tv-time">' + e.time + '</div>' +
+        '<div class="tv-dot"></div>' +
+        '<div class="tv-body">' +
+          '<span class="tv-kind">' + e.kind + '</span>' +
+          '<span class="tv-title">' + e.title + '</span>' +
+          '<div class="tv-meta">' + e.who + '</div>' +
+          (e.detail ? '<div class="tv-detail">' + e.detail + '</div>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    var totalRepair = 0;
+    document.getElementById('repair-tbody').innerHTML = d.repairHistory.map(function (r) {
+      totalRepair += r.cost;
+      var color = r.kind === '故障维修' ? 'red' : r.kind.indexOf('保养') >= 0 ? 'green' : 'gray';
+      return '<tr>' +
+        '<td class="muted">' + r.date + '</td>' +
+        '<td><span class="badge ' + color + '">' + r.kind + '</span></td>' +
+        '<td>' + r.desc + '</td>' +
+        '<td>' + r.stop + '</td>' +
+        '<td class="num">' + SC.fmtMoney(r.cost) + '</td>' +
+      '</tr>';
+    }).join('');
+    document.getElementById('repair-total').textContent = SC.fmtMoney(totalRepair);
+
+    document.getElementById('rel-tbody').innerHTML = d.relatedDocs.map(function (r) {
+      var href = r.type.indexOf('合同') >= 0 ? 'contract-detail.html' :
+                 r.type.indexOf('租赁') >= 0 ? 'equipment-rent.html' :
+                 r.type.indexOf('到货') >= 0 ? 'goods-receipt.html' : '#';
+      return '<tr>' +
+        '<td><span class="badge gray">' + r.type + '</span></td>' +
+        '<td class="code"><a href="' + href + '">' + r.code + '</a></td>' +
+        '<td class="num">' + (r.amount > 0 ? SC.fmtMoney(r.amount) : '<span class="muted">—</span>') + '</td>' +
+        '<td>' + r.state + '</td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

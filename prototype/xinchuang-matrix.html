@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>信创兼容性矩阵 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+            <span class="badge blue dot">说明</span>
+            <div class="text-2">
+              本页面汇总<strong>本系统对国产化软硬件栈的兼容性测试结果</strong>，作为<strong>招标技术响应</strong>与<strong>选型决策</strong>的依据。<br>
+              对齐《11-非功能详细设计 V1.0》第 1 章信创要求 + 集团统筹层"统一信创适配原则"。<strong>全部数据为演示用，正式数据须以联调测试报告为准。</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- 测试覆盖统计 -->
+        <div class="coverage-stat">
+          <div class="stat-item brand">
+            <div class="lbl">已测组合</div>
+            <div class="val" id="cov-tested"></div>
+          </div>
+          <div class="stat-item green">
+            <div class="lbl">通过</div>
+            <div class="val" id="cov-passed"></div>
+          </div>
+          <div class="stat-item amber">
+            <div class="lbl">部分通过</div>
+            <div class="val" id="cov-partial"></div>
+          </div>
+          <div class="stat-item red">
+            <div class="lbl">阻塞 / 不支持</div>
+            <div class="val" id="cov-blocked"></div>
+          </div>
+        </div>
+
+        <!-- 矩阵 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="title">兼容性矩阵</div>
+            <div class="actions">
+              <button class="btn">下载完整测试报告</button>
+              <button class="btn btn-primary">导出招标响应表</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="matrix-area"></div>
+          </div>
+        </div>
+
+        <!-- 关键说明 -->
+        <div class="cols-2">
+          <div class="card">
+            <div class="card-header"><div class="title">推荐组合 / 过渡兼容 / 注意事项</div></div>
+            <div class="card-body">
+              <div id="key-notes" class="rule-list"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="title">招标技术响应承诺</div></div>
+            <div class="card-body" style="font-size:13px;color:var(--text-2);">
+              <div class="kv">
+                <div class="k">最低支持范围</div>
+                <div class="v">麒麟 V10 SP2 + 瀚高 HGDB / 人大金仓 KingbaseES + 奇安信 / 红莲花浏览器 + WPS 国产版 — <strong style="color:var(--green);">全部通过</strong></div>
+                <div class="k">CPU 架构</div>
+                <div class="v">同时提供 <strong>x86_64 + aarch64</strong> 镜像；前端构建产物双架构发布</div>
+                <div class="k">过渡期</div>
+                <div class="v">允许试运行期使用 Windows / Chrome / SQL Server，正式上线后 6 个月内必须切换</div>
+                <div class="k">联调责任</div>
+                <div class="v">国产化栈下的 NC 接口客户端兼容性，由本系统供应商联合 NC 厂商完成联调，<strong>非客户责任</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'xinchuang-matrix',
+      crumbs: ['运维 / 集成', '信创兼容性矩阵'],
+      title: '信创兼容性矩阵',
+      desc: '对齐《11-非功能详细设计 V1.0》第 1 章 + 集团统筹层信创原则',
+      actions: [{ label: '下载完整测试报告' }, { label: '导出招标响应表', primary: true }],
+    });
+
+    var x = SC.data.xinchuangMatrix;
+
+    /* 覆盖统计 */
+    document.getElementById('cov-tested').textContent = x.coverage.tested;
+    document.getElementById('cov-passed').textContent = x.coverage.passed;
+    document.getElementById('cov-partial').textContent = x.coverage.partial;
+    document.getElementById('cov-blocked').textContent = x.coverage.blocked;
+
+    /* 矩阵 */
+    var area = document.getElementById('matrix-area');
+    area.innerHTML = x.matrix.map(function (sec) {
+      var headers = '<th class="name-col">名称</th><th class="vendor-col">厂商</th>' +
+        x.targets.map(function (t) { return '<th>' + t + '</th>'; }).join('') +
+        '<th class="note-col">说明</th>';
+      var rows = sec.items.map(function (it) {
+        var cells = it.sup.map(function (s) {
+          if (s === '✓') return '<td class="cell-yes">✓</td>';
+          if (s === '~') return '<td class="cell-partial">~</td>';
+          return '<td class="cell-no">—</td>';
+        }).join('');
+        return '<tr>' +
+          '<td>' + it.name + '</td>' +
+          '<td class="vendor-col">' + it.vendor + '</td>' +
+          cells +
+          '<td class="note-col">' + it.note + '</td>' +
+        '</tr>';
+      }).join('');
+      return '<div class="matrix-section">' +
+        '<h3>' + sec.layer + '</h3>' +
+        '<table class="matrix"><thead><tr>' + headers + '</tr></thead><tbody>' + rows + '</tbody></table>' +
+      '</div>';
+    }).join('');
+
+    /* 关键说明 */
+    document.getElementById('key-notes').innerHTML = x.keyNotes.map(function (n) {
+      var kindClass = n.kind === '推荐' ? 'allow' : n.kind === '过渡' ? 'audit' : 'deny';
+      var icon = n.kind === '推荐' ? '✓ 推荐' : n.kind === '过渡' ? '◉ 过渡' : '⚠ 注意';
+      return '<div class="rule-item ' + kindClass + '">' +
+        '<span class="icon">' + icon + '</span>' +
+        '<span>' + n.text + '</span>' +
+      '</div>';
+    }).join('');
+  </script>
+</body>
+</html>

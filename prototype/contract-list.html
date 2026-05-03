@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>合同管理 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="kpi-grid">
+          <div class="kpi"><div class="label">在执行合同</div><div class="value">3</div><div class="trend">含 1 框架协议</div></div>
+          <div class="kpi"><div class="label">本月合同金额</div><div class="value">¥ 414 万</div><div class="trend up">较上月 ↑ 8.2%</div></div>
+          <div class="kpi"><div class="label">付款节点临期</div><div class="value" style="color:var(--amber)">5</div><div class="trend">7 日内需付款</div></div>
+          <div class="kpi"><div class="label">已支付占比</div><div class="value">29.9%</div><div class="trend">¥ 145 万 / ¥ 485 万</div></div>
+        </div>
+
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field"><label>合同编号</label><input placeholder="HT-2026-…"></div>
+            <div class="form-field"><label>合同名称</label><input placeholder="关键词"></div>
+            <div class="form-field"><label>供应商</label><input placeholder="模糊搜索"></div>
+            <div class="form-field"><label>合同类型</label>
+              <select>
+                <option>全部</option><option>物资订单</option><option>物资框架</option>
+                <option>设备租赁</option><option>服务合同</option>
+              </select>
+            </div>
+            <div class="form-field"><label>状态</label>
+              <select>
+                <option>全部</option><option>草稿</option><option>会签中</option>
+                <option>待签订</option><option>执行中</option><option>已完成</option><option>已终止</option>
+              </select>
+              <small class="muted" style="margin-top:2px;">字段：contract_state（C-01 8 状态机）</small>
+            </div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="title">合同列表</div>
+            <div class="actions">
+              <button class="btn">导出</button>
+              <button class="btn">合同模板</button>
+              <button class="btn btn-primary">+ 新建合同</button>
+            </div>
+          </div>
+
+          <table class="data">
+            <thead>
+              <tr>
+                <th>合同编号</th>
+                <th>合同名称</th>
+                <th>供应商</th>
+                <th>类型</th>
+                <th class="num">合同金额</th>
+                <th class="num">已付 / 待付</th>
+                <th>签订 ~ 到期</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="ct-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+            <span class="badge blue dot">说明</span>
+            <div class="text-2">
+              <strong>四层付款控制链路：</strong>合同付款节点 (C-04) → 付款计划 (C-05) → 付款申请 (C-06) → 付款执行 (C-07)。每一环均可查 NC 推送任务（NC-BIZ-013 付款单推送）。详见《05-合同与资金详细设计 V1.0》。
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'contract-list',
+      crumbs: ['合同与资金', '合同管理'],
+      title: '合同管理',
+      desc: '对齐《05-合同与资金详细设计 V1.0》— C-01~C-11、合同 8 状态机 + 四层付款控制',
+      actions: [{ label: '导出 Excel' }, { label: '+ 新建合同', primary: true }],
+    });
+
+    var tbody = document.getElementById('ct-tbody');
+    tbody.innerHTML = SC.data.contracts.map(function (c) {
+      var paidRatio = c.amount > 0 ? Math.round(c.paid / c.amount * 100) : 0;
+      return '<tr>' +
+        '<td class="code"><a href="contract-detail.html">' + c.code + '</a></td>' +
+        '<td>' + c.name + '</td>' +
+        '<td>' + c.supplier + '</td>' +
+        '<td><span class="badge gray">' + c.type + '</span></td>' +
+        '<td class="num">' + SC.fmtMoney(c.amount) + '</td>' +
+        '<td class="num">' + SC.fmtMoney(c.paid) + '<div class="muted" style="font-size:11px;">待付 ' + SC.fmtMoney(c.pendingPay) + '</div></td>' +
+        '<td class="muted">' + c.signed + '<br>' + c.expire + '</td>' +
+        '<td>' + SC.badge(c.state, c.color, true) + '</td>' +
+        '<td class="actions"><a href="contract-detail.html">查看</a>' +
+          (c.state === '执行中' ? '<a>付款申请</a>' : '') +
+          (c.state === '草稿' ? '<a>编辑</a>' : '') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

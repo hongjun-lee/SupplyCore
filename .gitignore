@@ -10,3 +10,6 @@ IDENTITY.md
 BOOTSTRAP.md
 HEARTBEAT.md
 MEMORY.md
+
+# Local Playwright CLI cache / snapshots
+.playwright-cli/

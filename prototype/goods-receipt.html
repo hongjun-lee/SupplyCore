@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>到货验收 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <!-- 流转条 -->
+        <div class="card">
+          <div class="flow-strip">
+            <div class="node done"><span class="step-num">1</span> 采购订单下达</div>
+            <div class="node done"><span class="step-num">2</span> 供应商发货</div>
+            <div class="node current"><span class="step-num">3</span> 到货验收 (S-03)</div>
+            <div class="node"><span class="step-num">4</span> 质检 (S-04)</div>
+            <div class="node"><span class="step-num">5</span> 入库 (S-05)</div>
+            <div class="node"><span class="step-num">6</span> NC 推送 (NC-BIZ-007)</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field"><label>到货单号</label><input placeholder="DH-2026-…"></div>
+            <div class="form-field"><label>关联订单</label><input placeholder="CG-2026-…"></div>
+            <div class="form-field"><label>仓库</label>
+              <select>
+                <option>全部</option>
+                <option>艾友矿主仓</option><option>五龙矿设备库</option>
+                <option>东梁矿主仓</option><option>艾友矿安全器材库</option>
+                <option>集团中心库</option>
+              </select>
+            </div>
+            <div class="form-field"><label>验收状态</label>
+              <select>
+                <option>全部</option>
+                <option>待验收</option><option>验收中</option><option>部分验收</option>
+                <option>验收完成</option><option>已退回</option>
+              </select>
+              <small class="muted" style="margin-top:2px;">字段名：goods_receipt_state</small>
+            </div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="title">到货验收单</div>
+            <div class="actions">
+              <button class="btn">扫码到货</button>
+              <button class="btn btn-primary">+ 登记到货</button>
+            </div>
+          </div>
+
+          <table class="data">
+            <thead>
+              <tr>
+                <th>到货单号</th>
+                <th>关联订单</th>
+                <th>供应商</th>
+                <th class="num">行数</th>
+                <th class="num">到货数量</th>
+                <th>收货仓库</th>
+                <th>到货时间</th>
+                <th>验收状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="dh-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- 验收明细（演示一单） -->
+        <div class="card">
+          <div class="card-header">
+            <div class="title">验收明细 — DH-2026-0509（关联 CG-2026-0313）</div>
+            <div class="actions">
+              <button class="btn">扫码逐件</button>
+              <button class="btn">质检送检</button>
+              <button class="btn btn-primary">提交验收并入库</button>
+            </div>
+          </div>
+          <table class="data">
+            <thead>
+              <tr>
+                <th>行号</th>
+                <th>物料编码</th>
+                <th>物料名称</th>
+                <th class="num">订单数</th>
+                <th class="num">到货数</th>
+                <th class="num">验收合格</th>
+                <th>批次号</th>
+                <th>货位</th>
+                <th>是否质检</th>
+                <th>结果</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td class="code">M-DJ-0118</td>
+                <td>矿用变频器 KBSGZY 660V 200kVA</td>
+                <td class="num">2</td>
+                <td class="num">2</td>
+                <td class="num">2</td>
+                <td class="muted">—</td>
+                <td>B-02-04</td>
+                <td><span class="badge green">免检</span></td>
+                <td><span class="badge green dot">合格</span></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td class="code">M-DJ-0211</td>
+                <td>矿用隔爆开关 BQD-200</td>
+                <td class="num">6</td>
+                <td class="num">6</td>
+                <td class="num">5</td>
+                <td class="muted">—</td>
+                <td>B-02-08</td>
+                <td><a href="quality-check.html"><span class="badge amber">送检</span></a></td>
+                <td><a href="quality-check.html"><span class="badge amber dot">部分合格 (1 退)</span></a></td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td class="code">M-RH-0033</td>
+                <td>乳化油 N5 200L/桶</td>
+                <td class="num">8</td>
+                <td class="num">8</td>
+                <td class="num">8</td>
+                <td>B202605-001 (新生成)</td>
+                <td>C-01-02</td>
+                <td><span class="badge green">免检</span></td>
+                <td><span class="badge green dot">合格</span></td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td class="code">M-DL-0220</td>
+                <td>矿用电缆 MYP3*50+1*16 (200m/卷)</td>
+                <td class="num">2</td>
+                <td class="num">2</td>
+                <td class="num">2</td>
+                <td class="muted">—</td>
+                <td>D-04-08</td>
+                <td><a href="quality-check.html"><span class="badge amber">送检</span></a></td>
+                <td><a href="quality-check.html"><span class="badge blue dot">检验中</span></a></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="card-body" style="border-top:1px solid var(--border);">
+            <div class="form-row">
+              <div class="form-field">
+                <label>验收员</label>
+                <div class="static">王志国 · 五龙矿设备库</div>
+              </div>
+              <div class="form-field">
+                <label>验收时间</label>
+                <div class="static">2026-05-02 10:32</div>
+              </div>
+              <div class="form-field">
+                <label>暂估入库</label>
+                <div class="static">否（已有合同价）</div>
+              </div>
+              <div class="form-field">
+                <label>NC 推送策略</label>
+                <div class="static">入库提交后自动触发 NC-BIZ-007</div>
+              </div>
+            </div>
+            <div class="form-field">
+              <label>验收备注</label>
+              <textarea rows="2" placeholder="如部分退回、临时放置等情况说明">隔爆开关到货 6 台，外观检查发现 1 台外壳变形，已暂留并退还供应商。已通知采购员重新配货。</textarea>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'goods-receipt',
+      crumbs: ['库存实物流转', '到货验收'],
+      title: '到货验收',
+      desc: '对齐《06-库存实物流转详细设计 V1.0》— 实体 S-03 (goods_receipt_state) → S-04 质检 → S-05 (purchase_receipt_state)',
+      actions: [{ label: '扫码到货' }, { label: '+ 登记到货', primary: true }],
+    });
+
+    var tbody = document.getElementById('dh-tbody');
+    tbody.innerHTML = SC.data.goodsReceipts.map(function (g) {
+      return '<tr>' +
+        '<td class="code">' + g.code + '</td>' +
+        '<td class="code muted">' + g.po + '</td>' +
+        '<td>' + g.supplier + '</td>' +
+        '<td class="num">' + g.lines + '</td>' +
+        '<td class="num">' + SC.fmtNum(g.qty) + '</td>' +
+        '<td>' + g.warehouse + '</td>' +
+        '<td class="muted">' + g.arriveAt + '</td>' +
+        '<td>' + SC.badge(g.state, g.color, true) + '</td>' +
+        '<td class="actions"><a>明细</a>' +
+          (g.state === '待验收' || g.state === '验收中' ? '<a>验收</a>' : '') +
+          (g.state === '验收完成' ? '<a>查看入库单</a>' : '') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

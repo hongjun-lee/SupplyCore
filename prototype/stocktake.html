@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>盘点 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="flow-strip">
+            <div class="node done"><span class="step-num">1</span> 盘点计划 (S-15)</div>
+            <div class="node done"><span class="step-num">2</span> 冻结库存 (S-13.locked)</div>
+            <div class="node current"><span class="step-num">3</span> 现场盘点</div>
+            <div class="node"><span class="step-num">4</span> 差异核对 (S-16)</div>
+            <div class="node"><span class="step-num">5</span> 盘盈盘亏审批 (S-17/18)</div>
+            <div class="node"><span class="step-num">6</span> 调账 → 库存事务 (S-21)</div>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi"><div class="label">本月盘点单</div><div class="value">4</div><div class="trend">2 全盘 / 1 抽盘 / 1 专项</div></div>
+          <div class="kpi"><div class="label">差异条目</div><div class="value" style="color:var(--amber)">11</div><div class="trend">盘亏 7 / 盘盈 4</div></div>
+          <div class="kpi"><div class="label">盘亏金额</div><div class="value" style="color:var(--red)">¥ 15,610</div><div class="trend">含 1 项需安全部门复核</div></div>
+          <div class="kpi"><div class="label">待审批</div><div class="value">2</div><div class="trend">差异调账审批中</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="title">盘点单列表</div>
+            <div class="actions">
+              <button class="btn">导出</button>
+              <button class="btn btn-primary">+ 新建盘点计划</button>
+            </div>
+          </div>
+          <table class="data">
+            <thead>
+              <tr>
+                <th>盘点单号</th>
+                <th>仓库</th>
+                <th>盘点类型</th>
+                <th>计划日期</th>
+                <th>实际日期</th>
+                <th class="num">盘点条目</th>
+                <th class="num">盘盈</th>
+                <th class="num">盘亏</th>
+                <th>盘点负责人</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="pd-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- 差异详情（演示一单） -->
+        <div class="card">
+          <div class="card-header">
+            <div class="title">差异明细 — PD-2026-0023（艾友矿主仓 月度全盘）</div>
+            <div class="actions">
+              <button class="btn">导出差异</button>
+              <button class="btn">追溯流水</button>
+              <button class="btn btn-primary">提交差异调账审批</button>
+            </div>
+          </div>
+          <table class="data">
+            <thead>
+              <tr>
+                <th>物料编码</th>
+                <th>物料名称</th>
+                <th class="num">账面数</th>
+                <th class="num">实盘数</th>
+                <th class="num">差异数</th>
+                <th>盘点结果</th>
+                <th class="num">差异金额</th>
+                <th>建议处理</th>
+              </tr>
+            </thead>
+            <tbody id="diff-tbody"></tbody>
+          </table>
+
+          <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+            <span class="badge amber dot">规则</span>
+            <span style="margin-left:8px;">
+              <strong>盘盈盘亏分别走独立审批：</strong>盘亏由 <strong>仓管员 → 物资部 → 财务</strong> 三级审批；金额 ≥ ¥10,000 需集团物资部复核；安全监测 / 火工品类目无论金额一律升级到安全部门会签。
+              详见《06-库存实物流转详细设计 V1.0》第 5 章。
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'stocktake',
+      crumbs: ['库存实物流转', '盘点'],
+      title: '盘点',
+      desc: '对齐《06》— S-15 盘点单 / S-16 差异 / S-17 盘盈 / S-18 盘亏 / S-21 流水',
+      actions: [{ label: '+ 新建盘点计划', primary: true }],
+    });
+
+    document.getElementById('pd-tbody').innerHTML = SC.data.stocktakes.map(function (p) {
+      return '<tr>' +
+        '<td class="code">' + p.code + '</td>' +
+        '<td>' + p.warehouse + '</td>' +
+        '<td><span class="badge gray">' + p.type + '</span></td>' +
+        '<td class="muted">' + p.planDate + '</td>' +
+        '<td class="muted">' + p.actDate + '</td>' +
+        '<td class="num">' + p.items + '</td>' +
+        '<td class="num" style="color:var(--green);">' + p.plus + '</td>' +
+        '<td class="num" style="color:var(--red);">' + p.minus + '</td>' +
+        '<td>' + p.leader + '</td>' +
+        '<td>' + SC.badge(p.state, p.color, true) + '</td>' +
+        '<td class="actions"><a>明细</a>' + (p.state === '差异复核中' ? '<a>提审</a>' : '') + '</td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('diff-tbody').innerHTML = SC.data.stocktakeDiffs.map(function (d) {
+      var diffStr = (d.diff > 0 ? '+' : '') + d.diff;
+      var color = d.diff > 0 ? 'green' : 'red';
+      var advice = d.kind === '盘亏'
+        ? (Math.abs(d.amount) >= 10000 ? '集团物资部复核' : '物资部 → 财务调账')
+        : '物资部审核入账';
+      return '<tr>' +
+        '<td class="code">' + d.mcode + '</td>' +
+        '<td>' + d.mname + '</td>' +
+        '<td class="num">' + SC.fmtNum(d.book) + '</td>' +
+        '<td class="num">' + SC.fmtNum(d.count) + '</td>' +
+        '<td class="num" style="color:var(--' + (d.diff > 0 ? 'green' : 'red') + ');font-weight:600;">' + diffStr + '</td>' +
+        '<td>' + SC.badge(d.kind, color, true) + '</td>' +
+        '<td class="num" style="color:var(--' + (d.diff > 0 ? 'green' : 'red') + ');">' + (d.diff > 0 ? '+' : '-') + SC.fmtMoney(d.amount) + '</td>' +
+        '<td class="muted">' + advice + '</td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

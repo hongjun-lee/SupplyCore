@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>需求详情 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <!-- 流转条 -->
+        <div class="card">
+          <div class="flow-strip">
+            <div class="node done"><span class="step-num">1</span> 草稿</div>
+            <div class="node done"><span class="step-num">2</span> 矿物资审核</div>
+            <div class="node current"><span class="step-num">3</span> 集团物资部复核</div>
+            <div class="node"><span class="step-num">4</span> 生成采购计划</div>
+            <div class="node"><span class="step-num">5</span> 采购执行 / 招采</div>
+            <div class="node"><span class="step-num">6</span> 到货 / 入库</div>
+          </div>
+
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+              <h2 class="mt-0 mb-0" style="font-size:18px;">需求计划 <span class="code" id="title-code"></span></h2>
+              <span class="badge red">加急</span>
+              <span id="state-badge"></span>
+              <span class="spacer" style="flex:1;"></span>
+              <button class="btn">打印</button>
+              <button class="btn">导出 PDF</button>
+              <button class="btn">撤回</button>
+              <button class="btn btn-primary">提交至上级审批</button>
+            </div>
+
+            <div class="kv mb-12">
+              <div class="k">需求标题</div><div class="v" id="kv-title"></div>
+              <div class="k">申请单位</div><div class="v" id="kv-org"></div>
+              <div class="k">提报人</div><div class="v" id="kv-requester"></div>
+              <div class="k">提交时间</div><div class="v" id="kv-submit"></div>
+              <div class="k">期望到货</div><div class="v" id="kv-expect"></div>
+              <div class="k">需求事由</div><div class="v" id="kv-reason"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <!-- 行项目 -->
+            <div class="card">
+              <div class="card-header">
+                <div class="title">需求行项目</div>
+                <div class="actions">
+                  <span class="muted">合计：<strong id="line-total" style="color:var(--text);"></strong></span>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>行号</th>
+                    <th>物料编码</th>
+                    <th>物料名称</th>
+                    <th>规格型号</th>
+                    <th>计量单位</th>
+                    <th class="num">数量</th>
+                    <th class="num">参考单价</th>
+                    <th class="num">小计</th>
+                  </tr>
+                </thead>
+                <tbody id="lines-tbody"></tbody>
+              </table>
+            </div>
+
+            <!-- 附件 -->
+            <div class="card">
+              <div class="card-header"><div class="title">附件</div></div>
+              <div class="card-body">
+                <table class="data">
+                  <tbody>
+                    <tr>
+                      <td style="width:24px;">📎</td>
+                      <td>井下安全监测主控柜检修记录_20260428.pdf</td>
+                      <td class="muted">312 KB</td>
+                      <td><a>下载</a></td>
+                    </tr>
+                    <tr>
+                      <td>📎</td>
+                      <td>厂家初步报价_山东微感.pdf</td>
+                      <td class="muted">186 KB</td>
+                      <td><a>下载</a></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <!-- 审批时间轴 -->
+            <div class="card">
+              <div class="card-header"><div class="title">审批进度</div></div>
+              <div class="card-body">
+                <div class="timeline" id="timeline"></div>
+              </div>
+            </div>
+
+            <!-- 关联单据 -->
+            <div class="card">
+              <div class="card-header"><div class="title">关联单据</div></div>
+              <div class="card-body" style="padding:0;">
+                <table class="data">
+                  <tbody>
+                    <tr><td><span class="badge gray">采购计划</span></td><td>—</td><td class="muted">未生成</td></tr>
+                    <tr><td><span class="badge gray">采购订单</span></td><td>—</td><td class="muted">未生成</td></tr>
+                    <tr><td><span class="badge gray">合同</span></td><td>—</td><td class="muted">未生成</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    var d = SC.data.requirementDetail;
+    SC.layout({
+      page: 'requirement-list',
+      crumbs: ['采购协同', '需求计划', d.code],
+      title: d.title,
+      desc: '对齐《04-需求计划与采购协同详细设计 V1.0》P-01 / S-01 + 《10-权限审批流详细设计 V1.0》A-20 approval_instance',
+    });
+
+    document.getElementById('title-code').textContent = d.code;
+    document.getElementById('kv-title').textContent = d.title;
+    document.getElementById('kv-org').textContent = d.org;
+    document.getElementById('kv-requester').innerHTML = d.requester + ' <span class="muted">' + d.requesterPhone + '</span>';
+    document.getElementById('kv-submit').textContent = d.submitDate;
+    document.getElementById('kv-expect').textContent = d.expectDate;
+    document.getElementById('kv-reason').textContent = d.reason;
+    document.getElementById('state-badge').innerHTML = SC.badge(d.state, d.stateColor, true);
+
+    var total = 0;
+    var rowsHtml = d.lines.map(function (l) {
+      total += l.amount;
+      return '<tr>' +
+        '<td>' + l.no + '</td>' +
+        '<td class="code">' + l.mcode + '</td>' +
+        '<td>' + l.mname + '</td>' +
+        '<td class="muted">' + l.spec + '</td>' +
+        '<td>' + l.unit + '</td>' +
+        '<td class="num">' + SC.fmtNum(l.qty) + '</td>' +
+        '<td class="num">' + SC.fmtMoney(l.price) + '</td>' +
+        '<td class="num">' + SC.fmtMoney(l.amount) + '</td>' +
+      '</tr>';
+    }).join('');
+    document.getElementById('lines-tbody').innerHTML = rowsHtml;
+    document.getElementById('line-total').textContent = SC.fmtMoney(total);
+
+    document.getElementById('timeline').innerHTML = d.timeline.map(function (t) {
+      var cls = t.state === 'done' ? 'done' : t.state === 'current' ? 'current' : t.state === 'reject' ? 'reject' : '';
+      var comment = t.comment ? '<div class="comment">' + t.comment + '</div>' : '';
+      return '<div class="step ' + cls + '">' +
+        '<div class="title">' + t.title + '</div>' +
+        '<div class="meta">' + t.who + ' · ' + t.time + '</div>' +
+        comment +
+      '</div>';
+    }).join('');
+  </script>
+</body>
+</html>

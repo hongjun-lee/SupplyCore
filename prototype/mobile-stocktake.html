@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>移动端盘点 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+            <span class="badge blue dot">说明</span>
+            <div class="text-2">
+              本页面演示<strong>仓管员现场使用手持设备（PDA / 手机）扫码盘点</strong>的界面样式。下方手机外框为 360×720 实际像素的演示视图，所有交互、扫码动画与 Mock 数据均可作为业务沟通的视觉参考。
+              对齐《06-库存实物流转详细设计 V1.0》第 5 章 — S-15 盘点单 + S-16 差异 + 移动端友好录入要求。
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <!-- 左：手机演示 -->
+          <div style="display:flex;justify-content:center;padding:20px 0;">
+            <div class="phone-frame">
+              <div class="phone-screen">
+                <div class="phone-status-bar">
+                  <span>15:43</span>
+                  <span>● 信号 · ● 4G · ⌐⌐ 86%</span>
+                </div>
+                <div class="phone-app-bar">
+                  <span class="back">‹</span>
+                  <span style="flex:1;">盘点 · <span id="m-sheet"></span></span>
+                  <span style="font-size:12px;">扫码</span>
+                </div>
+                <div class="phone-body" style="padding:0;">
+                  <!-- 扫码区 -->
+                  <div style="padding:12px;">
+                    <div class="scan-zone">
+                      <div style="font-size:13px;">请将摄像头对准物料条码</div>
+                      <div class="scan-frame"></div>
+                      <div class="scan-tip">支持 Code128 / QR / DataMatrix</div>
+                      <div class="scan-action">▢ 手动输入编码</div>
+                    </div>
+                  </div>
+
+                  <!-- 当前位置 + 进度 -->
+                  <div style="padding:0 12px;">
+                    <div class="phone-card">
+                      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-2);">
+                        <span>当前区域</span>
+                        <span id="m-leader"></span>
+                      </div>
+                      <div style="font-size:14px;font-weight:600;margin-top:2px;" id="m-area"></div>
+                      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-2);margin-top:8px;">
+                        <span>盘点进度 <strong id="m-pct" style="color:var(--brand);"></strong></span>
+                        <span><span id="m-done"></span> / <span id="m-total"></span></span>
+                      </div>
+                      <div class="phone-progress"><div class="fill" id="m-pf" style="width:65%;"></div></div>
+                    </div>
+
+                    <!-- 待盘项目 -->
+                    <div class="phone-card" style="border-left:3px solid var(--brand);">
+                      <div style="font-size:11px;color:var(--brand);font-weight:600;">待盘 · 下一项</div>
+                      <div style="font-size:14px;font-weight:600;margin-top:2px;" id="m-next-name"></div>
+                      <div style="font-size:11px;color:var(--text-2);margin-top:2px;" id="m-next-spec"></div>
+                      <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:8px;">
+                        <span class="muted">货位 <strong style="color:var(--text);" id="m-next-loc"></strong></span>
+                        <span class="muted">账面 <strong style="color:var(--text);" id="m-next-qty"></strong></span>
+                      </div>
+                    </div>
+
+                    <!-- 已盘列表 -->
+                    <div class="phone-card">
+                      <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px;">最近已盘（4 / <span id="m-done2"></span>）</div>
+                      <div id="m-scanned"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 底部操作 -->
+                <div class="phone-bottom-action">
+                  <button class="btn-mobile btn-secondary">⏸ 挂起</button>
+                  <button class="btn-mobile btn-primary">⌽ 开始扫码</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右：交互说明 + 后端联动 -->
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">手持端关键交互</div></div>
+              <div class="card-body" style="font-size:13px;">
+                <div class="kv">
+                  <div class="k">扫码方式</div><div class="v">摄像头实时扫描 + 物理扫码枪 + 手动输入 三选一</div>
+                  <div class="k">条码标准</div><div class="v">Code128（默认）/ QR / DataMatrix · 无条码物料用编码手输</div>
+                  <div class="k">差异处理</div><div class="v">扫码后 PDA 自动比对账面数，差异即时显示并要求填写原因</div>
+                  <div class="k">离线缓存</div><div class="v">井下弱网络下支持本地缓存，回到地面后批量同步</div>
+                  <div class="k">挂起 / 续盘</div><div class="v">仓管员可中途挂起切到其他任务，回来时从断点继续</div>
+                  <div class="k">权限</div><div class="v">同 PC 端 — 按仓库 / 货位归属 + Nova SSO 单点登录</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">扫码完成后的后端联动</div></div>
+              <div class="card-body">
+                <div class="timeline-vert">
+                  <div class="tv-step done">
+                    <div class="tv-time">15:42:18</div>
+                    <div class="tv-dot"></div>
+                    <div class="tv-body">
+                      <span class="tv-title">扫码 M-AQ-0021 · 实盘 33 / 账面 36 · 盘亏 -3</span>
+                      <div class="tv-meta">PDA 上传至 S-15 盘点单</div>
+                    </div>
+                  </div>
+                  <div class="tv-step done">
+                    <div class="tv-time">15:42:18</div>
+                    <div class="tv-dot"></div>
+                    <div class="tv-body">
+                      <span class="tv-title">系统自动生成差异行 (S-16) · 标记盘亏</span>
+                      <div class="tv-meta">差异金额 -¥14,400.00（按平均成本 ¥4,800 × 3 只）</div>
+                    </div>
+                  </div>
+                  <div class="tv-step current">
+                    <div class="tv-time">完成盘点后</div>
+                    <div class="tv-dot"></div>
+                    <div class="tv-body">
+                      <span class="tv-title">PDA 提交 → 走差异审批</span>
+                      <div class="tv-meta">单笔盘亏 ≥ ¥10,000 → 升集团物资部复核</div>
+                    </div>
+                  </div>
+                  <div class="tv-step pending">
+                    <div class="tv-time">审批通过后</div>
+                    <div class="tv-dot"></div>
+                    <div class="tv-body">
+                      <span class="tv-title">调账 → 库存事务流水 (S-21) 同事务原子写入</span>
+                    </div>
+                  </div>
+                  <div class="tv-step pending">
+                    <div class="tv-time">月结时</div>
+                    <div class="tv-dot"></div>
+                    <div class="tv-body">
+                      <span class="tv-title">NC-BIZ-018 推送盘盈盘亏 → 财务记账</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+                <span class="badge amber dot">硬件建议</span>
+                <div class="text-2">
+                  一期建议手持端选型：<strong>Honeywell EDA52 / Urovo i6310</strong> 等工业级 PDA（防摔、激光扫码、信创认证）；普通 Android 手机 + 手机摄像头亦可作为备用方案。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'mobile-stocktake',
+      crumbs: ['库存实物流转', '盘点', '移动端演示'],
+      title: '移动端盘点（手持扫码）',
+      desc: '对齐《06》— S-15 盘点单 + S-16 差异 + 移动端友好录入要求',
+    });
+
+    var m = SC.data.mobileStocktakeData;
+    document.getElementById('m-sheet').textContent = m.sheet;
+    document.getElementById('m-leader').textContent = m.leader;
+    document.getElementById('m-area').textContent = m.currentArea;
+    document.getElementById('m-pct').textContent = m.progress.pct + '%';
+    document.getElementById('m-done').textContent = m.progress.done;
+    document.getElementById('m-done2').textContent = m.progress.done;
+    document.getElementById('m-total').textContent = m.progress.total;
+    document.getElementById('m-pf').style.width = m.progress.pct + '%';
+    document.getElementById('m-next-name').innerHTML = m.nextItem.name + ' <span class="muted code" style="font-size:11px;">(' + m.nextItem.code + ')</span>';
+    document.getElementById('m-next-spec').textContent = m.nextItem.spec;
+    document.getElementById('m-next-loc').textContent = m.nextItem.loc;
+    document.getElementById('m-next-qty').textContent = m.nextItem.bookQty + ' ' + m.nextItem.unit;
+
+    document.getElementById('m-scanned').innerHTML = m.scannedItems.map(function (s) {
+      var diffStr = s.diff > 0 ? '+' + s.diff : s.diff === 0 ? '0' : '' + s.diff;
+      var color = s.diff === 0 ? 'var(--green)' : 'var(--red)';
+      return '<div class="phone-list-row">' +
+        '<div class="t">' + s.time.split(':').slice(0,2).join(':') + '</div>' +
+        '<div class="name">' + s.name + '<div class="code">' + s.code + '</div></div>' +
+        '<div class="diff" style="color:' + color + ';">' + diffStr + '</div>' +
+      '</div>';
+    }).join('');
+  </script>
+</body>
+</html>

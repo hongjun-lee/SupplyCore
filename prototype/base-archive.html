@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>基础档案 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="tabs" id="tabs">
+            <div class="tab active" data-tab="org">组织架构（来自 Nova 同步）</div>
+            <div class="tab" data-tab="wh">仓库 / 库区货位</div>
+            <div class="tab" data-tab="sp">供应商档案</div>
+          </div>
+
+          <!-- 组织 -->
+          <div class="tab-pane active" id="tab-org">
+            <div class="card-header">
+              <div class="title">组织架构 · 5 级 · 物化路径编码</div>
+              <div class="actions">
+                <span class="badge blue dot">从 Nova Platform 同步</span>
+                <button class="btn">同步日志</button>
+                <button class="btn">导出</button>
+              </div>
+            </div>
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>组织编码</th>
+                  <th>组织名称</th>
+                  <th>层级</th>
+                  <th>上级组织</th>
+                  <th>负责人</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="org-tbody"></tbody>
+            </table>
+            <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              组织 / 部门 / 人员主数据来自 <span class="font-mono">Nova Platform · platform.organizations / platform.persons</span>，本系统只读副本；变更须在 Nova 端发起，本地 5 分钟内同步。
+            </div>
+          </div>
+
+          <!-- 仓库 -->
+          <div class="tab-pane" id="tab-wh">
+            <div class="card-header">
+              <div class="title">仓库与库区货位</div>
+              <div class="actions">
+                <button class="btn">导出</button>
+                <button class="btn">+ 新增库区</button>
+                <button class="btn btn-primary">+ 新增仓库</button>
+              </div>
+            </div>
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>仓库编码</th>
+                  <th>仓库名称</th>
+                  <th>所属厂矿</th>
+                  <th>仓库类型</th>
+                  <th>面积</th>
+                  <th>仓管员 / 主责</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="wh-tbody"></tbody>
+            </table>
+            <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              支持 <strong>仓库 → 库区 → 货位</strong> 三级嵌套；火工品 / 化工品类型仓库需开启「双人双锁专管」标记，写入时强制双人审批。详见《02-基础档案与组织仓库详细设计 V1.0》。
+            </div>
+          </div>
+
+          <!-- 供应商 -->
+          <div class="tab-pane" id="tab-sp">
+            <div class="card-header">
+              <div class="title">供应商档案（M-10）</div>
+              <div class="actions">
+                <button class="btn">导出</button>
+                <button class="btn">资质证照库</button>
+                <button class="btn btn-primary">+ 新增供应商</button>
+              </div>
+            </div>
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>供应商编码</th>
+                  <th>供应商名称</th>
+                  <th>主营类目</th>
+                  <th>统一社会信用</th>
+                  <th>联系人 / 电话</th>
+                  <th>信用等级</th>
+                  <th>资质状态<br><span class="muted" style="font-weight:400;font-size:11px;">qualification_status</span></th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="sp-tbody"></tbody>
+            </table>
+            <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              供应商资质状态 = 准入待审 / 合格 / 暂停 / 黑名单 / 已作废；信用等级 A/B/C 由历史履约自动计算（《03》M-10 状态字段）。"黑名单" 状态下系统拒绝任何新订单创建。
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'base-archive',
+      crumbs: ['基础数据', '基础档案'],
+      title: '基础档案',
+      desc: '对齐《02-基础档案与组织仓库详细设计 V1.0》+ Nova Platform 组织 / 人员同步',
+    });
+
+    /* 组织 */
+    var orgColors = { 1:'blue',2:'teal',3:'green',4:'gray',5:'gray' };
+    var levelMap = { '二级集团':1,'厂矿':2,'部门':4,'班组':5 };
+    document.getElementById('org-tbody').innerHTML = SC.data.organizations.map(function (o) {
+      var lc = orgColors[levelMap[o.level]] || 'gray';
+      return '<tr>' +
+        '<td class="code">' + o.code + '</td>' +
+        '<td>' + o.name + '</td>' +
+        '<td><span class="badge ' + lc + '">' + o.level + '</span></td>' +
+        '<td class="muted">' + o.parent + '</td>' +
+        '<td>' + o.leader + '</td>' +
+        '<td>' + (o.enabled ? '<span class="badge green dot">启用</span>' : '<span class="badge gray dot">停用</span>') + '</td>' +
+        '<td class="actions"><a>查看</a></td>' +
+      '</tr>';
+    }).join('');
+
+    /* 仓库 */
+    document.getElementById('wh-tbody').innerHTML = SC.data.warehouses.map(function (w) {
+      var typeColor = w.type.indexOf('火工品') >= 0 ? 'red' : w.type === '油料库' ? 'amber' : 'gray';
+      return '<tr>' +
+        '<td class="code">' + w.code + '</td>' +
+        '<td>' + w.name + '</td>' +
+        '<td>' + w.mine + '</td>' +
+        '<td><span class="badge ' + typeColor + '">' + w.type + '</span></td>' +
+        '<td>' + w.area + '</td>' +
+        '<td>' + w.keeper + '</td>' +
+        '<td><span class="badge green dot">启用</span></td>' +
+        '<td class="actions"><a>库区货位</a><a>变更</a></td>' +
+      '</tr>';
+    }).join('');
+
+    /* 供应商 */
+    document.getElementById('sp-tbody').innerHTML = SC.data.suppliers.map(function (s) {
+      return '<tr>' +
+        '<td class="code">' + s.code + '</td>' +
+        '<td>' + s.name + '</td>' +
+        '<td>' + s.cat + '</td>' +
+        '<td class="code">' + s.tax + '</td>' +
+        '<td>' + s.contact + '<div class="muted" style="font-size:11px;">' + s.phone + '</div></td>' +
+        '<td>' + (s.credit === '—' ? '<span class="muted">—</span>' : '<span class="badge ' + (s.credit === 'A' ? 'green' : s.credit === 'B' ? 'amber' : 'gray') + '">' + s.credit + '</span>') + '</td>' +
+        '<td>' + SC.badge(s.state, s.color, true) + '</td>' +
+        '<td class="actions"><a>查看</a><a>变更</a></td>' +
+      '</tr>';
+    }).join('');
+
+    /* tabs */
+    document.querySelectorAll('#tabs .tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        document.querySelectorAll('#tabs .tab').forEach(function (x) { x.classList.remove('active'); });
+        document.querySelectorAll('.tab-pane').forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
