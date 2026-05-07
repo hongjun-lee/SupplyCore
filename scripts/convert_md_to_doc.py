@@ -204,18 +204,23 @@ def add_paragraph_with_bold(doc: Document, text: str, style: Optional[str] = Non
 def add_cell_text_with_bold(cell, text: str):
     """
     将包含 **加粗** 标记的文本写入表格单元格
+    支持 <br/> / <br> 在单元格内软换行
     """
     cell.text = ''
     paragraph = cell.paragraphs[0]
-    parts = re.split(r'(\*\*.*?\*\*)', text)
-    for part in parts:
-        if not part:
-            continue
-        if part.startswith('**') and part.endswith('**') and len(part) >= 4:
-            run = paragraph.add_run(part[2:-2])
-            run.bold = True
-        else:
-            paragraph.add_run(part)
+    segments = re.split(r'<br\s*/?>', text)
+    for seg_idx, segment in enumerate(segments):
+        if seg_idx > 0:
+            paragraph.add_run().add_break()
+        parts = re.split(r'(\*\*.*?\*\*)', segment)
+        for part in parts:
+            if not part:
+                continue
+            if part.startswith('**') and part.endswith('**') and len(part) >= 4:
+                run = paragraph.add_run(part[2:-2])
+                run.bold = True
+            else:
+                paragraph.add_run(part)
 
 
 def apply_project_style(docx_path: str) -> bool:
