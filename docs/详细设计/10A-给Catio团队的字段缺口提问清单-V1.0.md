@@ -1,6 +1,6 @@
 # 给 Catio 团队的字段缺口提问清单 V1.0
 
-**文档目的：** SupplyCores（物资管理系统）通过 `[DependsOn]` 复用 Catio 仓库的 `Nova.Platform` + `Nova.Workflow` ABP 模块代码，在本地独立数据库建相同结构的表（不访问集团 Nova Platform 的运行库，部署边界遵循概设 01）。本清单原按详设 10《权限审批流详细设计 V1.0》发函核对字段缺口；Catio 2026-05-05 回函后，已吸收到详设 10 V1.1 与 10A V0.6。本文档保留为发函/回函闭环记录，当前实施口径以 `10-权限审批流详细设计-V1.1.md` + `10A-权限审计域整合方案-V0.6.md` 为准。
+**文档目的：** SupplyCores（物资管理系统）通过 `[DependsOn]` 复用 Catio 仓库的 `Nova.Platform` + `Nova.Workflow` 模块代码，在本地独立数据库建相同结构的表（不访问集团 Nova Platform 的运行库，部署边界遵循概设 01）。本清单原按详设 10《权限审批流详细设计 V1.0》发函核对字段缺口；Catio 2026-05-05 回函后，已吸收到详设 10 V1.1 与 10A V0.6。本文档保留为发函/回函闭环记录，当前实施口径以 `10-权限审批流详细设计-V1.1.md` + `10A-权限审计域整合方案-V0.6.md` 为准。
 
 **回复 SLA 期望：** T+5 工作日。超期 SupplyCores 将按降级方案落地（缺失字段的表从 REUSE 改为 SupplyCores 自建 ADD），后续如 Catio 扩展再回切。
 
@@ -34,7 +34,7 @@
 
 ## 二、缺口 #1：`AbpRoles` `Properties` 字段索引（对应 A-02）
 
-**SupplyCores 需求：** A-02 业务角色表有 `role_category varchar(50)` 字段（值域：管理查询/信息化运维/物资管理/仓储执行/业务申请/采购执行/质检控制/财务控制/安全专项/审计查询/系统管理 共 11 类），需要支持"按 role_category 列表查询所有角色"业务功能（如系统管理页按类别筛选）。SupplyCores 计划把此字段落到 ABP 标准 `AbpRoles.Properties` JSON 字段。
+**SupplyCores 需求：** A-02 业务角色表有 `role_category varchar(50)` 字段（值域：管理查询/信息化运维/物资管理/仓储执行/业务申请/采购执行/质检控制/财务控制/安全专项/审计查询/系统管理 共 11 类），需要支持"按 role_category 列表查询所有角色"业务功能（如系统管理页按类别筛选）。SupplyCores 计划把此字段落到框架标准 `AbpRoles.Properties` JSON 字段。
 
 **问 Catio 团队：**
 

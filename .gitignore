@@ -13,3 +13,7 @@ MEMORY.md
 
 # Local Playwright CLI cache / snapshots
 .playwright-cli/
+
+# Word 输出目录（由 md 通过 scripts/convert_md_to_doc.py 生成）
+word/
+docs/**/word/
