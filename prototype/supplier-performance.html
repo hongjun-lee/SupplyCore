@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>供应商履约画像 — 阜矿物资供应管理系统（原型）</title><link rel="stylesheet" href="assets/styles.css"></head>
+<body><div id="header"></div><div class="app-layout"><div id="sidebar"></div><div class="app-main"><div id="page-area">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="label">合格供应商</div><div class="value">126</div><div class="trend">A 级 32 / B 级 78 / C 级 16</div></div>
+    <div class="kpi"><div class="label">本月准入待审</div><div class="value" style="color:var(--amber)">7</div><div class="trend down">证照过期 2 家</div></div>
+    <div class="kpi"><div class="label">平均准时交付率</div><div class="value">91.6%</div><div class="trend">近 12 个月</div></div>
+    <div class="kpi"><div class="label">黑名单 / 暂停</div><div class="value" style="color:var(--red)">4</div><div class="trend down">禁止创建新订单</div></div>
+  </div>
+
+  <div class="cols-2">
+    <div class="card">
+      <div class="card-header"><div class="title">供应商履约画像</div><div class="actions"><button class="btn">导出评价</button><button class="btn btn-primary">+ 准入申请</button></div></div>
+      <table class="data">
+        <thead><tr><th>供应商</th><th>主营类目</th><th class="num">准时率</th><th class="num">一次合格率</th><th class="num">退货次数</th><th>等级</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td>辽宁矿安设备有限公司<div class="code">SP-00018</div></td><td>安全监测 / 设备</td><td class="num">96.2%</td><td class="num">98.1%</td><td class="num">1</td><td><span class="badge green">A</span></td><td><span class="badge green dot">合格</span></td><td class="actions"><a>详情</a><a>评价</a></td></tr>
+          <tr><td>沈阳华通电缆集团<div class="code">SP-00027</div></td><td>电缆电线</td><td class="num">89.7%</td><td class="num">94.4%</td><td class="num">3</td><td><span class="badge amber">B</span></td><td><span class="badge green dot">合格</span></td><td class="actions"><a>详情</a><a>评价</a></td></tr>
+          <tr><td>阜新煤机配件厂<div class="code">SP-00042</div></td><td>采掘备件</td><td class="num">78.0%</td><td class="num">86.5%</td><td class="num">7</td><td><span class="badge gray">C</span></td><td><span class="badge amber dot">暂停接单</span></td><td class="actions"><a>整改</a><a>黑名单</a></td></tr>
+          <tr><td>锦州恒远贸易有限公司<div class="code">SP-00061</div></td><td>劳保用品</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td><span class="muted">—</span></td><td><span class="badge blue dot">准入待审</span></td><td class="actions"><a>审核</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-header"><div class="title">供应商详情 · 辽宁矿安设备有限公司</div></div>
+        <div class="card-body">
+          <div class="kv">
+            <div class="k">统一社会信用代码</div><div class="v code">91210900MA0XXXX18</div>
+            <div class="k">准入状态</div><div class="v"><span class="badge green dot">合格</span></div>
+            <div class="k">准入有效期</div><div class="v">2026-01-01 至 2026-12-31</div>
+            <div class="k">履约等级</div><div class="v"><span class="badge green">A</span></div>
+            <div class="k">风险标签</div><div class="v"><span class="badge blue">长期合作</span> <span class="badge green">低风险</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="title">评价构成</div></div>
+        <div class="card-body">
+          <div class="timeline-vert">
+            <div class="tl-item done"><div class="tl-title">交付准时率 96.2%</div><div class="tl-desc">按采购订单承诺到货日期与实际到货日期计算。</div></div>
+            <div class="tl-item done"><div class="tl-title">验收一次合格率 98.1%</div><div class="tl-desc">质检不合格、退货、让步接收均计入扣分。</div></div>
+            <div class="tl-item current"><div class="tl-title">证照 / 资质有效性</div><div class="tl-desc">营业执照、煤安证、防爆证等到期前 30 天预警。</div></div>
+            <div class="tl-item"><div class="tl-title">异常与黑名单</div><div class="tl-desc">严重质量事故、围标串标、廉洁风险触发暂停或黑名单。</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card"><div class="card-body" style="font-size:12px;color:var(--text-2);"><span class="badge blue dot">边界</span><span style="margin-left:8px;">供应商基础信息可在基础档案维护；准入、评价、暂停、黑名单和履约画像作为供应商管理业务能力独立展示，并与招投标、合同、采购订单联动。</span></div></div>
+</div></div></div>
+<script src="assets/data.js"></script><script src="assets/chrome.js"></script><script>SC.layout({page:'supplier-performance',crumbs:['基础数据','供应商管理'],title:'供应商履约画像',desc:'补齐供应商准入、评价、黑名单和履约画像，避免仅停留在基础档案层',actions:[{label:'资质证照库'},{label:'+ 准入申请',primary:true}]});</script>
+</body></html>

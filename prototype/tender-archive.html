@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>招投标过程归档 — 阜矿物资供应管理系统（原型）</title><link rel="stylesheet" href="assets/styles.css"></head>
+<body><div id="header"></div><div class="app-layout"><div id="sidebar"></div><div class="app-main"><div id="page-area">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="label">待归档项目</div><div class="value" style="color:var(--amber)">3</div><div class="trend down">缺评委签字表 1 项</div></div>
+    <div class="kpi"><div class="label">本月归档完成</div><div class="value">12</div><div class="trend">自动校验通过 10 项</div></div>
+    <div class="kpi"><div class="label">合同已生成</div><div class="value">8</div><div class="trend">由中标结果联动</div></div>
+    <div class="kpi"><div class="label">审计抽查问题</div><div class="value" style="color:var(--red)">1</div><div class="trend down">附件缺失待补录</div></div>
+  </div>
+
+  <div class="card">
+    <div class="flow-strip">
+      <div class="node done"><span class="step-num">1</span> 计划来源</div>
+      <div class="node done"><span class="step-num">2</span> 标包拆分</div>
+      <div class="node done"><span class="step-num">3</span> 采购文件</div>
+      <div class="node done"><span class="step-num">4</span> 平台开评标</div>
+      <div class="node current"><span class="step-num">5</span> 结果回传归档</div>
+      <div class="node"><span class="step-num">6</span> 合同生成</div>
+    </div>
+    <div class="card-body" style="font-size:12px;color:var(--text-2);"><span class="badge blue dot">一期边界</span><span style="margin-left:8px;">开标、投标、评标过程仍在能源集团电子商务/招采平台完成；本系统负责采购文件生成、资料回传归档、审计留痕和合同联动。</span></div>
+  </div>
+
+  <div class="cols-2">
+    <div class="card">
+      <div class="card-header"><div class="title">项目归档清单</div><div class="actions"><button class="btn">归档校验</button><button class="btn btn-primary">上传资料</button></div></div>
+      <table class="data">
+        <thead><tr><th>资料类型</th><th>文件名称</th><th>来源</th><th>状态</th><th>留痕</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td>采购文件</td><td>主通风机备件采购文件.pdf</td><td>系统生成</td><td><span class="badge green dot">已归档</span></td><td>2026-05-06 09:21 张伟</td><td class="actions"><a>预览</a><a>下载</a></td></tr>
+          <tr><td>公告回执</td><td>招采平台公告回执.xml</td><td>平台回传</td><td><span class="badge green dot">已归档</span></td><td>接口任务 IF-7782</td><td class="actions"><a>查看</a></td></tr>
+          <tr><td>开标记录</td><td>开标记录单.pdf</td><td>平台回传</td><td><span class="badge green dot">已归档</span></td><td>带电子签章</td><td class="actions"><a>预览</a></td></tr>
+          <tr><td>评标报告</td><td>评标报告-主通风机备件.pdf</td><td>平台回传</td><td><span class="badge green dot">已归档</span></td><td>哈希校验通过</td><td class="actions"><a>预览</a></td></tr>
+          <tr><td>评委签字表</td><td>—</td><td>人工补录</td><td><span class="badge red dot">缺失</span></td><td>已提醒负责人</td><td class="actions"><a>补传</a></td></tr>
+          <tr><td>中标通知书</td><td>中标通知书.pdf</td><td>平台回传</td><td><span class="badge blue dot">待确认</span></td><td>待采购负责人确认</td><td class="actions"><a>确认</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-header"><div class="title">标包与合同联动</div></div>
+        <table class="data">
+          <thead><tr><th>标包</th><th>中标供应商</th><th class="num">中标金额</th><th>合同状态</th></tr></thead>
+          <tbody>
+            <tr><td>包 1：主通风机备件</td><td>辽宁矿安设备有限公司</td><td class="num">¥ 486,000.00</td><td><span class="badge amber dot">合同草稿</span></td></tr>
+            <tr><td>包 2：隔爆开关配件</td><td>沈阳华通电缆集团</td><td class="num">¥ 231,500.00</td><td><span class="badge green dot">已生成合同</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="title">归档校验规则</div></div>
+        <div class="card-body">
+          <div class="timeline-vert">
+            <div class="tl-item done"><div class="tl-title">完整性校验</div><div class="tl-desc">采购文件、公告回执、开标记录、评标报告、中标通知书必须齐全。</div></div>
+            <div class="tl-item done"><div class="tl-title">一致性校验</div><div class="tl-desc">标包、供应商、金额与合同草稿保持一致。</div></div>
+            <div class="tl-item current"><div class="tl-title">审计留痕</div><div class="tl-desc">资料上传、替换、删除均记录操作人、时间、原因和水印。</div></div>
+            <div class="tl-item"><div class="tl-title">合同联动</div><div class="tl-desc">归档通过后允许生成合同；缺关键资料时仅允许保存草稿。</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div></div>
+<script src="assets/data.js"></script><script src="assets/chrome.js"></script><script>SC.layout({page:'tender-archive',crumbs:['采购协同','招投标过程归档'],title:'招投标过程归档',desc:'补齐标包、采购文件、开评标资料、评标报告和合同生成的审计链路',actions:[{label:'归档校验'},{label:'生成合同草稿',primary:true}]});</script>
+</body></html>

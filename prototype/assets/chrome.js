@@ -20,6 +20,7 @@ SC.nav = [
     { id: 'goods-receipt',     href: 'goods-receipt.html',      label: '到货验收', icon: '⇩' },
     { id: 'quality-check',     href: 'quality-check.html',      label: '质检', icon: '✓' },
     { id: 'inventory',         href: 'inventory.html',          label: '库存查询', icon: '▦' },
+    { id: 'inventory-flow',    href: 'inventory-flow.html',     label: '库存流转', icon: '↔' },
     { id: 'stocktake',         href: 'stocktake.html',          label: '盘点', icon: '⊞' },
     { id: 'scrap-disposal',    href: 'scrap-disposal.html',     label: '废旧处置', icon: '✗' },
     { id: 'equipment-rent',    href: 'equipment-rent.html',     label: '设备租赁', icon: '⚙' },
@@ -29,6 +30,7 @@ SC.nav = [
   ]},
   { title: '采购协同', items: [
     { id: 'tender',            href: 'tender.html',             label: '招投标', icon: '◐' },
+    { id: 'tender-archive',    href: 'tender-archive.html',     label: '招投标归档', icon: '▣' },
   ]},
   { title: '合同与资金', items: [
     { id: 'contract-list',     href: 'contract-list.html',      label: '合同管理', icon: '◇' },
@@ -39,9 +41,11 @@ SC.nav = [
   { title: '基础数据', items: [
     { id: 'material-master',   href: 'material-master.html',    label: '物料主数据', icon: '◫' },
     { id: 'base-archive',      href: 'base-archive.html',       label: '基础档案', icon: '◯' },
+    { id: 'supplier-performance', href: 'supplier-performance.html', label: '供应商履约画像', icon: '◎' },
   ]},
   { title: '决策 / AI', items: [
     { id: 'reports',           href: 'reports.html',            label: '报表 / AI 助理', icon: '☆' },
+    { id: 'alert-rules',       href: 'alert-rules.html',        label: '预警规则配置', icon: '!' },
     { id: 'ai-assistant',      href: 'ai-assistant.html',       label: 'AI 助理（独立演示）', icon: '✺' },
     { id: 'ai-write-flow',     href: 'ai-write-flow.html',      label: 'AI 写操作（演示）', icon: '✎' },
     { id: 'dashboard-bigscreen', href: 'dashboard-bigscreen.html', label: '大屏看板（投屏）', icon: '⬜' },
