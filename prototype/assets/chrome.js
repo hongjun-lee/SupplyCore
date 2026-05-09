@@ -26,6 +26,7 @@ SC.nav = [
     { id: 'equipment-rent',    href: 'equipment-rent.html',     label: '设备租赁', icon: '⚙' },
     { id: 'equipment-lifecycle', href: 'equipment-lifecycle.html', label: '设备生命周期', icon: '◑' },
     { id: 'maintenance-order', href: 'maintenance-order.html',  label: '设备维修工单', icon: '⚒' },
+    { id: 'equipment-oee',     href: 'equipment-oee.html',      label: '设备 OEE 看板', icon: '◴' },
     { id: 'mobile-stocktake',  href: 'mobile-stocktake.html',   label: '移动端盘点（演示）', icon: '▢' },
   ]},
   { title: '采购协同', items: [
@@ -37,6 +38,7 @@ SC.nav = [
     { id: 'contract-detail',   href: 'contract-detail.html',    label: '合同详情（演示）', icon: '◇' },
     { id: 'payment-request',   href: 'payment-request.html',    label: '付款申请（演示）', icon: '¥' },
     { id: 'funding-plan',      href: 'funding-plan.html',       label: '资金计划（月度）', icon: '☷' },
+    { id: 'three-way-match',   href: 'three-way-match.html',    label: '三单匹配', icon: '☰' },
   ]},
   { title: '基础数据', items: [
     { id: 'material-master',   href: 'material-master.html',    label: '物料主数据', icon: '◫' },
@@ -52,6 +54,7 @@ SC.nav = [
   ]},
   { title: '运维 / 集成', items: [
     { id: 'nc-interface',      href: 'nc-interface.html',       label: 'NC 接口监控', icon: '⇆' },
+    { id: 'nc-interface-detail', href: 'nc-interface-detail.html', label: '接口异常详情（演示）', icon: '⚠' },
     { id: 'system-admin',      href: 'system-admin.html',       label: '系统管理', icon: '⚙' },
     { id: 'xinchuang-matrix',  href: 'xinchuang-matrix.html',   label: '信创兼容性矩阵', icon: '◧' },
   ]},
@@ -86,7 +89,7 @@ SC.renderHeader = function () {
     <button class="menu-toggle" id="menu-toggle" aria-label="菜单">☰</button>
     <div class="logo">
       <div class="mark">辽</div>
-      <div>辽宁能源 · 阜矿物资供应管理系统 <span class="sub">原型 v0.6</span></div>
+      <div>辽宁能源 · 阜矿物资供应管理系统 <span class="sub">原型 v0.7</span></div>
     </div>
     <span class="spacer"></span>
     <div class="h-item">二级集团：<strong style="color:var(--text);font-weight:500;margin-left:4px;">${sg.name}</strong></div>
@@ -143,7 +146,7 @@ SC.renderFooter = function () {
   if (document.querySelector('.app-footer')) return;
   const f = document.createElement('div');
   f.className = 'app-footer';
-  f.innerHTML = `SupplyCore 原型 v0.6 · 演示数据，不作为开发或验收依据 · ${SC.docVer}`;
+  f.innerHTML = `SupplyCore 原型 v0.7 · 演示数据，不作为开发或验收依据 · ${SC.docVer}`;
   document.body.appendChild(f);
 };
 

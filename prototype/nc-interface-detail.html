@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>NC 接口异常详情 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    /* 报文代码块 */
+    .codeblock {
+      background: #0e1d3a; color: #cdd5e3; border-radius: 6px;
+      padding: 12px 14px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px; line-height: 1.65; overflow-x: auto;
+      max-height: 280px; overflow-y: auto;
+    }
+    .codeblock .key { color: #93c5fd; }
+    .codeblock .str { color: #86efac; }
+    .codeblock .num { color: #fcd34d; }
+    .codeblock .err-line { background: rgba(220, 38, 38, 0.18); display: block; margin: 0 -14px; padding: 0 14px; }
+    .codeblock-toolbar {
+      display: flex; align-items: center; gap: 12px; padding: 8px 12px;
+      background: #16294e; border-radius: 6px 6px 0 0; color: #cdd5e3; font-size: 11px;
+    }
+    .codeblock-toolbar .tag { background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; }
+    .codeblock-toolbar .spacer { flex: 1; }
+    .codeblock-toolbar a { color: #93c5fd; cursor: pointer; }
+
+    /* 错误诊断卡 */
+    .diag-card {
+      background: var(--red-50); border: 1px solid #fecaca; border-left: 4px solid var(--red);
+      border-radius: 6px; padding: 12px 14px;
+    }
+    .diag-card .err-code {
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      background: #fff; padding: 1px 6px; border-radius: 3px;
+      border: 1px solid #fecaca; color: var(--red); font-size: 12px;
+    }
+
+    /* tabs */
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 0; }
+    .tabs .tab {
+      padding: 10px 16px; cursor: pointer; font-size: 13px; color: var(--text-2);
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .tabs .tab.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 500; }
+    .tabpane { display: none; padding: 16px; }
+    .tabpane.active { display: block; }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card">
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+              <h2 class="mt-0 mb-0" style="font-size:18px;">推送任务 <span class="code">T2026050201103</span></h2>
+              <span class="badge red dot">推送失败</span>
+              <span class="badge amber">已尝试 3/5 次</span>
+              <span class="spacer" style="flex:1;"></span>
+              <button class="btn">下载报文</button>
+              <button class="btn">查看 NC 错误码字典</button>
+              <button class="btn">⊘ 关闭任务（人工）</button>
+              <button class="btn btn-primary">⟳ 重推（高敏感审批）</button>
+            </div>
+
+            <div class="kv">
+              <div class="k">接口</div>
+              <div class="v"><span class="code">NC-BIZ-005</span> 采购订单推送 ·
+                <a href="nc-interface.html" style="font-size:12px;">查看接口清单</a></div>
+              <div class="k">关联业务</div>
+              <div class="v"><a href="purchase-orders.html" class="code">CG-2026-0314</a> 抚顺矿用电缆厂 · ¥412,800.00</div>
+              <div class="k">触发于</div>
+              <div class="v">2026-05-02 09:14:22 · 由"采购订单审批通过"事件触发</div>
+              <div class="k">最近一次</div>
+              <div class="v">2026-05-02 14:22:08 (5h 7m 前) · 由系统自动重试触发</div>
+              <div class="k">业务执行状态</div>
+              <div class="v"><span class="badge amber dot">执行中</span> <span class="muted" style="font-size:11px;">不受推送失败影响 · order_state ≠ interface_push_state</span></div>
+              <div class="k">当前指派</div>
+              <div class="v">系统集成工程师 · 张工 <span class="muted">（自动指派 + 维持 24h，未处理升级到运维主管）</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 错误诊断 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="title">错误诊断与建议处置</div>
+            <div class="actions">
+              <span class="badge teal">AI 辅助分析</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="diag-card mb-12">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <strong style="color:var(--red);">NC 返回错误：</strong>
+                <span class="err-code">V_91022</span>
+                <span style="color:var(--red);font-weight:500;">供应商编码不存在</span>
+              </div>
+              <div style="font-size:12px;color:var(--text-2);">
+                NC 服务在校验报文 <span class="font-mono">supplierCode = "S20240312001"</span> 时返回该错误。
+                经核对：本系统供应商主数据中"抚顺矿用电缆厂"的 NC 映射码为 <span class="font-mono">S20240312001</span>，但 NC 当前主数据库中**未找到该码**。
+              </div>
+            </div>
+
+            <div class="cols-2" style="grid-template-columns:1fr 1fr;">
+              <div>
+                <div style="font-weight:500;margin-bottom:6px;">可能原因</div>
+                <ol style="margin:0;padding-left:18px;font-size:12px;color:var(--text-2);">
+                  <li>NC 端供应商主数据未同步（最近一次 NC-MD-003 推送应为 4/30，但 NC 未生效）</li>
+                  <li>供应商在 NC 端被禁用或变更编码（核对 NC 端审批流）</li>
+                  <li>本系统映射表 <span class="font-mono">supplier_nc_map</span> 数据陈旧</li>
+                </ol>
+              </div>
+              <div>
+                <div style="font-weight:500;margin-bottom:6px;">建议处置（按推荐顺序）</div>
+                <ol style="margin:0;padding-left:18px;font-size:12px;color:var(--text-2);">
+                  <li>重新触发 <span class="code">NC-MD-003</span> 供应商主数据下推 → 等待 NC 主数据生效</li>
+                  <li>NC 主数据确认后 → 重推本任务（高敏感审批）</li>
+                  <li>如 NC 编码已变更：先在本系统更新 <span class="font-mono">supplier_nc_map</span> 后重推</li>
+                  <li>如 24h 内未处理：自动升级到运维主管 + AI 助理预警</li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="mt-12" style="padding:8px 12px;background:var(--brand-50);border-left:3px solid var(--brand);border-radius:0 4px 4px 0;font-size:12px;color:var(--text-2);">
+              <strong style="color:var(--brand);">AI 助理建议：</strong>该错误已在近 30 日发生 4 次，均与 NC 主数据同步延迟相关。建议在 09 报表预警中开启"NC 主数据同步异常"规则，提前发现。
+              <a href="alert-rules.html" style="font-size:12px;margin-left:6px;">配置规则 →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 报文 + 重试历史 + 处置建议 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="title">报文与重试详情</div>
+          </div>
+          <div class="tabs">
+            <div class="tab active" data-tab="payload">请求报文</div>
+            <div class="tab" data-tab="response">响应报文</div>
+            <div class="tab" data-tab="history">重试历史 (3)</div>
+            <div class="tab" data-tab="audit">审计与处置</div>
+          </div>
+
+          <!-- pane: 请求报文 -->
+          <div class="tabpane active" id="pane-payload">
+            <div class="codeblock-toolbar">
+              <span class="tag">application/json</span>
+              <span>POST /nc/biz/purchase-order</span>
+              <span class="spacer"></span>
+              <a>复制</a>
+              <a>下载 .json</a>
+            </div>
+            <pre class="codeblock" style="margin:0;border-radius:0 0 6px 6px;"><code>{
+  <span class="key">"messageId"</span>: <span class="str">"T2026050201103"</span>,
+  <span class="key">"businessKey"</span>: <span class="str">"CG-2026-0314"</span>,
+  <span class="key">"orderType"</span>: <span class="str">"PURCHASE_ORDER"</span>,
+  <span class="key">"orderDate"</span>: <span class="str">"2026-04-24"</span>,
+  <span class="key">"supplierCode"</span>: <span class="str">"S20240312001"</span>,    <span class="err-line">// ← NC 端不存在</span>
+  <span class="key">"supplierName"</span>: <span class="str">"抚顺矿用电缆厂"</span>,
+  <span class="key">"organizationCode"</span>: <span class="str">"FK-AY"</span>,
+  <span class="key">"contractCode"</span>: <span class="str">"HT-2026-0042"</span>,
+  <span class="key">"totalAmount"</span>: <span class="num">412800.00</span>,
+  <span class="key">"currency"</span>: <span class="str">"CNY"</span>,
+  <span class="key">"lines"</span>: [
+    {
+      <span class="key">"lineNo"</span>: <span class="num">1</span>,
+      <span class="key">"materialCode"</span>: <span class="str">"M-DL-0220"</span>,
+      <span class="key">"qty"</span>: <span class="num">200</span>,
+      <span class="key">"unitPrice"</span>: <span class="num">2064.00</span>
+    }
+    <span class="key">/* ... 共 8 行明细 ...*/</span>
+  ]
+}</code></pre>
+          </div>
+
+          <!-- pane: 响应报文 -->
+          <div class="tabpane" id="pane-response">
+            <div class="codeblock-toolbar">
+              <span class="tag">application/json</span>
+              <span>HTTP 200 OK</span>
+              <span class="tag" style="background:rgba(220,38,38,0.25);color:#fecaca;">业务错误</span>
+              <span class="spacer"></span>
+              <a>复制</a>
+            </div>
+            <pre class="codeblock" style="margin:0;border-radius:0 0 6px 6px;"><code>{
+  <span class="key">"success"</span>: <span class="num">false</span>,
+  <span class="key">"errorCode"</span>: <span class="str">"V_91022"</span>,                <span class="err-line">// ← 业务校验错</span>
+  <span class="key">"errorMessage"</span>: <span class="str">"供应商编码不存在: S20240312001"</span>,
+  <span class="key">"errorLevel"</span>: <span class="str">"BUSINESS"</span>,
+  <span class="key">"messageId"</span>: <span class="str">"T2026050201103"</span>,
+  <span class="key">"timestamp"</span>: <span class="str">"2026-05-02T14:22:08+08:00"</span>,
+  <span class="key">"trace"</span>: {
+    <span class="key">"ncTraceId"</span>: <span class="str">"NC-2026050214220812-0091"</span>,
+    <span class="key">"ncEndpoint"</span>: <span class="str">"/api/biz/purchase/v3/sync"</span>,
+    <span class="key">"latencyMs"</span>: <span class="num">186</span>
+  }
+}</code></pre>
+            <div class="mt-12" style="font-size:12px;color:var(--text-2);">
+              <strong>错误级别说明：</strong>
+              <span class="badge red">BUSINESS</span> 业务校验失败（如本例） — 重试无意义，需修复数据后重推 ·
+              <span class="badge amber">SYSTEM</span> NC 系统异常 — 系统自动指数退避重试 ·
+              <span class="badge gray">NETWORK</span> 网络/超时 — 自动 5 次重试
+            </div>
+          </div>
+
+          <!-- pane: 重试历史 -->
+          <div class="tabpane" id="pane-history">
+            <div class="timeline-vert">
+              <div class="tv-step warn">
+                <div class="tv-time">2026-05-02 14:22:08</div>
+                <div class="tv-dot"></div>
+                <div class="tv-body">
+                  <span class="tv-title">第 3 次重试 — 推送失败</span>
+                  <div class="tv-meta">触发：系统自动重试（指数退避 4h）· 耗时 186ms</div>
+                  <div class="tv-detail">错误：<span class="font-mono">V_91022</span> 供应商编码不存在；尝试上限 5 次，剩余 2 次</div>
+                </div>
+              </div>
+              <div class="tv-step warn">
+                <div class="tv-time">2026-05-02 11:18:30</div>
+                <div class="tv-dot"></div>
+                <div class="tv-body">
+                  <span class="tv-title">第 2 次重试 — 推送失败</span>
+                  <div class="tv-meta">触发：系统自动重试（指数退避 2h）· 耗时 192ms</div>
+                  <div class="tv-detail">错误：<span class="font-mono">V_91022</span>（同前）</div>
+                </div>
+              </div>
+              <div class="tv-step warn">
+                <div class="tv-time">2026-05-02 09:25:14</div>
+                <div class="tv-dot"></div>
+                <div class="tv-body">
+                  <span class="tv-title">第 1 次重试 — 推送失败</span>
+                  <div class="tv-meta">触发：系统自动重试（10min 后）· 耗时 178ms</div>
+                  <div class="tv-detail">错误：<span class="font-mono">V_91022</span>（同前）</div>
+                </div>
+              </div>
+              <div class="tv-step warn">
+                <div class="tv-time">2026-05-02 09:14:22</div>
+                <div class="tv-dot"></div>
+                <div class="tv-body">
+                  <span class="tv-title">首次推送 — 推送失败</span>
+                  <div class="tv-meta">触发：业务事件 = "采购订单审批通过" · 耗时 165ms</div>
+                  <div class="tv-detail">错误：<span class="font-mono">V_91022</span>；首次失败后入队等待重试</div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-12" style="padding:8px 12px;background:#fafbfd;border-radius:4px;font-size:12px;color:var(--text-2);">
+              <strong>下一次自动重试：</strong>2026-05-02 22:22 · 之后将停止自动重试，需人工介入。
+            </div>
+          </div>
+
+          <!-- pane: 审计与处置 -->
+          <div class="tabpane" id="pane-audit">
+            <div class="text-2 mb-12" style="font-size:13px;">
+              本任务的所有处置（重推 / 关闭 / 转人工 / 报文修改）均产生审计日志，写入 <span class="font-mono">interface_push_audit</span>，与业务单据审计串联。
+            </div>
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>操作</th>
+                  <th>操作人</th>
+                  <th>说明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="muted">2026-05-02 09:14:22</td>
+                  <td><span class="badge gray">CREATE</span></td>
+                  <td>system</td>
+                  <td>由"采购订单审批通过"事件触发推送任务创建</td>
+                </tr>
+                <tr>
+                  <td class="muted">2026-05-02 09:14:23</td>
+                  <td><span class="badge red">PUSH_FAIL</span></td>
+                  <td>system</td>
+                  <td>首次推送失败 V_91022</td>
+                </tr>
+                <tr>
+                  <td class="muted">2026-05-02 14:50:12</td>
+                  <td><span class="badge blue">ASSIGN</span></td>
+                  <td>system</td>
+                  <td>3 次失败后自动指派给"系统集成工程师·张工"</td>
+                </tr>
+                <tr>
+                  <td class="muted">2026-05-02 15:08:20</td>
+                  <td><span class="badge teal">VIEW</span></td>
+                  <td>张工</td>
+                  <td>查看任务详情、报文与诊断</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="mt-12" style="padding:10px 12px;background:var(--brand-50);border-left:3px solid var(--brand);border-radius:0 4px 4px 0;">
+              <div style="font-weight:500;margin-bottom:4px;">人工处置入口（任选）</div>
+              <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-sm">先触发 NC-MD-003 供应商下推</button>
+                <button class="btn btn-sm">编辑映射表 supplier_nc_map</button>
+                <button class="btn btn-sm">忽略本任务（保留审计）</button>
+                <button class="btn btn-sm" style="color:var(--red);">关闭任务（不再推送）</button>
+                <button class="btn btn-sm btn-primary">⟳ 立即重推（高敏感审批）</button>
+              </div>
+              <div class="muted mt-8" style="font-size:11px;">说明：重推、关闭、忽略、修改报文均需"高敏感审批"（审批模板：F-13 / 详设 10）。</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'nc-interface',
+      crumbs: ['运维 / 集成', 'NC 接口监控', '接口异常详情'],
+      title: 'NC 接口异常详情 — T2026050201103',
+      desc: '对齐《08-财务与NC接口详细设计 V1.0》F-03 推送任务 + F-07 重推审批 + F-13 接口开关',
+      actions: [{ label: '返回任务列表' }],
+    });
+
+    document.querySelectorAll('.tabs .tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        var tabId = t.getAttribute('data-tab');
+        document.querySelectorAll('.tabs .tab').forEach(function (x) { x.classList.remove('active'); });
+        document.querySelectorAll('.tabpane').forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        document.getElementById('pane-' + tabId).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

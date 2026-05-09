@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>三单匹配 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    /* 三栏对比 */
+    .triple-cols {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
+      border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+    }
+    .triple-cols .col-head {
+      padding: 10px 14px; font-weight: 600; font-size: 13px; color: var(--text);
+      background: #fafbfd; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .triple-cols .col-head .src-tag {
+      font-size: 11px; color: var(--text-3); font-weight: 400;
+    }
+    .triple-cols > div + div { border-left: 1px solid var(--border); }
+    .triple-cols .col-body { padding: 12px 14px; font-size: 12px; }
+    .triple-cols .row { display: flex; justify-content: space-between; padding: 4px 0; }
+    .triple-cols .row .lbl { color: var(--text-3); }
+    .triple-cols .row .val { color: var(--text); font-variant-numeric: tabular-nums; }
+    .triple-cols .row.diff .val { color: var(--red); font-weight: 600; }
+    .triple-cols .row.diff { background: var(--red-50); margin: 0 -14px; padding-left: 14px; padding-right: 14px; border-left: 3px solid var(--red); }
+
+    /* 匹配总览徽章 */
+    .match-summary {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 12px 14px; border-radius: 6px;
+      background: linear-gradient(90deg, var(--brand-50) 0%, #ecfeff 100%);
+      border: 1px solid #bfdbfe;
+    }
+    .match-summary.fail { background: var(--red-50); border-color: #fecaca; }
+    .match-summary.warn { background: var(--amber-50); border-color: #fdba74; }
+
+    /* 差异行 */
+    .diff-row td.diff { color: var(--red); font-weight: 600; }
+    .diff-row { background: rgba(220,38,38,0.04); }
+
+    /* 容差展示 */
+    .tol-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    }
+    .tol-grid .cell {
+      background: #fafbfd; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px;
+    }
+    .tol-grid .cell .lbl { font-size: 11px; color: var(--text-3); }
+    .tol-grid .cell .val { font-size: 14px; font-weight: 500; color: var(--text); margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="kpi-grid">
+          <div class="kpi"><div class="label">本月待匹配</div><div class="value">42</div><div class="trend">已匹配 38 · 待人工 4</div></div>
+          <div class="kpi"><div class="label">自动通过率</div><div class="value">90.5%</div><div class="trend up">环比 ↑ 3.1pp</div></div>
+          <div class="kpi"><div class="label">差异挂账</div><div class="value" style="color:var(--amber)">3</div><div class="trend">含金额差 2 · 数量差 1</div></div>
+          <div class="kpi"><div class="label">异常拒付</div><div class="value" style="color:var(--red)">1</div><div class="trend">需例外审批</div></div>
+        </div>
+
+        <!-- 列表 -->
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field"><label>采购订单</label><input placeholder="CG-2026-…"></div>
+            <div class="form-field"><label>供应商</label><input placeholder="名称或税号"></div>
+            <div class="form-field"><label>匹配状态</label>
+              <select>
+                <option>全部</option>
+                <option>待匹配</option><option>匹配通过</option>
+                <option>有差异</option><option>已拒付</option><option>例外通过</option>
+              </select>
+              <small class="muted" style="margin-top:2px;">字段名：three_way_match_state</small>
+            </div>
+            <div class="form-field"><label>差异类型</label>
+              <select>
+                <option>全部</option><option>数量差</option><option>金额差</option>
+                <option>单价差</option><option>税率差</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="title">三单匹配清单</div>
+            <div class="actions">
+              <button class="btn">导出</button>
+              <button class="btn">三单容差配置</button>
+              <button class="btn btn-primary">批量匹配</button>
+            </div>
+          </div>
+
+          <table class="data">
+            <thead>
+              <tr>
+                <th>采购订单</th>
+                <th>供应商</th>
+                <th>到货单</th>
+                <th>发票</th>
+                <th class="num">订单金额</th>
+                <th class="num">入库金额</th>
+                <th class="num">发票金额</th>
+                <th>匹配结果</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="match-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- 匹配通过示例 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="title">示例 1 · 匹配通过 — CG-2026-0312 沈阳安泰电子</div>
+            <div class="actions">
+              <span class="badge green dot">三单一致</span>
+              <button class="btn">下载凭证</button>
+              <button class="btn btn-primary">推送 NC 应付 (NC-BIZ-009)</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="match-summary mb-12">
+              <span style="font-size:18px;">✓</span>
+              <strong>三单完全一致</strong>
+              <span class="muted">订单 = 入库 = 发票 = ¥184,500.00 / 240 件</span>
+              <span class="spacer" style="flex:1;"></span>
+              <span class="muted" style="font-size:11px;">匹配于 2026-05-02 16:08 · 系统自动</span>
+            </div>
+            <div class="triple-cols">
+              <div>
+                <div class="col-head">
+                  <span>采购订单</span>
+                  <span class="src-tag"><a href="purchase-orders.html" class="code">CG-2026-0312</a></span>
+                </div>
+                <div class="col-body">
+                  <div class="row"><span class="lbl">下达日期</span><span class="val">2026-04-22</span></div>
+                  <div class="row"><span class="lbl">行数 / 数量</span><span class="val">6 / 240</span></div>
+                  <div class="row"><span class="lbl">含税金额</span><span class="val">¥184,500.00</span></div>
+                  <div class="row"><span class="lbl">税额（13%）</span><span class="val">¥21,235.40</span></div>
+                  <div class="row"><span class="lbl">合同</span><span class="val"><a href="contract-detail.html" class="code">HT-2026-0048</a></span></div>
+                </div>
+              </div>
+              <div>
+                <div class="col-head">
+                  <span>到货 / 入库</span>
+                  <span class="src-tag"><a href="goods-receipt.html" class="code">DH-2026-0506 + RK-2026-1145</a></span>
+                </div>
+                <div class="col-body">
+                  <div class="row"><span class="lbl">入库日期</span><span class="val">2026-04-29</span></div>
+                  <div class="row"><span class="lbl">行数 / 数量</span><span class="val">6 / 240</span></div>
+                  <div class="row"><span class="lbl">入库金额</span><span class="val">¥184,500.00</span></div>
+                  <div class="row"><span class="lbl">仓库</span><span class="val">艾友矿安全器材库</span></div>
+                  <div class="row"><span class="lbl">质检结果</span><span class="val"><span class="badge green dot">合格</span></span></div>
+                </div>
+              </div>
+              <div>
+                <div class="col-head">
+                  <span>发票</span>
+                  <span class="src-tag code">FP-2026-08823</span>
+                </div>
+                <div class="col-body">
+                  <div class="row"><span class="lbl">发票日期</span><span class="val">2026-04-30</span></div>
+                  <div class="row"><span class="lbl">行数 / 数量</span><span class="val">6 / 240</span></div>
+                  <div class="row"><span class="lbl">含税金额</span><span class="val">¥184,500.00</span></div>
+                  <div class="row"><span class="lbl">税额（13%）</span><span class="val">¥21,235.40</span></div>
+                  <div class="row"><span class="lbl">校验</span><span class="val"><span class="badge green dot">税控查验通过</span></span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-2 mt-12" style="font-size:12px;color:var(--text-2);">
+              <strong>下一步：</strong>系统已生成应付凭证草稿 <span class="font-mono">VG-2026-04830</span>，将于结算日按合同账期（30 日）触发付款申请；<a href="payment-request.html">查看付款节点</a>。
+            </div>
+          </div>
+        </div>
+
+        <!-- 差异示例 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="title">示例 2 · 差异挂账 — CG-2026-0314 抚顺矿用电缆厂</div>
+            <div class="actions">
+              <span class="badge red dot">差异：数量 + 金额</span>
+              <button class="btn">查看历史差异</button>
+              <button class="btn btn-primary">提交例外审批</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="match-summary fail mb-12">
+              <span style="font-size:18px;color:var(--red);">⚠</span>
+              <strong style="color:var(--red);">三单不一致</strong>
+              <span class="muted">订单 200 卷 / ¥412,800 · 入库 196 卷 / ¥404,544 · 发票 200 卷 / ¥412,800</span>
+              <span class="spacer" style="flex:1;"></span>
+              <span class="muted" style="font-size:11px;">检出于 2026-05-02 16:12 · 已挂"差异挂账"</span>
+            </div>
+
+            <div class="triple-cols mb-12">
+              <div>
+                <div class="col-head">
+                  <span>采购订单</span>
+                  <span class="src-tag"><a href="purchase-orders.html" class="code">CG-2026-0314</a></span>
+                </div>
+                <div class="col-body">
+                  <div class="row"><span class="lbl">下达日期</span><span class="val">2026-04-24</span></div>
+                  <div class="row"><span class="lbl">行数 / 数量</span><span class="val">8 / 200 卷</span></div>
+                  <div class="row"><span class="lbl">含税金额</span><span class="val">¥412,800.00</span></div>
+                  <div class="row"><span class="lbl">单价（含税）</span><span class="val">¥2,064.00 / 卷</span></div>
+                  <div class="row"><span class="lbl">合同</span><span class="val"><a href="contract-detail.html" class="code">HT-2026-0042</a></span></div>
+                </div>
+              </div>
+              <div>
+                <div class="col-head">
+                  <span>到货 / 入库</span>
+                  <span class="src-tag"><a href="goods-receipt.html" class="code">DH-2026-0508 + RK-2026-1148</a></span>
+                </div>
+                <div class="col-body">
+                  <div class="row"><span class="lbl">入库日期</span><span class="val">2026-05-02</span></div>
+                  <div class="row diff"><span class="lbl">行数 / 数量</span><span class="val">8 / <strong>196</strong> 卷 ⚠</span></div>
+                  <div class="row diff"><span class="lbl">入库金额</span><span class="val"><strong>¥404,544.00</strong> ⚠</span></div>
+                  <div class="row"><span class="lbl">单价（含税）</span><span class="val">¥2,064.00 / 卷</span></div>
+                  <div class="row"><span class="lbl">备注</span><span class="val" style="color:var(--red);">质检 4 卷外皮破损，已退货并通知采购员补发</span></div>
+                </div>
+              </div>
+              <div>
+                <div class="col-head">
+                  <span>发票</span>
+                  <span class="src-tag code">FP-2026-08891</span>
+                </div>
+                <div class="col-body">
+                  <div class="row"><span class="lbl">发票日期</span><span class="val">2026-05-01</span></div>
+                  <div class="row diff"><span class="lbl">行数 / 数量</span><span class="val">8 / <strong>200</strong> 卷 ⚠</span></div>
+                  <div class="row diff"><span class="lbl">含税金额</span><span class="val"><strong>¥412,800.00</strong> ⚠</span></div>
+                  <div class="row"><span class="lbl">单价（含税）</span><span class="val">¥2,064.00 / 卷</span></div>
+                  <div class="row"><span class="lbl">校验</span><span class="val"><span class="badge green dot">税控查验通过</span></span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 差异行明细 -->
+            <div class="card-header" style="padding:0 0 8px 0;border:0;">
+              <div class="title" style="font-size:13px;">差异行明细</div>
+            </div>
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>行号</th>
+                  <th>物料编码</th>
+                  <th>物料名称</th>
+                  <th class="num">订单数</th>
+                  <th class="num">入库合格数</th>
+                  <th class="num">发票数</th>
+                  <th class="num">单价</th>
+                  <th class="num">差异金额</th>
+                  <th>差异类型</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="diff-row">
+                  <td>3</td>
+                  <td class="code">M-DL-0220</td>
+                  <td>矿用电缆 MYP3*50+1*16 (200m/卷)</td>
+                  <td class="num">50</td>
+                  <td class="num diff">46</td>
+                  <td class="num diff">50</td>
+                  <td class="num">2,064.00</td>
+                  <td class="num diff">-8,256.00</td>
+                  <td><span class="badge red">数量差 4</span></td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="muted" style="text-align:right;">其余 7 行均一致</td>
+                  <td class="num">150</td>
+                  <td class="num">150</td>
+                  <td class="num">150</td>
+                  <td class="muted">—</td>
+                  <td class="num">0.00</td>
+                  <td><span class="badge green">一致</span></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr style="background:#fafbfd;font-weight:600;">
+                  <td colspan="3">合计</td>
+                  <td class="num">200</td>
+                  <td class="num diff">196</td>
+                  <td class="num diff">200</td>
+                  <td class="muted">—</td>
+                  <td class="num diff" style="color:var(--red);">-8,256.00</td>
+                  <td>—</td>
+                </tr>
+              </tfoot>
+            </table>
+
+            <div class="cols-2 mt-12">
+              <div>
+                <div class="card-header" style="padding:0 0 6px 0;border:0;">
+                  <div class="title" style="font-size:13px;">系统判定与建议</div>
+                </div>
+                <div style="padding:10px 12px;background:var(--amber-50);border-left:3px solid var(--amber);border-radius:0 4px 4px 0;font-size:12px;color:var(--text-2);">
+                  <strong style="color:var(--amber);">差异类型：</strong>数量差 4 卷（订单/发票一致，入库少 4 卷，因质检不合格退货）<br>
+                  <strong style="color:var(--amber);">差异金额：</strong>¥ 8,256.00（占订单 2.0%，超容差 1%）<br>
+                  <strong style="color:var(--amber);">建议处置：</strong>挂账等待供应商补发 4 卷或开红字发票冲减；超 30 日仍未闭环转例外审批。
+                </div>
+              </div>
+              <div>
+                <div class="card-header" style="padding:0 0 6px 0;border:0;">
+                  <div class="title" style="font-size:13px;">关联单据</div>
+                </div>
+                <table class="data">
+                  <tbody>
+                    <tr><td><span class="badge gray">订单</span></td><td class="code"><a href="purchase-orders.html">CG-2026-0314</a></td><td class="muted">8 行 · ¥412,800</td></tr>
+                    <tr><td><span class="badge gray">合同</span></td><td class="code"><a href="contract-detail.html">HT-2026-0042</a></td><td class="muted">框架协议</td></tr>
+                    <tr><td><span class="badge gray">到货</span></td><td class="code"><a href="goods-receipt.html">DH-2026-0508</a></td><td class="muted">部分验收</td></tr>
+                    <tr><td><span class="badge gray">质检</span></td><td class="code"><a href="quality-check.html">QC-2026-0182</a></td><td class="muted">4 卷不合格</td></tr>
+                    <tr><td><span class="badge gray">发票</span></td><td class="code">FP-2026-08891</td><td class="muted">税控通过</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 三单容差与边界 -->
+        <div class="cols-2">
+          <div class="card">
+            <div class="card-header"><div class="title">三单容差配置（节选）</div></div>
+            <div class="card-body">
+              <div class="tol-grid">
+                <div class="cell"><div class="lbl">数量容差</div><div class="val">±1%</div></div>
+                <div class="cell"><div class="lbl">金额容差</div><div class="val">±1%</div></div>
+                <div class="cell"><div class="lbl">单价容差</div><div class="val">±0.5%</div></div>
+                <div class="cell"><div class="lbl">超容差</div><div class="val">挂账 / 例外</div></div>
+              </div>
+              <div class="text-2 mt-12" style="font-size:12px;color:var(--text-2);">
+                容差按物料类别可分档（电缆 / 油料 / 设备等），运维可在"三单容差配置"中调整；超容差场景一律走例外审批，不允许直接通过。
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="title">边界说明</div></div>
+            <div class="card-body" style="font-size:12px;color:var(--text-2);">
+              <div class="mb-8">
+                <strong>不替代财务做账：</strong>三单匹配是付款前的"业务校验"环节，匹配通过后生成应付凭证草稿，由财务在 NC 中正式做账。
+              </div>
+              <div class="mb-8">
+                <strong>暂估闭环联动：</strong>已暂估入库的物资，发票到达后在此匹配；冲减暂估后回写库存计价（详设 06）。
+              </div>
+              <div>
+                <strong>不影响业务执行状态：</strong>采购订单的 <span class="font-mono">order_state</span> 与 <span class="font-mono">three_way_match_state</span> 解耦，匹配未通过不阻塞订单履约。
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'three-way-match',
+      crumbs: ['合同与资金', '三单匹配'],
+      title: '三单匹配（采购订单 / 入库 / 发票）',
+      desc: '对齐《08-财务与NC接口详细设计 V1.0》F-09 三单匹配 + 《06》暂估闭环 + 《05》合同账期联动',
+      actions: [{ label: '三单容差配置' }, { label: '批量匹配', primary: true }],
+    });
+
+    var tbody = document.getElementById('match-tbody');
+    tbody.innerHTML = SC.data.threeWayMatches.map(function (m) {
+      var rs = m.result;
+      var color = rs === '匹配通过' ? 'green' : rs === '有差异' ? 'amber' : rs === '例外通过' ? 'blue' : rs === '已拒付' ? 'red' : 'gray';
+      return '<tr>' +
+        '<td class="code">' + m.po + '</td>' +
+        '<td>' + m.supplier + '</td>' +
+        '<td class="code muted">' + m.dh + '</td>' +
+        '<td class="code muted">' + m.fp + '</td>' +
+        '<td class="num">' + SC.fmtMoney(m.poAmt) + '</td>' +
+        '<td class="num"' + (m.dhAmt !== m.poAmt ? ' style="color:var(--red);"' : '') + '>' + SC.fmtMoney(m.dhAmt) + '</td>' +
+        '<td class="num"' + (m.fpAmt !== m.poAmt ? ' style="color:var(--red);"' : '') + '>' + SC.fmtMoney(m.fpAmt) + '</td>' +
+        '<td>' + SC.badge(rs, color, true) + (m.note ? '<div class="muted" style="font-size:11px;">' + m.note + '</div>' : '') + '</td>' +
+        '<td class="actions"><a>详情</a>' + (rs === '有差异' ? '<a>例外审批</a>' : '') + '</td>' +
+      '</tr>';
+    }).join('');
+  </script>
+</body>
+</html>

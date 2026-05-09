@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>设备 OEE 看板 — 阜矿物资供应管理系统（原型）</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    /* OEE 仪表小环 */
+    .oee-ring {
+      position: relative; width: 96px; height: 96px;
+    }
+    .oee-ring svg { transform: rotate(-90deg); }
+    .oee-ring .ring-center {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 600; color: var(--text);
+    }
+    .oee-ring .ring-center .lbl { font-size: 10px; font-weight: 400; color: var(--text-3); margin-top: 2px; }
+
+    /* 趋势柱图 */
+    .trend-bars {
+      display: flex; align-items: flex-end; gap: 6px;
+      height: 120px; padding: 8px 0;
+    }
+    .trend-bars .col {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .trend-bars .bar-stack {
+      width: 100%; max-width: 22px; display: flex; flex-direction: column;
+      justify-content: flex-end; gap: 2px; height: 80px;
+    }
+    .trend-bars .seg { width: 100%; border-radius: 2px 2px 0 0; }
+    .trend-bars .seg.fault { background: var(--red); }
+    .trend-bars .seg.maint { background: var(--amber); }
+    .trend-bars .label { font-size: 10px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+
+    /* OEE 公式条 */
+    .formula {
+      background: linear-gradient(135deg, var(--brand-50) 0%, #ecfeff 100%);
+      border: 1px solid #bfdbfe; border-radius: 6px;
+      padding: 10px 14px; font-size: 12px; color: var(--text-2);
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .formula .formula-eq { font-weight: 600; color: var(--brand); font-size: 13px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+    .formula .formula-note { color: var(--text-3); font-size: 11px; }
+
+    /* 三联指标条 */
+    .triple {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      margin-top: 8px;
+    }
+    .triple .cell {
+      background: #fafbfd; border: 1px solid var(--border); border-radius: 6px;
+      padding: 8px 10px;
+    }
+    .triple .cell .lbl { font-size: 11px; color: var(--text-3); }
+    .triple .cell .val { font-size: 18px; font-weight: 600; color: var(--text); margin-top: 2px; font-variant-numeric: tabular-nums; }
+    .triple .cell .delta { font-size: 11px; margin-top: 2px; }
+    .triple .cell .delta.up { color: var(--green); }
+    .triple .cell .delta.down { color: var(--red); }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="kpi-grid">
+          <div class="kpi accent">
+            <div class="label">本月集团综合 OEE</div>
+            <div class="value">71.2%</div>
+            <div class="trend up">环比 ↑ 2.3pp · 行业基准 65%</div>
+          </div>
+          <div class="kpi"><div class="label">运行率 (Availability)</div><div class="value">86.5%</div><div class="trend">计划停机 86h · 非计划停机 38h</div></div>
+          <div class="kpi"><div class="label">性能率 (Performance)</div><div class="value">88.4%</div><div class="trend">实际产出 / 理论产出</div></div>
+          <div class="kpi"><div class="label">良品率 (Quality)</div><div class="value">93.1%</div><div class="trend">含设备相关返工损失</div></div>
+        </div>
+
+        <div class="formula">
+          <span class="formula-eq">OEE = 运行率 × 性能率 × 良品率</span>
+          <span>＝ 86.5% × 88.4% × 93.1% ＝ <strong style="color:var(--brand);">71.2%</strong></span>
+          <span class="formula-note">数据来源：设备维修工单 (E-04) 关单回写 + 设备生命周期 (E-01) + 09 报表预警口径</span>
+        </div>
+
+        <div class="cols-2" style="margin-top:16px;">
+          <!-- 左：Top10 OEE 排行 -->
+          <div>
+            <div class="card">
+              <div class="filter-bar">
+                <div class="form-field"><label>设备类别</label>
+                  <select>
+                    <option>全部</option>
+                    <option>采煤设备</option><option>掘进设备</option>
+                    <option>运输设备</option><option>电气设备</option>
+                  </select>
+                </div>
+                <div class="form-field"><label>厂矿</label>
+                  <select>
+                    <option>全部</option>
+                    <option>艾友矿</option><option>五龙矿</option><option>东梁矿</option>
+                  </select>
+                </div>
+                <div class="form-field"><label>统计周期</label>
+                  <select>
+                    <option>本月（2026-05）</option>
+                    <option>上月（2026-04）</option>
+                    <option>近 12 周</option>
+                  </select>
+                </div>
+                <div class="filter-actions">
+                  <button class="btn">导出</button>
+                  <button class="btn btn-primary">查询</button>
+                </div>
+              </div>
+
+              <div class="card-header">
+                <div class="title">关键设备 OEE 排行 — 本月</div>
+                <div class="actions">
+                  <span class="muted" style="font-size:12px;">红色：OEE &lt; 60% 触发预警 → 自动推送至维修班</span>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>设备 / 编号</th>
+                    <th>所在厂矿</th>
+                    <th class="num">运行率</th>
+                    <th class="num">性能率</th>
+                    <th class="num">良品率</th>
+                    <th class="num">综合 OEE</th>
+                    <th>OEE 趋势</th>
+                    <th class="num">本月故障</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="oee-tbody"></tbody>
+              </table>
+            </div>
+
+            <!-- 故障频次趋势 -->
+            <div class="card">
+              <div class="card-header">
+                <div class="title">近 12 周故障频次趋势</div>
+                <div class="actions">
+                  <span style="font-size:11px;color:var(--text-3);">
+                    <span style="display:inline-block;width:10px;height:10px;background:var(--red);vertical-align:middle;margin-right:4px;border-radius:2px;"></span>故障维修
+                    <span style="display:inline-block;width:10px;height:10px;background:var(--amber);vertical-align:middle;margin:0 4px 0 12px;border-radius:2px;"></span>计划保养
+                  </span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="trend-bars" id="trend-bars"></div>
+                <div class="text-2 mt-12" style="font-size:12px;color:var(--text-2);">
+                  W19 故障峰值（11 起）已通过 5/8 全集团皮带系统专项检修缓解；W20 起回落至常态区间。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右：单设备 OEE 详情 + 停机原因 + 边界说明 -->
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">单设备 OEE 详情 — 掘进机 EBZ200</div>
+                <div class="actions">
+                  <a href="equipment-lifecycle.html" class="btn btn-sm">生命周期</a>
+                  <a href="maintenance-order.html" class="btn btn-sm">维修工单</a>
+                </div>
+              </div>
+              <div class="card-body">
+                <div style="display:flex;gap:14px;align-items:center;">
+                  <div class="oee-ring">
+                    <svg width="96" height="96" viewBox="0 0 96 96">
+                      <circle cx="48" cy="48" r="42" stroke="#e3e8ef" stroke-width="8" fill="none"/>
+                      <circle cx="48" cy="48" r="42" stroke="#dc2626" stroke-width="8" fill="none"
+                              stroke-dasharray="263.9" stroke-dashoffset="142.5" stroke-linecap="round"/>
+                    </svg>
+                    <div class="ring-center">46%<div class="lbl">综合 OEE</div></div>
+                  </div>
+                  <div style="flex:1;">
+                    <div style="font-weight:600;font-size:14px;">EQ-JJ-00208 · 东梁矿掘进一队</div>
+                    <div style="font-size:12px;color:var(--text-2);margin-top:4px;">
+                      <span class="badge red dot">OEE 预警</span>
+                      OEE 已连续 3 周 &lt; 60%，建议安排专项检修。
+                    </div>
+                  </div>
+                </div>
+
+                <div class="triple">
+                  <div class="cell"><div class="lbl">运行率</div><div class="val">62.5%</div><div class="delta down">↓ 11.2pp</div></div>
+                  <div class="cell"><div class="lbl">性能率</div><div class="val">82.3%</div><div class="delta down">↓ 5.6pp</div></div>
+                  <div class="cell"><div class="lbl">良品率</div><div class="val">89.4%</div><div class="delta">→ 0.0pp</div></div>
+                </div>
+
+                <div class="text-2 mt-12" style="font-size:12px;color:var(--text-2);">
+                  <strong>主要拖累：</strong>截割部 2# 行星轮组件磨损（5/2 故障），停机 16h；待 5/3 工单 WX-2026-042 完成验收后回升。
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">本月停机原因构成（小时）</div></div>
+              <div class="card-body" style="padding:12px 16px;">
+                <div id="stop-reason"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">指标定义与回写来源</div></div>
+              <div class="card-body" style="font-size:12px;color:var(--text-2);">
+                <ul style="margin:0;padding-left:18px;">
+                  <li><strong>运行率</strong> = (计划运行时长 − 非计划停机) / 计划运行时长；非计划停机来自 <a href="maintenance-order.html">E-04 维修工单</a> 的"停机时长"字段（关单后回写）</li>
+                  <li><strong>性能率</strong> = 实际产出 / 理论产出；产出从生产端集成（一期为人工录入或月度核算，二期对接生产系统）</li>
+                  <li><strong>良品率</strong> = 1 − 设备相关返工损失率；与 03 物料质检相关字段联动</li>
+                  <li><strong>预警阈值</strong> = OEE &lt; 60% 触发 09 报表预警，自动推送 → 维修班长 + 设备管理员</li>
+                  <li><strong>统计粒度</strong> = 日 / 周 / 月，存于 <span class="code">equipment_oee_daily / weekly / monthly</span>（详设 07 + 09）</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">边界说明</div></div>
+              <div class="card-body" style="font-size:12px;color:var(--text-2);">
+                <div class="mb-8">本看板为 <strong>设备综合效率分析视图</strong>，不替代生产系统的 OEE 主数据。</div>
+                <div class="mb-8">一期：性能率与良品率支持人工录入或 CSV 导入；二期对接厂矿生产系统自动取值。</div>
+                <div>OEE 数据用于 <strong>设备管理决策与维修优先级</strong>，不用于 KPI 考核口径，避免误用。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    SC.layout({
+      page: 'equipment-oee',
+      crumbs: ['设备', '设备 OEE 看板'],
+      title: '设备 OEE 看板',
+      desc: '对齐《07-设备与设备租赁详细设计 V1.0》E-04 关单回写 + 《09-报表预警与AI能力详细设计》— 设备综合效率',
+      actions: [{ label: '导出本月报告' }, { label: '配置 OEE 预警', primary: true }],
+    });
+
+    /* 排行表 */
+    var oeeTbody = document.getElementById('oee-tbody');
+    oeeTbody.innerHTML = SC.data.equipmentOee.map(function (e) {
+      var oeeColor = e.oee >= 75 ? 'green' : e.oee >= 60 ? 'amber' : 'red';
+      var oeeStyle = e.oee < 60 ? 'color:var(--red);font-weight:600;' : '';
+      var trend = e.trend.map(function (v) {
+        var h = Math.max(2, Math.round(v * 0.32));
+        var color = v >= 75 ? 'var(--green)' : v >= 60 ? 'var(--amber)' : 'var(--red)';
+        return '<span style="display:inline-block;width:4px;height:' + h + 'px;background:' + color + ';margin-right:1px;border-radius:1px;vertical-align:bottom;"></span>';
+      }).join('');
+      return '<tr>' +
+        '<td>' + e.name + '<div class="muted code" style="font-size:11px;">' + e.code + '</div></td>' +
+        '<td>' + e.mine + '</td>' +
+        '<td class="num">' + e.avail.toFixed(1) + '%</td>' +
+        '<td class="num">' + e.perf.toFixed(1) + '%</td>' +
+        '<td class="num">' + e.quality.toFixed(1) + '%</td>' +
+        '<td class="num" style="' + oeeStyle + '">' + SC.badge(e.oee.toFixed(1) + '%', oeeColor, false) + '</td>' +
+        '<td>' + trend + '</td>' +
+        '<td class="num">' + (e.faults > 0 ? '<span style="color:' + (e.faults >= 3 ? 'var(--red)' : 'var(--amber)') + ';">' + e.faults + '</span>' : '<span class="muted">0</span>') + '</td>' +
+        '<td class="actions"><a>详情</a>' + (e.oee < 60 ? '<a style="color:var(--red);">报修</a>' : '') + '</td>' +
+      '</tr>';
+    }).join('');
+
+    /* 故障频次趋势柱图 */
+    var trendBars = document.getElementById('trend-bars');
+    trendBars.innerHTML = SC.data.equipmentOeeTrend.map(function (w) {
+      var faultH = w.fault * 6;
+      var maintH = w.maint * 4;
+      return '<div class="col">' +
+        '<div class="bar-stack">' +
+          (w.maint > 0 ? '<div class="seg maint" style="height:' + maintH + 'px;" title="计划保养 ' + w.maint + ' 起"></div>' : '') +
+          (w.fault > 0 ? '<div class="seg fault" style="height:' + faultH + 'px;" title="故障维修 ' + w.fault + ' 起"></div>' : '') +
+        '</div>' +
+        '<div class="label">' + w.week + '</div>' +
+        '<div class="label" style="font-weight:600;color:var(--text-2);">' + (w.fault + w.maint) + '</div>' +
+      '</div>';
+    }).join('');
+
+    /* 停机原因构成 */
+    var stopReasonEl = document.getElementById('stop-reason');
+    var stopMax = Math.max.apply(null, SC.data.equipmentStopReasons.map(function (s) { return s.hours; }));
+    stopReasonEl.innerHTML = SC.data.equipmentStopReasons.map(function (s) {
+      var pct = Math.round(s.hours / stopMax * 100);
+      var barClass = s.kind === 'fault' ? 'red' : s.kind === 'plan' ? 'amber' : '';
+      return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
+        '<div style="width:96px;font-size:12px;color:var(--text-2);">' + s.label + '</div>' +
+        '<div class="bar ' + barClass + '" style="flex:1;">' +
+          '<div class="track"><div class="fill" style="width:' + pct + '%;"></div></div>' +
+        '</div>' +
+        '<div style="width:60px;text-align:right;font-size:12px;font-variant-numeric:tabular-nums;">' + s.hours + ' h</div>' +
+      '</div>';
+    }).join('');
+  </script>
+</body>
+</html>

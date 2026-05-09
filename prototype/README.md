@@ -1,4 +1,4 @@
-# SupplyCore 原型 v0.6
+# SupplyCore 原型 v0.7
 
 > **用途仅限演示与沟通** — 与管理层、业务部门、招标参与方对齐功能与流程。
 > **非真实数据，亦非开发或验收依据。** 权威口径请以 `docs/详细设计/*` 为准。
@@ -15,35 +15,58 @@
 - 无需任何构建步骤、无需联网；样式与脚本均为本地文件
 - 兼容 Chrome / Edge / Safari 现代版本
 
-## 二、本版覆盖范围（v0.6 = v0.5 + 4 页）
+## 二、本版覆盖范围（v0.7 = v0.6 + 3 页）
 
-### 业务流转 — 13 页
+### 业务流转 — 14 页
 
-需求计划列表 / 详情 · 采购订单 · 到货验收 · **质检** · 库存查询 · **库存流转** ★v0.6 · 盘点 · **移动端盘点** ★v0.5 · 废旧处置 · 设备租赁 · 设备生命周期 · **设备维修工单** ★v0.5
+需求计划列表 / 详情 · 采购订单 · 到货验收 · 质检 · 库存查询 · 库存流转 · 盘点 · **移动端盘点** · 废旧处置 · 设备租赁 · 设备生命周期 · 设备维修工单 · **设备 OEE 看板** ★v0.7
 
 ### 采购协同 — 2 页
 
-招投标 · **招投标过程归档** ★v0.6
+招投标 · 招投标过程归档
 
-### 合同与资金 — 4 页
+### 合同与资金 — 5 页
 
-合同管理 · 合同详情 · 付款申请 · 资金计划月度
+合同管理 · 合同详情 · 付款申请 · 资金计划月度 · **三单匹配** ★v0.7
 
 ### 基础数据 — 3 页
 
-物料主数据（7 状态机）· 基础档案（组织/仓库/供应商）· **供应商履约画像** ★v0.6
+物料主数据（7 状态机）· 基础档案（组织/仓库/供应商）· 供应商履约画像
 
 ### 决策 / AI — 6 页
 
-报表中心 · 报表穿透 · **预警规则配置** ★v0.6 · AI 助理（互动）· **AI 写操作完整链路** ★v0.5 · 大屏看板（暗色投屏）
+报表中心 · 报表穿透 · 预警规则配置 · AI 助理（互动）· AI 写操作完整链路 · 大屏看板（暗色投屏）
 
-### 运维 / 集成 — 3 页
+### 运维 / 集成 — 4 页
 
-NC 接口监控 · 系统管理 · **信创兼容性矩阵** ★v0.5
+NC 接口监控 · **NC 接口异常详情** ★v0.7 · 系统管理 · 信创兼容性矩阵
 
 ### 工作 — 2 页
 
 工作台 · 审批中心
+
+### v0.7 新页面要点
+
+#### 1. `equipment-oee.html` — 设备 OEE 看板
+- 4 张 KPI（综合 OEE / 运行率 / 性能率 / 良品率）+ OEE 公式条
+- **关键设备 OEE 排行**：12 周迷你趋势条 + 故障数 + OEE < 60% 自动飘红
+- **近 12 周故障频次趋势**：双色堆叠柱图（故障维修 + 计划保养）
+- **单设备 OEE 详情**：环形仪表（46% 预警）+ 三联指标 + 主要拖累分析
+- 本月停机原因构成横向条形 + 指标定义与回写来源说明 + 边界
+
+#### 2. `nc-interface-detail.html` — NC 接口异常详情
+- 任务概要：接口 / 关联业务 / 触发时间 / 业务执行状态（与推送状态分层）
+- **错误诊断**：NC 错误码 + 可能原因 + AI 建议处置（按推荐顺序）
+- 4 个 Tab：请求报文 / 响应报文（深色代码块带语法高亮）/ 重试历史 / 审计与处置
+- **人工处置入口**：触发主数据下推 / 编辑映射 / 忽略 / 关闭 / 重推（高敏感审批）
+- 解释三类错误级别（BUSINESS / SYSTEM / NETWORK）的不同重试策略
+
+#### 3. `three-way-match.html` — 三单匹配
+- 4 张 KPI（待匹配 / 自动通过率 / 差异挂账 / 异常拒付）
+- 匹配清单 + 匹配状态 + 差异类型筛选
+- **示例 1 · 匹配通过**：三栏对比（订单 / 入库 / 发票）一致 → 生成应付凭证
+- **示例 2 · 差异挂账**：差异行标红 + 系统判定 + 关联单据 + 例外审批入口
+- 三单容差配置（数量/金额/单价 ±1%）+ 边界（不替代财务做账、暂估闭环联动）
 
 ### v0.6 新页面要点
 
@@ -103,15 +126,15 @@ NC 接口监控 · 系统管理 · **信创兼容性矩阵** ★v0.5
 - 4 条关键说明：推荐组合 / 过渡兼容 / 注意事项
 - **招标技术响应承诺**卡：最低支持范围 / 双架构 / 过渡期 / 联调责任
 
-## 三、暂未覆盖（v0.7 候选）
+## 三、暂未覆盖（v0.8 候选）
 
-- **设备 OEE 指标看板**：单设备运行率 / 性能率 / 良品率 + 故障频次趋势
-- **接口异常处理详情页/弹窗**：失败原因、报文回执、重推审批、人工处理闭环
-- **租赁计费深化**：起租、停租、退租、费用汇总、付款联动
-- **合同变更与履约节点深化**：变更审批、履约节点预警、三单匹配细化
+- **租赁计费深化**：起租、停租、退租、费用汇总、付款联动（部分需 P0 业务方回执后再做）
+- **合同变更与履约节点深化**：变更审批、履约节点预警（受 P0 Q-04 集团三部门串/并行影响）
+- **暂估闭环页**：暂估入库 → 发票到达 → 冲减暂估（受 P0 Q-05-2 暂估期限 6/12 月影响）
+- **委托加工台账 / 直达使用单位流程**：受 P0 Q-07 / Q-08 影响
 - **真实后端 / 升 C 档**：平移到 `../SupplyCores/modules/nova.supplycores/frontend` 的 Vite/React 工程
 
-## 四、文件结构（33 个 HTML + 3 个资产）
+## 四、文件结构（36 个 HTML + 3 个资产）
 
 ```
 prototype/
@@ -121,24 +144,25 @@ prototype/
 │
 ├── requirement-list.html / requirement-detail.html
 ├── purchase-orders.html / goods-receipt.html / quality-check.html
-├── inventory.html / inventory-flow.html ★v0.6 / stocktake.html / mobile-stocktake.html ★v0.5
+├── inventory.html / inventory-flow.html / stocktake.html / mobile-stocktake.html
 ├── scrap-disposal.html
 ├── equipment-rent.html / equipment-lifecycle.html
-├── maintenance-order.html         ★ v0.5
+├── maintenance-order.html / equipment-oee.html ★v0.7
 │
-├── tender.html / tender-archive.html ★v0.6
+├── tender.html / tender-archive.html
 │
 ├── contract-list.html / contract-detail.html
 ├── payment-request.html / funding-plan.html
+├── three-way-match.html           ★ v0.7
 │
-├── material-master.html / base-archive.html / supplier-performance.html ★v0.6
+├── material-master.html / base-archive.html / supplier-performance.html
 │
-├── reports.html / report-detail.html / alert-rules.html ★v0.6
-├── ai-assistant.html / ai-write-flow.html ★v0.5
+├── reports.html / report-detail.html / alert-rules.html
+├── ai-assistant.html / ai-write-flow.html
 ├── dashboard-bigscreen.html
 │
-├── nc-interface.html / system-admin.html
-├── xinchuang-matrix.html          ★ v0.5
+├── nc-interface.html / nc-interface-detail.html ★v0.7 / system-admin.html
+├── xinchuang-matrix.html
 │
 └── assets/
     ├── styles.css                 含响应式 + 大屏暗色 + 手机外框 + 扫码动画 + 信创矩阵 + AI 草稿面板
@@ -157,6 +181,7 @@ prototype/
 
 ## 六、变更日志
 
+- **v0.7 (2026-05-08)** — 新增 3 页（P0 业务方回执未到的间隙补"零踩 P0"展示页）：设备 OEE 看板（综合 OEE + 12 周趋势 + 单设备详情 + 停机原因）、NC 接口异常详情（错误诊断 + 报文 / 重试历史 / 审计与处置 + 高敏感重推）、三单匹配（订单 / 入库 / 发票三栏对比 + 差异挂账 + 例外审批）。共 36 页。
 - **v0.6 (2026-05-08)** — 新增 4 页：库存流转（领料出库 / 退料入库 / 调拨单 + 库存台账流水 + NC 触发点）、供应商履约画像（准入 / 评价 / 暂停 / 黑名单 + 准时率 / 一次合格率）、招投标过程归档（采购文件 / 开评标资料 / 评标报告 / 中标通知书 + 合同联动）、预警规则配置（安全库存 / 合同履约 / NC 接口 / 供应商资质 / 报表订阅）。共 33 页。
 - **v0.5 (2026-05-03)** — 新增 4 页：设备维修工单（E-04 + 备件领用 + 关单回写）、移动端扫码盘点（360×720 手机外框 + 扫码动画 + 后端联动）、AI 写操作完整链路（6 轮对话 + 草稿确认 + 7 条边界 + 审计标注）、信创兼容性矩阵（6 层 × 4 目标 OS + 招标响应承诺）。新增组件：matrix（信创矩阵网格）/ phone-frame（手机外框）/ scan-zone（扫码动画）/ ai-draft-panel（AI 草稿确认）/ rule-list（允许/禁止/审计）。共 29 页。
 - **v0.4 (2026-05-03)** — 新增 4 页：设备生命周期 / 招投标 / AI 助理独立 / 大屏看板。共 25 页。
