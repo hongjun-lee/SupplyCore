@@ -155,9 +155,9 @@
   <script>
     SC.layout({
       page: 'inventory-transfer',
-      crumbs: ['二期', 'A3 调拨主线'],
+      crumbs: ['业务流转', '库存调拨'],
       title: '调拨主线（S-11 → S-12）',
-      desc: '档 A 二期 A3：详设 06 §6 + 08 BIZ-007 — 跨组织调拨 + 双向 S-21 流水 + 内部往来对冲',
+      desc: '对齐《06 §6》+《08 BIZ-007》— 跨组织调拨 + 双向 S-21 流水 + 内部往来对冲',
     });
 
     var orgMap = {}; SC.store.list('M-01').forEach(function (o) { orgMap[o.id] = o.name; });

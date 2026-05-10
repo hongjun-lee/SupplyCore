@@ -414,7 +414,7 @@
       var rows = [
         { name: '采购订单 P-05', entity: 'P-05', total: orders.length, matched: orders.filter(function (r) { return r.state === '已关闭'; }).length, pending: orders.filter(function (r) { return r.state !== '已关闭' && r.state !== '已作废'; }).length, nc: '—' },
         { name: '入库单 S-02', entity: 'S-02', total: receipts.length, matched: receipts.filter(function (r) { return r.state === '已入库'; }).length, pending: receipts.filter(function (r) { return r.state === '草稿' || r.state === '待审' || r.state === '已审'; }).length, nc: f01.filter(function (f) { return f.biz_code === 'BIZ-001' || f.biz_code === 'BIZ-002'; }).length + ' 笔' },
-        { name: '发票 F-08（待二期 P3）', entity: 'F-08', total: '—', matched: '—', pending: '—', nc: '—' },
+        { name: '发票 F-08（待扩展）', entity: 'F-08', total: '—', matched: '—', pending: '—', nc: '—' },
       ];
       document.getElementById('engine-twm-tbody').innerHTML = rows.map(function (r) {
         return '<tr>' +

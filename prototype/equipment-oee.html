@@ -69,7 +69,7 @@
 
         <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
           <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 09 V1.2 §六 RPT-EQ-OEE 设备综合效率报表 + 详设 07 V1.0a §设备运行 + 一期 → 二期 P3 OEE 体系。<br>
+            <strong>📋 业务依据：</strong>详设 09 V1.2 §六 RPT-EQ-OEE 设备综合效率报表 + 详设 07 V1.0a §设备运行。<br>
             <strong>📐 OEE 公式：</strong>OEE = <strong>可用率 × 性能率 × 良品率</strong>；可用率 = (计划 - 故障停机 - 计划停机) / 计划；性能率 = 实际产量 / (理论速度 × 实际工时)；良品率 = 合格 / 总产量。<br>
             <strong>🛤 链路：</strong>E-01 设备状态变化 → 累计停机时长 → linkage 自动重算 OEE → R-05 预警（OEE &lt; 阈值 / 故障停机 &gt; 24h）→ 月度报表 RPT-EQ-OEE。
           </div>
@@ -92,7 +92,7 @@
             </table>
             <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
               <span class="badge blue dot">演示</span>
-              一期：基础态聚合 + 月度报表；二期 P3：实时 SCADA 接入 + IoT 故障数据流 + AI 趋势预测（详设 07 §设备运行 V1.0a）。
+              当前：基础态聚合 + 月度报表；后续扩展：实时 SCADA 接入 + IoT 故障数据流 + AI 趋势预测（详设 07 §设备运行 V1.0a）。
             </div>
           </div>
         </div>
@@ -242,7 +242,7 @@
               <div class="card-body" style="font-size:12px;color:var(--text-2);">
                 <ul style="margin:0;padding-left:18px;">
                   <li><strong>运行率</strong> = (计划运行时长 − 非计划停机) / 计划运行时长；非计划停机来自 <a href="maintenance-order.html">E-04 维修工单</a> 的"停机时长"字段（关单后回写）</li>
-                  <li><strong>性能率</strong> = 实际产出 / 理论产出；产出从生产端集成（一期为人工录入或月度核算，二期对接生产系统）</li>
+                  <li><strong>性能率</strong> = 实际产出 / 理论产出；产出从生产端集成（当前为人工录入或月度核算，后续对接生产系统）</li>
                   <li><strong>良品率</strong> = 1 − 设备相关返工损失率；与 03 物料质检相关字段联动</li>
                   <li><strong>预警阈值</strong> = OEE &lt; 60% 触发 09 报表预警，自动推送 → 维修班长 + 设备管理员</li>
                   <li><strong>统计粒度</strong> = 日 / 周 / 月，存于 <span class="code">equipment_oee_daily / weekly / monthly</span>（详设 07 + 09）</li>
@@ -254,7 +254,7 @@
               <div class="card-header"><div class="title">边界说明</div></div>
               <div class="card-body" style="font-size:12px;color:var(--text-2);">
                 <div class="mb-8">本看板为 <strong>设备综合效率分析视图</strong>，不替代生产系统的 OEE 主数据。</div>
-                <div class="mb-8">一期：性能率与良品率支持人工录入或 CSV 导入；二期对接厂矿生产系统自动取值。</div>
+                <div class="mb-8">当前：性能率与良品率支持人工录入或 CSV 导入；后续对接厂矿生产系统自动取值。</div>
                 <div>OEE 数据用于 <strong>设备管理决策与维修优先级</strong>，不用于 KPI 考核口径，避免误用。</div>
               </div>
             </div>

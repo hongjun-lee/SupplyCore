@@ -72,7 +72,7 @@
               <span class="spacer" style="flex:1;"></span>
               <button class="btn">下载合同 PDF</button>
               <button class="btn">打印</button>
-              <button class="btn btn-primary" disabled>付款链路（二期 A4）</button>
+              <button class="btn btn-primary" disabled>付款链路（计划中）</button>
             </div>
             <h3 class="mt-0 mb-8" id="title-name" style="font-size:15px;font-weight:500;color:var(--text);"></h3>
             <div class="kv mb-8">
@@ -92,10 +92,10 @@
             <!-- 付款条件静态展示：一期 A 仅保留 payment_terms 文本，不建 C-04 实体 -->
             <div class="card">
               <div class="card-header">
-                <div class="title">付款条件（payment_terms 文本字段）<span class="muted" style="font-size:11px;font-weight:normal;margin-left:6px;">— 一期 A 不建 C-04 实体；C-04 / C-07 / C-08 / C-10 四层付款控制移二期 A4，详见 03-档A二期扩展规划-V0.2.md</span></div>
+                <div class="title">付款条件（payment_terms 文本字段）<span class="muted" style="font-size:11px;font-weight:normal;margin-left:6px;">— 一期 A 不建 C-04 实体；C-04 / C-07 / C-08 / C-10 四层付款控制为后续扩展项</span></div>
                 <div class="actions">
                   <button class="btn btn-sm">导出条款</button>
-                  <button class="btn btn-sm btn-primary" disabled>付款申请（二期）</button>
+                  <button class="btn btn-sm btn-primary" disabled>付款申请（计划中）</button>
                 </div>
               </div>
               <table class="data">
@@ -228,7 +228,7 @@
               </table>
               <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
                 <span class="badge blue dot">联动规则</span>
-                <span style="margin-left:6px;">变更已审后，服务层自动同步 C-02 字段、C-03 条款（旧条款 is_superseded=true）；<strong style="color:var(--red);">付款条件变更</strong>修订 C-02 <code>payment_terms</code> 文本（一期 A 范围）；C-04 / C-07 节点编辑移二期 A4。金额变更超过 SY-02 配置阈值升级至项目领导小组。</span>
+                <span style="margin-left:6px;">变更已审后，服务层自动同步 C-02 字段、C-03 条款（旧条款 is_superseded=true）；<strong style="color:var(--red);">付款条件变更</strong>修订 C-02 <code>payment_terms</code> 文本（一期 A 范围）；C-04 / C-07 节点编辑为后续扩展项。金额变更超过 SY-02 配置阈值升级至项目领导小组。</span>
               </div>
             </div>
           </div>
@@ -257,7 +257,7 @@
                   <div class="k">归口部门</div><div class="v" id="lock-owner"></div>
                 </div>
                 <div class="text-2" style="margin-top:8px;font-size:12px;color:var(--text-2);">
-                  存在待审 / 已审未生效的付款条件变更时，一期仅冻结 payment_terms 文本展示；付款节点编辑与付款申请链路移二期 A4。
+                  存在待审 / 已审未生效的付款条件变更时，一期仅冻结 payment_terms 文本展示；付款节点编辑与付款申请链路为后续扩展项。
                 </div>
               </div>
             </div>
@@ -357,7 +357,7 @@
       page: 'contract-list',
       crumbs: ['合同与资金', '合同管理', d.code],
       title: d.name,
-      desc: '对齐 05 V1.1 + 02 V0.4 范围 — 合同 + payment_terms 文本字段（一期 A）+ 三单匹配 + 履约保证金 SENS-CON-003；C-04 节点移二期 A4',
+      desc: '对齐 05 V1.1 + 02 V0.4 范围 — 合同 + payment_terms 文本字段（一期 A）+ 三单匹配 + 履约保证金 SENS-CON-003；C-04 节点为后续扩展项',
     });
 
     document.getElementById('title-code').textContent = d.code;

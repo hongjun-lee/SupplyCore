@@ -149,9 +149,9 @@
               <div class="card-header"><div class="title">🔗 BIZ-013 / 014 / 015 / 020 联动占位</div></div>
               <div class="card-body" style="font-size:12px;line-height:1.7;">
                 <div><strong style="color:var(--green);">✓ BIZ-013</strong> 付款执行（一期 A 已演示） — C-10 已记账触发，应付消减</div>
-                <div><strong style="color:var(--text-3);">○ BIZ-014</strong> 预付款转应付（待二期 A4 完整版）— 预付时 C-08 走 BIZ-014，到货后转 BIZ-015</div>
-                <div><strong style="color:var(--text-3);">○ BIZ-015</strong> 应付暂估转正式（待二期 A4 完整版）— S-07 暂估冲销后正式发票入账走 BIZ-015，与 BIZ-001 区分</div>
-                <div><strong style="color:var(--text-3);">○ BIZ-020</strong> 月度应付消减（待二期 A4 完整版）— 月末批量消减已付应付，与 BIZ-013 实付逐笔消减并行</div>
+                <div><strong style="color:var(--text-3);">○ BIZ-014</strong> 预付款转应付（待扩展）— 预付时 C-08 走 BIZ-014，到货后转 BIZ-015</div>
+                <div><strong style="color:var(--text-3);">○ BIZ-015</strong> 应付暂估转正式（待扩展）— S-07 暂估冲销后正式发票入账走 BIZ-015，与 BIZ-001 区分</div>
+                <div><strong style="color:var(--text-3);">○ BIZ-020</strong> 月度应付消减（待扩展）— 月末批量消减已付应付，与 BIZ-013 实付逐笔消减并行</div>
               </div>
             </div>
 
@@ -180,9 +180,9 @@
             借 1122 应收账款 / 6602 财务费用（汇兑差额）<br>
             贷 1002 银行存款<br>
             <hr style="border:none;border-top:1px dashed var(--border);margin:8px 0;">
-            <strong>BIZ-014 预付款转应付（二期 A4 完整版）：</strong>预付时入账，到货验收时转应付<br>
-            <strong>BIZ-015 应付暂估转正式（二期 A4 完整版）：</strong>S-07 暂估冲销后正式发票入账<br>
-            <strong>BIZ-020 月度应付消减（二期 A4 完整版）：</strong>月末批量消减已付应付
+            <strong>BIZ-014 预付款转应付（计划扩展）：</strong>预付时入账，到货验收时转应付<br>
+            <strong>BIZ-015 应付暂估转正式（计划扩展）：</strong>S-07 暂估冲销后正式发票入账<br>
+            <strong>BIZ-020 月度应付消减（计划扩展）：</strong>月末批量消减已付应付
           </div>
         </div>
 
@@ -203,9 +203,9 @@
   <script>
     SC.layout({
       page: 'payment-execution',
-      crumbs: ['二期', 'A4b 付款执行'],
+      crumbs: ['合同与资金', '付款执行台账'],
       title: '付款执行（C-10 + BIZ-013）',
-      desc: '档 A 二期 A4b：详设 05 §8.2 + 08 BIZ-013 — C-08 已审 → linkage create C-10 → mock-nc 推送 → 应付消减',
+      desc: '对齐《05 §8.2》+《08 BIZ-013》— C-08 已审 → linkage create C-10 → mock-nc 推送 → 应付消减',
     });
 
     var supMap = {}; SC.store.list('M-09').forEach(function (s) { supMap[s.id] = s.name; });

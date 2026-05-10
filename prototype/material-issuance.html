@@ -121,9 +121,9 @@
   <script>
     SC.layout({
       page: 'material-issuance',
-      crumbs: ['二期', 'A2 出库主线'],
+      crumbs: ['业务流转', '领料出库'],
       title: '领料出库主线（S-08 → S-09）',
-      desc: '档 A 二期 A2：详设 06 §7.4/7.7 + BIZ-005/005A — 状态机 + linkage + 库存原子事务',
+      desc: '对齐《06 §7.4/7.7》+《BIZ-005/005A》— 状态机 + linkage + 库存原子事务',
     });
 
     var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m; });

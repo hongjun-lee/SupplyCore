@@ -15,7 +15,7 @@
 
         <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
           <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>02 V0.4 §3.3 二期 B2 数据导入导出 + B6 演示快照（保存 / 还原）— 演示场景切换 + 跨设备演示 + 故障恢复。<br>
+            <strong>📋 业务依据：</strong>02 V0.4 §3.3 数据导入导出 + 演示快照（保存 / 还原）— 演示场景切换 + 跨设备演示 + 故障恢复。<br>
             <strong>🛤 链路：</strong>当前 SC.store LocalStorage 全量序列化为 JSON → 下载文件（B2）/ 命名保存到内置快照（B6）→ 在另一台演示机或新会话中导入还原 → 1:1 重现演示场景。
           </div>
         </div>
@@ -111,9 +111,9 @@
   <script>
     SC.layout({
       page: 'demo-snapshot',
-      crumbs: ['二期', 'B2/B6 演示快照'],
+      crumbs: ['决策 / AI', '演示数据快照'],
       title: '演示数据快照（B2 导入导出 + B6 命名快照）',
-      desc: '档 A 二期 B2 + B6：跨设备演示 / 多场景切换 / 培训重置 / 故障恢复',
+      desc: '跨设备演示 / 多场景切换 / 培训重置 / 故障恢复',
     });
 
     var SNAPSHOT_LIST_KEY = 'sc:_snapshots';

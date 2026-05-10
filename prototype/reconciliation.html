@@ -45,7 +45,7 @@
             </table>
             <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
               <span class="badge blue dot">演示对账</span>
-              一期 A 演示用：仅对账 S-13 余额 vs S-21 累计（系统内自洽）；二期 P3 接入"财务系统对账数据"（mock）+ "保管卡片对账数据"（mock）做完整三对一致。
+              当前演示：仅对账 S-13 余额 vs S-21 累计（系统内自洽）；后续扩展接入"财务系统对账数据"（mock）+ "保管卡片对账数据"（mock）做完整三对一致。
             </div>
           </div>
         </div>
@@ -119,9 +119,9 @@
   <script>
     SC.layout({
       page: 'reconciliation',
-      crumbs: ['二期', 'B4 三对一致对账'],
+      crumbs: ['运维 / 集成', '三对一致对账'],
       title: '三对一致定期对账（INV_RECON_TRIPLE_CONSISTENCY）',
-      desc: '档 A 二期 B4：详设 11 §11.1 + 09 ALR-INV-RECON-001 + RPT-INV-RECON — 月度自动比对 + 异常预警',
+      desc: '对齐《11 §11.1》+《09 ALR-INV-RECON-001》+ RPT-INV-RECON — 月度自动比对 + 异常预警',
     });
 
     var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m.name; });
