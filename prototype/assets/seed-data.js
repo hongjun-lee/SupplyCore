@@ -73,28 +73,19 @@
       { id: 4, switch_code: 'BIZ-013-switch', interface_name: '付款执行',                 switch_status: '关', remark: '一期 A 付款链路移二期 A4' },
     ],
 
-    /* P-01 示例需求（演示用，2 个草稿态 + 1 个已审） */
+    /* P-01 示例需求（演示用，v0.16 改为草稿态 — 让用户从最起点演示
+     * 提交审批 → 审批通过 → linkage 自动聚合 P-02 + P-03 + 后续链路）
+     * 修复同事评审 P1-2：原 seed 已审 + 已审 P-02 + P-03 但无 P-05，诱导测试页重复 emit 补数据 */
     'P-01': [
       { id: 1, request_no: 'XQ-2026-0421', org_id: 3, material_id: 8, quantity: 200, amount: 95620,
-        purpose: '艾友矿 1308 工作面回风顺槽支护', urgency: '普通', state: '已审',
+        purpose: '艾友矿 1308 工作面回风顺槽支护', urgency: '普通', state: '草稿',
         applicant: '李振华', submit_date: '2026-04-15' },
       { id: 2, request_no: 'XQ-2026-0427', org_id: 4, material_id: 3, quantity: 800, amount: 55000,
-        purpose: '东梁矿掘进备件月度补充', urgency: '普通', state: '已审',
+        purpose: '东梁矿掘进备件月度补充', urgency: '普通', state: '草稿',
         applicant: '王志刚', submit_date: '2026-04-20' },
     ],
 
-    /* P-02 示例计划（已审，等计划员分解） */
-    'P-02': [
-      { id: 1, plan_no: 'PP-202605-001', org_id: 2, period: '2026-05',
-        amount: 466520, state: '已审',
-        owner: '集团物资部 · 计划员', approve_date: '2026-05-07' },
-    ],
-
-    /* P-03 计划行（关联到 P-02 #1） */
-    'P-03': [
-      { id: 1, plan_id: 1, plan_line_no: 'PP-202605-001-01a', material_id: 8, quantity: 200, amount: 95620, tender_type: '招标', source_request: 'XQ-2026-0421' },
-      { id: 2, plan_id: 1, plan_line_no: 'PP-202605-001-01b', material_id: 7, quantity: 800, amount: 55000, tender_type: '招标', source_request: 'XQ-2026-0427' },
-    ],
+    /* v0.16 不再 seed P-02 / P-03 — 由 P-01 已审 linkage 自动聚合 */
   };
 
   /* 自动 seed（如果 store 已就绪） */

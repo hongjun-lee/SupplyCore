@@ -214,17 +214,20 @@
     }
 
     function approveP02() {
-      var plan = SC.store.list('P-02', { state: '已审' })[0] || SC.store.list('P-02', { state: '草稿' })[0];
-      if (!plan) { alert('没有可操作的 P-02'); return; }
-      if (plan.state === '草稿') {
-        try { SC.sm.transition('P-02', plan.id, '提交审批'); plan = SC.store.get('P-02', plan.id); } catch (e) { alert('提交失败：' + e.message); return; }
+      // v0.16：去掉重复 emit（同事评审 P1-2）；只走状态机迁移；幂等由 linkage 内部保证
+      var plan = SC.store.list('P-02', { state: '草稿' })[0]
+              || SC.store.list('P-02', { state: '待审' })[0];
+      if (!plan) {
+        var anyAudit = SC.store.list('P-02', { state: '已审' })[0];
+        if (anyAudit) { alert('当前 P-02 已是已审状态（' + anyAudit.plan_no + '），需要新草稿。请先在 requirement-list.html 审批 P-01 → linkage 自动聚合新 P-02。'); }
+        else { alert('没有 P-02 · 先到 requirement-list.html 审批 P-01 触发自动聚合'); }
+        return;
       }
-      if (plan.state === '待审') {
-        try { SC.sm.transition('P-02', plan.id, '审批通过'); } catch (e) { alert('审批失败：' + e.message); return; }
-      } else if (plan.state === '已审') {
-        // 重新触发已审事件（演示 linkage 已经跑过）— 直接调 emit
-        SC.linkage.emit('P-02:已审', plan);
-      }
+      try {
+        if (plan.state === '草稿') SC.sm.transition('P-02', plan.id, '提交审批');
+        var current = SC.store.get('P-02', plan.id);
+        if (current.state === '待审') SC.sm.transition('P-02', plan.id, '审批通过');
+      } catch (e) { alert('迁移失败：' + e.message); return; }
       refreshAll();
     }
 
