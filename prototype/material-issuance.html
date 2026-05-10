@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>领料出库主线 — 阜矿物资供应管理系统（原型）</title>
+  <title>领料出库主线 (S-08/S-09) — 阜矿物资供应管理系统（原型）</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
@@ -13,104 +13,93 @@
     <div class="app-main">
       <div id="page-area">
 
-        <div class="card" style="border-left:4px solid var(--blue);background:#f0f7ff;">
-          <div class="card-body" style="font-size:13px">
-            <strong>📋 业务依据：</strong>详设 06 §7.4 库存计价（全口径移动加权）+ §7.7 对厂矿出库销售凭证 + 详设 08 BIZ-005 / BIZ-005A 凭证拆分。
-            <br/>
-            <strong>🛤 链路：</strong>S-08 领料申请 → 审批（按金额阈值路由）→ S-09 领料出库 → S-13 库存减少 + S-21 库存事务流水 → 成本归集 → 推送 NC（BIZ-005 自用 / BIZ-005A 对厂矿销售）。
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 06 §7.4 库存计价（全口径移动加权）+ §7.7 对厂矿出库销售凭证 + 详设 08 BIZ-005 / BIZ-005A 凭证拆分。<br>
+            <strong>🛤 链路：</strong>S-08 领料申请 → 按金额阈值审批 → S-09 领料出库执行 → 同事务原子写入（S-21 流水 + S-13 余额减）+ 成本归集到成本中心 → NC 推送（BIZ-005 自用消耗 / BIZ-005A 对厂矿销售）。
           </div>
         </div>
 
         <div class="kpi-grid" id="iss-kpis"></div>
 
-        <div class="card">
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
           <div class="card-header">
-            <div class="title">领料申请 / 出库台账</div>
+            <div class="title">📡 档 A 引擎接入 · S-08 领料申请</div>
             <div class="actions">
-              <button class="btn btn-sm" onclick="filterType('all')" id="ft-all">全部</button>
-              <button class="btn btn-sm" onclick="filterType('selfuse')">自用消耗 (BIZ-005)</button>
-              <button class="btn btn-sm" onclick="filterType('factory_sale')">对厂矿销售 (BIZ-005A)</button>
-              <button class="btn btn-primary btn-sm" onclick="addNewIssuance()">+ 新建领料</button>
+              <button class="btn btn-sm btn-primary" onclick="engineCreateS08()">+ 创建领料申请（自用消耗）</button>
+              <button class="btn btn-sm" onclick="engineCreateS08Sale()">+ 创建领料申请（对厂矿销售）</button>
             </div>
           </div>
-          <table class="data">
-            <thead>
-              <tr>
-                <th>单号</th>
-                <th>类型</th>
-                <th>申请部门 / 收货方</th>
-                <th>物料</th>
-                <th class="num">数量</th>
-                <th class="num">单位成本（移动加权）</th>
-                <th class="num">出库金额</th>
-                <th>NC 凭证</th>
-                <th>状态</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody id="iss-tbody"></tbody>
-          </table>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>申请号</th>
+                  <th>类型</th>
+                  <th>成本中心</th>
+                  <th>物料 / 数量</th>
+                  <th class="num">金额</th>
+                  <th>状态</th>
+                  <th>下游 S-09</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-s08-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · S-09 出库执行 + 库存原子事务</div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>出库号</th>
+                  <th>来源 S-08</th>
+                  <th>物料</th>
+                  <th class="num">数量</th>
+                  <th class="num">金额</th>
+                  <th>状态</th>
+                  <th>S-21 / S-13 / NC 效应</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-s09-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              点 "执行出库" → linkage 同事务原子写入：S-21 出库流水（quantity_delta 负值）+ S-13 余额减 + F-01 BIZ-005 NC 任务（mock 1-2 秒回执）。
+            </div>
+          </div>
         </div>
 
         <div class="cols-2">
           <div>
             <div class="card">
-              <div class="card-header"><div class="title">📊 出库成本归集（按成本中心）</div></div>
-              <div class="card-body">
-                <table class="data">
-                  <thead><tr><th>成本中心</th><th class="num">领料笔数</th><th class="num">累计金额</th><th>占比</th></tr></thead>
-                  <tbody id="cost-tbody"></tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header"><div class="title">📦 物料库存与移动加权成本（演示）</div></div>
-              <div class="card-body">
-                <table class="data">
-                  <thead><tr><th>物料</th><th class="num">库存数量</th><th class="num">移动加权单价</th><th class="num">库存金额</th><th>S-21 流水</th></tr></thead>
-                  <tbody id="stock-tbody"></tbody>
-                </table>
+              <div class="card-header"><div class="title">⚖ 出库类型 → NC 凭证路由</div></div>
+              <div class="card-body" style="font-size:12px;line-height:1.7;">
+                <div><strong>BIZ-005 自用消耗</strong>：物资领出供本单位生产 / 检修 / 行政使用<br>
+                  借 5101 主营业务成本（或 6602 管理费用）/ 5301 制造费用 / 6601 销售费用<br>
+                  贷 1403 原材料 / 1405 库存商品（按 unit_cost 移动加权计算）</div>
+                <hr style="border:none;border-top:1px dashed var(--border);margin:10px 0;">
+                <div><strong>BIZ-005A 对厂矿销售</strong>：物资公司向集团内其他厂矿（非本单位）销售出库<br>
+                  借 1122 应收账款<br>
+                  贷 6001 主营业务收入 + 2221 应交税费-应交增值税（销项税额）<br>
+                  同时：借 6401 主营业务成本，贷 1403 原材料（按 unit_cost）</div>
               </div>
             </div>
           </div>
-
           <div>
             <div class="card">
-              <div class="card-header"><div class="title">⚖ 出库类型 → NC 凭证路由</div></div>
-              <div class="card-body" style="font-size:12px;line-height:1.7">
-                <div class="kv">
-                  <div class="k">物资公司自用</div>
-                  <div class="v">issuance_type ∈ {领料出库 / 维修出库 / 消耗出库}<br/>→ <b>BIZ-005</b>：借 6602 销售费用 / 贷 1403 原材料</div>
-                  <div class="k">对厂矿销售</div>
-                  <div class="v">收货方 = 厂矿（集团内部用户单位）<br/>→ <b>BIZ-005A</b>：借 1122 应收账款 / 贷 6001 主营业务收入 + 2221 销项税</div>
-                  <div class="k">分流字段</div>
-                  <div class="v">S-09 <code>usage_unit_id</code>：物资公司自身组织 → BIZ-005；厂矿组织 → BIZ-005A（详设 08 §5.2）</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header"><div class="title">📐 移动加权成本算法演示</div></div>
-              <div class="card-body" style="font-size:12px;font-family:Consolas,monospace;background:#f6f8fa;padding:12px;border-radius:4px;line-height:1.7">
-                <div><b>入库时：</b></div>
-                <div style="padding-left:20px">unit_cost_after = (qty_before × cost_before + qty_in × cost_in) / (qty_before + qty_in)</div>
-                <div style="padding-left:20px">qty_after = qty_before + qty_in</div>
-                <div style="margin-top:8px"><b>出库时：</b></div>
-                <div style="padding-left:20px">unit_cost_after = unit_cost_before <span style="color:#52c41a">// 出库不改单价</span></div>
-                <div style="padding-left:20px">qty_after = qty_before - qty_out</div>
-                <div style="padding-left:20px">amount_out = qty_out × unit_cost_before</div>
-                <div style="margin-top:8px;color:var(--text-2)"><b>S-21 流水必填字段：</b>unit_cost_before/after, quantity_before/after, amount_before/after</div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-body" style="display:flex;gap:12px;align-items:start;">
-                <span class="badge blue dot">边界</span>
-                <div class="text-2" style="font-size:12px">
-                  本页演示出库主线 mock；不替代真实 NC 凭证生成（仍需 BIZ-005/005A 按详设 08 接口推送）。"对厂矿销售"按外部销售实质开票（业务方 Q-MERGE-1 决议，2026-05-09 V1.3）。
-                </div>
-              </div>
+              <div class="card-header"><div class="title">📊 成本归集（按成本中心实时聚合）</div></div>
+              <table class="data">
+                <thead><tr><th>成本中心</th><th class="num">出库笔数</th><th class="num">累计金额</th></tr></thead>
+                <tbody id="cost-center-tbody"></tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -122,187 +111,179 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
     SC.layout({
       page: 'material-issuance',
-      crumbs: ['库存领用', '领料出库主线'],
-      title: '领料出库主线 (S-08 / S-09)',
-      desc: '档 A 二期 A2 — 领料申请 → 审批 → 出库 → 成本归集 → BIZ-005 自用 / BIZ-005A 对厂矿销售',
-      actions: [{ label: '导出台账' }, { label: '查看成本中心', primary: true }]
+      crumbs: ['二期', 'A2 出库主线'],
+      title: '领料出库主线（S-08 → S-09）',
+      desc: '档 A 二期 A2：详设 06 §7.4/7.7 + BIZ-005/005A — 状态机 + linkage + 库存原子事务',
     });
 
-    /* Mock 数据 — 物料 + 库存(移动加权) */
-    var MATERIALS = {
-      'M-1001': { name: '矿用电缆 MYP-3.6/6 3×95+1×35', qty: 250, cost: 142.50 },
-      'M-1002': { name: '高强度螺栓 M24×120', qty: 8800, cost: 12.40 },
-      'M-1003': { name: '液压支架立柱密封件', qty: 480, cost: 86.00 },
-      'M-1004': { name: '工业润滑脂 (锂基)', qty: 1200, cost: 24.80 },
-      'M-1005': { name: '安全帽 (矿工专用)', qty: 600, cost: 78.00 }
-    };
+    var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m; });
+    var ccMap  = {}; SC.store.list('M-12').forEach(function (c) { ccMap[c.id]  = c; });
 
-    var SEED_ISSUANCES = [
-      { code: 'IS-2026-0421', type: 'selfuse', dept: '物资公司机修车间', recipient: '物资公司机修车间', materialId: 'M-1003', qty: 8, applyDate: '2026-05-05', state: '已出库', costCenter: '机修车间' },
-      { code: 'IS-2026-0428', type: 'factory_sale', dept: '阜新一矿', recipient: '阜新一矿综采队', materialId: 'M-1001', qty: 50, applyDate: '2026-05-06', state: '已出库', costCenter: '阜新一矿' },
-      { code: 'IS-2026-0432', type: 'factory_sale', dept: '阜新一矿', recipient: '阜新一矿掘进二队', materialId: 'M-1002', qty: 1200, applyDate: '2026-05-07', state: '已出库', costCenter: '阜新一矿' },
-      { code: 'IS-2026-0438', type: 'selfuse', dept: '物资公司仓库', recipient: '物资公司仓库', materialId: 'M-1004', qty: 30, applyDate: '2026-05-08', state: '已审', costCenter: '总库' },
-      { code: 'IS-2026-0445', type: 'factory_sale', dept: '阜新二矿', recipient: '阜新二矿运输队', materialId: 'M-1005', qty: 80, applyDate: '2026-05-09', state: '待审', costCenter: '阜新二矿' },
-      { code: 'IS-2026-0451', type: 'factory_sale', dept: '阜新一矿', recipient: '阜新一矿综采队', materialId: 'M-1001', qty: 30, applyDate: '2026-05-09', state: '待审', costCenter: '阜新一矿' }
-    ];
-
-    var issuances = SEED_ISSUANCES.map(function (i) { return Object.assign({}, i); });
-    var currentFilter = 'all';
-
-    function calcAmount(iss) {
-      var m = MATERIALS[iss.materialId];
-      if (!m) return 0;
-      return iss.qty * m.cost;
-    }
-
-    function genVoucher(iss) {
-      var amt = calcAmount(iss);
-      if (iss.type === 'factory_sale') {
-        // BIZ-005A: 借 应收账款 / 贷 主营业务收入 + 销项税(13%)
-        var tax = Math.round(amt * 0.13 * 100) / 100;
-        var revenue = amt - tax;
-        return {
-          biz: 'BIZ-005A',
-          desc: '借 1122 应收账款 ' + SC.fmtMoney(amt) + ' / 贷 6001 主营业务收入 ' + SC.fmtMoney(revenue) + ' + 2221 销项税 ' + SC.fmtMoney(tax),
-          short: 'BIZ-005A 销售凭证'
-        };
-      } else {
-        return {
-          biz: 'BIZ-005',
-          desc: '借 6602 销售费用 ' + SC.fmtMoney(amt) + ' / 贷 1403 原材料 ' + SC.fmtMoney(amt),
-          short: 'BIZ-005 自用消耗'
-        };
-      }
-    }
-
-    window.filterType = function (t) {
-      currentFilter = t;
-      ['all', 'selfuse', 'factory_sale'].forEach(function (f) {
-        var btn = document.getElementById('ft-' + f);
-        if (btn) btn.style.background = '';
-      });
-      var btn = document.getElementById('ft-' + t);
-      if (btn) btn.style.background = '#e6f4ff';
-      render();
-    };
-
-    window.addNewIssuance = function () {
-      var seq = issuances.length + 421;
-      var dt = SC.time.today().toISOString().slice(0, 10);
-      issuances.push({
-        code: 'IS-2026-' + String(seq).padStart(4, '0'),
-        type: 'selfuse',
-        dept: '物资公司',
-        recipient: '物资公司新增模拟',
-        materialId: 'M-1004',
-        qty: 10,
-        applyDate: dt,
-        state: '待审',
-        costCenter: '总库'
-      });
-      render();
-    };
-
-    window.executeIssuance = function (code) {
-      var i = issuances.find(function (x) { return x.code === code; });
-      if (i && i.state !== '已出库') {
-        i.state = '已出库';
-        i.executedAt = SC.time.iso();
-        // 演示:库存数量减少（不真实改 MATERIALS,只演示）
-        var m = MATERIALS[i.materialId];
-        if (m) m.qty = Math.max(0, m.qty - i.qty);
-        render();
-      }
-    };
-
-    function render() {
-      var rows = currentFilter === 'all' ? issuances : issuances.filter(function (i) { return i.type === currentFilter; });
-      var totalAmt = 0, exeAmt = 0, exeCnt = 0, pendCnt = 0, factoryAmt = 0, selfAmt = 0;
-      issuances.forEach(function (i) {
-        var amt = calcAmount(i);
-        totalAmt += amt;
-        if (i.state === '已出库') { exeAmt += amt; exeCnt++; if (i.type === 'factory_sale') factoryAmt += amt; else selfAmt += amt; }
-        else pendCnt++;
-      });
-
-      // KPI
+    function renderKpis() {
+      var s08 = SC.store.list('S-08');
+      var s09 = SC.store.list('S-09', { state: '已出库' });
+      var totalAmt = s09.reduce(function (a, r) { return a + (r.amount || 0); }, 0);
+      var saleCount = s09.filter(function (r) { return r.issue_type === '对厂矿销售'; }).length;
       document.getElementById('iss-kpis').innerHTML = [
-        '<div class="kpi"><div class="label">本月领料</div><div class="value">' + issuances.length + '</div><div class="trend">累计 ' + SC.fmtMoney(totalAmt) + '</div></div>',
-        '<div class="kpi"><div class="label">已出库</div><div class="value" style="color:var(--green)">' + exeCnt + '</div><div class="trend">' + SC.fmtMoney(exeAmt) + '</div></div>',
-        '<div class="kpi"><div class="label">待处理</div><div class="value" style="color:var(--amber)">' + pendCnt + '</div><div class="trend">待审 / 已审</div></div>',
-        '<div class="kpi"><div class="label">销售 (BIZ-005A) / 自用 (BIZ-005)</div><div class="value" style="font-size:18px">' + SC.fmtMoney(factoryAmt) + ' / ' + SC.fmtMoney(selfAmt) + '</div><div class="trend">销售 vs 消耗凭证拆分</div></div>'
-      ].join('');
-
-      // 列表
-      document.getElementById('iss-tbody').innerHTML = rows.map(function (i) {
-        var m = MATERIALS[i.materialId] || { name: '?', cost: 0 };
-        var v = genVoucher(i);
-        var typeBadge = i.type === 'factory_sale' ?
-          SC.badge('对厂矿销售', 'blue', true) :
-          SC.badge('自用消耗', 'gray', true);
-        var stateColor = i.state === '已出库' ? 'green' : i.state === '已审' ? 'blue' : 'amber';
-        var stateBadge = SC.badge(i.state, stateColor, true);
-        var act = i.state === '已出库' ? '<span class="muted" style="font-size:11px">已生效</span>' :
-                  '<button class="btn btn-sm" onclick="executeIssuance(\'' + i.code + '\')" style="padding:2px 8px;font-size:11px">模拟出库</button>';
-        return '<tr>' +
-          '<td class="code">' + i.code + '</td>' +
-          '<td>' + typeBadge + '</td>' +
-          '<td><div>' + i.dept + '</div><div class="muted" style="font-size:11px">→ ' + i.recipient + '</div></td>' +
-          '<td><div>' + m.name + '</div><div class="muted" style="font-size:11px">' + i.materialId + '</div></td>' +
-          '<td class="num">' + i.qty + '</td>' +
-          '<td class="num muted">' + SC.fmtMoney(m.cost) + '</td>' +
-          '<td class="num"><b>' + SC.fmtMoney(calcAmount(i)) + '</b></td>' +
-          '<td title="' + v.desc + '"><span style="font-size:11px;color:var(--blue)">' + v.short + '</span></td>' +
-          '<td>' + stateBadge + '</td>' +
-          '<td>' + act + '</td>' +
-        '</tr>';
+        ['S-08 申请', s08.length, '草稿 ' + s08.filter(function (x) { return x.state === '草稿'; }).length + ' / 已审 ' + s08.filter(function (x) { return x.state === '已审'; }).length],
+        ['S-09 已出库', s09.length, '自用 ' + (s09.length - saleCount) + ' / 销售 ' + saleCount],
+        ['累计出库金额', SC.fmtMoney(totalAmt), '移动加权计算'],
+        ['NC 推送', SC.store.list('F-01', { interface_id: 'BIZ-005' }).length, 'BIZ-005 / 005A'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
       }).join('');
+    }
 
-      // 成本中心归集
-      var cc = {};
-      issuances.forEach(function (i) {
-        if (i.state !== '已出库') return;
-        var amt = calcAmount(i);
-        if (!cc[i.costCenter]) cc[i.costCenter] = { count: 0, total: 0 };
-        cc[i.costCenter].count++;
-        cc[i.costCenter].total += amt;
+    function renderS08() {
+      var rows = SC.store.list('S-08');
+      var s09all = SC.store.list('S-09');
+      document.getElementById('engine-s08-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="9" class="muted" style="text-align:center;padding:18px;">无 S-08 · 点上方"+ 创建领料申请"</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('S-08', r);
+            var stateColor = r.state === '已审' ? 'green' : r.state === '已出库' ? 'blue' : r.state === '待审' ? 'amber' : 'gray';
+            var s09 = s09all.filter(function (o) { return o.request_id === r.id; })[0];
+            return '<tr>' +
+              '<td class="code">' + r.request_no + '</td>' +
+              '<td><span class="badge ' + (r.issue_type === '对厂矿销售' ? 'amber' : 'gray') + '">' + r.issue_type + '</span></td>' +
+              '<td class="muted" style="font-size:11px;">' + (ccMap[r.cost_center_id] ? ccMap[r.cost_center_id].name : '—') + '</td>' +
+              '<td>' + (matMap[r.material_id] ? matMap[r.material_id].name : '—') + '<div class="muted" style="font-size:11px;">数量 ' + (r.quantity || 0) + '</div></td>' +
+              '<td class="num">' + SC.fmtMoney(r.amount || 0) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (s09 ? '<span class="code">S-09 #' + s09.id + ' [' + s09.state + ']</span>' : '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineS08(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function renderS09() {
+      var rows = SC.store.list('S-09');
+      var s21 = SC.store.list('S-21');
+      var f01 = SC.store.list('F-01', { interface_id: 'BIZ-005' });
+      document.getElementById('engine-s09-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px;">无 S-09 · 先到 S-08 审批通过自动创建</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('S-09', r);
+            var stateColor = r.state === '已出库' ? 'green' : r.state === '已撤销' ? 'red' : 'gray';
+            var effects = '—';
+            if (r.state === '已出库') {
+              var rs21 = s21.filter(function (t) { return t.source_bill_type === 'S-09' && t.source_bill_id === r.id; });
+              var rf01 = f01.filter(function (t) { return t.source_bill_id === r.id; });
+              effects = (rs21.length > 0 ? '<span class="badge green dot">S-21 ×' + rs21.length + '</span> ' : '') +
+                        (rf01.length > 0 ? '<span class="badge ' + (rf01[0].task_state === '推送成功' ? 'green' : rf01[0].task_state === '推送失败' ? 'red' : 'amber') + ' dot">F-01 ' + rf01[0].task_state + '</span>' : '');
+            }
+            return '<tr>' +
+              '<td class="code">' + r.record_no + '</td>' +
+              '<td class="muted code" style="font-size:11px;">S-08 #' + r.request_id + '</td>' +
+              '<td>' + (matMap[r.material_id] ? matMap[r.material_id].name : '—') + '</td>' +
+              '<td class="num">' + (r.quantity || 0) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.amount || 0) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td>' + effects + '</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineS09(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function renderCostCenter() {
+      var s09 = SC.store.list('S-09', { state: '已出库' });
+      var byCC = {};
+      s09.forEach(function (r) {
+        var s08 = SC.store.get('S-08', r.request_id);
+        var ccId = s08 ? s08.cost_center_id : null;
+        if (!ccId) return;
+        if (!byCC[ccId]) byCC[ccId] = { count: 0, amount: 0 };
+        byCC[ccId].count++;
+        byCC[ccId].amount += r.amount || 0;
       });
-      var ccTotal = Object.values(cc).reduce(function (s, c) { return s + c.total; }, 0) || 1;
-      document.getElementById('cost-tbody').innerHTML = Object.keys(cc).sort(function (a, b) { return cc[b].total - cc[a].total; }).map(function (k) {
-        var pct = (cc[k].total / ccTotal * 100).toFixed(1);
-        return '<tr>' +
-          '<td>' + k + '</td>' +
-          '<td class="num">' + cc[k].count + '</td>' +
-          '<td class="num">' + SC.fmtMoney(cc[k].total) + '</td>' +
-          '<td>' + pct + ' % <span style="display:inline-block;width:' + pct + 'px;max-width:60px;height:6px;background:var(--blue);vertical-align:middle;margin-left:4px"></span></td>' +
-        '</tr>';
-      }).join('') || '<tr><td colspan="4" class="muted" style="text-align:center;padding:20px">暂无已出库数据</td></tr>';
-
-      // 物料库存表
-      document.getElementById('stock-tbody').innerHTML = Object.keys(MATERIALS).map(function (id) {
-        var m = MATERIALS[id];
-        var lastFlow = issuances.filter(function (i) { return i.materialId === id && i.state === '已出库'; }).slice(-1)[0];
-        var flowText = lastFlow ?
-          'qty:' + (m.qty + lastFlow.qty) + '→' + m.qty + ' / cost:' + m.cost + ' (不变)' :
-          '—';
-        return '<tr>' +
-          '<td><div>' + m.name + '</div><div class="muted" style="font-size:11px">' + id + '</div></td>' +
-          '<td class="num">' + m.qty + '</td>' +
-          '<td class="num">' + SC.fmtMoney(m.cost) + '</td>' +
-          '<td class="num">' + SC.fmtMoney(m.qty * m.cost) + '</td>' +
-          '<td class="muted" style="font-size:11px">' + flowText + '</td>' +
-        '</tr>';
-      }).join('');
+      var keys = Object.keys(byCC);
+      document.getElementById('cost-center-tbody').innerHTML = keys.length === 0
+        ? '<tr><td colspan="3" class="muted" style="text-align:center;padding:8px;">无出库</td></tr>'
+        : keys.map(function (k) {
+            return '<tr>' +
+              '<td>' + (ccMap[k] ? ccMap[k].name : 'CC#' + k) + '</td>' +
+              '<td class="num">' + byCC[k].count + '</td>' +
+              '<td class="num">' + SC.fmtMoney(byCC[k].amount) + '</td>' +
+            '</tr>';
+          }).join('');
     }
 
-    filterType('all');
-
-    if (SC.time && SC.time.subscribe) {
-      SC.time.subscribe(function () { render(); });
+    function engineCreateS08(saleType) {
+      var matIds = Object.keys(matMap).filter(function (id) {
+        var inv = SC.store.list('S-13', { material_id: parseInt(id, 10) })[0];
+        return inv && inv.quantity > 0;
+      });
+      if (matIds.length === 0) {
+        SC.ui.toast('S-13 库存为空，先到「采购入库审核」做一笔 S-05 入库再来出库', 'warning'); return;
+      }
+      var matId = parseInt(matIds[0], 10);
+      var mat = matMap[matId];
+      var inv = SC.store.list('S-13', { material_id: matId })[0];
+      var qty = Math.min(20, inv.quantity);
+      var unitCost = inv.unit_cost || 100;
+      var amount = qty * unitCost;
+      SC.store.create('S-08', {
+        request_no: SC.store.nextNo('LL'),
+        issue_type: saleType ? '对厂矿销售' : '自用消耗',
+        cost_center_id: 1,
+        material_id: matId,
+        warehouse_id: inv.warehouse_id,
+        org_id: 3,
+        quantity: qty,
+        amount: amount,
+        state: '草稿',
+      });
+      SC.ui.toast('S-08 草稿已创建（' + (saleType ? 'BIZ-005A 对厂矿销售' : 'BIZ-005 自用消耗') + '，' + mat.name + ' × ' + qty + '）', 'success');
     }
+    function engineCreateS08Sale() { engineCreateS08(true); }
+
+    function engineS08(id, event) {
+      try {
+        SC.sm.transition('S-08', id, event);
+        if (event === '审批通过') {
+          SC.ui.toast('S-08 #' + id + ' 已审 → linkage 自动 create S-09 待执行', 'success');
+        } else {
+          SC.ui.toast('S-08 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function engineS09(id, event) {
+      try {
+        SC.sm.transition('S-09', id, event);
+        if (event === '执行出库') {
+          SC.ui.toast('S-09 #' + id + ' 已出库 → linkage 触发 S-21 流水 + S-13 减库存 + F-01 BIZ-005', 'success');
+          setTimeout(refresh, 1500);
+          setTimeout(refresh, 3000);
+        } else {
+          SC.ui.toast('S-09 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function refresh() {
+      renderKpis(); renderS08(); renderS09(); renderCostCenter();
+    }
+
+    ['S-08', 'S-09', 'S-13', 'S-21', 'F-01', 'F-03'].forEach(function (e) {
+      SC.store.subscribe(e, refresh);
+    });
+    refresh();
   </script>
 </body>
 </html>

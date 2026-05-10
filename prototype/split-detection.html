@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>化整为零反规避检测 — 阜矿物资供应管理系统（原型）</title>
+  <title>反规避检测 (ALR-PUR-SPLIT) — 阜矿物资供应管理系统（原型）</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
@@ -13,87 +13,79 @@
     <div class="app-main">
       <div id="page-area">
 
-        <div class="card" style="border-left:4px solid var(--amber);background:#fffbf3;">
-          <div class="card-body" style="font-size:13px">
-            <strong>📋 规则依据：</strong>政策 04《阜新矿业集团采购管理办法》（阜矿发 [2025] 70 号）<b>第二十六条</b>："任何单位和个人不得将本办法规定的招标项目化整为零或以其他任何方式规避招标"+ <b>第十七条</b>"同类合并：年度累计达到上述应招标限额的，应合并招标或采取入围招标"。
-            <br/>
-            <strong>🛡 检测窗口：</strong>30 天滚动窗口（业务方答 Q-02-1 已落 V0.3）；按 <b>(部门 × 物料类别 × 供应商类别)</b> 三维分组累计采购申请金额，达到应招标阈值时触发 <b>ALR-PUR-SPLIT-001</b>。
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 04 §8.3 反规避（化整为零禁止）+ 详设 09 §六 ALR-PUR-SPLIT-001 化整为零嫌疑 / ALR-PUR-DESIGNATE-001 指定供应商嫌疑。<br>
+            <strong>🛤 链路：</strong>P-01 审批通过 → linkage 检查 30 天累计同 org + 同 material 申请 → 累计金额超阈值 → 自动 emit ALR-PUR-SPLIT-001（重要级）→ R-05 预警台账 + 物资管理审计。
           </div>
         </div>
 
-        <div class="kpi-grid" id="split-kpis"></div>
+        <div class="kpi-grid" id="sd-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · 反规避检测看板（同 org + 同 material 30 天累计）</div>
+            <div class="actions">
+              <a class="btn btn-sm" href="requirement-list.html">← P-01 需求审批（触发源）</a>
+              <a class="btn btn-sm" href="alert-rules.html">→ 预警中心</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>组织</th>
+                  <th>物料</th>
+                  <th class="num">30 天笔数</th>
+                  <th class="num">累计金额</th>
+                  <th class="num">阈值</th>
+                  <th>嫌疑</th>
+                  <th>关联 R-05</th>
+                </tr>
+              </thead>
+              <tbody id="engine-sd-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              在「需求计划」连续创建多笔同 org + 同 material 的 P-01 + 审批 → 累计金额超 ¥200,000 阈值 → 自动 emit ALR-PUR-SPLIT-001。本页实时聚合显示。
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · ALR-PUR-SPLIT-001 预警记录</div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>预警代码</th>
+                  <th>级别</th>
+                  <th>来源 P-01</th>
+                  <th>说明</th>
+                  <th>触发时间</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+              <tbody id="engine-split-tbody"></tbody>
+            </table>
+          </div>
+        </div>
 
         <div class="card">
-          <div class="card-header">
-            <div class="title">⚠ 化整为零可疑分组（30 天滚动窗口）</div>
-            <div class="actions">
-              <button class="btn btn-sm" onclick="seedExtraData()">+ 模拟新增可疑申请</button>
-              <button class="btn btn-sm" onclick="resetData()">重置数据</button>
-            </div>
-          </div>
-          <table class="data">
-            <thead>
-              <tr>
-                <th>分组键</th>
-                <th>部门</th>
-                <th>物料类别</th>
-                <th class="num">申请笔数</th>
-                <th class="num">累计金额</th>
-                <th>应招标阈值</th>
-                <th class="num">超阈值</th>
-                <th>风险级别</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody id="split-tbody"></tbody>
-          </table>
-        </div>
-
-        <div class="cols-2">
-          <div>
-            <div class="card">
-              <div class="card-header"><div class="title">检测逻辑（伪代码）</div></div>
-              <div class="card-body" style="font-size:12px;font-family:Consolas,monospace;background:#f6f8fa;padding:12px;border-radius:4px;color:var(--text-1);line-height:1.6">
-                <div>FOR each <b>(dept, material_category)</b> 分组:</div>
-                <div style="padding-left:20px">window = SC.time.now() - <span style="color:#cf1322">30 days</span></div>
-                <div style="padding-left:20px">total = SUM(amount) WHERE apply_date IN window</div>
-                <div style="padding-left:20px">threshold = <span style="color:#1677ff">应招标限额(物料类型)</span></div>
-                <div style="padding-left:20px">// 物资类 ≥20万 / 工程 ≥50万 / 服务·修 ≥10万</div>
-                <div style="padding-left:20px">IF total &gt;= threshold AND apply_count &gt; 1:</div>
-                <div style="padding-left:40px;color:#cf1322">TRIGGER ALR-PUR-SPLIT-001</div>
-                <div style="padding-left:40px">level = total &gt;= threshold * 1.5 ? 'CRITICAL' : 'WARNING'</div>
-                <div style="padding-left:40px">block_subsequent_split = true (新申请受阻断)</div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="card">
-              <div class="card-header"><div class="title">风险级别 + 处置动作</div></div>
-              <div class="card-body">
-                <div class="kv">
-                  <div class="k">⚠ WARNING</div>
-                  <div class="v">累计 ≥ 应招标阈值 → 提醒业务部主管 + 进合规月报</div>
-                  <div class="k">🚨 CRITICAL</div>
-                  <div class="v">累计 ≥ 应招标阈值 × 1.5 → 强制合并审批（或转招标）+ 经发部审计抽查 + 阻断后续拆单</div>
-                  <div class="k">关联报表</div>
-                  <div class="v">RPT-PUR-SPLIT-MONTHLY 月度反规避检测台账</div>
-                  <div class="k">关联审批</div>
-                  <div class="v">CRITICAL 升级 → 触发 WF-PUR-MERGE-001 强制合并审批模板</div>
-                  <div class="k">免规避情形</div>
-                  <div class="v">应急采购（is_emergency=true）+ 不可预见特殊情况</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-body" style="display:flex;gap:12px;align-items:start;">
-                <span class="badge blue dot">边界</span>
-                <div class="text-2" style="font-size:12px">
-                  本页演示反规避自动检测；具体阈值表达式（含税/不含税、年度/30 天/季度等多种窗口）配置在 SY-02 系统配置项，由经发部维护。检测精度按详设 09 §六 ALR-PUR-001 联动。
-                </div>
-              </div>
-            </div>
+          <div class="card-header"><div class="title">⚖ 反规避规则（详设 04 §8.3 + 09 §六）</div></div>
+          <div class="card-body" style="font-size:12px;line-height:1.7;">
+            <strong>化整为零嫌疑（ALR-PUR-SPLIT-001）：</strong><br>
+            • 检测窗口：30 天（SY-02 配置）<br>
+            • 检测维度：同 org + 同 material（详设 04 §8.3）<br>
+            • 阈值：累计金额超 SY-02 SPLIT_THRESHOLD（演示 ¥200,000）<br>
+            • 触发：P-01 审批通过时实时检测；超阈值 emit R-05 重要级<br>
+            <strong>指定供应商嫌疑（ALR-PUR-DESIGNATE-001）：</strong><br>
+            • 检测：60 天内同供应商中标 ≥3 次同物料 + 招采竞争方家数不足<br>
+            • 触发：T-05 中标录入时检测<br>
+            <strong>合规处置：</strong>预警发起 → 物资管理审核 → 拒绝 / 接受合理解释 / 升级法务<br>
+            <strong>本期演示用：</strong>仅化整为零检测；指定供应商嫌疑作为占位
           </div>
         </div>
 
@@ -104,136 +96,97 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
     SC.layout({
       page: 'split-detection',
-      crumbs: ['报表预警与AI', '化整为零反规避检测'],
-      title: '化整为零反规避检测 (ALR-PUR-SPLIT-001)',
-      desc: '对齐详设 09 §六 + 政策 04 第二十六条 — 30 天滚动窗口 + (部门 × 物料类别) 分组累计 + 自动阻断后续拆单',
-      actions: [{ label: '导出月报' }, { label: '查看规则配置', primary: true }]
+      crumbs: ['二期', 'A14 反规避检测'],
+      title: '反规避检测（化整为零）',
+      desc: '档 A 二期 A14：详设 04 §8.3 + 09 §六 — P-01 审批 linkage 检测 30 天累计 + 同 org+material → ALR-PUR-SPLIT-001',
     });
 
-    /* ─── Mock 数据：30 天内同部门同类累计已超应招标阈值，但拆成多笔每笔 < 阈值 ─── */
-    var APPLY_THRESHOLD = { '物资设备': 200000, '工程建设': 500000, '咨询服务': 100000, '设备修理': 100000 };
+    var THRESHOLD = 200000;
+    var WINDOW_DAYS = 30;
+    var orgMap = {}; SC.store.list('M-01').forEach(function (o) { orgMap[o.id] = o.name; });
+    var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m.name; });
 
-    function genApplications() {
-      var now = SC.time.now();
-      function ago(days) { return SC.time.addDays(now, -days).toISOString().slice(0, 10); }
-      return [
-        // 综采队 + 矿用电缆: 5 笔累计 ¥98 万 → CRITICAL（>200 万应招标 × 1.5 ? 不,只是 ≥ 阈值,WARNING 级)
-        { code: 'PR-2026-0421', dept: '综采队', cat: '物资设备', material: '矿用电缆', amount: 198000, applyDate: ago(28), state: '待执行' },
-        { code: 'PR-2026-0489', dept: '综采队', cat: '物资设备', material: '矿用电缆', amount: 196000, applyDate: ago(21), state: '待执行' },
-        { code: 'PR-2026-0532', dept: '综采队', cat: '物资设备', material: '矿用电缆 (备料)', amount: 199500, applyDate: ago(14), state: '已执行' },
-        { code: 'PR-2026-0588', dept: '综采队', cat: '物资设备', material: '矿用电缆 (扩展规格)', amount: 192000, applyDate: ago(7), state: '已执行' },
-        { code: 'PR-2026-0612', dept: '综采队', cat: '物资设备', material: '矿用电缆 (附件)', amount: 195000, applyDate: ago(2), state: '待审批' },
-        // 掘进二队 + 工程建设: 3 笔累计 ¥110 万 → CRITICAL（≥ 50 万 × 1.5 = 75 万 已超）
-        { code: 'PR-2026-0501', dept: '掘进二队', cat: '工程建设', material: '巷道支护工程', amount: 480000, applyDate: ago(20), state: '已执行' },
-        { code: 'PR-2026-0567', dept: '掘进二队', cat: '工程建设', material: '巷道支护 (二期)', amount: 320000, applyDate: ago(10), state: '待执行' },
-        { code: 'PR-2026-0598', dept: '掘进二队', cat: '工程建设', material: '巷道支护 (附属)', amount: 300000, applyDate: ago(3), state: '待审批' },
-        // 安全监察部 + 咨询服务: 2 笔累计 ¥12 万 → 刚过 WARNING(≥10万 应招标)
-        { code: 'PR-2026-0540', dept: '安全监察部', cat: '咨询服务', material: '安全评估咨询', amount: 65000, applyDate: ago(15), state: '已执行' },
-        { code: 'PR-2026-0610', dept: '安全监察部', cat: '咨询服务', material: '应急预案咨询', amount: 58000, applyDate: ago(4), state: '待审批' },
-        // 综采队 + 物资设备 + 普通材料: 2 笔累计 ¥15 万 < 阈值 (正常)
-        { code: 'PR-2026-0476', dept: '综采队', cat: '物资设备', material: '工具五金', amount: 80000, applyDate: ago(18), state: '已执行' },
-        { code: 'PR-2026-0594', dept: '综采队', cat: '物资设备', material: '劳保用品', amount: 70000, applyDate: ago(5), state: '待审批' },
-      ];
-    }
-
-    var applications = genApplications();
-
-    function detectSplits() {
-      var window30 = SC.time.addDays(SC.time.now(), -30);
-      // 按 (dept, cat) 分组,但只把"重复物料类(如矿用电缆 vs 工具五金)"算同组
-      // 简化:按 dept + 主物料类(取 material 的前若干字符 / 或归类)
+    function aggregateBy() {
+      var p01 = SC.store.list('P-01', { state: '已审' });
+      var now = SC.time && SC.time.now ? SC.time.now() : new Date();
+      var since = new Date(now.getTime() - WINDOW_DAYS * 24 * 3600 * 1000);
       var groups = {};
-      applications.forEach(function (a) {
-        if (new Date(a.applyDate) < window30) return;  // 超出 30 天窗口跳过
-        // 归类:取 material 的"主类"(最简化:取空格前的部分,实际应基于 material category)
-        var mainCat = a.material.replace(/\s*\(.*\)|\s+\(.*$/, '').trim();
-        var key = a.dept + ' / ' + mainCat;
-        if (!groups[key]) groups[key] = { dept: a.dept, cat: a.cat, mainCat: mainCat, items: [], total: 0 };
-        groups[key].items.push(a);
-        groups[key].total += a.amount;
+      p01.forEach(function (r) {
+        var d = new Date(r.submit_date || r.created_at || 0);
+        if (d < since) return;
+        var k = r.org_id + ':' + r.material_id;
+        if (!groups[k]) groups[k] = { org_id: r.org_id, material_id: r.material_id, count: 0, sum: 0, ids: [] };
+        groups[k].count++;
+        groups[k].sum += r.amount || 0;
+        groups[k].ids.push(r.id);
       });
-      // 转数组 + 算阈值 + 风险级别
-      return Object.keys(groups).map(function (k) {
-        var g = groups[k];
-        var threshold = APPLY_THRESHOLD[g.cat] || 200000;
-        var diff = g.total - threshold;
-        var level;
-        if (g.items.length === 1) level = 'normal';  // 单笔不算化整为零
-        else if (g.total < threshold) level = 'normal';
-        else if (g.total < threshold * 1.5) level = 'warning';
-        else level = 'critical';
-        return { key: k, dept: g.dept, cat: g.cat, mainCat: g.mainCat, items: g.items,
-                 total: g.total, threshold: threshold, diff: diff, level: level };
-      }).filter(function (g) { return g.items.length > 0; })
-        .sort(function (a, b) { return b.total - a.total; });
+      return Object.values(groups);
     }
 
-    function render() {
-      var groups = detectSplits();
-      var stats = { critical: 0, warning: 0, normal: 0, totalRiskAmt: 0 };
-      groups.forEach(function (g) {
-        stats[g.level]++;
-        if (g.level !== 'normal') stats.totalRiskAmt += g.total;
-      });
-
-      // KPI
-      document.getElementById('split-kpis').innerHTML = [
-        '<div class="kpi"><div class="label">检测分组</div><div class="value">' + groups.length + '</div><div class="trend">30 天滚动窗口</div></div>',
-        '<div class="kpi"><div class="label">CRITICAL 升级</div><div class="value" style="color:var(--red)">' + stats.critical + '</div><div class="trend">≥ 阈值 × 1.5 强制合并</div></div>',
-        '<div class="kpi"><div class="label">WARNING 提醒</div><div class="value" style="color:var(--amber)">' + stats.warning + '</div><div class="trend">≥ 阈值 进合规月报</div></div>',
-        '<div class="kpi"><div class="label">风险金额</div><div class="value" style="color:var(--red)">' + SC.fmtMoney(stats.totalRiskAmt) + '</div><div class="trend">受 ALR-PUR-SPLIT-001 监控</div></div>'
-      ].join('');
-
-      // 表格
-      document.getElementById('split-tbody').innerHTML = groups.map(function (g) {
-        var levelBadge = g.level === 'critical' ? SC.badge('🚨 CRITICAL', 'red', true) :
-                         g.level === 'warning' ? SC.badge('⚠ WARNING', 'amber', true) :
-                         SC.badge('正常', 'green', true);
-        var diffStyle = g.diff > 0 ? 'color:var(--red);font-weight:600;' : 'color:var(--text-2);';
-        var rowStyle = g.level === 'critical' ? 'background:#fff1f0;' : g.level === 'warning' ? 'background:#fffbf3;' : '';
-        var act = g.level === 'critical' ? '<button class="btn btn-sm" style="background:#cf1322;color:#fff">强制合并审批</button>' :
-                  g.level === 'warning' ? '<button class="btn btn-sm">查看明细</button>' :
-                  '<span class="muted">—</span>';
-        return '<tr style="' + rowStyle + '">' +
-          '<td class="code" style="font-size:11px">' + g.key + '</td>' +
-          '<td>' + g.dept + '</td>' +
-          '<td>' + g.cat + ' / ' + g.mainCat + '</td>' +
-          '<td class="num">' + g.items.length + '</td>' +
-          '<td class="num">' + SC.fmtMoney(g.total) + '</td>' +
-          '<td class="muted">' + SC.fmtMoney(g.threshold) + '</td>' +
-          '<td class="num" style="' + diffStyle + '">' + (g.diff >= 0 ? '+' : '') + SC.fmtMoney(g.diff) + '</td>' +
-          '<td>' + levelBadge + '</td>' +
-          '<td>' + act + '</td>' +
-        '</tr>';
+    function renderKpis() {
+      var groups = aggregateBy();
+      var alerts = SC.store.list('R-05', { alert_code: 'ALR-PUR-SPLIT-001' });
+      var suspicious = groups.filter(function (g) { return g.sum > THRESHOLD; });
+      document.getElementById('sd-kpis').innerHTML = [
+        ['监控分组数', groups.length, '同 org × 同 material'],
+        ['超阈值组', suspicious.length, '> ¥' + (THRESHOLD / 10000) + ' 万'],
+        ['ALR-PUR-SPLIT-001', alerts.length, '未读 ' + alerts.filter(function (a) { return a.read_state === '未读'; }).length],
+        ['检测窗口', WINDOW_DAYS + ' 天', '当前阈值 ¥' + (THRESHOLD / 10000) + ' 万'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
       }).join('');
     }
 
-    window.seedExtraData = function () {
-      var now = SC.time.now();
-      var seq = applications.length + 1;
-      applications.push({
-        code: 'PR-2026-' + String(700 + seq).padStart(4, '0'),
-        dept: '综采队', cat: '物资设备', material: '矿用电缆 (新增模拟)',
-        amount: 195000 + Math.floor(Math.random() * 5000),
-        applyDate: SC.time.addDays(now, -1).toISOString().slice(0, 10),
-        state: '待审批'
-      });
-      render();
-    };
-
-    window.resetData = function () {
-      applications = genApplications();
-      render();
-    };
-
-    render();
-
-    if (SC.time && SC.time.subscribe) {
-      SC.time.subscribe(function () { applications = genApplications(); render(); });
+    function renderTable() {
+      var groups = aggregateBy().sort(function (a, b) { return b.sum - a.sum; });
+      var alerts = SC.store.list('R-05', { alert_code: 'ALR-PUR-SPLIT-001' });
+      document.getElementById('engine-sd-tbody').innerHTML = groups.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">无监控数据 · 30 天内无已审 P-01</td></tr>'
+        : groups.map(function (g) {
+            var suspicious = g.sum > THRESHOLD;
+            var related = alerts.filter(function (a) { return g.ids.indexOf(a.source_id) >= 0; });
+            return '<tr style="' + (suspicious ? 'background:#fff5f5;' : '') + '">' +
+              '<td>' + (orgMap[g.org_id] || ('org#' + g.org_id)) + '</td>' +
+              '<td>' + (matMap[g.material_id] || ('mat#' + g.material_id)) + '</td>' +
+              '<td class="num">' + g.count + '</td>' +
+              '<td class="num"><strong style="color:' + (suspicious ? 'var(--red)' : 'var(--text)') + ';">' + SC.fmtMoney(g.sum) + '</strong></td>' +
+              '<td class="num muted">' + SC.fmtMoney(THRESHOLD) + '</td>' +
+              '<td>' + (suspicious ? '<span class="badge red dot">化整为零嫌疑</span>' : '<span class="badge gray">正常</span>') + '</td>' +
+              '<td class="muted code" style="font-size:11px;">' + (related.length > 0 ? related.map(function (a) { return '#' + a.id; }).join(', ') : '—') + '</td>' +
+            '</tr>';
+          }).join('');
     }
+
+    function renderAlerts() {
+      var rows = SC.store.list('R-05', { alert_code: 'ALR-PUR-SPLIT-001' });
+      document.getElementById('engine-split-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="6" class="muted" style="text-align:center;padding:8px;">无预警 · 在「需求计划」连续审批同 org+material 多笔超阈值 → 自动触发</td></tr>'
+        : rows.slice().reverse().map(function (a) {
+            var stateColor = a.read_state === '未读' ? 'red' : a.read_state === '已确认' ? 'amber' : 'green';
+            return '<tr>' +
+              '<td class="code">' + a.alert_code + '</td>' +
+              '<td><span class="badge ' + (a.level === '紧急' ? 'red' : a.level === '重要' ? 'amber' : 'gray') + ' dot">' + a.level + '</span></td>' +
+              '<td class="muted code" style="font-size:11px;">P-01 #' + a.source_id + '</td>' +
+              '<td class="muted" style="font-size:11px;max-width:380px;">' + (a.message || a.title || '') + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (a.occur_time || '').slice(11, 19) + '</td>' +
+              '<td>' + SC.badge(a.read_state, stateColor, true) + '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function refresh() { renderKpis(); renderTable(); renderAlerts(); }
+    ['P-01', 'R-05'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
   </script>
 </body>
 </html>

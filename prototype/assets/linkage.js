@@ -454,6 +454,203 @@
     }
   });
 
+  /* ========================================================
+   * 二期 P0 引擎接入（v0.18 补 — 让二期页面也走引擎层）
+   * ======================================================== */
+
+  /* A2 出库主线：S-08 领料申请审批通过 → 自动 create S-09 出库执行草稿 */
+  SC.linkage.on('S-08:已审', function (req) {
+    var existing = SC.store.list('S-09').filter(function (o) { return o.request_id === req.id; })[0];
+    if (existing) return;
+    SC.store.create('S-09', {
+      record_no: SC.store.nextNo('CK'),
+      request_id: req.id,
+      cost_center_id: req.cost_center_id,
+      material_id: req.material_id,
+      warehouse_id: req.warehouse_id || 2,
+      org_id: req.org_id,
+      quantity: req.quantity,
+      amount: req.amount,
+      state: '草稿',
+    });
+    console.log('[linkage] S-08:' + req.id + ' 已审 → 创建 S-09 #' + (SC.store.list('S-09').slice(-1)[0].id));
+  });
+
+  /* A2 出库主线：S-09:已出库 → 库存原子事务（S-21 出库流水 + S-13 余额减 + F-01 BIZ-005）*/
+  SC.linkage.on('S-09:已出库', function (rec) {
+    var ncSwitch = SC.store.list('F-13', { switch_code: 'BIZ-005-switch' })[0];
+    SC.store.transaction(['S-21', 'S-13', 'F-01'], function () {
+      // S-21 出库流水
+      SC.store.create('S-21', {
+        transaction_no: SC.store.nextNo('IT'),
+        transaction_type: '出库',
+        material_id: rec.material_id,
+        warehouse_id: rec.warehouse_id,
+        cost_center_id: rec.cost_center_id,
+        quantity_delta: -(rec.quantity || 0),
+        amount_delta: -(rec.amount || 0),
+        source_bill_type: 'S-09',
+        source_bill_id: rec.id,
+      });
+      // S-13 余额减（用现有 unit_cost 计算实际出库金额，演示用按 rec.amount 简化）
+      var inv = SC.store.list('S-13').filter(function (i) {
+        return i.material_id === rec.material_id && i.warehouse_id === rec.warehouse_id;
+      })[0];
+      if (inv) {
+        var newQty = (inv.quantity || 0) - rec.quantity;
+        var newAmount = newQty > 0 && inv.unit_cost ? newQty * inv.unit_cost : 0;
+        SC.store.update('S-13', inv.id, {
+          quantity: newQty,
+          total_amount: newAmount,
+          available_quantity: newQty - (inv.frozen_quantity || 0),
+        });
+      }
+      // F-01 NC 任务（BIZ-005 出库凭证）
+      if (!ncSwitch || ncSwitch.switch_status === '开') {
+        var task = SC.store.create('F-01', {
+          task_no: SC.store.nextNo('FT'),
+          interface_id: 'BIZ-005',
+          source_bill_no: rec.record_no,
+          source_bill_type: 'S-09',
+          source_bill_id: rec.id,
+          task_state: '待推送',
+          retry_count: 0,
+        });
+        if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+      }
+    });
+    console.log('[linkage] S-09:' + rec.id + ' 已出库 → S-21 流水 + S-13 余额减 + F-01 BIZ-005');
+  });
+
+  /* A4b 付款链路：C-08:已审 → 自动 create C-10 付款执行 + 触发 NC mock BIZ-013 */
+  SC.linkage.on('C-08:已审', function (req) {
+    var existing = SC.store.list('C-10').filter(function (e) { return e.request_id === req.id; })[0];
+    if (existing) return;
+    SC.store.create('C-10', {
+      execution_no: SC.store.nextNo('FK'),
+      request_id: req.id,
+      contract_id: req.contract_id,
+      supplier_id: req.supplier_id,
+      amount: req.amount,
+      state: '待执行',
+    });
+    console.log('[linkage] C-08:' + req.id + ' 已审 → 创建 C-10 待执行');
+  });
+
+  /* A4b 付款链路：C-10:已记账 → 应付消减 + 更新合同 paid_amount */
+  SC.linkage.on('C-10:已记账', function (exec) {
+    if (exec.contract_id) {
+      var c = SC.store.get('C-02', exec.contract_id);
+      if (c) {
+        SC.store.update('C-02', exec.contract_id, {
+          paid_amount: (c.paid_amount || 0) + (exec.amount || 0),
+        });
+      }
+    }
+    console.log('[linkage] C-10:' + exec.id + ' 已记账 → C-02 paid_amount += ' + exec.amount);
+  });
+
+  /* C-10 触发 NC mock 推送：调用 SC.nc.push 即可（创建 F-01 任务）
+   * 需要在 C-10 状态变 '执行中' 时主动调 */
+  SC.linkage.on('C-10:执行中', function (exec) {
+    var ncSwitch = SC.store.list('F-13', { switch_code: 'BIZ-013-switch' })[0];
+    if (ncSwitch && ncSwitch.switch_status === '关') {
+      console.log('[linkage] C-10:' + exec.id + ' BIZ-013 开关=关，跳过 NC 推送');
+      return;
+    }
+    var task = SC.store.create('F-01', {
+      task_no: SC.store.nextNo('FT'),
+      interface_id: 'BIZ-013',
+      source_bill_no: exec.execution_no,
+      source_bill_type: 'C-10',
+      source_bill_id: exec.id,
+      task_state: '待推送',
+      retry_count: 0,
+    });
+    if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+    console.log('[linkage] C-10:' + exec.id + ' 执行中 → F-01 BIZ-013 任务 + mock NC 推送');
+  });
+
+  /* A8 暂估：S-05:已审 时，如果 receipt.estimate_required = true 则自动创建 S-07 暂估 + BIZ-002 */
+  SC.linkage.on('S-05:已审', function (receipt) {
+    if (!receipt.estimate_required) return;
+    var existing = SC.store.list('S-07').filter(function (e) { return e.receipt_id === receipt.id; })[0];
+    if (existing) return;
+    var period = (SC.time && SC.time.iso ? SC.time.iso() : new Date().toISOString()).slice(0, 7);
+    var lines = SC.store.list('S-25', { receipt_id: receipt.id });
+    var totalAmt = lines.reduce(function (a, l) { return a + (l.line_amount || 0); }, 0);
+    SC.store.create('S-07', {
+      estimate_no: SC.store.nextNo('ZG'),
+      receipt_id: receipt.id,
+      supplier_id: receipt.supplier_id,
+      estimate_period: period,
+      estimate_amount: totalAmt,
+      estimate_state: '暂估中',
+    });
+    // 推 BIZ-002
+    var ncSwitch = SC.store.list('F-13', { switch_code: 'BIZ-002-switch' })[0];
+    if (ncSwitch && ncSwitch.switch_status === '开') {
+      var task = SC.store.create('F-01', {
+        task_no: SC.store.nextNo('FT'),
+        interface_id: 'BIZ-002',
+        source_bill_no: receipt.receipt_no,
+        source_bill_type: 'S-05',
+        source_bill_id: receipt.id,
+        task_state: '待推送',
+        retry_count: 0,
+      });
+      if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+    }
+    console.log('[linkage] S-05:' + receipt.id + ' 已审（含暂估）→ 创建 S-07 暂估 + BIZ-002');
+  });
+
+  /* A8 暂估：S-07:已冲销 → 推 BIZ-003 红字冲销 */
+  SC.linkage.on('S-07:已冲销', function (est) {
+    var ncSwitch = SC.store.list('F-13', { switch_code: 'BIZ-002-switch' })[0];
+    if (ncSwitch && ncSwitch.switch_status === '开') {
+      var task = SC.store.create('F-01', {
+        task_no: SC.store.nextNo('FT'),
+        interface_id: 'BIZ-003',
+        source_bill_no: est.estimate_no,
+        source_bill_type: 'S-07',
+        source_bill_id: est.id,
+        task_state: '待推送',
+        retry_count: 0,
+      });
+      if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+    }
+    console.log('[linkage] S-07:' + est.id + ' 已冲销 → F-01 BIZ-003 红字推送');
+  });
+
+  /* A14 反规避：P-01:已审 → 检查 30 天累计同 org+material 申请总额，超阈值预警 */
+  SC.linkage.on('P-01:已审', function (req) {
+    var WINDOW_DAYS = 30;
+    var THRESHOLD = 200000; // mock 阈值，实际应从 SY-02 配置读
+    var now = SC.time && SC.time.now ? SC.time.now() : new Date();
+    var since = new Date(now.getTime() - WINDOW_DAYS * 24 * 3600 * 1000);
+    var related = SC.store.list('P-01').filter(function (r) {
+      return r.id !== req.id &&
+        r.org_id === req.org_id &&
+        r.material_id === req.material_id &&
+        r.state === '已审' &&
+        new Date(r.submit_date || r.created_at || 0) >= since;
+    });
+    var sum = related.reduce(function (a, r) { return a + (r.amount || 0); }, 0) + (req.amount || 0);
+    if (sum > THRESHOLD) {
+      emitAlert({
+        alert_code: 'ALR-PUR-SPLIT-001',
+        level: '重要',
+        source_entity: 'P-01',
+        source_id: req.id,
+        title: '化整为零嫌疑',
+        message: '同 org#' + req.org_id + ' 同 material#' + req.material_id + ' ' + WINDOW_DAYS + ' 天累计 ' +
+          related.length + ' + 1 = ' + (related.length + 1) + ' 笔，金额 ' +
+          sum + ' > 阈值 ' + THRESHOLD + '（详设 04 §8.3 反规避）',
+      });
+      console.log('[linkage] P-01:' + req.id + ' → ALR-PUR-SPLIT-001 反规避预警');
+    }
+  });
+
   /* 暴露给页面调用：mock 触发审批超时（无时间穿越的替代）*/
   SC.linkage.mockTriggerWFTimeout = function () {
     var pending = []

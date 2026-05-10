@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>付款执行台账（C-10）— 阜矿物资供应管理系统（原型）</title>
+  <title>付款执行 (C-10) — 阜矿物资供应管理系统（原型）</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
@@ -13,122 +13,76 @@
     <div class="app-main">
       <div id="page-area">
 
-        <div class="card" style="border-left:4px solid var(--blue);background:#f0f7ff;">
-          <div class="card-body" style="font-size:13px">
-            <strong>📋 业务依据：</strong>详设 05 §C-10 付款执行台账 + 详设 08 BIZ-014 预付款登记 / BIZ-015 预付款核销 / BIZ-020 实付回写。
-            <br/>
-            <strong>🛤 链路：</strong>月度集体决议（C-08）→ 终审 → <b>C-10 付款执行</b> → BIZ-020 NC 推送 → NC 回执 → C-07 累计回写 → C-02 paid_amount 更新 → 合同推进至"已完成"（如满足）。
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 05 §8.2 四层付款控制链路（C-04 → C-07 → C-08 → C-10，一期 C-10 即可演示）+ 详设 08 BIZ-013 付款执行 NC 实付回写。<br>
+            <strong>🛤 链路：</strong>C-08 付款申请已审 → linkage 自动 create C-10 待执行 → 出纳触发"执行" → mock-nc 推送 BIZ-013 → NC 实付回写 → C-10 已记账 → 应付消减（C-02 paid_amount 累加）。
           </div>
         </div>
 
         <div class="kpi-grid" id="pe-kpis"></div>
 
-        <div class="card">
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
           <div class="card-header">
-            <div class="title">付款执行台账（C-10）</div>
+            <div class="title">📡 档 A 引擎接入 · C-10 付款执行台账</div>
             <div class="actions">
-              <button class="btn btn-sm" onclick="filterState('all')" id="fs-all">全部</button>
-              <button class="btn btn-sm" onclick="filterState('pending')">待执行</button>
-              <button class="btn btn-sm" onclick="filterState('pushed')">推送中</button>
-              <button class="btn btn-sm" onclick="filterState('paid')">已支付</button>
-              <button class="btn btn-sm" onclick="filterState('failed')">支付失败</button>
+              <a class="btn btn-sm" href="council-meeting.html">← 月度集体决议（C-08 起点）</a>
             </div>
           </div>
-          <table class="data">
-            <thead>
-              <tr>
-                <th>执行单号</th>
-                <th>来源 C-08</th>
-                <th>供应商</th>
-                <th>类型</th>
-                <th class="num">金额</th>
-                <th>三单匹配</th>
-                <th>NC 凭证</th>
-                <th>支付凭证号</th>
-                <th>状态</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody id="pe-tbody"></tbody>
-          </table>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>执行号</th>
+                  <th>来源 C-08</th>
+                  <th>合同</th>
+                  <th class="num">金额</th>
+                  <th>状态</th>
+                  <th>NC 凭证</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-c10-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              点"执行" → linkage 触发 NC mock 推送 BIZ-013（1-2 秒延迟 + 5% 失败率）；成功后点"记账完成" → linkage 自动 update C-02.paid_amount += 金额（应付消减）。
+            </div>
+          </div>
         </div>
 
-        <div class="cols-2">
-          <div>
-            <div class="card">
-              <div class="card-header"><div class="title">⚖ 三单匹配前置校验</div></div>
-              <div class="card-body" style="font-size:12px;line-height:1.6">
-                <table class="data">
-                  <thead><tr><th>校验项</th><th>规则</th><th>当前状态</th></tr></thead>
-                  <tbody>
-                    <tr><td>合同存在</td><td>C-08.contract_id 必须有效</td><td><span class="badge green dot">通过</span></td></tr>
-                    <tr><td>入库单匹配</td><td>预付款例外；其他必须有 S-05 审核通过</td><td><span class="badge green dot">通过</span></td></tr>
-                    <tr><td>发票匹配</td><td>金额 / 物料 / 数量 与 S-05 / C-02 一致</td><td><span class="badge amber dot">部分</span></td></tr>
-                    <tr><td>未超付</td><td>C-07.cumulative_paid + 申请金额 ≤ C-04.payment_amount</td><td><span class="badge green dot">通过</span></td></tr>
-                    <tr><td>账期符合</td><td>合同付款节点 payment_condition 已满足</td><td><span class="badge green dot">通过</span></td></tr>
-                    <tr><td>决议授权</td><td>付款申请须在月度集体决议名单内（业务方 Q-13-1 拍板）</td><td><span class="badge green dot">通过</span></td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header"><div class="title">📐 NC 凭证路由</div></div>
-              <div class="card-body" style="font-size:12px">
-                <div class="kv">
-                  <div class="k">BIZ-014</div>
-                  <div class="v">预付款登记：借 1123 预付账款 / 贷 1002 银行存款</div>
-                  <div class="k">BIZ-015</div>
-                  <div class="v">预付款核销：借 2202 应付账款 / 贷 1123 预付账款（发票 + 入库匹配完成时）</div>
-                  <div class="k">BIZ-020</div>
-                  <div class="v">实付回写：借 2202 应付账款 / 贷 1002 银行存款（C-08 终审通过 → C-10 推送 → NC 回执）</div>
-                </div>
-              </div>
-            </div>
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · F-01 BIZ-013 NC 推送（实付回写）</div>
           </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>任务号</th>
+                  <th>接口</th>
+                  <th>来源 C-10</th>
+                  <th>状态</th>
+                  <th>凭证号 / 错误</th>
+                  <th>重推</th>
+                </tr>
+              </thead>
+              <tbody id="engine-f01-pay-tbody"></tbody>
+            </table>
+          </div>
+        </div>
 
-          <div>
-            <div class="card">
-              <div class="card-header"><div class="title">🔁 NC 实付回写时序</div></div>
-              <div class="card-body" style="font-size:12px;font-family:Consolas,monospace;background:#f6f8fa;padding:12px;border-radius:4px;line-height:1.8">
-                <div>1. C-08 终审通过 → C-10 自动生成（state=待执行）</div>
-                <div>2. 三单匹配前置校验 → 通过 → state=已校验</div>
-                <div>3. 推送 BIZ-020 NC 接口 → state=推送中</div>
-                <div>4. 等待 NC 回执（payment_voucher_no + actual_amount + actual_date）</div>
-                <div>5. 收到 NC 回执 → state=已支付，回写：</div>
-                <div style="padding-left:24px;color:#1677ff">C-07.cumulative_paid_amount += actual_amount</div>
-                <div style="padding-left:24px;color:#1677ff">C-07.remaining_amount -= actual_amount</div>
-                <div style="padding-left:24px;color:#1677ff">C-02.paid_amount += actual_amount</div>
-                <div>6. 检查 C-07.remaining ≤ 0 → C-04.node_state=已付款</div>
-                <div>7. 检查 C-02.paid ≥ contract_amount × (1 - retention) → C-02 → 已完成</div>
-                <div>8. 失败回退：state=支付失败 → C-08 退回到"支付退回"重发起</div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header"><div class="title">⚙ NC 过渡口径（详设 05 §4.10.2）</div></div>
-              <div class="card-body">
-                <div class="kv">
-                  <div class="k">阶段 1</div>
-                  <div class="v">NC 完全未落地 → nc_source=手工录入 → 财务手工录入已支付记录</div>
-                  <div class="k">阶段 2</div>
-                  <div class="v">NC 就绪但付款接口未启用 → 同手工录入 + NC 端手工记账</div>
-                  <div class="k">阶段 3</div>
-                  <div class="v">NC 付款接口联调通过 → nc_source=NC回执 → F-03 自动回写</div>
-                  <div class="k">本演示</div>
-                  <div class="v">阶段 3 模式 — 模拟 NC 回执自动回写</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-body" style="display:flex;gap:12px;align-items:start;">
-                <span class="badge blue dot">边界</span>
-                <div class="text-2" style="font-size:12px">
-                  本页仅 mock NC 回执时序；真实 NC 接口的字段映射、幂等键、错误重试、对账差异处理见详设 08 §五 + §九。
-                </div>
-              </div>
-            </div>
+        <div class="card">
+          <div class="card-header"><div class="title">⚖ NC 凭证规则（BIZ-013 / 014 / 015 / 020）</div></div>
+          <div class="card-body" style="font-size:12px;line-height:1.7;">
+            <strong>BIZ-013 付款执行（一期 A 演示用）：</strong><br>
+            借 1122 应收账款 / 6602 财务费用（汇兑差额）<br>
+            贷 1002 银行存款<br>
+            <hr style="border:none;border-top:1px dashed var(--border);margin:8px 0;">
+            <strong>BIZ-014 预付款转应付（二期 A4 完整版）：</strong>预付时入账，到货验收时转应付<br>
+            <strong>BIZ-015 应付暂估转正式（二期 A4 完整版）：</strong>S-07 暂估冲销后正式发票入账<br>
+            <strong>BIZ-020 月度应付消减（二期 A4 完整版）：</strong>月末批量消减已付应付
           </div>
         </div>
 
@@ -139,126 +93,103 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
     SC.layout({
       page: 'payment-execution',
-      crumbs: ['合同与资金', '付款执行台账'],
-      title: '付款执行台账（C-10 + BIZ-020）',
-      desc: '档 A 二期 A4b — 集体决议名单制 → C-10 → NC 实付回写 → C-07/C-02 联动',
-      actions: [{ label: '导出对账' }, { label: '批量推送 NC', primary: true }]
+      crumbs: ['二期', 'A4b 付款执行'],
+      title: '付款执行（C-10 + BIZ-013）',
+      desc: '档 A 二期 A4b：详设 05 §8.2 + 08 BIZ-013 — C-08 已审 → linkage create C-10 → mock-nc 推送 → 应付消减',
     });
 
-    /* Mock C-10 付款执行清单(由 A4a 决议名单接力) */
-    var executions = [
-      { code: 'CE-2026-0501', source: 'PA-2026-0501', supplier: '抚顺矿用电缆厂', type: '进度款', amount: 580000,
-        threeWay: 'matched', biz: 'BIZ-020', voucher: null, state: 'pushed' },
-      { code: 'CE-2026-0507', source: 'PA-2026-0507', supplier: '辽宁中煤矿山装备', type: '预付款', amount: 320000,
-        threeWay: 'partial', biz: 'BIZ-014', voucher: 'NC-202605-08821', state: 'paid' },
-      { code: 'CE-2026-0512', source: 'PA-2026-0512', supplier: '沈阳安泰电子有限公司', type: '结算款', amount: 86500,
-        threeWay: 'matched', biz: 'BIZ-020', voucher: 'NC-202605-08854', state: 'paid' },
-      { code: 'CE-2026-0518', source: 'PA-2026-0518', supplier: '阜新本地物资协作单位', type: '进度款', amount: 24800,
-        threeWay: 'matched', biz: 'BIZ-020', voucher: null, state: 'pending' },
-      { code: 'CE-2026-0521', source: 'PA-2026-0521', supplier: '大连重工设备制造', type: '预付款', amount: 1200000,
-        threeWay: 'na', biz: 'BIZ-014', voucher: null, state: 'failed', error: 'NC 端账户余额不足' },
-      { code: 'CE-2026-0526', source: 'PA-2026-0526', supplier: '抚顺矿用电缆厂', type: '质保金返还', amount: 58000,
-        threeWay: 'matched', biz: 'BIZ-020', voucher: null, state: 'pushed' }
-    ];
+    var supMap = {}; SC.store.list('M-09').forEach(function (s) { supMap[s.id] = s.name; });
 
-    var filter = 'all';
-
-    window.filterState = function (s) {
-      filter = s;
-      ['all', 'pending', 'pushed', 'paid', 'failed'].forEach(function (f) {
-        var btn = document.getElementById('fs-' + f);
-        if (btn) btn.style.background = '';
-      });
-      var btn = document.getElementById('fs-' + s);
-      if (btn) btn.style.background = '#e6f4ff';
-      render();
-    };
-
-    window.pushNC = function (code) {
-      var e = executions.find(function (x) { return x.code === code; });
-      if (e && e.state === 'pending') {
-        e.state = 'pushed';
-        render();
-      }
-    };
-
-    window.simulateReceipt = function (code) {
-      var e = executions.find(function (x) { return x.code === code; });
-      if (e && e.state === 'pushed') {
-        e.state = 'paid';
-        e.voucher = 'NC-' + (SC.time.today().getFullYear()) + String(SC.time.today().getMonth() + 1).padStart(2, '0') + '-' + Math.floor(Math.random() * 90000 + 10000);
-        e.paidAt = SC.time.iso();
-        render();
-      }
-    };
-
-    window.retry = function (code) {
-      var e = executions.find(function (x) { return x.code === code; });
-      if (e && e.state === 'failed') {
-        e.state = 'pending';
-        e.error = null;
-        render();
-      }
-    };
-
-    function render() {
-      var rows = filter === 'all' ? executions : executions.filter(function (e) { return e.state === filter; });
-
-      var stats = { total: 0, pending: 0, pushed: 0, paid: 0, failed: 0, paidAmt: 0, totalAmt: 0 };
-      executions.forEach(function (e) {
-        stats.total++;
-        stats[e.state]++;
-        stats.totalAmt += e.amount;
-        if (e.state === 'paid') stats.paidAmt += e.amount;
-      });
-
+    function renderKpis() {
+      var c10 = SC.store.list('C-10');
+      var booked = c10.filter(function (e) { return e.state === '已记账'; });
+      var totalPaid = booked.reduce(function (a, e) { return a + (e.amount || 0); }, 0);
       document.getElementById('pe-kpis').innerHTML = [
-        '<div class="kpi"><div class="label">本月执行</div><div class="value">' + stats.total + '</div><div class="trend">累计 ' + SC.fmtMoney(stats.totalAmt) + '</div></div>',
-        '<div class="kpi"><div class="label">已支付</div><div class="value" style="color:var(--green)">' + stats.paid + '</div><div class="trend">' + SC.fmtMoney(stats.paidAmt) + '</div></div>',
-        '<div class="kpi"><div class="label">推送中 / 待执行</div><div class="value" style="color:var(--blue)">' + stats.pushed + ' / ' + stats.pending + '</div><div class="trend">等 NC 回执</div></div>',
-        '<div class="kpi"><div class="label">支付失败</div><div class="value" style="color:var(--red)">' + stats.failed + '</div><div class="trend">需重发</div></div>'
-      ].join('');
-
-      document.getElementById('pe-tbody').innerHTML = rows.map(function (e) {
-        var stateBadge =
-          e.state === 'paid' ? SC.badge('✓ 已支付', 'green', true) :
-          e.state === 'pushed' ? SC.badge('推送中', 'blue', true) :
-          e.state === 'pending' ? SC.badge('待执行', 'amber', true) :
-          SC.badge('✗ 失败', 'red', true);
-        var twBadge =
-          e.threeWay === 'matched' ? SC.badge('✓ 匹配', 'green', false) :
-          e.threeWay === 'partial' ? SC.badge('部分', 'amber', false) :
-          SC.badge('—', 'gray', false);
-        var act =
-          e.state === 'pending' ? '<button class="btn btn-sm" onclick="pushNC(\'' + e.code + '\')" style="padding:2px 6px;font-size:11px">推送 NC</button>' :
-          e.state === 'pushed' ? '<button class="btn btn-sm" onclick="simulateReceipt(\'' + e.code + '\')" style="padding:2px 6px;font-size:11px;background:#52c41a;color:#fff;border-color:#52c41a">模拟 NC 回执</button>' :
-          e.state === 'failed' ? '<button class="btn btn-sm" onclick="retry(\'' + e.code + '\')" style="padding:2px 6px;font-size:11px;background:#faad14;color:#fff;border-color:#faad14">重发</button>' :
-          '<span class="muted" style="font-size:11px">完成</span>';
-        var rowStyle = e.state === 'failed' ? 'background:#fff1f0;' : '';
-        var errMsg = e.error ? '<div class="muted" style="font-size:10px;color:#cf1322">' + e.error + '</div>' : '';
-        return '<tr style="' + rowStyle + '">' +
-          '<td class="code">' + e.code + errMsg + '</td>' +
-          '<td class="code muted">' + e.source + '</td>' +
-          '<td>' + e.supplier + '</td>' +
-          '<td>' + e.type + '</td>' +
-          '<td class="num"><b>' + SC.fmtMoney(e.amount) + '</b></td>' +
-          '<td>' + twBadge + '</td>' +
-          '<td><span style="font-size:11px;color:var(--blue)">' + e.biz + '</span></td>' +
-          '<td class="code muted" style="font-size:11px">' + (e.voucher || '—') + '</td>' +
-          '<td>' + stateBadge + '</td>' +
-          '<td>' + act + '</td>' +
-        '</tr>';
+        ['C-10 待执行', c10.filter(function (e) { return e.state === '待执行'; }).length, '出纳放款入口'],
+        ['执行中', c10.filter(function (e) { return e.state === '执行中'; }).length, '推 BIZ-013'],
+        ['已记账', booked.length, '应付已消减'],
+        ['累计实付', SC.fmtMoney(totalPaid), 'NC 回写金额'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
       }).join('');
     }
 
-    filterState('all');
-
-    if (SC.time && SC.time.subscribe) {
-      SC.time.subscribe(function () { render(); });
+    function renderC10() {
+      var rows = SC.store.list('C-10');
+      var f01 = SC.store.list('F-01', { interface_id: 'BIZ-013' });
+      document.getElementById('engine-c10-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px;">无 C-10 · 先到「月度集体决议」批量决议 → C-08 → 审批通过自动 create C-10</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('C-10', r);
+            var stateColor = r.state === '已记账' ? 'green' : r.state === '执行中' ? 'amber' : r.state === '已失败' ? 'red' : 'gray';
+            var task = f01.filter(function (t) { return t.source_bill_id === r.id; })[0];
+            var ncCell = task ?
+              (task.task_state === '推送成功' ? '<span class="badge green dot">' + task.push_voucher_no + '</span>' :
+               task.task_state === '推送失败' ? '<span class="badge red dot">' + task.push_error_code + '</span>' :
+               '<span class="badge amber dot">' + task.task_state + '</span>') : '<span class="muted">—</span>';
+            return '<tr>' +
+              '<td class="code">' + r.execution_no + '</td>' +
+              '<td class="muted code" style="font-size:11px;">C-08 #' + r.request_id + '</td>' +
+              '<td class="muted code" style="font-size:11px;">C-02 #' + r.contract_id + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.amount || 0) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td>' + ncCell + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineC10(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
     }
+
+    function renderF01() {
+      var rows = SC.store.list('F-01', { interface_id: 'BIZ-013' });
+      document.getElementById('engine-f01-pay-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="6" class="muted" style="text-align:center;padding:8px;">无 BIZ-013 推送任务</td></tr>'
+        : rows.slice().reverse().map(function (t) {
+            var stateColor = t.task_state === '推送成功' ? 'green' : t.task_state === '推送失败' ? 'red' : t.task_state === '推送中' ? 'amber' : 'gray';
+            return '<tr>' +
+              '<td class="code">' + t.task_no + '</td>' +
+              '<td class="muted">' + t.interface_id + '</td>' +
+              '<td class="muted code" style="font-size:11px;">C-10 #' + t.source_bill_id + '</td>' +
+              '<td>' + SC.badge(t.task_state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' +
+                (t.push_voucher_no ? '<span class="code" style="color:var(--green);">' + t.push_voucher_no + '</span>' :
+                 t.push_error_message ? '<span style="color:var(--red);">' + t.push_error_code + '</span>' : '—') +
+              '</td>' +
+              '<td class="num">' + (t.retry_count || 0) + '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineC10(id, event) {
+      try {
+        SC.sm.transition('C-10', id, event);
+        if (event === '执行') {
+          SC.ui.toast('C-10 #' + id + ' 执行中 → linkage 触发 BIZ-013 NC 推送', 'success');
+          setTimeout(refresh, 1500);
+          setTimeout(refresh, 3000);
+        } else if (event === '记账完成') {
+          SC.ui.toast('C-10 #' + id + ' 已记账 → linkage 自动消减 C-02 paid_amount', 'success');
+        } else {
+          SC.ui.toast('C-10 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function refresh() { renderKpis(); renderC10(); renderF01(); }
+    ['C-08', 'C-10', 'C-02', 'F-01', 'F-03'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
   </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>月度集体决议（WF-PAY-001 节点 4）— 阜矿物资供应管理系统（原型）</title>
+  <title>月度集体决议 (WF-PAY-001) — 阜矿物资供应管理系统（原型）</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
@@ -13,78 +13,82 @@
     <div class="app-main">
       <div id="page-area">
 
-        <div class="card" style="border-left:4px solid var(--green);background:#f6ffed;">
-          <div class="card-body" style="font-size:13px">
-            <strong>📋 业务依据：</strong>详设 10 V1.2 §6.2 WF-PAY-001 付款审批流（4→5 节点，业务方 Q-13-1 答复 2026-05-09 落地）+ 详设 05 §8.5 月度资金计划与集体决议规则。
-            <br/>
-            <strong>🛤 链路：</strong>本月所有付款申请（C-08）→ 财务复核 → <b>月度集体决议（节点 4）</b> → 名单制输出 → 终审 → C-10 付款执行 → BIZ-014/015/020 NC 推送。
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 10 V1.2 §6.2 WF-PAY-001 付款审批流 + 详设 05 §8.5 月度资金计划与集体决议规则（业务方 Q-13-1 答复 2026-05-09）。<br>
+            <strong>🛤 链路：</strong>已签合同 + 已执行 + 应付未付 → 月度集体决议（按月汇总批量审议）→ 决议批准的合同清单 → 自动 create C-08 付款申请 → 财务执行 → C-10 付款执行 + BIZ-013 NC 实付回写。
           </div>
         </div>
 
         <div class="kpi-grid" id="cm-kpis"></div>
 
-        <div class="cols-2">
-          <div>
-            <div class="card">
-              <div class="card-header">
-                <div class="title" id="cm-title">📅 本月待决议付款清单</div>
-                <div class="actions">
-                  <button class="btn btn-sm" onclick="advanceMonth()">⇨ 模拟下月</button>
-                  <button class="btn btn-primary btn-sm" onclick="convene()" id="convene-btn">召开月度决议会议</button>
-                </div>
-              </div>
-              <table class="data">
-                <thead>
-                  <tr>
-                    <th>付款申请单</th>
-                    <th>供应商</th>
-                    <th>类型</th>
-                    <th class="num">金额</th>
-                    <th>合同</th>
-                    <th>来源</th>
-                    <th>决议状态</th>
-                  </tr>
-                </thead>
-                <tbody id="cm-tbody"></tbody>
-              </table>
-              <div id="cm-summary" style="padding:12px;background:#fafbfd;border-top:1px solid var(--border);font-size:12px;color:var(--text-2)"></div>
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · 待决议合同（已签 / 已执行 / 应付未付）</div>
+            <div class="actions">
+              <button class="btn btn-sm" onclick="engineSelectAll()">全选</button>
+              <button class="btn btn-sm" onclick="engineClearSel()">清空</button>
+              <button class="btn btn-primary btn-sm" onclick="engineApproveCouncil()">📋 批量决议批准 → 创建 C-08</button>
             </div>
           </div>
-
-          <div>
-            <div class="card">
-              <div class="card-header"><div class="title">⚖ 集体决议会签状态（signMode=COUNTERSIGN）</div></div>
-              <div class="card-body">
-                <table class="data" style="font-size:12px">
-                  <thead><tr><th>决议人</th><th>角色</th><th>状态</th><th>签字时间</th><th>意见</th></tr></thead>
-                  <tbody id="council-tbody"></tbody>
-                </table>
-                <div style="padding:10px;background:#fafbfd;font-size:12px;color:var(--text-2);border-top:1px solid var(--border)">
-                  <b>会议要求：</b>所有 4 位决议人必须签字（minSignCount=4）；任一驳回 → 整体驳回到财务复核。<br/>
-                  <b>留痕：</b>会议纪要 + 决议名单作为附件存档（A-14 审批日志 + SENS-PAY-002 高敏感）。
-                </div>
-              </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="cm-check-all" onchange="engineToggleAll(this.checked)"></th>
+                  <th>合同号</th>
+                  <th>供应商</th>
+                  <th class="num">合同金额</th>
+                  <th class="num">已执行 / 已付</th>
+                  <th class="num">本期拟付</th>
+                  <th>付款条件</th>
+                  <th>已生成 C-08</th>
+                </tr>
+              </thead>
+              <tbody id="engine-cm-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              勾选 + 点"批量决议批准" → 一次性 create N 个 C-08 草稿（state=待审，标 council_meeting_id=本月）→ 在「付款执行」页继续 C-08:已审 → linkage 自动 C-10 + BIZ-013 NC 推送。
             </div>
+          </div>
+        </div>
 
-            <div class="card">
-              <div class="card-header"><div class="title">📦 决议输出 — 名单制</div></div>
-              <div class="card-body">
-                <div id="output-list" style="font-size:12px"></div>
-              </div>
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · 本月已生成 C-08 付款申请（决议输出）</div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>申请号</th>
+                  <th>合同</th>
+                  <th>供应商</th>
+                  <th class="num">金额</th>
+                  <th>状态</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-c08-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              C-08 在本页可"提交审批"和"审批通过"模拟决议后的财务复核 + 出纳放款。<a href="payment-execution.html">→ 跳到「付款执行」页查看 C-10</a>
             </div>
+          </div>
+        </div>
 
-            <div class="card">
-              <div class="card-header"><div class="title">⚙ 配置项（SY-02）</div></div>
-              <div class="card-body">
-                <div class="kv">
-                  <div class="k">月度触发日</div><div class="v"><code>MONTHLY_COUNCIL_DAY</code> = 5（每月 5 日 — 详设 10 §九）</div>
-                  <div class="k">会议节点超时</div><div class="v">72 小时（24-168 小时可调）</div>
-                  <div class="k">触发范围</div><div class="v">所有付款（无金额阈值豁免，业务方 Q-13-1 拍板）</div>
-                  <div class="k">决议方式</div><div class="v">名单制（无灵活额度，业务方 Q-13-2 拍板）</div>
-                  <div class="k">高敏感</div><div class="v"><code>SENS-PAY-002</code> 强制留痕</div>
-                </div>
-              </div>
-            </div>
+        <div class="card">
+          <div class="card-header"><div class="title">⚖ 月度集体决议规则</div></div>
+          <div class="card-body" style="font-size:12px;line-height:1.7;">
+            <strong>合规约束（详设 05 §8.5）：</strong><br>
+            • 本月所有付款申请须经月度决议会议汇总审议，不可独立审批（特殊紧急除外，需说明）<br>
+            • 决议批准的清单作为出纳放款依据；未在清单中的付款不予执行<br>
+            • 决议会议必须含财务部、物资公司、集团副总三方<br>
+            • 名单制输出：决议结束后生成《XX 月度付款审批清单》，作为审计留痕<br>
+            <strong>付款条件类型：</strong>预付（按合同 prepayment_ratio）/ 进度款（按 milestone）/ 验收款（按 acceptance）/ 质保金（质保期满）<br>
+            <strong>资金优先级：</strong>合同到期日临近 + 高敏感供应商 + 大额验收款 → 优先决议
           </div>
         </div>
 
@@ -95,197 +99,140 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
     SC.layout({
       page: 'council-meeting',
-      crumbs: ['合同与资金', '月度集体决议'],
-      title: '月度集体决议（WF-PAY-001 节点 4）',
-      desc: '档 A 二期 A4a — 业务方 Q-13-1 拍板：所有付款必须经过月度集体决议，名单制输出',
-      actions: [{ label: '查看会议纪要' }, { label: '导出决议名单', primary: true }]
+      crumbs: ['二期', 'A4a 月度集体决议'],
+      title: '月度集体决议（WF-PAY-001）',
+      desc: '档 A 二期 A4a：详设 10 V1.2 + 05 §8.5 — 已签合同批量决议 → 自动生成 C-08 付款申请',
     });
 
-    /* Mock 待决议清单 */
-    var COUNCIL_MEMBERS = [
-      { id: 'M1', name: '总经理', role: '主任' },
-      { id: 'M2', name: '总会计师', role: '副主任' },
-      { id: 'M3', name: '物资分管副总', role: '成员' },
-      { id: 'M4', name: '财务部部长', role: '成员' }
-    ];
+    var supMap = {}; SC.store.list('M-09').forEach(function (s) { supMap[s.id] = s.name; });
+    var selected = new Set();
 
-    var paymentApplications = [
-      { code: 'PA-2026-0501', supplier: '抚顺矿用电缆厂', type: '进度款', amount: 580000, contract: 'CN-2025-0218', source: 'C-08', state: 'pending' },
-      { code: 'PA-2026-0507', supplier: '辽宁中煤矿山装备', type: '预付款', amount: 320000, contract: 'CN-2026-0042', source: 'C-08', state: 'pending' },
-      { code: 'PA-2026-0512', supplier: '沈阳安泰电子有限公司', type: '结算款', amount: 86500, contract: 'CN-2025-0511', source: 'C-08', state: 'pending' },
-      { code: 'PA-2026-0518', supplier: '阜新本地物资协作单位', type: '进度款', amount: 24800, contract: 'CN-2026-0119', source: 'C-08', state: 'pending' },
-      { code: 'PA-2026-0521', supplier: '大连重工设备制造', type: '预付款', amount: 1200000, contract: 'CN-2026-0058', source: 'C-08（重大）', state: 'pending' },
-      { code: 'PA-2026-0526', supplier: '抚顺矿用电缆厂', type: '质保金返还', amount: 58000, contract: 'CN-2024-0833', source: 'C-08', state: 'pending' }
-    ];
-
-    var council = COUNCIL_MEMBERS.map(function (m) { return Object.assign({ status: 'pending', signTime: null, opinion: null }, m); });
-    var meetingState = 'pending';  // pending / convened / approved / rejected
-    var approvedList = [];
-
-    function totalAmount() {
-      return paymentApplications.reduce(function (s, p) { return s + p.amount; }, 0);
+    function pendingPayables() {
+      return SC.store.list('C-02').filter(function (c) {
+        return (c.state === '已签' || c.state === '执行中') &&
+               (c.amount || 0) > (c.paid_amount || 0);
+      });
     }
 
-    function render() {
-      var total = totalAmount();
-      var approvedAmt = paymentApplications.filter(function (p) { return p.state === 'approved'; }).reduce(function (s, p) { return s + p.amount; }, 0);
-      var pendingCnt = paymentApplications.filter(function (p) { return p.state === 'pending'; }).length;
-
-      // KPI
-      var stateBadge = meetingState === 'pending' ? '<span class="badge amber dot">待召开</span>' :
-                       meetingState === 'convened' ? '<span class="badge blue dot">会议中</span>' :
-                       meetingState === 'approved' ? '<span class="badge green dot">已通过</span>' :
-                       '<span class="badge red dot">已驳回</span>';
+    function renderKpis() {
+      var pendingContracts = pendingPayables();
+      var c08Total = SC.store.list('C-08').length;
+      var c08Pending = SC.store.list('C-08', { state: '待审' }).length;
+      var c10Records = SC.store.list('C-10');
       document.getElementById('cm-kpis').innerHTML = [
-        '<div class="kpi"><div class="label">本月付款申请</div><div class="value">' + paymentApplications.length + '</div><div class="trend">累计 ' + SC.fmtMoney(total) + '</div></div>',
-        '<div class="kpi"><div class="label">待决议</div><div class="value" style="color:var(--amber)">' + pendingCnt + '</div><div class="trend">' + SC.fmtMoney(total - approvedAmt) + '</div></div>',
-        '<div class="kpi"><div class="label">已通过</div><div class="value" style="color:var(--green)">' + approvedList.length + '</div><div class="trend">' + SC.fmtMoney(approvedAmt) + '</div></div>',
-        '<div class="kpi"><div class="label">会议状态</div><div class="value" style="font-size:18px">' + stateBadge + '</div><div class="trend">月度 1 次</div></div>'
-      ].join('');
-
-      // 待决议清单
-      document.getElementById('cm-tbody').innerHTML = paymentApplications.map(function (p) {
-        var stateBadge2 = p.state === 'approved' ? SC.badge('已通过', 'green', true) :
-                          p.state === 'rejected' ? SC.badge('已驳回', 'red', true) :
-                          SC.badge('待决议', 'amber', true);
-        var typeColor = p.type === '预付款' ? 'blue' : p.type === '进度款' ? 'green' : p.type === '结算款' ? 'amber' : 'gray';
-        return '<tr>' +
-          '<td class="code">' + p.code + '</td>' +
-          '<td>' + p.supplier + '</td>' +
-          '<td>' + SC.badge(p.type, typeColor, false) + '</td>' +
-          '<td class="num"><b>' + SC.fmtMoney(p.amount) + '</b></td>' +
-          '<td class="code muted">' + p.contract + '</td>' +
-          '<td class="muted">' + p.source + '</td>' +
-          '<td>' + stateBadge2 + '</td>' +
-        '</tr>';
+        ['本月待决议合同', pendingContracts.length, '已签 / 应付未付'],
+        ['已生成 C-08', c08Total, '待审 ' + c08Pending],
+        ['C-10 付款执行', c10Records.length, '已记账 ' + SC.store.list('C-10', { state: '已记账' }).length],
+        ['NC 推送', SC.store.list('F-01', { interface_id: 'BIZ-013' }).length, 'BIZ-013 实付回写'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
       }).join('');
-
-      var nextDate = SC.time.today();
-      nextDate.setDate(5);  // 每月 5 日
-      var monthDisplay = (SC.time.today().getMonth() + 1) + ' 月度集体决议会议';
-      document.getElementById('cm-title').innerText = '📅 ' + monthDisplay + ' — 待决议付款清单';
-
-      var summary = '<b>会议时间：</b>' + SC.time.today().getFullYear() + '-' + String(SC.time.today().getMonth() + 1).padStart(2, '0') + '-05（每月 5 日固定）' +
-                    ' | <b>申请笔数：</b>' + paymentApplications.length +
-                    ' | <b>累计金额：</b>' + SC.fmtMoney(total) +
-                    ' | <b>决议人数：</b>' + COUNCIL_MEMBERS.length + ' 人会签';
-      document.getElementById('cm-summary').innerHTML = summary;
-
-      // 决议人会签状态
-      document.getElementById('council-tbody').innerHTML = council.map(function (m) {
-        var stat = m.status === 'approved' ? SC.badge('✓ 通过', 'green', true) :
-                   m.status === 'rejected' ? SC.badge('✗ 驳回', 'red', true) :
-                   meetingState === 'pending' ? SC.badge('待召开', 'gray', true) :
-                   SC.badge('待签字', 'amber', true);
-        var act = m.status !== 'pending' || meetingState !== 'convened' ? '' :
-                  '<button class="btn btn-sm" onclick="signMember(\'' + m.id + '\', true)" style="padding:1px 6px;font-size:10px;background:#52c41a;color:#fff;border-color:#52c41a">通过</button> <button class="btn btn-sm" onclick="signMember(\'' + m.id + '\', false)" style="padding:1px 6px;font-size:10px;background:#cf1322;color:#fff;border-color:#cf1322">驳回</button>';
-        return '<tr>' +
-          '<td><b>' + m.name + '</b></td>' +
-          '<td>' + m.role + '</td>' +
-          '<td>' + stat + '</td>' +
-          '<td class="muted" style="font-size:11px">' + (m.signTime || '—') + '</td>' +
-          '<td>' + (m.opinion || act || '—') + '</td>' +
-        '</tr>';
-      }).join('');
-
-      // 决议输出（名单制）
-      if (meetingState === 'approved') {
-        document.getElementById('output-list').innerHTML =
-          '<div style="padding:8px;background:#f6ffed;border:1px solid #b7eb8f;border-radius:4px;color:#135200;line-height:1.7">' +
-          '<b>✅ ' + (SC.time.today().getFullYear()) + '-' + String(SC.time.today().getMonth() + 1).padStart(2, '0') + ' 月度决议名单已锁定</b><br/>' +
-          '已通过 <b>' + approvedList.length + ' 笔付款 / 累计 ' + SC.fmtMoney(approvedList.reduce(function (s, p) { return s + p.amount; }, 0)) + '</b><br/>' +
-          '<b>名单制（无灵活额度）：</b>已锁死供应商 + 金额 → 推送至付款执行（C-10）→ 启动 BIZ-014 / BIZ-015 / BIZ-020 NC 推送链路<br/>' +
-          '<b>留痕：</b>会议纪要 + 决议名单已存档至 A-14 审批日志（SENS-PAY-002）' +
-          '</div>';
-      } else if (meetingState === 'convened') {
-        var signed = council.filter(function (m) { return m.status === 'approved'; }).length;
-        document.getElementById('output-list').innerHTML =
-          '<div style="padding:8px;background:#e6f4ff;border:1px solid #91caff;border-radius:4px;color:#0958d9">' +
-          '⏳ 会议进行中 — ' + signed + ' / ' + council.length + ' 位决议人已签字' +
-          '</div>';
-      } else if (meetingState === 'rejected') {
-        document.getElementById('output-list').innerHTML =
-          '<div style="padding:8px;background:#fff1f0;border:1px solid #ffccc7;border-radius:4px;color:#a8071a">' +
-          '❌ 会议驳回 — 退回到财务复核重新发起' +
-          '</div>';
-      } else {
-        document.getElementById('output-list').innerHTML =
-          '<div class="muted" style="padding:8px">尚未召开本月决议会议。点击右上角 "召开月度决议会议" 启动演示。</div>';
-      }
-
-      var btn = document.getElementById('convene-btn');
-      if (meetingState === 'pending') {
-        btn.innerText = '召开月度决议会议';
-        btn.style.background = '#1677ff';
-        btn.disabled = false;
-      } else if (meetingState === 'convened') {
-        btn.innerText = '会议进行中';
-        btn.style.background = '#999';
-        btn.disabled = true;
-      } else {
-        btn.innerText = '重置（演示用）';
-        btn.style.background = '#cf1322';
-        btn.disabled = false;
-        btn.onclick = function () { reset(); };
-      }
     }
 
-    window.convene = function () {
-      if (meetingState === 'pending') {
-        meetingState = 'convened';
-        render();
-      }
-    };
-
-    window.signMember = function (id, approve) {
-      var m = council.find(function (x) { return x.id === id; });
-      if (!m || m.status !== 'pending') return;
-      m.status = approve ? 'approved' : 'rejected';
-      m.signTime = SC.time.label().replace('🕐 ', '').replace(' (mock)', '');
-      m.opinion = approve ? '<span class="muted" style="font-size:11px;color:#52c41a">同意</span>' :
-                            '<span class="muted" style="font-size:11px;color:#cf1322">驳回 — 需要补充材料</span>';
-
-      // 检查整体状态
-      if (council.some(function (x) { return x.status === 'rejected'; })) {
-        meetingState = 'rejected';
-      } else if (council.every(function (x) { return x.status === 'approved'; })) {
-        meetingState = 'approved';
-        // 锁定所有 pending 申请
-        approvedList = paymentApplications.filter(function (p) { return p.state === 'pending'; }).map(function (p) { return Object.assign({}, p); });
-        paymentApplications.forEach(function (p) { if (p.state === 'pending') p.state = 'approved'; });
-      }
-      render();
-    };
-
-    window.reset = function () {
-      paymentApplications.forEach(function (p) { p.state = 'pending'; });
-      council.forEach(function (m) { m.status = 'pending'; m.signTime = null; m.opinion = null; });
-      meetingState = 'pending';
-      approvedList = [];
-      var btn = document.getElementById('convene-btn');
-      btn.onclick = function () { convene(); };
-      render();
-    };
-
-    window.advanceMonth = function () {
-      SC.time.advance(30);
-      // mock 时间前进后,新增几条本月新申请
-      var nextSeq = paymentApplications.length + 530;
-      paymentApplications.push(
-        { code: 'PA-2026-' + String(nextSeq).padStart(4, '0'), supplier: '阜新二矿合作伙伴', type: '进度款', amount: 380000, contract: 'CN-2026-0089', source: 'C-08（新月）', state: 'pending' },
-        { code: 'PA-2026-' + String(nextSeq + 1).padStart(4, '0'), supplier: '抚顺重工配套', type: '预付款', amount: 156000, contract: 'CN-2026-0102', source: 'C-08（新月）', state: 'pending' }
-      );
-      reset();
-    };
-
-    render();
-
-    if (SC.time && SC.time.subscribe) {
-      SC.time.subscribe(function () { render(); });
+    function renderContractList() {
+      var rows = pendingPayables();
+      var c08List = SC.store.list('C-08');
+      document.getElementById('engine-cm-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px;">无待决议合同。先到「合同详情」会签通过 → 创建 C-02 已签合同。</td></tr>'
+        : rows.map(function (c) {
+            var sup = supMap[c.supplier_id] || ('SUP#' + c.supplier_id);
+            var pending = (c.amount || 0) - (c.paid_amount || 0);
+            var thisRound = Math.min(pending, Math.round((c.amount || 0) * 0.3));
+            var c08 = c08List.filter(function (r) { return r.contract_id === c.id; });
+            return '<tr>' +
+              '<td><input type="checkbox"' + (selected.has(c.id) ? ' checked' : '') + ' onchange="engineToggleSel(' + c.id + ', this.checked)"></td>' +
+              '<td class="code">' + c.contract_no + '</td>' +
+              '<td>' + sup + '</td>' +
+              '<td class="num">' + SC.fmtMoney(c.amount || 0) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(c.executed_amount || 0) + ' / ' + SC.fmtMoney(c.paid_amount || 0) + '</td>' +
+              '<td class="num"><strong style="color:var(--brand);">' + SC.fmtMoney(thisRound) + '</strong></td>' +
+              '<td class="muted" style="font-size:11px;max-width:200px;">' + (c.payment_terms || '—') + '</td>' +
+              '<td class="muted code" style="font-size:11px;">' + (c08.length > 0 ? c08.map(function (r) { return '#' + r.id; }).join(', ') : '—') + '</td>' +
+            '</tr>';
+          }).join('');
     }
+
+    function renderC08() {
+      var rows = SC.store.list('C-08').filter(function (r) { return r.council_meeting_id; });
+      document.getElementById('engine-c08-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">尚未发起决议。勾选合同 → 点"批量决议批准"。</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('C-08', r);
+            var stateColor = r.state === '已支付' ? 'green' : r.state === '已审' ? 'blue' : r.state === '待审' ? 'amber' : 'gray';
+            return '<tr>' +
+              '<td class="code">' + r.request_no + '</td>' +
+              '<td class="muted code" style="font-size:11px;">C-02 #' + r.contract_id + '</td>' +
+              '<td>' + (supMap[r.supplier_id] || '—') + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.amount || 0) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineC08(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineToggleSel(id, on) {
+      if (on) selected.add(id); else selected.delete(id);
+    }
+    function engineToggleAll(on) {
+      if (on) pendingPayables().forEach(function (c) { selected.add(c.id); });
+      else selected.clear();
+      renderContractList();
+    }
+    function engineSelectAll() { engineToggleAll(true); document.getElementById('cm-check-all').checked = true; }
+    function engineClearSel() { engineToggleAll(false); document.getElementById('cm-check-all').checked = false; }
+
+    function engineApproveCouncil() {
+      if (selected.size === 0) { SC.ui.toast('先勾选要决议批准的合同', 'warning'); return; }
+      var period = (SC.time && SC.time.iso ? SC.time.iso() : new Date().toISOString()).slice(0, 7);
+      var meetingId = 'COUNCIL-' + period;
+      var created = 0;
+      selected.forEach(function (cid) {
+        var c = SC.store.get('C-02', cid);
+        if (!c) return;
+        var thisRound = Math.min((c.amount || 0) - (c.paid_amount || 0), Math.round((c.amount || 0) * 0.3));
+        SC.store.create('C-08', {
+          request_no: SC.store.nextNo('FK'),
+          contract_id: c.id,
+          supplier_id: c.supplier_id,
+          amount: thisRound,
+          state: '待审',
+          council_meeting_id: meetingId,
+          period: period,
+        });
+        created++;
+      });
+      SC.ui.toast('月度决议（' + meetingId + '）已生成 ' + created + ' 笔 C-08 付款申请', 'success');
+      selected.clear();
+      document.getElementById('cm-check-all').checked = false;
+    }
+
+    function engineC08(id, event) {
+      try {
+        SC.sm.transition('C-08', id, event);
+        if (event === '审批通过') {
+          SC.ui.toast('C-08 #' + id + ' 已审 → linkage 自动 create C-10 待执行', 'success');
+        } else {
+          SC.ui.toast('C-08 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function refresh() { renderKpis(); renderContractList(); renderC08(); }
+    ['C-02', 'C-08', 'C-10', 'F-01'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
   </script>
 </body>
 </html>

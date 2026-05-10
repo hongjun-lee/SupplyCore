@@ -65,12 +65,12 @@
       { id: 4, code: 'CC-WLK-01', name: '五龙矿·运输二队',     org_id: 5 },
     ],
 
-    /* F-13 NC 接口开关（mock 演示用，默认全开） */
+    /* F-13 NC 接口开关（v0.18 二期 P0 引擎接入：BIZ-002/005/013 改"开"，让出库/暂估/付款链路 NC mock 跑通） */
     'F-13': [
       { id: 1, switch_code: 'BIZ-001-switch', interface_name: '采购入库（正式）',         switch_status: '开' },
-      { id: 2, switch_code: 'BIZ-002-switch', interface_name: '采购入库（暂估）',         switch_status: '关', remark: '一期 A 暂估闭环移二期 A8' },
-      { id: 3, switch_code: 'BIZ-005-switch', interface_name: '出库（自用消耗）',         switch_status: '关', remark: '一期 A 出库主线移二期 A2' },
-      { id: 4, switch_code: 'BIZ-013-switch', interface_name: '付款执行',                 switch_status: '关', remark: '一期 A 付款链路移二期 A4' },
+      { id: 2, switch_code: 'BIZ-002-switch', interface_name: '采购入库（暂估）',         switch_status: '开', remark: '二期 A8 暂估闭环演示用 — BIZ-002 暂估 + BIZ-003 红字冲销' },
+      { id: 3, switch_code: 'BIZ-005-switch', interface_name: '出库（自用消耗）',         switch_status: '开', remark: '二期 A2 出库主线演示用' },
+      { id: 4, switch_code: 'BIZ-013-switch', interface_name: '付款执行',                 switch_status: '开', remark: '二期 A4b 付款链路演示用 — NC 实付回写' },
     ],
 
     /* P-01 示例需求（演示用，v0.16 改为草稿态 — 让用户从最起点演示
@@ -89,6 +89,14 @@
     ],
 
     /* v0.16 不再 seed P-02 / P-03 — 由 P-01 已审 linkage 自动聚合 */
+
+    /* v0.18 二期演示种子：1 个已签合同 + 1 个执行中合同（演示付款链路起点）*/
+    'C-02': [
+      { id: 1, contract_no: 'HT-2026-0042', supplier_id: 1, amount: 4280000,
+        payment_terms: '30% 预付 + 60% 验收 + 10% 质保（一期 payment_terms 文本，二期 A4 落 C-04 实体）',
+        executed_amount: 412800, paid_amount: 1284000,
+        state: '执行中', signed_date: '2026-03-12' },
+    ],
   };
 
   /* 自动 seed（如果 store 已就绪） */

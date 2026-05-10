@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>暂估闭环 — 阜矿物资供应管理系统（原型）</title>
+  <title>暂估闭环 (S-07 + BIZ-002/003) — 阜矿物资供应管理系统（原型）</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
@@ -13,86 +13,78 @@
     <div class="app-main">
       <div id="page-area">
 
-        <div id="block-banner" class="card" style="display:none;background:#fff1f0;border-color:#ffccc7;padding:10px 14px;color:#a8071a;font-size:13px;margin-bottom:12px"></div>
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 06 V1.1a §7.6 暂估入库与冲销闭环（业务方 Q-05-2 答复 2026-05-09 — 6 个月窗口 + D-90/D-30/D-0/D+30 四阶段）+ 详设 09 ALR-INV-006/006B/007 + 详设 08 BIZ-002/003。<br>
+            <strong>🛤 链路：</strong>到货早于发票 → S-05 入库时勾选"含暂估"→ linkage 自动 create S-07 暂估单 + BIZ-002 NC 推送 → 发票到达 → S-07 冲销 → BIZ-003 红字 + BIZ-001 正式入账（暂估转正）。
+          </div>
+        </div>
 
-        <div class="kpi-grid" id="estimate-kpis"></div>
+        <div class="kpi-grid" id="te-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · S-07 暂估台账（D-90 / D-30 / D-0 / D+30 四阶段）</div>
+            <div class="actions">
+              <button class="btn btn-sm" onclick="engineCreateEstimate()">+ 模拟暂估入库</button>
+              <a class="btn btn-sm" href="purchase-receipt.html">→ S-05 入库（含暂估标记）</a>
+              <a class="btn btn-sm" href="alert-rules.html">→ 预警中心 (ALR-INV-006/006B/007)</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>暂估号</th>
+                  <th>来源 S-05</th>
+                  <th>供应商</th>
+                  <th class="num">暂估金额</th>
+                  <th>暂估期间</th>
+                  <th>D 阶段</th>
+                  <th>状态</th>
+                  <th>BIZ-002/003</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-s07-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              S-07 创建时 → linkage 自动推 BIZ-002（暂估借 1403 / 贷 2181 应付暂估）。点"冲销" → linkage 推 BIZ-003 红字冲销。配合 B1 时间穿越（顶部 widget），将系统时间推到 D+30 后看预警升级。
+            </div>
+          </div>
+        </div>
 
         <div class="cols-2">
           <div>
             <div class="card">
-              <div class="card-header">
-                <div class="title">暂估闭环台账</div>
-                <div class="actions">
-                  <button class="btn">催票记录</button>
-                  <button class="btn btn-primary">批量发起对账</button>
-                </div>
-              </div>
-              <table class="data">
-                <thead>
-                  <tr>
-                    <th>暂估单号</th>
-                    <th>入库单</th>
-                    <th>供应商</th>
-                    <th class="num">暂估金额</th>
-                    <th>入库日期</th>
-                    <th>6 个月截止</th>
-                    <th class="num">剩余天数</th>
-                    <th>阶段</th>
-                    <th>NC 状态</th>
-                  </tr>
-                </thead>
-                <tbody id="estimate-tbody"></tbody>
-              </table>
-            </div>
-
-            <div class="card">
-              <div class="card-header"><div class="title">暂估与三单匹配联动</div></div>
-              <div class="card-body" style="font-size:12px;color:var(--text-2);">
-                <div class="mb-8">
-                  <strong>发票未到：</strong>月末按采购订单价或配置规则生成 BIZ-002 暂估凭证，库存入账与财务暂估余额保持可追踪。
-                </div>
-                <div class="mb-8">
-                  <strong>发票到达：</strong>进入三单匹配；匹配通过后生成 BIZ-003 红字冲销暂估，再按正式发票入账。
-                </div>
-                <div class="mb-8">
-                  <strong>D-0 控制：</strong>超过 6 个月仍未冲减的，升级 ALR-INV-007 紧急级，对账完成前阻断该供应商新采购订单审批。
-                </div>
-                <div>
-                  <strong>D+30 控制：</strong>超期 30 天后仍未冲减的，自动转入详设 09 §六"暂估超期物资"月度报表，提交财务月度核对，必要时启动专项对账。
+              <div class="card-header"><div class="title">⏰ D-90 / D-30 / D-0 / D+30 四阶段控制</div></div>
+              <div class="card-body">
+                <div class="timeline">
+                  <div class="step done"><div class="title">D-90（暂估第 3 个月）</div><div class="comment">详设 09 ALR-INV-006「暂估首次超期预警」一般级，提醒业务员跟进发票到位</div></div>
+                  <div class="step current"><div class="title">D-30（暂估第 5 个月）</div><div class="comment">ALR-INV-006B「暂估二次超期预警」重要级，推送业务员 + 财务，强制业务员发起供应商对账</div></div>
+                  <div class="step"><div class="title">D-0（暂估第 6 个月）</div><div class="comment">ALR-INV-007「暂估超期阻断预警」紧急级，对账完成前阻断该供应商的新采购订单审批</div></div>
+                  <div class="step"><div class="title">D+30（超期 30 天后）</div><div class="comment">自动转入"暂估超期物资"月度报表，提交财务月度核对，必要时启动专项对账</div></div>
                 </div>
               </div>
             </div>
           </div>
-
           <div>
             <div class="card">
-              <div class="card-header"><div class="title">D-90 / D-30 / D-0 / D+30 四阶段控制</div></div>
-              <div class="card-body">
-                <div class="timeline" id="estimate-flow"></div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header"><div class="title">配置口径</div></div>
-              <div class="card-body">
-                <div class="kv">
-                  <div class="k">暂估窗口</div><div class="v" id="cfg-window"></div>
-                  <div class="k">一级预警</div><div class="v" id="cfg-warn90"></div>
-                  <div class="k">升级预警</div><div class="v" id="cfg-warn30"></div>
-                  <div class="k">阻断控制</div><div class="v" id="cfg-block"></div>
-                  <div class="k">月度转报</div><div class="v" id="cfg-monthly"></div>
-                  <div class="k">关联报表</div><div class="v">R-INV-006 暂估超期预警台账 / 09 §六 暂估超期物资月报</div>
-                  <div class="k">关联接口</div><div class="v">BIZ-002 暂估 / BIZ-003 冲销 / 三单匹配</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-body" style="display:flex;gap:12px;align-items:start;">
-                <span class="badge blue dot">边界</span>
-                <div class="text-2">
-                  本页只表达暂估业务闭环、预警和审批阻断，不写死 NC 科目。科目、凭证模板仍以财务 / NC 厂商确认后回写 08 为准。
-                </div>
+              <div class="card-header"><div class="title">⚖ NC 凭证规则（BIZ-002 / BIZ-003）</div></div>
+              <div class="card-body" style="font-size:12px;line-height:1.7;">
+                <strong>BIZ-002 暂估入库：</strong><br>
+                借 1403 原材料（暂估）<br>
+                贷 2181 应付暂估<br>
+                <hr style="border:none;border-top:1px dashed var(--border);margin:8px 0;">
+                <strong>BIZ-003 暂估冲销（红字）：</strong><br>
+                红字冲销 BIZ-002 原始凭证（互为对销）<br>
+                <hr style="border:none;border-top:1px dashed var(--border);margin:8px 0;">
+                <strong>BIZ-001 正式入账（冲销后接续）：</strong><br>
+                借 1403 原材料 + 1221 应交税费<br>
+                贷 2181 应付暂估 / 2202 应付账款<br>
+                <strong>边界：</strong>外委检修暂估科目仍待财务+NC厂商确认，不在原型写死
               </div>
             </div>
           </div>
@@ -105,123 +97,142 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
-    var d = SC.data.tentativeEstimates;
     SC.layout({
       page: 'tentative-estimate',
-      crumbs: ['合同与资金', '暂估闭环'],
-      title: '暂估闭环',
-      desc: '对齐详设 06 V1.1a / 08 / 09 / 11 — 6 个月窗口、D-90 / D-30 二段预警 + D-0 阻断 + D+30 月度专项对账',
-      actions: [{ label: '导出预警台账' }, { label: '发起财务对账', primary: true }],
+      crumbs: ['二期', 'A8 暂估闭环'],
+      title: '暂估闭环（S-07 + BIZ-002/003）',
+      desc: '档 A 二期 A8：详设 06 V1.1a §7.6 + 09 ALR-INV-006/006B/007 + 08 BIZ-002/003 — 6 月窗口 + 四阶段预警 + 冲销闭环',
     });
 
-    /* B1 时间穿越联动 — 基于 SC.time 动态计算 daysLeft / stage / color；KPI 由 renderRows 重算 */
-    function computeStage(row) {
-      var due = new Date(row.dueDate);
-      var daysLeft = SC.time.daysBetween(SC.time.now(), due);
-      var stage, color, level;
-      if (row.cleared) {
-        stage = '已冲减'; color = 'green'; level = 'cleared';
-      } else if (daysLeft >= 90) {
-        stage = '正常跟踪'; color = 'green'; level = 'normal';
-      } else if (daysLeft > 30) {
-        stage = 'D-90 预警 (一般级)'; color = 'amber'; level = 'd90';
-      } else if (daysLeft > 0) {
-        stage = 'D-30 升级 (重要级)'; color = 'red'; level = 'd30';
-      } else if (daysLeft >= -30) {
-        stage = 'D-0 阻断 (紧急级)'; color = 'red'; level = 'd0';
-      } else {
-        stage = 'D+30 月度专项对账'; color = 'red'; level = 'dplus30';
+    var supMap = {}; SC.store.list('M-09').forEach(function (s) { supMap[s.id] = s.name; });
+
+    function calcStage(estimate) {
+      // 暂估期间起算：estimate_period (YYYY-MM)；窗口 6 月
+      var period = estimate.estimate_period || (estimate.created_at || '').slice(0, 7);
+      if (!period) return { label: '—', color: 'gray' };
+      var startMonth = new Date(period + '-01');
+      var dueDate = new Date(startMonth.getTime());
+      dueDate.setMonth(dueDate.getMonth() + 6); // 6 月窗口
+      var now = SC.time && SC.time.now ? SC.time.now() : new Date();
+      var daysToD0 = Math.floor((dueDate - now) / (1000 * 60 * 60 * 24));
+
+      if (estimate.estimate_state !== '暂估中') {
+        return { label: '已结案', color: 'green', daysToD0: daysToD0 };
       }
-      return { daysLeft: daysLeft, stage: stage, color: color, level: level };
+      if (daysToD0 > 90) return { label: '正常', color: 'gray', daysToD0: daysToD0 };
+      if (daysToD0 > 30) return { label: 'D-90 一般', color: 'gray', daysToD0: daysToD0 };
+      if (daysToD0 > 0)  return { label: 'D-30 重要', color: 'amber', daysToD0: daysToD0 };
+      if (daysToD0 > -30) return { label: 'D-0 紧急（阻断）', color: 'red', daysToD0: daysToD0 };
+      return { label: 'D+30 月度专项', color: 'red', daysToD0: daysToD0 };
     }
 
-    function renderRows() {
-      var rows = d.rows;
-      // 阻断订单的供应商集合（供顶部 banner 用）
-      var blockedSuppliers = {};
-      var html = rows.map(function (r) {
-        var s = computeStage(r);
-        if (s.level === 'd0' || s.level === 'dplus30') blockedSuppliers[r.supplier] = true;
-        var dlColor = s.daysLeft <= 0 ? 'color:var(--red);font-weight:700;' :
-                      s.daysLeft <= 30 ? 'color:var(--red);font-weight:600;' :
-                      s.daysLeft <= 90 ? 'color:var(--amber);font-weight:600;' : '';
-        var clearBtn = r.cleared ? '<span class="muted" style="font-size:11px">已冲销</span>' :
-          '<button class="btn" onclick="clearEstimate(\'' + r.code + '\')" style="padding:2px 8px;font-size:11px">模拟冲减</button>';
-        return '<tr>' +
-          '<td class="code">' + r.code + '</td>' +
-          '<td class="code muted">' + r.receipt + '</td>' +
-          '<td>' + r.supplier + (blockedSuppliers[r.supplier] && !r.cleared ? ' <span class="badge red dot" style="font-size:10px">已阻断</span>' : '') + '</td>' +
-          '<td class="num">' + SC.fmtMoney(r.amount) + '</td>' +
-          '<td class="muted">' + r.entryDate + '</td>' +
-          '<td class="muted">' + r.dueDate + '</td>' +
-          '<td class="num" style="' + dlColor + '">' + s.daysLeft + '</td>' +
-          '<td>' + SC.badge(s.stage, s.color, true) + '</td>' +
-          '<td class="muted">' + (r.cleared ? 'BIZ-003 已冲销' : r.ncState) + ' ' + clearBtn + '</td>' +
-        '</tr>';
-      }).join('');
-      document.getElementById('estimate-tbody').innerHTML = html;
-
-      // 顶部 banner — 阻断供应商
-      var banner = document.getElementById('block-banner');
-      var blockList = Object.keys(blockedSuppliers);
-      if (blockList.length > 0) {
-        banner.style.display = '';
-        banner.innerHTML = '<span class="badge red dot">⚠ 已阻断</span> 以下供应商因暂估超期，新采购订单审批已被阻断：<b>' + blockList.join(' / ') + '</b>（对账完成后解除）';
-      } else {
-        banner.style.display = 'none';
-      }
-
-      // 重算 KPI
-      var counts = { total: 0, d90: 0, d30: 0, d0: 0, dplus30: 0, cleared: 0, balance: 0 };
-      rows.forEach(function (r) {
-        var s = computeStage(r);
-        if (r.cleared) { counts.cleared++; return; }
-        counts.total++;
-        counts.balance += r.amount;
-        if (s.level === 'd90') counts.d90++;
-        else if (s.level === 'd30') counts.d30++;
-        else if (s.level === 'd0') counts.d0++;
-        else if (s.level === 'dplus30') counts.dplus30++;
+    function renderKpis() {
+      var s07 = SC.store.list('S-07');
+      var active = s07.filter(function (e) { return e.estimate_state === '暂估中'; });
+      var totalAmt = active.reduce(function (a, e) { return a + (e.estimate_amount || 0); }, 0);
+      var stageCount = { 'D-90 一般': 0, 'D-30 重要': 0, 'D-0 紧急（阻断）': 0, 'D+30 月度专项': 0 };
+      active.forEach(function (e) {
+        var s = calcStage(e).label;
+        if (stageCount[s] != null) stageCount[s]++;
       });
-      var kpiHtml = [
-        '<div class="kpi"><div class="label">暂估余额</div><div class="value">' + SC.fmtMoney(counts.balance) + '</div><div class="trend">' + counts.total + ' 笔未冲减</div></div>',
-        '<div class="kpi"><div class="label">D-90 预警</div><div class="value" style="color:var(--amber)">' + counts.d90 + '</div><div class="trend">一般级 · 催票窗口</div></div>',
-        '<div class="kpi"><div class="label">D-30 升级</div><div class="value" style="color:var(--red)">' + counts.d30 + '</div><div class="trend">重要级 · 财务+采购联合</div></div>',
-        '<div class="kpi"><div class="label">D-0 阻断 / D+30 转报</div><div class="value" style="color:var(--red)">' + counts.d0 + ' / ' + counts.dplus30 + '</div><div class="trend">紧急级 · 阻断新采购</div></div>'
-      ].join('');
-      document.getElementById('estimate-kpis').innerHTML = kpiHtml;
+      document.getElementById('te-kpis').innerHTML = [
+        ['暂估中', active.length, '总金额 ' + SC.fmtMoney(totalAmt)],
+        ['D-90 / D-30', (stageCount['D-90 一般'] + stageCount['D-30 重要']), '一般 ' + stageCount['D-90 一般'] + ' / 重要 ' + stageCount['D-30 重要']],
+        ['D-0 紧急', stageCount['D-0 紧急（阻断）'], '阻断该供应商新采购'],
+        ['D+30 月度专项', stageCount['D+30 月度专项'], '转专项对账'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
     }
 
-    window.clearEstimate = function (code) {
-      var row = d.rows.find(function (r) { return r.code === code; });
-      if (row) {
-        row.cleared = true;
-        row.clearedAt = SC.time.iso();
-        renderRows();
+    function renderTable() {
+      var rows = SC.store.list('S-07');
+      var f01 = SC.store.list('F-01').filter(function (t) { return t.interface_id === 'BIZ-002' || t.interface_id === 'BIZ-003'; });
+      document.getElementById('engine-s07-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="10" class="muted" style="text-align:center;padding:18px;">无 S-07 暂估记录 · 点上方"+ 模拟暂估入库"或到「采购入库审核」勾选含暂估</td></tr>'
+        : rows.slice().reverse().map(function (e) {
+            var stage = calcStage(e);
+            var events = SC.sm.getAllowedEvents('S-07', e);
+            var stateColor = e.estimate_state === '已正式入账' ? 'green' : e.estimate_state === '已冲销' ? 'blue' : e.estimate_state === '暂估中' ? 'amber' : 'gray';
+            var related = f01.filter(function (t) { return t.source_bill_id === e.id || (t.source_bill_type === 'S-05' && t.source_bill_id === e.receipt_id); });
+            var biz002 = related.filter(function (t) { return t.interface_id === 'BIZ-002'; })[0];
+            var biz003 = related.filter(function (t) { return t.interface_id === 'BIZ-003'; })[0];
+            return '<tr>' +
+              '<td class="code">' + e.estimate_no + '</td>' +
+              '<td class="muted code" style="font-size:11px;">' + (e.receipt_id ? 'S-05 #' + e.receipt_id : '—') + '</td>' +
+              '<td>' + (supMap[e.supplier_id] || ('SUP#' + e.supplier_id || '—')) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(e.estimate_amount || 0) + '</td>' +
+              '<td class="muted">' + e.estimate_period + ' · D' + (stage.daysToD0 >= 0 ? '-' + stage.daysToD0 : '+' + (-stage.daysToD0)) + '</td>' +
+              '<td><span class="badge ' + stage.color + ' dot">' + stage.label + '</span></td>' +
+              '<td>' + SC.badge(e.estimate_state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' +
+                (biz002 ? '<span class="badge ' + (biz002.task_state === '推送成功' ? 'green' : 'amber') + ' dot">BIZ-002 ' + biz002.task_state + '</span>' : '<span class="muted">—</span>') +
+                (biz003 ? '<br><span class="badge ' + (biz003.task_state === '推送成功' ? 'green' : 'amber') + ' dot">BIZ-003 ' + biz003.task_state + '</span>' : '') +
+              '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (ev) { return '<a href="javascript:void(0)" onclick="engineS07(' + e.id + ', \'' + ev + '\')">' + ev + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineCreateEstimate() {
+      var supplier = SC.store.list('M-09')[0];
+      if (!supplier) { SC.ui.toast('无供应商种子', 'error'); return; }
+      var period = (SC.time && SC.time.iso ? SC.time.iso() : new Date().toISOString()).slice(0, 7);
+      var amount = Math.floor(Math.random() * 100000 + 50000);
+      // 模拟一个有 receipt_id 的 S-07（实际场景由 S-05:已审 linkage 自动创建）
+      SC.store.create('S-07', {
+        estimate_no: SC.store.nextNo('ZG'),
+        receipt_id: null,
+        supplier_id: supplier.id,
+        estimate_period: period,
+        estimate_amount: amount,
+        estimate_state: '暂估中',
+      });
+      // 推 BIZ-002
+      var ncSwitch = SC.store.list('F-13', { switch_code: 'BIZ-002-switch' })[0];
+      var newEst = SC.store.list('S-07').slice(-1)[0];
+      if (ncSwitch && ncSwitch.switch_status === '开') {
+        var task = SC.store.create('F-01', {
+          task_no: SC.store.nextNo('FT'),
+          interface_id: 'BIZ-002',
+          source_bill_no: newEst.estimate_no,
+          source_bill_type: 'S-07',
+          source_bill_id: newEst.id,
+          task_state: '待推送',
+          retry_count: 0,
+        });
+        if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
       }
-    };
-
-    renderRows();
-
-    // mock 时间变化时刷新
-    if (SC.time && SC.time.subscribe) {
-      SC.time.subscribe(function () { renderRows(); });
+      SC.ui.toast('S-07 #' + newEst.id + ' 暂估已创建（' + supplier.name + ' / ¥' + amount + '）→ BIZ-002 推送', 'success');
     }
 
-    document.getElementById('estimate-flow').innerHTML = d.timeline.map(function (t) {
-      var cls = t.state === 'done' ? 'done' : t.state === 'current' ? 'current' : '';
-      return '<div class="step ' + cls + '">' +
-        '<div class="title">' + t.title + '</div>' +
-        '<div class="comment">' + t.detail + '</div>' +
-      '</div>';
-    }).join('');
+    function engineS07(id, event) {
+      try {
+        SC.sm.transition('S-07', id, event);
+        if (event === '冲销') {
+          SC.ui.toast('S-07 #' + id + ' 已冲销 → linkage 推 BIZ-003 红字', 'success');
+          setTimeout(refresh, 1500);
+        } else {
+          SC.ui.toast('S-07 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
 
-    document.getElementById('cfg-window').textContent = d.windowMonths + ' 个月';
-    document.getElementById('cfg-warn90').textContent = d.warn90 + ' 触发采购催票';
-    document.getElementById('cfg-warn30').textContent = d.warn30 + ' 升级财务 / 采购联合处理';
-    document.getElementById('cfg-block').textContent = d.blockDay;
-    document.getElementById('cfg-monthly').textContent = d.monthlyReport;
+    function refresh() { renderKpis(); renderTable(); }
+    ['S-07', 'F-01', 'F-03'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    if (SC.time && SC.time.subscribe) SC.time.subscribe(refresh); // 时间穿越触发 D 阶段重算
+    refresh();
   </script>
 </body>
 </html>
