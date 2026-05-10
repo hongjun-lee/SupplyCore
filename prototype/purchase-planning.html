@@ -96,6 +96,37 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · P-02 采购计划（多节点审批 + linkage 自动生成 P-05）</div>
+            <div class="actions">
+              <button class="btn btn-sm" onclick="enginePlanCreate()">+ 新建 P-02 草稿</button>
+              <a class="btn btn-sm" href="purchase-task-decomposition.html">→ P-05 任务分解</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>计划单号</th>
+                  <th>所属期间</th>
+                  <th>组织</th>
+                  <th class="num">金额</th>
+                  <th class="num">P-03 行数 / P-05 任务数</th>
+                  <th>状态</th>
+                  <th>可执行 events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-p02-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              点"审批通过"→ <code>SC.linkage.on('P-02:已审')</code> 自动按 P-03 计划行生成 P-05 草稿，跳转「采购任务分解」页可见。再回来看"P-05 任务数"已增加。详见 02 V0.4 §6.2-6.3。
+            </div>
+          </div>
+        </div>
+
         <div class="kpi-grid" id="planning-kpis"></div>
 
         <div class="card">
@@ -213,7 +244,82 @@
 
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
+    /* ---------- 引擎面板（活数据 from SC.store）---------- */
+    function renderEngineP02() {
+      var plans = SC.store.list('P-02');
+      document.getElementById('engine-p02-tbody').innerHTML = plans.length === 0
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px;">暂无 P-02 记录 · 点上方"+ 新建 P-02 草稿"</td></tr>'
+        : plans.map(function (p) {
+            var lines = SC.store.list('P-03', { plan_id: p.id });
+            var tasks = SC.store.list('P-05', { plan_id: p.id });
+            var events = SC.sm.getAllowedEvents('P-02', p);
+            var stateColor = p.state === '已分解' ? 'green' : p.state === '已审' ? 'blue' : p.state === '待审' ? 'amber' : 'gray';
+            return '<tr>' +
+              '<td class="code">' + (p.plan_no || '#' + p.id) + '</td>' +
+              '<td>' + (p.period || '—') + '</td>' +
+              '<td>org #' + p.org_id + '</td>' +
+              '<td class="num">' + SC.fmtMoney(p.amount || 0) + '</td>' +
+              '<td class="num">' + lines.length + ' / ' + tasks.length + '</td>' +
+              '<td>' + SC.badge(p.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) {
+                  return '<a href="javascript:void(0)" onclick="engineP02Transition(' + p.id + ', \'' + e + '\')">' + e + '</a>';
+                }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function enginePlanCreate() {
+      var period = new Date().toISOString().slice(0, 7);
+      var plan = SC.store.create('P-02', {
+        plan_no: SC.store.nextNo('PP'),
+        org_id: 2,
+        period: period,
+        amount: 0,
+        state: '草稿',
+        owner: SC.roles.currentInfo().label,
+      });
+      // 同时创建 2 条 P-03 计划行（演示数据）
+      var line1 = SC.store.create('P-03', {
+        plan_id: plan.id, plan_line_no: plan.plan_no + '-01',
+        material_id: 8, quantity: 100, amount: 50000, tender_type: '招标',
+      });
+      var line2 = SC.store.create('P-03', {
+        plan_id: plan.id, plan_line_no: plan.plan_no + '-02',
+        material_id: 7, quantity: 60, amount: 30000, tender_type: '直采',
+      });
+      SC.store.update('P-02', plan.id, { amount: 80000 });
+      SC.ui.toast('P-02 草稿 + 2 条 P-03 计划行已创建', 'success');
+    }
+
+    function engineP02Transition(id, event) {
+      try {
+        SC.sm.transition('P-02', id, event);
+        if (event === '审批通过') {
+          SC.ui.toast('P-02 #' + id + ' 已审 → linkage 自动生成 P-05 草稿（去任务分解页查看）', 'success');
+        } else {
+          SC.ui.toast('P-02 #' + id + ' → ' + event + ' 成功', 'success');
+        }
+      } catch (e) {
+        SC.ui.toast('迁移失败：' + e.message, 'error');
+      }
+    }
+
+    SC.store.subscribe('P-02', renderEngineP02);
+    SC.store.subscribe('P-05', renderEngineP02); // P-05 数量变化也刷新本页统计
+    renderEngineP02();
+
+    /* ---------- 原静态展示 ---------- */
     var d = SC.data.purchasePlanning;
     SC.layout({
       page: 'purchase-planning',

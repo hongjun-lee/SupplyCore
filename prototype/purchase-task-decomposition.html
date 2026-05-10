@@ -144,6 +144,36 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · P-05 任务分解（人工合并/拆分 + 路径分流 linkage）</div>
+            <div class="actions">
+              <a class="btn btn-sm" href="purchase-planning.html">← P-02 计划</a>
+              <a class="btn btn-sm" href="tender.html">→ T-01 招标</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>任务编号</th>
+                  <th>来源 P-02 / 计划行</th>
+                  <th>物料 / 数量</th>
+                  <th>采购方式</th>
+                  <th>状态</th>
+                  <th>可执行 events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-p05-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">分流规则</span>
+              选 tender_type → 点"确认分解" → linkage 自动按路径生成 T-01（招采）或 S-01（直采）+ 检查 P-02 全部分解完毕则自动转「已分解」（V0.4a 收口）。
+            </div>
+          </div>
+        </div>
+
         <div class="kpi-grid" id="task-kpis"></div>
 
         <div class="card">
@@ -297,7 +327,83 @@
 
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
+    /* ---------- 引擎面板 P-05 ---------- */
+    function renderEngineP05() {
+      var tasks = SC.store.list('P-05');
+      var lines = SC.store.list('P-03');
+      var mats = SC.store.list('M-05');
+      var lineMap = {}; lines.forEach(function (l) { lineMap[l.id] = l; });
+      var matMap = {}; mats.forEach(function (m) { matMap[m.id] = m.name; });
+
+      document.getElementById('engine-p05-tbody').innerHTML = tasks.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">暂无 P-05 记录 · 先到「采购计划编排」审批 P-02 → linkage 自动生成 P-05 草稿</td></tr>'
+        : tasks.map(function (t) {
+            var line = lineMap[t.plan_line_id] || {};
+            var events = SC.sm.getAllowedEvents('P-05', t);
+            var stateColor = t.task_state === '已完成' ? 'green' : t.task_state === '已分解' ? 'blue' : t.task_state === '草稿' ? 'gray' : 'amber';
+            var typeOpts = ['招采', '直采', '合同采购'].map(function (opt) {
+              return '<option value="' + opt + '"' + (t.tender_type === opt ? ' selected' : '') + '>' + opt + '</option>';
+            }).join('');
+            return '<tr>' +
+              '<td class="code">' + (t.task_no || '#' + t.id) + '</td>' +
+              '<td class="muted" style="font-size:11px;">P-02#' + t.plan_id + ' / ' + (line.plan_line_no || '—') + '</td>' +
+              '<td>' + (matMap[t.material_id] || '—') + '<div class="muted" style="font-size:11px;">数量 ' + (t.quantity || 0) + '</div></td>' +
+              '<td>' + (t.task_state === '草稿'
+                ? '<select onchange="engineSetTenderType(' + t.id + ', this.value)"><option value="">未选</option>' + typeOpts + '</select>'
+                : '<span class="badge ' + (t.tender_type === '招采' ? 'blue' : t.tender_type === '直采' ? 'teal' : 'gray') + '">' + (t.tender_type || '—') + '</span>') +
+              '</td>' +
+              '<td>' + SC.badge(t.task_state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) {
+                  return '<a href="javascript:void(0)" onclick="engineP05Transition(' + t.id + ', \'' + e + '\')">' + e + '</a>';
+                }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineSetTenderType(id, value) {
+      SC.store.update('P-05', id, { tender_type: value });
+      SC.ui.toast('P-05 #' + id + ' 采购方式: ' + (value || '清除'), 'info');
+    }
+
+    function engineP05Transition(id, event) {
+      var task = SC.store.get('P-05', id);
+      if (event === '确认分解' && !task.tender_type) {
+        SC.ui.toast('请先选择采购方式（招采 / 直采 / 合同采购）', 'warning');
+        return;
+      }
+      try {
+        SC.sm.transition('P-05', id, event);
+        if (event === '确认分解') {
+          var msg = '已确认分解 → ';
+          if (task.tender_type === '招采') msg += 'linkage 自动创建 T-01 招标申请';
+          else if (task.tender_type === '直采') msg += 'linkage 自动创建 S-01 采购申请';
+          else msg += '路径分流';
+          SC.ui.toast(msg, 'success');
+        } else {
+          SC.ui.toast('P-05 #' + id + ' → ' + event + ' 成功', 'success');
+        }
+      } catch (e) {
+        SC.ui.toast('迁移失败：' + e.message, 'error');
+      }
+    }
+
+    SC.store.subscribe('P-05', renderEngineP05);
+    SC.store.subscribe('T-01', renderEngineP05);
+    SC.store.subscribe('S-01', renderEngineP05);
+    renderEngineP05();
+
+    /* ---------- 原静态展示 ---------- */
     var d = SC.data.purchaseTaskDecomposition;
     var GROUP_COLORS = { A: '#3b82f6', B: '#8b5cf6', C: '#10b981', D: '#f59e0b', E: '#ef4444' };
     function groupColor(g) { return GROUP_COLORS[g] || '#9ca3af'; }

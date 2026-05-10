@@ -12,6 +12,37 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · P-01 需求（SC.store + SC.sm）</div>
+            <div class="actions">
+              <button class="btn btn-sm" onclick="engineCreate()">+ 创建 P-01 草稿</button>
+              <button class="btn btn-sm" onclick="engineReset()">重置引擎数据</button>
+              <a class="btn btn-sm" href="_engine-test.html">引擎测试页 →</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" id="engine-tbody-wrap">
+              <thead>
+                <tr>
+                  <th>需求单号</th>
+                  <th>申请单位</th>
+                  <th>物料 / 数量</th>
+                  <th class="num">金额</th>
+                  <th>状态</th>
+                  <th>可执行 events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-p01-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">引擎说明</span>
+              此面板数据来自 LocalStorage（<code>sc:P-01</code>），与下方静态列表独立。状态迁移走 <code>SC.sm.transition('P-01', id, event)</code>，刷新页面后数据保留；BroadcastChannel 跨页同步。详见 <code>02-档A增强原型实施方案-V0.4.md</code> §4.2 / §6.2。
+            </div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="filter-bar">
             <div class="form-field"><label>需求单号</label><input type="text" placeholder="XQ-2026-…"></div>
@@ -85,6 +116,13 @@
 
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
     SC.layout({
       page: 'requirement-list',
@@ -94,6 +132,7 @@
       actions: [{ label: '导入模板' }, { label: '+ 新建需求', primary: true }],
     });
 
+    /* ---------- 静态列表（保持原 v0.x 演示数据不变）---------- */
     var tbody = document.getElementById('req-tbody');
     tbody.innerHTML = SC.data.requirements.map(function (r) {
       var urgent = r.urgent ? '<span class="badge red" style="margin-left:6px;">加急</span>' : '';
@@ -115,6 +154,85 @@
         '</td>' +
       '</tr>';
     }).join('');
+
+    /* ---------- 引擎面板（活数据 from SC.store）---------- */
+    function renderEngineList() {
+      var items = SC.store.list('P-01');
+      var orgs = SC.store.list('M-01');
+      var mats = SC.store.list('M-05');
+      var orgMap = {}; orgs.forEach(function (o) { orgMap[o.id] = o.name; });
+      var matMap = {}; mats.forEach(function (m) { matMap[m.id] = m.name; });
+
+      document.getElementById('engine-p01-tbody').innerHTML = items.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">暂无 P-01 记录 · 点上方"+ 创建 P-01 草稿"</td></tr>'
+        : items.map(function (p) {
+            var events = SC.sm.getAllowedEvents('P-01', p);
+            var stateColor = p.state === '已审' ? 'green' : p.state === '待审' ? 'amber' : p.state === '已驳回' ? 'red' : 'gray';
+            return '<tr>' +
+              '<td class="code">' + (p.request_no || ('#' + p.id)) + '</td>' +
+              '<td>' + (orgMap[p.org_id] || '—') + '</td>' +
+              '<td>' + (matMap[p.material_id] || '—') + '<div class="muted" style="font-size:11px;">数量 ' + (p.quantity || 0) + '</div></td>' +
+              '<td class="num">' + SC.fmtMoney(p.amount || 0) + '</td>' +
+              '<td>' + SC.badge(p.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) {
+                  return '<a href="javascript:void(0)" onclick="engineDoTransition(' + p.id + ', \'' + e + '\')">' + e + '</a>';
+                }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineCreate() {
+      SC.ui.prompt('需求物料（输入物料 ID 1-10，留空默认 8 锚杆）', { default: '8', placeholder: '1-10' }).then(function (val) {
+        if (val === null) return;
+        var matId = parseInt(val, 10) || 8;
+        var mat = SC.store.get('M-05', matId);
+        if (!mat) { SC.ui.toast('物料 ID ' + matId + ' 不存在', 'error'); return; }
+        SC.ui.prompt('数量（默认随机 50-200）', { default: String(Math.floor(Math.random() * 150 + 50)) }).then(function (qStr) {
+          if (qStr === null) return;
+          var qty = parseInt(qStr, 10) || 100;
+          var amount = qty * (mat.unit_price || (Math.floor(Math.random() * 500) + 50));
+          SC.store.create('P-01', {
+            request_no: SC.store.nextNo('XQ'),
+            org_id: 3, // 艾友矿
+            material_id: matId,
+            quantity: qty,
+            amount: amount,
+            purpose: '档 A 引擎演示 · 由 requirement-list 创建',
+            urgency: '普通',
+            state: '草稿',
+            applicant: SC.roles.currentInfo().label,
+            submit_date: new Date().toISOString().slice(0, 10),
+          });
+          SC.ui.toast('P-01 草稿已创建（' + mat.name + ' × ' + qty + '）', 'success');
+        });
+      });
+    }
+
+    function engineDoTransition(id, event) {
+      try {
+        SC.sm.transition('P-01', id, event);
+        SC.ui.toast('P-01 #' + id + ' → ' + event + ' 成功', 'success');
+      } catch (e) {
+        SC.ui.toast('迁移失败：' + e.message, 'error');
+      }
+    }
+
+    function engineReset() {
+      SC.ui.confirm('确认重置引擎数据到 seed 状态？所有 P-01 LocalStorage 数据将清空。').then(function (ok) {
+        if (!ok) return;
+        SC.store.reset();
+        SC.ui.toast('引擎数据已重置', 'info');
+        renderEngineList();
+      });
+    }
+
+    /* 订阅 store 变化（同页 + 跨页 BroadcastChannel） */
+    SC.store.subscribe('P-01', function () { renderEngineList(); });
+
+    renderEngineList();
   </script>
 </body>
 </html>

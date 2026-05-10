@@ -12,6 +12,51 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · T-01 / T-03 / T-05 招采（D1 简化 + E5 流标）</div>
+            <div class="actions">
+              <a class="btn btn-sm" href="purchase-task-decomposition.html">← P-05 任务</a>
+              <a class="btn btn-sm" href="contract-list.html">→ C-02 合同</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border);">
+              <div style="padding:10px 16px;border-right:1px solid var(--border);">
+                <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px;">T-01 招标申请（来源 P-05 招采）</div>
+                <table class="data" style="font-size:12px;">
+                  <thead>
+                    <tr><th>申请号</th><th>状态</th><th>金额</th><th>操作</th></tr>
+                  </thead>
+                  <tbody id="engine-t01-tbody"></tbody>
+                </table>
+              </div>
+              <div style="padding:10px 16px;">
+                <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px;">T-03 标包（D1 简化 + 流标演示）</div>
+                <table class="data" style="font-size:12px;">
+                  <thead>
+                    <tr><th>标包号</th><th>状态</th><th>操作</th></tr>
+                  </thead>
+                  <tbody id="engine-t03-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div style="padding:10px 16px;">
+              <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px;">T-05 中标结果 → linkage 自动创建 C-01 会签</div>
+              <table class="data" style="font-size:12px;">
+                <thead>
+                  <tr><th>标包</th><th>中标供应商</th><th class="num">中标金额</th><th>操作</th></tr>
+                </thead>
+                <tbody id="engine-t05-tbody"></tbody>
+              </table>
+            </div>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">演示路径</span>
+              T-01 → T-03 → 录入中标 T-05 → linkage 自动 <code>create('C-01')</code> 进入合同会签；流标场景：T-03「流标」状态触发 ALR-PUR-002 + 重新发标须重走集体决策（详设 04 §4.10.5）。
+            </div>
+          </div>
+        </div>
+
         <div class="kpi-grid">
           <div class="kpi"><div class="label">本月招标项目</div><div class="value">4</div><div class="trend">公开 2 / 询比价 1 / 紧急 1</div></div>
           <div class="kpi"><div class="label">招标预算合计</div><div class="value">¥ 148.7 万</div><div class="trend">含 1 项框架协议</div></div>
@@ -156,6 +201,119 @@
 
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* ---------- 引擎面板 T-01/T-03/T-05 ---------- */
+    function renderEngineTender() {
+      // T-01
+      var t01 = SC.store.list('T-01');
+      document.getElementById('engine-t01-tbody').innerHTML = t01.length === 0
+        ? '<tr><td colspan="4" class="muted" style="text-align:center;padding:8px;">先到「采购任务分解」确认 P-05 招采路径</td></tr>'
+        : t01.map(function (t) {
+            var events = SC.sm.getAllowedEvents('T-01', t);
+            var stateColor = t.state === '已审' ? 'green' : t.state === '待审' ? 'amber' : 'gray';
+            return '<tr>' +
+              '<td class="code">' + (t.application_no || '#' + t.id) + '</td>' +
+              '<td>' + SC.badge(t.state, stateColor, true) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(t.amount || 0) + '</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineT01(' + t.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+                (t.state === '已审' && !SC.store.list('T-03', { application_id: t.id }).length
+                  ? '<a href="javascript:void(0)" onclick="engineCreateT03(' + t.id + ')" style="color:var(--brand);">→ 生成 T-03</a>' : '') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+
+      // T-03
+      var t03 = SC.store.list('T-03');
+      document.getElementById('engine-t03-tbody').innerHTML = t03.length === 0
+        ? '<tr><td colspan="3" class="muted" style="text-align:center;padding:8px;">无 T-03 标包</td></tr>'
+        : t03.map(function (b) {
+            var events = SC.sm.getAllowedEvents('T-03', b);
+            var stateColor = b.state === '已结案' ? 'green' : b.state === '流标' ? 'red' : 'gray';
+            return '<tr>' +
+              '<td class="code">' + (b.package_no || '#' + b.id) + '</td>' +
+              '<td>' + SC.badge(b.state, stateColor, true) + '</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineT03(' + b.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+
+      // T-05
+      var t05 = SC.store.list('T-05');
+      var c01 = SC.store.list('C-01');
+      document.getElementById('engine-t05-tbody').innerHTML = (t05.length === 0 && t03.length === 0)
+        ? '<tr><td colspan="4" class="muted" style="text-align:center;padding:8px;">先有 T-03，再"直录中标"录入 T-05</td></tr>'
+        : t05.map(function (r) {
+            var c = c01.find(function (x) { return x.tender_result_id === r.id; });
+            return '<tr>' +
+              '<td class="code">T-03 #' + r.tender_package_id + '</td>' +
+              '<td>supplier #' + r.supplier_id + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.winning_amount || 0) + '</td>' +
+              '<td>' + (c ? '<span class="badge green dot">已创建 C-01 #' + c.id + '</span>' : '<span class="muted">linkage 待触发</span>') + '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineT01(id, event) {
+      try { SC.sm.transition('T-01', id, event); SC.ui.toast('T-01 #' + id + ' → ' + event, 'success'); }
+      catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function engineCreateT03(applicationId) {
+      var t01 = SC.store.get('T-01', applicationId);
+      var pkg = SC.store.create('T-03', {
+        package_no: SC.store.nextNo('TB'),
+        application_id: applicationId,
+        amount: t01.amount,
+        state: '待标',
+      });
+      SC.ui.toast('T-03 #' + pkg.id + ' 标包已生成', 'success');
+    }
+
+    function engineT03(id, event) {
+      var pkg = SC.store.get('T-03', id);
+      if (event === '直录中标') {
+        SC.ui.prompt('中标供应商 ID（1-5）', { default: '1' }).then(function (sup) {
+          if (sup === null) return;
+          SC.ui.prompt('中标金额', { default: String(pkg.amount || 100000) }).then(function (amt) {
+            if (amt === null) return;
+            // 创建 T-05 中标结果
+            var result = SC.store.create('T-05', {
+              tender_package_id: id,
+              supplier_id: parseInt(sup, 10),
+              winning_amount: parseInt(amt, 10),
+              state: '已验证',
+            });
+            // 触发 T-05:已验证 linkage（自动创建 C-01）
+            SC.linkage.emit('T-05:已验证', result);
+            // T-03 转已结案
+            SC.sm.transition('T-03', id, '直录中标');
+            SC.ui.toast('T-05 录入 → linkage 自动创建 C-01 会签', 'success');
+          });
+        });
+      } else if (event === '流标') {
+        SC.sm.transition('T-03', id, '流标');
+        SC.ui.toast('T-03 #' + id + ' 流标 → ALR-PUR-002 触发，重发标须重走集体决策（E5）', 'warning');
+      } else {
+        try { SC.sm.transition('T-03', id, event); SC.ui.toast('T-03 #' + id + ' → ' + event, 'success'); }
+        catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+      }
+    }
+
+    SC.store.subscribe('T-01', renderEngineTender);
+    SC.store.subscribe('T-03', renderEngineTender);
+    SC.store.subscribe('T-05', renderEngineTender);
+    SC.store.subscribe('C-01', renderEngineTender);
+    renderEngineTender();
+  </script>
   <script>
     SC.layout({
       page: 'tender',
