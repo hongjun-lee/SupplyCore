@@ -203,8 +203,10 @@ a:hover { text-decoration: underline; }
   top: var(--header-h);
   z-index: 50;
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 8px;
+  width: 100%;
   margin: 0 0 12px;
   padding: 6px 10px;
   background: #fff;
@@ -212,6 +214,7 @@ a:hover { text-decoration: underline; }
   border-left: 4px solid var(--brand);
   border-radius: var(--radius);
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  box-sizing: border-box;
 }
 .demo-flow-badge {
   flex-shrink: 0;
@@ -233,11 +236,14 @@ a:hover { text-decoration: underline; }
   padding: 4px 8px;
 }
 .demo-flow-steps {
-  flex: 1;
+  flex: 1 1 0%;
   min-width: 0;
+  width: 0;
   display: flex;
+  flex-wrap: nowrap;
   gap: 4px;
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: thin;
 }
 .demo-flow-steps::-webkit-scrollbar { height: 4px; }
