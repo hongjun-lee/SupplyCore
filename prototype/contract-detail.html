@@ -12,6 +12,13 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div id="lock-banner" class="card" style="display:none;border-left:4px solid var(--red);background:#fff5f5;">
+          <div class="card-body" style="display:flex;gap:12px;align-items:flex-start;">
+            <span class="badge red dot" style="flex-shrink:0;">变更冻结</span>
+            <div class="text-2" id="lock-banner-text" style="font-size:13px;color:var(--text);"></div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="flow-strip">
             <div class="node done"><span class="step-num">1</span> 草稿</div>
@@ -138,6 +145,89 @@
           </div>
         </div>
 
+        <!-- 履约节点 + 合同变更 + 履约预警（v0.9 P1 深化） -->
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">履约节点进度（C-04 履约视角）</div>
+                <div class="muted text-2" style="font-size:12px;">区别于左侧"付款节点"——这里展示履约动作（到货 / 验收 / 质保）的计划 vs 实际对比。</div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th style="width:40px;">节点</th>
+                    <th>履约名称</th>
+                    <th>计划</th>
+                    <th>实际</th>
+                    <th>履约偏差</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody id="milestones-tbody"></tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="title">合同变更记录（C-05）</div>
+                <div class="actions">
+                  <button class="btn btn-sm">导出变更</button>
+                  <button class="btn btn-sm btn-primary" onclick="alert('演示模式：发起新变更草稿，进入审批流程。');">+ 发起变更</button>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th style="width:40px;">序号</th>
+                    <th>变更编号</th>
+                    <th>类型</th>
+                    <th>原因</th>
+                    <th class="num">金额变化</th>
+                    <th>提交 / 生效</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody id="changes-tbody"></tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+                <span class="badge blue dot">联动规则</span>
+                <span style="margin-left:6px;">变更已审后，服务层自动同步 C-02 字段、C-03 条款（旧条款 is_superseded=true）；<strong style="color:var(--red);">付款条件变更</strong>会同步修订 C-04 未支付节点的金额、日期；金额变更超过 SY-02 配置阈值升级至项目领导小组。</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">履约预警</div></div>
+              <table class="data">
+                <thead>
+                  <tr><th>预警代码</th><th>级别</th><th>说明</th></tr>
+                </thead>
+                <tbody id="alerts-tbody"></tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+                对齐详设 09 V1.2 §六 ALR-CON-* 规则：合同到期提醒（30 天）、付款超期、变更待审过期、外委超限、重大合同审批超时等，自动触发推送给物资 / 财务 / 法务相关角色。
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">变更冻结控制</div></div>
+              <div class="card-body">
+                <div class="kv">
+                  <div class="k">当前状态</div><div class="v" id="lock-state"></div>
+                  <div class="k">受影响节点</div><div class="v" id="lock-nodes"></div>
+                  <div class="k">冻结起始</div><div class="v" id="lock-since"></div>
+                  <div class="k">归口部门</div><div class="v" id="lock-owner"></div>
+                </div>
+                <div class="text-2" style="margin-top:8px;font-size:12px;color:var(--text-2);">
+                  存在待审 / 已审未生效的变更时，受影响付款节点不允许编辑或新建付款申请，避免变更前后口径不一致。变更生效后自动解除冻结。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -208,6 +298,59 @@
         comment +
       '</div>';
     }).join('');
+
+    /* 顶部冻结 banner */
+    if (d.paymentLockState && d.paymentLockState.isLocked) {
+      document.getElementById('lock-banner').style.display = '';
+      document.getElementById('lock-banner-text').innerHTML = '<strong>付款节点已冻结：</strong>' + d.paymentLockState.reason;
+    }
+
+    /* 履约节点 */
+    document.getElementById('milestones-tbody').innerHTML = d.milestones.map(function (m) {
+      return '<tr>' +
+        '<td>' + m.no + '</td>' +
+        '<td>' + m.name + '<div class="muted" style="font-size:11px;">' + m.detail + '</div></td>' +
+        '<td class="muted">' + m.planDate + '</td>' +
+        '<td class="muted">' + m.actDate + '</td>' +
+        '<td>' + (m.compliance === '—' ? '<span class="muted">—</span>' : SC.badge(m.compliance, m.color, true)) + '</td>' +
+        '<td>' + SC.badge(m.state, m.color, true) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    /* 合同变更 */
+    document.getElementById('changes-tbody').innerHTML = d.changes.map(function (c) {
+      var deltaText = c.delta === 0 ? '<span class="muted">不改金额</span>' :
+        '<span style="color:' + (c.delta > 0 ? 'var(--red)' : 'var(--green)') + ';font-weight:600;">' + (c.delta > 0 ? '+' : '') + SC.fmtMoney(c.delta) + '</span>' +
+        '<div class="muted" style="font-size:11px;">' + SC.fmtMoney(c.oldAmount) + ' → ' + SC.fmtMoney(c.newAmount) + '</div>';
+      return '<tr>' +
+        '<td>' + c.seq + '</td>' +
+        '<td class="code">' + c.changeNo + '</td>' +
+        '<td><span class="badge gray">' + c.type + '</span></td>' +
+        '<td class="muted" style="font-size:12px;max-width:240px;">' + c.reason + '<div style="font-size:11px;color:var(--text-3);margin-top:2px;">' + c.approvalNote + '</div></td>' +
+        '<td class="num">' + deltaText + '</td>' +
+        '<td class="muted" style="font-size:11px;">提交 ' + c.submitDate + '<br>' + (c.effectDate === '—' ? '<span style="color:var(--amber);">未生效</span>' : '生效 ' + c.effectDate) + '</td>' +
+        '<td>' + SC.badge(c.state, c.color, true) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    /* 履约预警 */
+    document.getElementById('alerts-tbody').innerHTML = d.complianceAlerts.map(function (a) {
+      var levelColor = a.level === '紧急' ? 'red' : a.level === '重要' ? 'amber' : 'gray';
+      return '<tr>' +
+        '<td class="code">' + a.code + '</td>' +
+        '<td>' + SC.badge(a.level, levelColor, true) + '</td>' +
+        '<td><strong>' + a.title + '</strong><div class="muted" style="font-size:11px;">' + a.detail + '</div></td>' +
+      '</tr>';
+    }).join('');
+
+    /* 变更冻结状态 */
+    var lock = d.paymentLockState;
+    document.getElementById('lock-state').innerHTML = lock.isLocked
+      ? '<span class="badge red dot">已冻结</span>'
+      : '<span class="badge green dot">未冻结</span>';
+    document.getElementById('lock-nodes').textContent = lock.affectedNodes.length ? '#' + lock.affectedNodes.join(' / #') : '—';
+    document.getElementById('lock-since').textContent = lock.lockedSince;
+    document.getElementById('lock-owner').textContent = lock.ownedBy;
   </script>
 </body>
 </html>

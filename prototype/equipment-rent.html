@@ -4,6 +4,52 @@
   <meta charset="utf-8">
   <title>设备租赁 — 阜矿物资供应管理系统（原型）</title>
   <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .three-bond {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .three-bond .bond {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      background: #fafbfd;
+    }
+    .three-bond .bond .head {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 4px;
+    }
+    .three-bond .bond .amount {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .action-grid .action-row {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .action-grid .action-row .desc {
+      flex: 1;
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+    @media (max-width: 1100px) {
+      .three-bond { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
   <div id="header"></div>
@@ -16,10 +62,11 @@
           <div class="flow-strip">
             <div class="node done"><span class="step-num">1</span> 租赁申请 (E-07)</div>
             <div class="node done"><span class="step-num">2</span> 审批</div>
-            <div class="node current"><span class="step-num">3</span> 租赁登记 (E-08)</div>
-            <div class="node"><span class="step-num">4</span> 起租 (E-09)</div>
-            <div class="node"><span class="step-num">5</span> 续租 / 停租 (E-10/11)</div>
-            <div class="node"><span class="step-num">6</span> 退租 (E-12) → 费用汇总 (E-13)</div>
+            <div class="node done"><span class="step-num">3</span> 租赁登记 (E-08)</div>
+            <div class="node done"><span class="step-num">4</span> 起租 (E-09)</div>
+            <div class="node current"><span class="step-num">5</span> 在租 / 月度费用 (E-13)</div>
+            <div class="node"><span class="step-num">6</span> 续租 / 停租 (E-10/11)</div>
+            <div class="node"><span class="step-num">7</span> 退租 + 交接 (E-12/14)</div>
           </div>
         </div>
 
@@ -27,7 +74,7 @@
           <div class="kpi"><div class="label">在租设备</div><div class="value">3</div><div class="trend">月度租金 ¥ 192,500</div></div>
           <div class="kpi"><div class="label">本月新起租</div><div class="value">1</div><div class="trend up">东梁矿掘进机</div></div>
           <div class="kpi"><div class="label">待起租 / 待退租</div><div class="value">2</div><div class="trend">需协调交接 / 结算</div></div>
-          <div class="kpi"><div class="label">本月费用汇总</div><div class="value">¥ 233,000</div><div class="trend">含续租审中部分</div></div>
+          <div class="kpi"><div class="label">本月费用汇总</div><div class="value">¥ 233,000</div><div class="trend">已汇总 ¥ 86k 待推付款</div></div>
         </div>
 
         <div class="card">
@@ -40,6 +87,11 @@
                 <option>艾友矿·综采一队</option><option>艾友矿·综采二队</option>
                 <option>东梁矿·掘进一队</option><option>五龙矿·运输二队</option>
                 <option>新邱矿·通防队</option>
+              </select>
+            </div>
+            <div class="form-field"><label>计费模式</label>
+              <select>
+                <option>全部</option><option>月度结算 (MONTHLY)</option><option>一次性收费 (ONE_TIME)</option>
               </select>
             </div>
             <div class="form-field"><label>状态</label>
@@ -59,7 +111,7 @@
             <div class="title">设备租赁台账</div>
             <div class="actions">
               <button class="btn">导出</button>
-              <button class="btn btn-primary">+ 新建租赁申请</button>
+              <button class="btn btn-primary" onclick="alert('演示模式：发起租赁申请草稿。');">+ 新建租赁申请</button>
             </div>
           </div>
 
@@ -71,7 +123,8 @@
                 <th>出租方</th>
                 <th>承租单位</th>
                 <th>租期</th>
-                <th class="num">月租金</th>
+                <th class="num">月租金 / 一次性</th>
+                <th>计费模式</th>
                 <th>状态</th>
                 <th>操作</th>
               </tr>
@@ -80,14 +133,131 @@
           </table>
         </div>
 
-        <!-- 提示 -->
-        <div class="card">
-          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
-            <span class="badge blue dot">边界说明</span>
-            <div class="text-2">
-              <div><strong>设备 / 库存事实源边界：</strong>租赁设备进入施工现场后，<u>不计入库存台账 S-13</u>；仅在设备档案 (E-01) 中标记为「在租使用」状态，相关台账通过设备生命周期表追踪。</div>
-              <div style="margin-top:6px;"><strong>租赁费用与合同付款：</strong>费用汇总 (E-13) 不直接生成付款单，需触达合同模块的付款节点 (C-04) 后由资金计划模块统一发起付款 → NC 推送。</div>
-              <div style="margin-top:6px;">详见《07-设备与设备租赁详细设计 V1.0》第 4 章 — 库存 / 合同 / 付款边界。</div>
+        <!-- 详情：选 ZL-2026-0211 采煤机 演示完整闭环 -->
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">租赁详情（示例：<span class="code" id="d-code"></span>）</div>
+                <div class="actions">
+                  <a class="btn btn-sm" id="d-contract-link">关联合同</a>
+                  <a class="btn btn-sm" href="equipment-lifecycle.html">查看设备</a>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="kv">
+                  <div class="k">设备 / 编号</div><div class="v" id="d-equip"></div>
+                  <div class="k">出租方</div><div class="v" id="d-lessor"></div>
+                  <div class="k">承租单位 / 责任人</div><div class="v" id="d-lessee"></div>
+                  <div class="k">合同 / 申请单</div><div class="v" id="d-contract"></div>
+                  <div class="k">租期</div><div class="v" id="d-period"></div>
+                  <div class="k">月租金 / 总额</div><div class="v" id="d-fee"></div>
+                  <div class="k">计费模式</div><div class="v" id="d-mode"></div>
+                  <div class="k">计费规则</div><div class="v" id="d-rule" style="font-size:12px;"></div>
+                  <div class="k">读数 (起 → 当前)</div><div class="v" id="d-reading"></div>
+                  <div class="k">登记状态</div><div class="v" id="d-state"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="title">月度费用汇总（E-13）</div>
+                <div class="actions">
+                  <button class="btn btn-sm" onclick="alert('演示模式：触发月度批处理重新汇总。');">月末批处理</button>
+                  <button class="btn btn-sm btn-primary" onclick="alert('演示模式：把 5 月汇总推送到合同付款计划 C-07，生成付款申请草稿。');">推付款 (C-07)</button>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>月份</th>
+                    <th class="num">计费 / 不计费天数</th>
+                    <th class="num">月租金</th>
+                    <th class="num">调整</th>
+                    <th class="num">应付</th>
+                    <th class="num">累计</th>
+                    <th>关联付款</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody id="fees-tbody"></tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="title">付款节点（C-04 · 本租赁合同）</div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>节点名称</th>
+                    <th class="num">计划 / 已付</th>
+                    <th>计划日期</th>
+                    <th>实际日期</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody id="paynode-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">三笔保证 / 押金（独立核算）</div>
+              </div>
+              <div class="card-body">
+                <div class="three-bond">
+                  <div class="bond" style="border-left:3px solid var(--brand);">
+                    <div class="head">押金 (rental_deposit)</div>
+                    <div class="amount" id="b-deposit"></div>
+                    <div class="muted" style="font-size:11px;margin-top:4px;">租赁结束 + 设备完好退还</div>
+                  </div>
+                  <div class="bond" style="border-left:3px solid var(--green);">
+                    <div class="head">履约保证金 (§8.6)</div>
+                    <div class="amount" id="b-perf"></div>
+                    <div class="muted" style="font-size:11px;margin-top:4px;" id="b-perf-note"></div>
+                  </div>
+                  <div class="bond" style="border-left:3px solid var(--amber);">
+                    <div class="head">租赁质保金 (§8.10 / 政策 02)</div>
+                    <div class="amount" id="b-quality"></div>
+                    <div class="muted" style="font-size:11px;margin-top:4px;" id="b-quality-note"></div>
+                  </div>
+                </div>
+                <div class="text-2" style="margin-top:10px;font-size:12px;color:var(--text-2);line-height:1.55;">
+                  <span class="badge blue dot">独立核算</span>
+                  押金、履约保证金、租赁质保金<strong>三笔独立</strong>，不冲抵。履约保证金触发条件按详设 05 §8.6.1（竞争性方式 + ≥20 万）；租赁质保金按 §8.10 / 政策 02 第四十一条（租赁合同 + ≥50 万），仅现金缴纳，比例默认 5%（可调 3%-10%）。
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">租赁动作（演示）</div></div>
+              <div class="card-body">
+                <div class="action-grid" id="actions-grid"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">全生命周期</div></div>
+              <div class="card-body">
+                <div class="timeline" id="lifecycle"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+                <span class="badge blue dot">边界说明</span>
+                <div class="text-2">
+                  <div><strong>设备 / 库存事实源边界：</strong>租赁设备进入施工现场后，<u>不计入库存台账 S-13</u>；仅在设备档案 (E-01) 中标记为「租赁在用」状态。</div>
+                  <div style="margin-top:6px;"><strong>租赁费用与合同付款：</strong>E-13 月度汇总不直接执行付款，须推送 C-07 付款计划 → C-08 付款申请 → NC 应付。</div>
+                  <div style="margin-top:6px;">详见《07-设备与设备租赁详细设计 V1.0》§4.2 + 《05-合同与资金详细设计 V1.1》§8.10。</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -103,19 +273,27 @@
       page: 'equipment-rent',
       crumbs: ['设备', '设备租赁'],
       title: '设备租赁',
-      desc: '对齐《07-设备与设备租赁详细设计 V1.0》— E-07~E-13 租赁闭环',
+      desc: '对齐《07-设备与设备租赁详细设计 V1.0》+ 《05 §8.10》+ 政策 02 — 起/在/续/停/退租闭环 + 月度费用 + 三笔保证金独立核算',
       actions: [{ label: '+ 设备建档' }, { label: '+ 新建租赁申请', primary: true }],
     });
 
-    var tbody = document.getElementById('lease-tbody');
-    tbody.innerHTML = SC.data.equipmentLeases.map(function (l) {
+    function modeBadge(m) {
+      return m === 'ONE_TIME' ? '<span class="badge amber">一次性</span>' : '<span class="badge gray">月度</span>';
+    }
+
+    /* 列表 */
+    document.getElementById('lease-tbody').innerHTML = SC.data.equipmentLeases.map(function (l) {
+      var feeText = l.paymentMode === 'ONE_TIME'
+        ? SC.fmtMoney(l.oneTimeAmount || 0) + '<div class="muted" style="font-size:11px;">一次性收取</div>'
+        : SC.fmtMoney(l.monthlyFee) + '<div class="muted" style="font-size:11px;">每月</div>';
       return '<tr>' +
         '<td class="code">' + l.code + '</td>' +
         '<td>' + l.equip + '<div class="muted code" style="font-size:11px;">' + l.equipCode + '</div></td>' +
         '<td>' + l.lessor + '</td>' +
         '<td>' + l.lessee + '</td>' +
         '<td class="muted">' + l.startDate + ' ~ ' + l.endDate + '</td>' +
-        '<td class="num">' + SC.fmtMoney(l.monthlyFee) + '</td>' +
+        '<td class="num">' + feeText + '</td>' +
+        '<td>' + modeBadge(l.paymentMode) + '</td>' +
         '<td>' + SC.badge(l.state, l.color, true) + '</td>' +
         '<td class="actions"><a>查看</a>' +
           (l.state === '执行中' ? '<a>停租</a><a>续租</a>' : '') +
@@ -125,6 +303,72 @@
           (l.state === '已退租' ? '<a>费用汇总</a>' : '') +
         '</td>' +
       '</tr>';
+    }).join('');
+
+    /* 详情 */
+    var d = SC.data.rentalDetail;
+    document.getElementById('d-code').textContent = d.code;
+    document.getElementById('d-equip').innerHTML = d.equip + ' <span class="muted code">(' + d.equipCode + ')</span>';
+    document.getElementById('d-lessor').innerHTML = d.lessor + ' <span class="muted code" style="font-size:11px;">' + d.lessorTax + '</span>';
+    document.getElementById('d-lessee').innerHTML = d.lessee + ' · 责任人 ' + d.responsible;
+    document.getElementById('d-contract').innerHTML = '<a href="contract-detail.html" class="code">' + d.contractCode + '</a> · 申请 <span class="code muted">' + d.requestNo + '</span> · 登记 <span class="code muted">' + d.registrationNo + '</span>';
+    document.getElementById('d-contract-link').href = 'contract-detail.html';
+    document.getElementById('d-period').textContent = d.startDate + ' ~ ' + d.plannedEndDate + '（实际退租 ' + d.actualEndDate + '）';
+    document.getElementById('d-fee').innerHTML = SC.fmtMoney(d.monthlyFee) + ' / 月 · 总额 <strong>' + SC.fmtMoney(d.totalAmount) + '</strong>';
+    document.getElementById('d-mode').innerHTML = modeBadge(d.paymentMode) + ' <span class="muted" style="font-size:11px;margin-left:6px;">' + d.paymentModeText + '</span>';
+    document.getElementById('d-rule').textContent = d.feeRule;
+    document.getElementById('d-reading').textContent = d.initialReading + ' → ' + d.currentReading;
+    document.getElementById('d-state').innerHTML = SC.badge(d.registrationState, 'green', true);
+
+    /* 月度费用 */
+    document.getElementById('fees-tbody').innerHTML = d.monthlyFees.map(function (f) {
+      return '<tr>' +
+        '<td class="code">' + f.month + '</td>' +
+        '<td class="num">' + f.billingDays + ' / ' + f.excludedDays + '</td>' +
+        '<td class="num">' + SC.fmtMoney(f.monthlyFee) + '</td>' +
+        '<td class="num">' + (f.adjustment === 0 ? '<span class="muted">—</span>' : SC.fmtMoney(f.adjustment)) + '</td>' +
+        '<td class="num"><strong>' + SC.fmtMoney(f.payable) + '</strong></td>' +
+        '<td class="num muted">' + SC.fmtMoney(f.accumulative) + '</td>' +
+        '<td class="muted code" style="font-size:11px;">' + f.paymentRequest + '</td>' +
+        '<td>' + SC.badge(f.state, f.color, true) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    /* 付款节点 */
+    document.getElementById('paynode-tbody').innerHTML = d.payNodes.map(function (n) {
+      return '<tr>' +
+        '<td>' + n.no + '</td>' +
+        '<td>' + n.name + '</td>' +
+        '<td class="num">' + SC.fmtMoney(n.plan) + '<div class="muted" style="font-size:11px;">已付 ' + SC.fmtMoney(n.paid) + '</div></td>' +
+        '<td class="muted">' + n.planDate + '</td>' +
+        '<td class="muted">' + n.actDate + '</td>' +
+        '<td>' + SC.badge(n.state, n.color, true) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    /* 三笔保证金 */
+    document.getElementById('b-deposit').textContent = SC.fmtMoney(d.depositAmount) + ' · ' + d.depositState;
+    document.getElementById('b-perf').textContent = SC.fmtMoney(d.performanceBond.amount) + ' · ' + d.performanceBond.state;
+    document.getElementById('b-perf-note').textContent = d.performanceBond.ratio + ' × 含税总额 · ' + d.performanceBond.refundCondition;
+    document.getElementById('b-quality').textContent = SC.fmtMoney(d.qualityBond.amount) + ' · ' + d.qualityBond.state;
+    document.getElementById('b-quality-note').textContent = d.qualityBond.ratio + ' · ' + d.qualityBond.paymentForm;
+
+    /* 操作 */
+    document.getElementById('actions-grid').innerHTML = d.pendingActions.map(function (a) {
+      return '<div class="action-row">' +
+        '<button class="btn btn-sm btn-primary" onclick="alert(\'演示模式：发起 ' + a.action + '；进入审批流。\');">' + a.action + '</button>' +
+        '<div class="desc">' + a.desc + '</div>' +
+      '</div>';
+    }).join('');
+
+    /* 生命周期 timeline */
+    document.getElementById('lifecycle').innerHTML = d.lifecycle.map(function (l) {
+      var cls = l.state;
+      return '<div class="step ' + cls + '">' +
+        '<div class="title">' + l.title + '</div>' +
+        '<div class="meta">' + l.who + ' · ' + l.time + '</div>' +
+        '<div class="comment">' + l.detail + '</div>' +
+      '</div>';
     }).join('');
   </script>
 </body>

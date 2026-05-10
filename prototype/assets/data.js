@@ -264,29 +264,113 @@ SC.data = {
       avgCost: 320, value: 5760, safetyStock: 24, turnoverDays: 15, reserveBudgetPct: 38, stockControl: '低储' },
   ],
 
-  /* 设备租赁（对齐 07） */
+  /* 设备租赁（对齐 07 V1.0 + 政策 02 资产租赁实施细则 + 详设 05 §8.10） */
   equipmentLeases: [
     { code: 'ZL-2026-0211', equip: '采煤机 MG250/591-WD', equipCode: 'EQ-CM-00112',
       lessor: '中煤张家口煤机制造', lessee: '艾友矿·综采一队',
       startDate: '2026-03-01', endDate: '2026-08-31', monthlyFee: 86000,
-      state: '执行中', color: 'green' },
+      paymentMode: 'MONTHLY', state: '执行中', color: 'green' },
     { code: 'ZL-2026-0212', equip: '掘进机 EBZ200', equipCode: 'EQ-JJ-00208',
       lessor: '太原重工股份', lessee: '东梁矿·掘进一队',
       startDate: '2026-04-15', endDate: '2026-10-14', monthlyFee: 64500,
-      state: '已起租', color: 'blue' },
+      paymentMode: 'MONTHLY', state: '已起租', color: 'blue' },
     { code: 'ZL-2026-0213', equip: '皮带运输机系统 1.4m', equipCode: 'EQ-PS-00321',
       lessor: '辽宁中煤矿山装备', lessee: '五龙矿·运输二队',
       startDate: '2026-05-01', endDate: '2026-11-30', monthlyFee: 42000,
-      state: '待起租', color: 'amber' },
+      paymentMode: 'MONTHLY', state: '待起租', color: 'amber' },
     { code: 'ZL-2026-0214', equip: '乳化液泵站 BRW400/31.5', equipCode: 'EQ-RH-00104',
       lessor: '郑州煤矿机械集团', lessee: '艾友矿·综采二队',
       startDate: '2026-02-01', endDate: '2026-04-30', monthlyFee: 28000,
-      state: '已退租', color: 'gray' },
+      paymentMode: 'MONTHLY', state: '已退租', color: 'gray' },
     { code: 'ZL-2026-0215', equip: '局部通风机 FBD№6.7/2×30', equipCode: 'EQ-TF-00088',
       lessor: '抚顺矿用风机厂', lessee: '新邱矿·通防队',
       startDate: '2026-04-01', endDate: '2026-07-31', monthlyFee: 12500,
-      state: '续租审中', color: 'amber' },
+      paymentMode: 'MONTHLY', state: '续租审中', color: 'amber' },
+    { code: 'ZL-2026-0216', equip: '应急排水泵 PB200/45', equipCode: 'EQ-PMP-00045',
+      lessor: '大连华锐重工集团', lessee: '艾友矿·机电科',
+      startDate: '2026-05-05', endDate: '2026-05-08', monthlyFee: 0,
+      paymentMode: 'ONE_TIME', oneTimeAmount: 18000,
+      state: '已退租', color: 'gray' },
   ],
+
+  /* 租赁详情（ZL-2026-0211 采煤机示例 — 演示完整闭环 + 计费 + 质保金 + 付款联动） */
+  rentalDetail: {
+    code: 'ZL-2026-0211',
+    requestNo: 'RR-2026-0098',
+    registrationNo: 'REG-2026-0033',
+    contractCode: 'HT-2026-0051',
+    equip: '采煤机 MG250/591-WD',
+    equipCode: 'EQ-CM-00112',
+    lessor: '中煤张家口煤机制造',
+    lessorTax: '91130700MA0XXXXXXX',
+    lessee: '艾友矿·综采一队',
+    responsible: '李振华（综采一队队长）',
+    startDate: '2026-03-01',
+    plannedEndDate: '2026-08-31',
+    actualEndDate: '—',
+    monthlyFee: 86000,
+    totalAmount: 516000,
+    paymentMode: 'MONTHLY',
+    paymentModeText: '月度结算（默认 SY-02 RENTAL_PAYMENT_MODE_DEFAULT=MONTHLY）',
+    billingCycle: '月',
+    feeRule: '月租金 × 计费天数 / 当月自然天数 + 调整金额（一期基础口径，复杂阶梯计价 / 台班计价 二期）',
+    initialReading: '运行 0 小时',
+    currentReading: '运行 920 小时',
+    /* 押金（一般预收，租期结束退还） */
+    depositAmount: 50000,
+    depositState: '已收',
+    /* 履约保证金（按详设 05 §8.6 — 竞争性方式 + ≥20 万触发） */
+    performanceBond: {
+      triggered: true,
+      reason: '竞争性招标 + 合同金额 ¥516,000 ≥ 20 万',
+      ratio: '10%',
+      amount: 51600,
+      state: '已收取',
+      refundCondition: '验收合格后 5 个工作日内退还',
+    },
+    /* 租赁质保金（按详设 05 §8.10 + 政策 02 第四十一条 — 租赁合同 + ≥50 万触发） */
+    qualityBond: {
+      triggered: true,
+      reason: '租赁合同 + lease_amount ¥516,000 ≥ SY-02 LEASE_QUALITY_BOND_THRESHOLD（50 万）',
+      ratio: '5% （SY-02 LEASE_QUALITY_BOND_RATIO，可调 3%-10%）',
+      amount: 25800,
+      paymentForm: '现金（不接受银行保函，与履约保证金不同）',
+      state: '已缴纳',
+      releaseCondition: '退租 + 设备验收合格 + 无损坏赔偿',
+      independence: '与履约保证金 §8.6 独立核算与退还，不冲抵',
+    },
+    registrationState: '在租',
+    /* 月度费用汇总 E-13（按月汇总） */
+    monthlyFees: [
+      { month: '2026-03', billingDays: 31, excludedDays: 0, monthlyFee: 86000, adjustment: 0, payable: 86000, accumulative: 86000, state: '已付', paymentRequest: 'FK-2026-0066', color: 'green' },
+      { month: '2026-04', billingDays: 30, excludedDays: 0, monthlyFee: 86000, adjustment: 0, payable: 86000, accumulative: 172000, state: '已付', paymentRequest: 'FK-2026-0098', color: 'green' },
+      { month: '2026-05', billingDays: 31, excludedDays: 0, monthlyFee: 86000, adjustment: 0, payable: 86000, accumulative: 258000, state: '已汇总待推', paymentRequest: '待生成', color: 'amber' },
+    ],
+    /* 付款节点（C-04 视角，与 contractDetail.payNodes 同口径但属本租赁合同） */
+    payNodes: [
+      { no: 1, name: '起租预付一个月租金', plan: 86000, paid: 86000, planDate: '2026-03-01', actDate: '2026-03-01', state: '已支付', color: 'green' },
+      { no: 2, name: '月度结算（3 月）', plan: 86000, paid: 86000, planDate: '2026-03-31', actDate: '2026-04-02', state: '已支付', color: 'green' },
+      { no: 3, name: '月度结算（4 月）', plan: 86000, paid: 86000, planDate: '2026-04-30', actDate: '2026-05-02', state: '已支付', color: 'green' },
+      { no: 4, name: '月度结算（5 月）', plan: 86000, paid: 0, planDate: '2026-05-31', actDate: '—', state: '待汇总', color: 'amber' },
+      { no: 5, name: '退租结算 + 质保金退还', plan: 25800, paid: 0, planDate: '2026-08-31', actDate: '—', state: '未到期', color: 'gray' },
+    ],
+    /* 全生命周期 timeline */
+    lifecycle: [
+      { state: 'done', title: 'E-07 租赁申请提交', who: '李振华（综采一队）', time: '2026-02-15', detail: 'RR-2026-0098 预计起租 2026-03-01；预计月租 ¥86,000' },
+      { state: 'done', title: '申请审批通过', who: '设备主管 / 集团物资部', time: '2026-02-22', detail: 'WF-LEASE-001 普通租赁审批通过' },
+      { state: 'done', title: 'C-02 租赁合同签订', who: '李宁（采购科）', time: '2026-02-25', detail: 'HT-2026-0051 月租 ¥86,000 / 6 个月，已收履约保证金 ¥51,600 + 质保金 ¥25,800' },
+      { state: 'done', title: 'E-08 租赁登记', who: '张大海（设备管理）', time: '2026-02-28', detail: 'REG-2026-0033 押金 ¥50,000，paymentMode=MONTHLY' },
+      { state: 'done', title: 'E-09 起租确认', who: '张大海 + 中煤交付员', time: '2026-03-01', detail: 'RST-2026-0066 初始读数 0 小时；E-01 状态置「租赁在用」' },
+      { state: 'current', title: 'E-13 月度费用汇总（在租中）', who: '艾友矿·综采一队', time: '2026-05-08', detail: '累计运行 920 小时 / 累计租金 ¥258,000；5 月汇总待推付款' },
+      { state: 'pending', title: 'E-12 退租 + E-14 交接', who: '—', time: '计划 2026-08-31', detail: '退租审批 + 交接确认（验收合格 → 释放质保金 ¥25,800 + 押金 ¥50,000）' },
+    ],
+    /* 待审 / 可发起的动作 */
+    pendingActions: [
+      { action: '续租 (E-10)', desc: '起租后或在租期内延长租期；新 end_date 必须晚于 planned_end_date；审批通过回写 E-08。' },
+      { action: '停租 (E-11)', desc: '检修 / 设备故障 / 工作面调整等；fee_excluded_flag 决定停租期间是否计费；停租→在租可恢复。' },
+      { action: '退租 (E-12)', desc: '退租审批 → E-14 交接 → 验收合格 → 释放押金 + 质保金；damage_amount 可作扣减依据。' },
+    ],
+  },
 
   /* 审批中心（对齐 10 A-20 approval_instance） */
   approvalTodo: [
@@ -358,29 +442,36 @@ SC.data = {
       color: 'gray', tries: 0, lastAt: '—', err: '外委检修 NC 科目 / 凭证模板待财务确认' },
   ],
 
-  /* 合同（对齐 05） */
+  /* 合同（对齐 05 V1.1 · 含 C-05 变更次数 + 待审标记） */
   contracts: [
     { code: 'HT-2026-0042', name: '抚顺矿用电缆厂年度框架协议', supplier: '抚顺矿用电缆厂',
       type: '物资框架', amount: 4280000, signed: '2026-03-12', expire: '2027-03-11',
-      state: '执行中', color: 'green', paid: 1280000, pendingPay: 800000 },
+      state: '执行中', color: 'green', paid: 1280000, pendingPay: 800000,
+      changeCount: 2, hasPendingChange: true },
     { code: 'HT-2026-0051', name: '采煤机租赁合同（艾友综采一队）', supplier: '中煤张家口煤机制造',
       type: '设备租赁', amount: 516000, signed: '2026-02-25', expire: '2026-08-31',
-      state: '执行中', color: 'green', paid: 172000, pendingPay: 86000 },
+      state: '执行中', color: 'green', paid: 172000, pendingPay: 86000,
+      changeCount: 1, hasPendingChange: false },
     { code: 'HT-2026-0058', name: '辽宁中煤矿山装备 5 月订单合同', supplier: '辽宁中煤矿山装备',
       type: '物资订单', amount: 96000, signed: '2026-04-23', expire: '2026-07-23',
-      state: '执行中', color: 'green', paid: 0, pendingPay: 96000 },
+      state: '执行中', color: 'green', paid: 0, pendingPay: 96000,
+      changeCount: 0, hasPendingChange: false },
     { code: 'HT-2026-0061', name: '北京赛福斯特科技专项合同', supplier: '北京赛福斯特科技',
       type: '物资订单', amount: 68400, signed: '2026-04-25', expire: '2026-06-25',
-      state: '已完成', color: 'gray', paid: 68400, pendingPay: 0 },
+      state: '已完成', color: 'gray', paid: 68400, pendingPay: 0,
+      changeCount: 0, hasPendingChange: false },
     { code: 'HT-2026-0066', name: '大连华锐重工集团 5 月订单', supplier: '大连华锐重工集团',
       type: '物资订单', amount: 248000, signed: '2026-04-26', expire: '2026-07-26',
-      state: '会签中', color: 'amber', paid: 0, pendingPay: 0 },
+      state: '会签中', color: 'amber', paid: 0, pendingPay: 0,
+      changeCount: 0, hasPendingChange: false },
     { code: 'HT-2026-0070', name: '阜新本地物资协作单位火工品月度协议', supplier: '阜新本地物资协作单位',
       type: '物资框架', amount: 320000, signed: '2026-05-01', expire: '2026-12-31',
-      state: '草稿', color: 'gray', paid: 0, pendingPay: 0 },
+      state: '草稿', color: 'gray', paid: 0, pendingPay: 0,
+      changeCount: 0, hasPendingChange: false },
     { code: 'HT-WX-2026-0018', name: '掘进机 EBZ200 外委检修合同', supplier: '太原重工股份',
       type: '外委检修', amount: 120000, signed: '2026-05-02', expire: '2026-06-15',
       state: '超限会签中', color: 'red', paid: 0, pendingPay: 120000,
+      changeCount: 0, hasPendingChange: false,
       control: '金额 / 原值 = 46.2%，触发 WF-CON-OVERLIMIT-001 + SENS-CON-004' },
   ],
 
@@ -430,6 +521,31 @@ SC.data = {
         comment: '已修改 8.3 条款；其余条款符合集团合同模板。' },
       { state: 'done', title: '主管副总审批', who: '张国强', time: '2026-03-11 17:40', comment: '同意。' },
       { state: 'done', title: '签订入库', who: '李宁', time: '2026-03-12 14:20', comment: '电子签章已完成。' },
+    ],
+    /* 履约节点（C-04 履约视角，区别于 payNodes 付款视角；按计划 vs 实际履约对比） */
+    milestones: [
+      { no: 1, name: '合同生效 + 预付款 30%', planDate: '2026-03-12', actDate: '2026-03-12', state: '已完成', color: 'green', compliance: '准时', detail: '已签订并完成预付 ¥1,284,000' },
+      { no: 2, name: '首批到货 50%（30 日账期）', planDate: '2026-05-10', actDate: '2026-05-08', state: '到货 → 验收中', color: 'amber', compliance: '提前 2 日', detail: '到货 DH-2026-0508 部分到货 412,800；待质检入库' },
+      { no: 3, name: '第二批到货 50%（30 日账期）', planDate: '2026-08-10', actDate: '—', state: '未到期', color: 'gray', compliance: '—', detail: '剩余订单 CG-2026-0314 续单' },
+      { no: 4, name: '质保期 1 年（验收合格后起算）', planDate: '2027-03-11', actDate: '—', state: '未启动', color: 'gray', compliance: '—', detail: '质保金 ¥1,000,000 留存至 2027-03-11' },
+    ],
+    /* 合同变更单 C-05（含数量变更已生效 + 付款条件变更待审两条） */
+    changes: [
+      { changeNo: 'CC-2026-0042-01', seq: 1, type: '数量变更', reason: '艾友综采一队上报矿用电缆需求增加 800 米（井下回风顺槽延长）', delta: 480000, oldAmount: 4280000, newAmount: 4760000, effectDate: '2026-04-22', state: '已审', color: 'green', operator: '李宁（采购科）', submitDate: '2026-04-18', approvalNote: '合同金额由 ¥4,280,000 升至 ¥4,760,000，C-04 节点 #2 #3 同步上调' },
+      { changeNo: 'CC-2026-0042-02', seq: 2, type: '付款条件变更', reason: '财务对账周期由 30 日调整为 45 日（与集团 2026 Q2 资金计划同步）', delta: 0, oldAmount: 4760000, newAmount: 4760000, effectDate: '—', state: '待审', color: 'amber', operator: '陈雪（财务部）', submitDate: '2026-05-08', approvalNote: '不改金额；改 C-04 节点 #2 #3 计划付款日；待集团副总财务审批' },
+    ],
+    /* 变更冻结状态（待审变更生效前，受影响付款节点暂停修改） */
+    paymentLockState: {
+      isLocked: true,
+      reason: '存在 1 笔待审变更（CC-2026-0042-02 付款条件变更），变更生效前付款节点 #2 / #3 暂不允许编辑或新建付款申请',
+      affectedNodes: [2, 3],
+      lockedSince: '2026-05-08',
+      ownedBy: '财务部',
+    },
+    /* 履约预警（对齐 09 V1.2 §六 ALR-CON-* 规则） */
+    complianceAlerts: [
+      { code: 'ALR-CON-001', level: '一般', title: '合同到期提醒', detail: '距 expire（2027-03-11）剩余 306 天，已完成累计金额 ¥1,280,000 / ¥4,760,000 = 26.9%', color: 'gray' },
+      { code: 'ALR-CON-CHANGE-PEND', level: '一般', title: '变更待审提醒', detail: 'CC-2026-0042-02 提交于 2026-05-08，已 2 日未审批；建议催办财务复核', color: 'amber' },
     ],
   },
 
