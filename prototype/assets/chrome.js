@@ -28,6 +28,7 @@ SC.nav = [
     { id: 'equipment-lifecycle', href: 'equipment-lifecycle.html', label: '设备生命周期', icon: '◑' },
     { id: 'maintenance-order', href: 'maintenance-order.html',  label: '设备维修工单', icon: '⚒' },
     { id: 'equipment-oee',     href: 'equipment-oee.html',      label: '设备 OEE 看板', icon: '◴' },
+    { id: 'material-issuance', href: 'material-issuance.html',  label: '领料出库主线 ★二期', icon: '↗' },
     { id: 'mobile-stocktake',  href: 'mobile-stocktake.html',   label: '移动端盘点（演示）', icon: '▢' },
   ]},
   { title: '采购协同', items: [
@@ -43,6 +44,7 @@ SC.nav = [
     { id: 'funding-plan',      href: 'funding-plan.html',       label: '资金计划（月度）', icon: '☷' },
     { id: 'three-way-match',   href: 'three-way-match.html',    label: '三单匹配', icon: '☰' },
     { id: 'tentative-estimate', href: 'tentative-estimate.html', label: '暂估闭环', icon: '◌' },
+    { id: 'council-meeting',   href: 'council-meeting.html',    label: '月度集体决议 ★二期', icon: '⊕' },
   ]},
   { title: '基础数据', items: [
     { id: 'material-master',   href: 'material-master.html',    label: '物料主数据', icon: '◫' },
