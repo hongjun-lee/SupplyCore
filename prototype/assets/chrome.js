@@ -127,37 +127,145 @@ SC.mountEngineDock = function () {
   });
 };
 
-SC.demoFlow = [
-  { id: 'requirement-list', file: 'requirement-list.html', label: 'P-01 需求', desc: '基层提报与审批', aliases: ['requirement-detail.html'] },
-  { id: 'purchase-planning', file: 'purchase-planning.html', label: 'P-02 计划', desc: '计划汇总 / P-03 聚合' },
-  { id: 'purchase-task-decomposition', file: 'purchase-task-decomposition.html', label: 'P-05 任务', desc: '合并拆分与采购路径选择' },
-  { id: 'tender', file: 'tender.html', label: 'T 招采', desc: '招标申请 / 标包 / 中标回传' },
-  { id: 'contract-detail', file: 'contract-detail.html', label: 'C 合同', desc: 'C-01 会签与 C-02 执行', aliases: ['contract-list.html'] },
-  { id: 'purchase-orders', file: 'purchase-orders.html', label: 'S-02 订单', desc: '采购订单下达' },
-  { id: 'goods-receipt', file: 'goods-receipt.html', label: 'S-03 到货', desc: '到货验收与质检开关' },
-  { id: 'quality-check', file: 'quality-check.html', label: 'S-04 质检', desc: '三类验收串行 / 可跳过' },
-  { id: 'purchase-receipt', file: 'purchase-receipt.html', label: 'S-05 入库', desc: '入库审核与库存原子事务' },
-  { id: 'inventory', file: 'inventory.html', label: 'S-13 库存', desc: '库存余额 / 流水追溯' },
-  { id: 'nc-interface', file: 'nc-interface.html', label: 'F-01 NC', desc: '接口推送与异常重试', aliases: ['nc-interface-detail.html'] },
-  { id: 'reports', file: 'reports.html', label: 'R 报表', desc: '报表汇总与演示收口', aliases: ['report-detail.html'] },
-];
+/* 演示场景多套主线（v0.17 — 步骤条改场景切换器，业务方按演示主题切换）
+ * 每场景一条短步骤条（≤ 8 步），不再单条塞所有业务 */
+SC.demoScenarios = {
+  'main-purchase': {
+    label: '采购入库主线',
+    desc: '需求 → 计划 → 任务 → 招采 → 合同 → 订单 → 到货 → 质检 → 入库 → 库存 → NC → 报表',
+    steps: [
+      { id: 'requirement-list', file: 'requirement-list.html', label: 'P-01 需求', desc: '基层提报与审批', aliases: ['requirement-detail.html'] },
+      { id: 'purchase-planning', file: 'purchase-planning.html', label: 'P-02 计划', desc: '计划汇总 / P-03 聚合' },
+      { id: 'purchase-task-decomposition', file: 'purchase-task-decomposition.html', label: 'P-05 任务', desc: '合并拆分与采购路径' },
+      { id: 'tender', file: 'tender.html', label: 'T 招采', desc: '招标申请 / 标包 / 中标', aliases: ['tender-archive.html'] },
+      { id: 'contract-detail', file: 'contract-detail.html', label: 'C 合同', desc: 'C-01 会签 + C-02 执行', aliases: ['contract-list.html'] },
+      { id: 'purchase-orders', file: 'purchase-orders.html', label: 'S-02 订单', desc: '采购订单下达' },
+      { id: 'goods-receipt', file: 'goods-receipt.html', label: 'S-03 到货', desc: '到货验收 + 质检开关' },
+      { id: 'quality-check', file: 'quality-check.html', label: 'S-04 质检', desc: '三类验收串行 / 可跳过' },
+      { id: 'purchase-receipt', file: 'purchase-receipt.html', label: 'S-05 入库', desc: '入库审核 + 库存原子事务' },
+      { id: 'inventory', file: 'inventory.html', label: 'S-13 库存', desc: '余额 / 流水追溯' },
+      { id: 'nc-interface', file: 'nc-interface.html', label: 'F-01 NC', desc: '接口推送 / 重推', aliases: ['nc-interface-detail.html'] },
+      { id: 'reports', file: 'reports.html', label: 'R 报表', desc: '汇总收口', aliases: ['report-detail.html'] },
+    ],
+  },
+  'payment-chain': {
+    label: '付款全链路',
+    desc: '合同 → 月度集体决议 → 付款申请 → 三单匹配 → 付款执行 → NC 实付',
+    steps: [
+      { id: 'contract-detail', file: 'contract-detail.html', label: 'C-02 合同', desc: '执行中合同', aliases: ['contract-list.html'] },
+      { id: 'council-meeting', file: 'council-meeting.html', label: '月度集体决议', desc: 'WF-PAY-001 决议批准付款' },
+      { id: 'payment-request', file: 'payment-request.html', label: 'C-08 付款申请', desc: '按节点发起付款' },
+      { id: 'three-way-match', file: 'three-way-match.html', label: '三单匹配', desc: '合同 / 入库 / 发票' },
+      { id: 'payment-execution', file: 'payment-execution.html', label: 'C-10 付款执行', desc: 'NC 实付回写 + 应付消减' },
+      { id: 'nc-interface', file: 'nc-interface.html', label: 'NC 实付', desc: 'BIZ-013 推送' },
+    ],
+  },
+  'tentative-loop': {
+    label: '暂估闭环',
+    desc: '入库时无票 → 暂估台账 → 6 月窗口预警 → 冲销 → NC',
+    steps: [
+      { id: 'goods-receipt', file: 'goods-receipt.html', label: 'S-03 到货', desc: '到货但发票未到' },
+      { id: 'purchase-receipt', file: 'purchase-receipt.html', label: 'S-05 暂估入库', desc: '暂估批准生成 BIZ-002' },
+      { id: 'tentative-estimate', file: 'tentative-estimate.html', label: '暂估台账', desc: '6 月窗口 / D-90/D-30/D-0/D+30' },
+      { id: 'three-way-match', file: 'three-way-match.html', label: '三单匹配', desc: '发票到达后冲销 BIZ-003' },
+      { id: 'nc-interface', file: 'nc-interface.html', label: 'NC 冲销', desc: 'BIZ-002 红冲 + BIZ-001 正式入账' },
+    ],
+  },
+  'tender-fail': {
+    label: '流标重走集体决策',
+    desc: '招标流标 → ALR-PUR-002 → 重新走 P-02 集体决策（合规防火墙）',
+    steps: [
+      { id: 'tender', file: 'tender.html', label: 'T-03 流标', desc: '直录流标 + 原因' },
+      { id: 'alert-rules', file: 'alert-rules.html', label: 'ALR-PUR-002', desc: '流标自动预警' },
+      { id: 'purchase-planning', file: 'purchase-planning.html', label: 'P-02 重审', desc: '重新走集体决策（详设 04 §4.10.5）' },
+      { id: 'tender', file: 'tender.html', label: 'T 重发标', desc: '重新发起招标' },
+    ],
+  },
+  'nc-retry': {
+    label: 'NC 失败 → 重推 → F-08',
+    desc: '入库审核 → NC 推送失败 → 自动重推 ≤3 → F-08 异常台账（治理闭环）',
+    steps: [
+      { id: 'purchase-receipt', file: 'purchase-receipt.html', label: 'S-05:已审', desc: '触发 BIZ-001 推送' },
+      { id: 'nc-interface', file: 'nc-interface.html', label: 'F-01 推送中', desc: 'mock 1-2 秒' },
+      { id: 'nc-interface', file: 'nc-interface.html', label: 'F-01 失败', desc: '5% 失败率 + ALR-INT-001' },
+      { id: 'nc-interface-detail', file: 'nc-interface-detail.html', label: 'F-08 异常', desc: '≥3 次重推升级 + 高敏感处置' },
+    ],
+  },
+  'issuance': {
+    label: '出库 / 成本归集',
+    desc: '领用申请 → 库存核对 → 出库审核 → S-21 流水 → BIZ-005 NC 凭证',
+    steps: [
+      { id: 'material-issuance', file: 'material-issuance.html', label: '领料申请', desc: '成本中心归集' },
+      { id: 'inventory-flow', file: 'inventory-flow.html', label: '出库审批', desc: '领料 / 退料 / 调拨' },
+      { id: 'inventory', file: 'inventory.html', label: 'S-13 库存', desc: '余额变化 + 移动平均出库成本' },
+      { id: 'nc-interface', file: 'nc-interface.html', label: 'NC 凭证', desc: 'BIZ-005 自用消耗' },
+    ],
+  },
+  'split-detect': {
+    label: '反规避检测',
+    desc: '化整为零 / 指定供应商嫌疑检测（30 天累计）',
+    steps: [
+      { id: 'split-detection', file: 'split-detection.html', label: '检测看板', desc: 'ALR-PUR-SPLIT/DESIGNATE-001' },
+      { id: 'purchase-planning', file: 'purchase-planning.html', label: 'P-02 关联', desc: '30 天累计申请' },
+      { id: 'alert-rules', file: 'alert-rules.html', label: '预警闭环', desc: '处置留痕' },
+    ],
+  },
+};
+
+SC.SCENARIO_KEY = 'sc.scenario';
+SC.getScenario = function () {
+  const id = localStorage.getItem(SC.SCENARIO_KEY) || 'main-purchase';
+  return SC.demoScenarios[id] ? id : 'main-purchase';
+};
+SC.findScenarioContaining = function (file, currentPage) {
+  for (const id of Object.keys(SC.demoScenarios)) {
+    const steps = SC.demoScenarios[id].steps;
+    const idx = steps.findIndex(s =>
+      s.id === currentPage || s.file === file || (s.aliases || []).indexOf(file) >= 0
+    );
+    if (idx >= 0) return { id, idx };
+  }
+  return null;
+};
 
 SC.renderDemoFlow = function (opts) {
   const area = document.getElementById('page-area');
   if (!area || document.getElementById('demo-flow-nav')) return;
   const file = (location.pathname.split('/').pop() || 'index.html');
   const currentPage = opts && opts.page;
-  const steps = SC.demoFlow || [];
-  const idx = steps.findIndex(s =>
-    s.id === currentPage ||
-    s.file === file ||
-    (s.aliases || []).indexOf(file) >= 0
-  );
-  if (idx < 0) return;
 
+  let scenarioId = SC.getScenario();
+  let scenario = SC.demoScenarios[scenarioId];
+  let idx = scenario.steps.findIndex(s =>
+    s.id === currentPage || s.file === file || (s.aliases || []).indexOf(file) >= 0
+  );
+
+  // 当前页面不在选中场景里 → 自动找包含该页的场景
+  let notInScenario = false;
+  if (idx < 0) {
+    const found = SC.findScenarioContaining(file, currentPage);
+    if (found) {
+      scenarioId = found.id;
+      scenario = SC.demoScenarios[scenarioId];
+      idx = found.idx;
+      notInScenario = (scenarioId !== SC.getScenario()); // 标记是自动切的
+    } else {
+      // 该页不属于任何场景 → 不显示步骤条
+      return;
+    }
+  }
+
+  const steps = scenario.steps;
   const cur = steps[idx];
   const prev = steps[idx - 1];
   const next = steps[idx + 1];
+
+  const scenarioOpts = Object.keys(SC.demoScenarios).map(id => {
+    const s = SC.demoScenarios[id];
+    const sel = id === scenarioId ? ' selected' : '';
+    return `<option value="${id}"${sel}>${s.label}（${s.steps.length} 步）</option>`;
+  }).join('');
+
   const links = steps.map((s, i) => {
     const cls = ['demo-flow-step'];
     if (i < idx) cls.push('done');
@@ -169,9 +277,14 @@ SC.renderDemoFlow = function (opts) {
 
   const prevBtn = prev ? `<a class="btn btn-sm" href="${prev.file}" title="${prev.desc}">←</a>` : '';
   const nextBtn = next ? `<a class="btn btn-sm btn-primary" href="${next.file}" title="${next.desc}">→</a>` : '';
+  const noticeHtml = notInScenario
+    ? `<span class="demo-flow-notice" title="当前页不在原选场景中">已切到「${scenario.label}」</span>` : '';
+
   const html = `
-    <div class="demo-flow-nav" id="demo-flow-nav" title="档 A 演示主流程 · 当前 ${idx + 1}/${steps.length}：${cur.label} · ${cur.desc}">
-      <span class="demo-flow-badge">档 A · ${idx + 1}/${steps.length}</span>
+    <div class="demo-flow-nav" id="demo-flow-nav" title="${scenario.desc} · 当前 ${idx + 1}/${steps.length}：${cur.label} · ${cur.desc}">
+      <select class="demo-flow-scenario" id="demo-flow-scenario" title="切换演示场景">${scenarioOpts}</select>
+      <span class="demo-flow-badge">${idx + 1}/${steps.length}</span>
+      ${noticeHtml}
       <div class="demo-flow-steps">${links}</div>
       <div class="demo-flow-pager">${prevBtn}${nextBtn}</div>
     </div>`;
@@ -179,6 +292,20 @@ SC.renderDemoFlow = function (opts) {
   const header = area.querySelector('.page-header');
   if (header) header.insertAdjacentHTML('afterend', html);
   else area.insertAdjacentHTML('afterbegin', html);
+
+  const sel = document.getElementById('demo-flow-scenario');
+  if (sel) {
+    sel.addEventListener('change', e => {
+      localStorage.setItem(SC.SCENARIO_KEY, e.target.value);
+      const newScenario = SC.demoScenarios[e.target.value];
+      // 跳到新场景的第一个 step
+      if (newScenario && newScenario.steps.length > 0) {
+        location.href = newScenario.steps[0].file;
+      } else {
+        location.reload();
+      }
+    });
+  }
 };
 
 SC.renderHeader = function () {

@@ -290,6 +290,21 @@ a:hover { text-decoration: underline; }
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
   box-sizing: border-box;
 }
+.demo-flow-scenario {
+  flex-shrink: 0;
+  height: 26px;
+  padding: 0 24px 0 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--brand-50);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  max-width: 200px;
+}
+.demo-flow-scenario:hover { background: #dbeafe; }
+.demo-flow-scenario:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
 .demo-flow-badge {
   flex-shrink: 0;
   font-size: 11px;
@@ -298,6 +313,16 @@ a:hover { text-decoration: underline; }
   background: var(--brand-50);
   padding: 4px 8px;
   border-radius: 999px;
+  white-space: nowrap;
+}
+.demo-flow-notice {
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--amber);
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  padding: 2px 6px;
+  border-radius: 4px;
   white-space: nowrap;
 }
 .demo-flow-pager {
