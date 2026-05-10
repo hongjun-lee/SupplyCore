@@ -72,6 +72,21 @@
           </div>
           <div>
             <div class="card">
+              <div class="card-header"><div class="title">📞 供应商催票记录（D-90 / D-30 升级时自动推送）</div></div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>供应商</th><th>暂估号</th><th>催办次数</th><th>最近催办</th><th>反馈</th></tr></thead>
+                <tbody>
+                  <tr><td>抚顺矿用电缆厂</td><td class="code">ZG-202602-0021</td><td class="num">3</td><td class="muted">2026-04-22</td><td><span class="badge amber dot">承诺月底</span></td></tr>
+                  <tr><td>辽宁中煤矿山装备</td><td class="code">ZG-202603-0008</td><td class="num">2</td><td class="muted">2026-05-05</td><td><span class="badge amber dot">已开票寄送中</span></td></tr>
+                  <tr><td>沈阳安泰电子有限公司</td><td class="code">ZG-202601-0012</td><td class="num">5</td><td class="muted">2026-05-08</td><td><span class="badge red dot">无回应（升级 D-0）</span></td></tr>
+                </tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+                D-30 升级后系统自动推送催办通知给采购员 + 财务；D-0 后阻断该供应商新订单。
+              </div>
+            </div>
+
+            <div class="card">
               <div class="card-header"><div class="title">⚖ NC 凭证规则（BIZ-002 / BIZ-003）</div></div>
               <div class="card-body" style="font-size:12px;line-height:1.7;">
                 <strong>BIZ-002 暂估入库：</strong><br>
@@ -85,6 +100,64 @@
                 借 1403 原材料 + 1221 应交税费<br>
                 贷 2181 应付暂估 / 2202 应付账款<br>
                 <strong>边界：</strong>外委检修暂估科目仍待财务+NC厂商确认，不在原型写死
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">📊 暂估月度专项对账（D+30 后自动转入）</div></div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>月份</th><th class="num">D+30 笔数</th><th class="num">暂估总额</th><th>专项对账状态</th></tr></thead>
+                <tbody>
+                  <tr><td class="muted">2026-04</td><td class="num">2</td><td class="num">¥ 380,000</td><td><span class="badge amber dot">财务复核中</span></td></tr>
+                  <tr><td class="muted">2026-03</td><td class="num">1</td><td class="num">¥ 86,500</td><td><span class="badge green dot">已对账冲销</span></td></tr>
+                  <tr><td class="muted">2026-02</td><td class="num">3</td><td class="num">¥ 542,000</td><td><span class="badge green dot">已对账冲销</span></td></tr>
+                </tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+                超过 6 月 + 30 天仍未冲减，自动转入月度专项对账（详设 09 §六 暂估超期物资月报）。财务汇总、必要时启动专项审计。
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">🚫 阻断供应商列表（D-0 触发，对账完成解除）</div></div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>供应商</th><th>阻断暂估</th><th>触发日</th><th>解除条件</th></tr></thead>
+                <tbody>
+                  <tr><td>沈阳安泰电子有限公司</td><td class="code">ZG-202601-0012</td><td class="muted">2026-05-08</td><td class="muted" style="font-size:11px;">完成与采购员对账确认 + 提交承诺函</td></tr>
+                </tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+                被阻断后该供应商所有新采购订单审批暂停（合同管理员 + 物资主管知悉）。
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">📋 历史冲销归档（已结案 S-07）</div></div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>暂估号</th><th>冲销日</th><th class="num">暂估额</th><th class="num">实际开票</th><th class="num">差异</th></tr></thead>
+                <tbody>
+                  <tr><td class="code">ZG-202512-0003</td><td class="muted">2026-04-15</td><td class="num">¥ 425,000</td><td class="num">¥ 428,500</td><td class="num" style="color:var(--amber);">+0.82%</td></tr>
+                  <tr><td class="code">ZG-202602-0006</td><td class="muted">2026-04-28</td><td class="muted num">¥ 86,000</td><td class="num">¥ 86,000</td><td class="num">—</td></tr>
+                  <tr><td class="code">ZG-202602-0011</td><td class="muted">2026-05-02</td><td class="num">¥ 142,500</td><td class="num">¥ 140,200</td><td class="num" style="color:var(--green);">-1.61%</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">⚖ 暂估 vs 正式入账对比（差异分析）</div></div>
+              <div class="card-body" style="font-size:12px;line-height:1.7;">
+                <strong>差异来源（详设 06 §7.6.5）：</strong><br>
+                • <strong>价格变动</strong>：暂估按订单价 / 历史平均价；正式发票按实际成交价；差异 ≤ 容差直接调整库存成本<br>
+                • <strong>数量误差</strong>：到货数量与发票数量不符（正常 ≤ 1%）<br>
+                • <strong>税额差异</strong>：暂估按 13% 估算，正式发票按实际税率（13% / 9% / 6%）<br>
+                <strong>差异处理：</strong>差异在容差内 → 自动冲销 + 调整 S-13 unit_cost；差异超容差 → 转人工复核 + 联系供应商<br>
+                <strong>本月差异分析：</strong>3 笔已冲销，1 笔超 1% 转复核（演示用）
               </div>
             </div>
           </div>

@@ -73,6 +73,106 @@
           </div>
         </div>
 
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">🏦 出纳放款工作台</div>
+                <div class="actions"><span class="muted" style="font-size:11px;">当前出纳：陈雪</span></div>
+              </div>
+              <div class="card-body">
+                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;font-size:12px;margin-bottom:10px;">
+                  <div style="padding:10px;background:var(--brand-50);border-radius:4px;">
+                    <div class="muted" style="font-size:10px;">本月待放款</div>
+                    <div style="font-size:18px;font-weight:600;color:var(--brand);" id="cashier-pending">¥ 0</div>
+                  </div>
+                  <div style="padding:10px;background:var(--green-50);border-radius:4px;">
+                    <div class="muted" style="font-size:10px;">本月已放款</div>
+                    <div style="font-size:18px;font-weight:600;color:var(--green);" id="cashier-paid">¥ 0</div>
+                  </div>
+                </div>
+                <div style="font-size:11px;color:var(--text-2);">
+                  <strong>放款流程：</strong>C-10 待执行 → 出纳确认银行账户余额充足 → 点"执行" → mock-nc BIZ-013 推送 → 1-2 秒回执 → 已记账 → 应付消减<br>
+                  <strong>双人复核：</strong>金额 ≥ ¥500,000 须出纳 + 财务主管双人复核（演示用占位，实际以详设 11 §权限审计为准）
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">💴 银行账户余额（mock）</div></div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>账户名</th><th>账号</th><th class="num">余额</th><th class="num">当日流出</th></tr></thead>
+                <tbody>
+                  <tr><td>物资公司基本户</td><td class="code muted">6228...3801</td><td class="num"><strong>¥ 28,640,000</strong></td><td class="num" style="color:var(--red);">¥ 86,000</td></tr>
+                  <tr><td>物资公司专项户（火工品）</td><td class="code muted">6228...4502</td><td class="num">¥ 5,820,000</td><td class="num">—</td></tr>
+                  <tr><td>外币户（USD）</td><td class="code muted">6228...0099</td><td class="num">$ 12,400</td><td class="num">—</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">🧾 银行回单上传 / 归档</div></div>
+              <div class="card-body" style="font-size:12px;">
+                <div style="margin-bottom:8px;color:var(--text-2);">回单核对后自动归档，与 C-10 记录关联，作为审计留痕。</div>
+                <table class="data" style="font-size:11px;">
+                  <thead><tr><th>关联 C-10</th><th>回单文件</th><th>金额</th><th>状态</th></tr></thead>
+                  <tbody>
+                    <tr><td class="code">FK-202605-0001</td><td class="muted">回单_20260512_8600.pdf</td><td class="num">¥ 86,000</td><td><span class="badge green dot">已归档</span></td></tr>
+                    <tr><td class="code">FK-202605-0002</td><td class="muted"><span style="color:var(--amber);">⏳ 待上传</span></td><td class="num">¥ 1,284,000</td><td><span class="badge amber dot">待上传</span></td></tr>
+                  </tbody>
+                </table>
+                <button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="alert('演示模式：选择 PDF / 图片回单文件 → OCR 识别金额 / 凭证号 → 自动关联 C-10');">📎 上传回单</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">⚠ 付款错误处置</div></div>
+              <div class="card-body" style="font-size:12px;">
+                <div style="margin-bottom:8px;">3 类常见付款错误：</div>
+                <table class="data" style="font-size:11px;">
+                  <thead><tr><th>错误类型</th><th>触发</th><th>处置流程</th></tr></thead>
+                  <tbody>
+                    <tr><td><span class="badge red">银行打回</span></td><td>账号格式错 / 户名不符 / 收款方账户冻结</td><td>更正 C-08 收款信息 → 重新提交决议 → 重走</td></tr>
+                    <tr><td><span class="badge red">余额不足</span></td><td>账户余额 < 付款金额</td><td>暂挂 → 资金调拨 → 重试</td></tr>
+                    <tr><td><span class="badge red">NC 推送失败</span></td><td>BIZ-013 推送 ≥ 3 次失败</td><td>升级 F-08 异常台账 → IT 处置（编辑映射 / 跳过 / 关闭）</td></tr>
+                  </tbody>
+                </table>
+                <div style="margin-top:8px;color:var(--text-2);font-size:11px;">
+                  <strong>合规：</strong>所有错误处置必须留痕（详设 11 §13 操作日志），可追溯到原始 C-08 / C-10 记录。
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">🔗 BIZ-013 / 014 / 015 / 020 联动占位</div></div>
+              <div class="card-body" style="font-size:12px;line-height:1.7;">
+                <div><strong style="color:var(--green);">✓ BIZ-013</strong> 付款执行（一期 A 已演示） — C-10 已记账触发，应付消减</div>
+                <div><strong style="color:var(--text-3);">○ BIZ-014</strong> 预付款转应付（待二期 A4 完整版）— 预付时 C-08 走 BIZ-014，到货后转 BIZ-015</div>
+                <div><strong style="color:var(--text-3);">○ BIZ-015</strong> 应付暂估转正式（待二期 A4 完整版）— S-07 暂估冲销后正式发票入账走 BIZ-015，与 BIZ-001 区分</div>
+                <div><strong style="color:var(--text-3);">○ BIZ-020</strong> 月度应付消减（待二期 A4 完整版）— 月末批量消减已付应付，与 BIZ-013 实付逐笔消减并行</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">📈 本月付款执行趋势</div></div>
+              <div class="card-body">
+                <div style="font-size:12px;color:var(--text-2);margin-bottom:6px;">每日付款笔数 × 金额（mock 演示）</div>
+                <table class="data" style="font-size:11px;">
+                  <thead><tr><th>日期</th><th class="num">笔数</th><th class="num">金额</th><th>趋势</th></tr></thead>
+                  <tbody>
+                    <tr><td class="muted">05-08</td><td class="num">2</td><td class="num">¥ 86,000</td><td>▂▂</td></tr>
+                    <tr><td class="muted">05-12</td><td class="num">5</td><td class="num">¥ 1,284,000</td><td>▆▆▅▆▆</td></tr>
+                    <tr><td class="muted">05-15</td><td class="num">8</td><td class="num">¥ 2,860,000</td><td>▇▇▆▇▇▇▆▇</td></tr>
+                    <tr><td class="muted">05-18</td><td class="num">3</td><td class="num">¥ 480,000</td><td>▄▃▄</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-header"><div class="title">⚖ NC 凭证规则（BIZ-013 / 014 / 015 / 020）</div></div>
           <div class="card-body" style="font-size:12px;line-height:1.7;">
@@ -187,7 +287,15 @@
       } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
     }
 
-    function refresh() { renderKpis(); renderC10(); renderF01(); }
+    function renderCashier() {
+      var c10 = SC.store.list('C-10');
+      var pending = c10.filter(function (e) { return e.state === '待执行' || e.state === '执行中'; }).reduce(function (a, e) { return a + (e.amount || 0); }, 0);
+      var paid = c10.filter(function (e) { return e.state === '已记账'; }).reduce(function (a, e) { return a + (e.amount || 0); }, 0);
+      document.getElementById('cashier-pending').textContent = SC.fmtMoney(pending);
+      document.getElementById('cashier-paid').textContent = SC.fmtMoney(paid);
+    }
+
+    function refresh() { renderKpis(); renderC10(); renderF01(); renderCashier(); }
     ['C-08', 'C-10', 'C-02', 'F-01', 'F-03'].forEach(function (e) { SC.store.subscribe(e, refresh); });
     refresh();
   </script>

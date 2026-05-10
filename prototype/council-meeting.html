@@ -79,6 +79,91 @@
           </div>
         </div>
 
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">📅 决议日历</div></div>
+              <div class="card-body">
+                <table class="data" style="font-size:12px;">
+                  <thead><tr><th>月份</th><th>决议日期</th><th>状态</th><th class="num">参会人数</th><th class="num">批准笔数</th><th class="num">批准金额</th></tr></thead>
+                  <tbody id="meeting-cal-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">🚨 紧急付款例外通道</div></div>
+              <div class="card-body">
+                <div style="font-size:12px;color:var(--text-2);margin-bottom:8px;">绕过月度集体决议的特殊紧急付款，须主管副总+财务+法务三方紧急会签 + 事后补审议。本月例外：</div>
+                <table class="data" style="font-size:12px;">
+                  <thead><tr><th>申请号</th><th>金额</th><th>原因</th><th>状态</th></tr></thead>
+                  <tbody>
+                    <tr><td class="code">FK-EM-2026-0001</td><td class="num">¥ 86,000</td><td class="muted" style="font-size:11px;max-width:160px;">井下抢险设备应急维修，超 24h 停产损失</td><td><span class="badge red dot">已紧急批准</span></td></tr>
+                    <tr><td class="code">FK-EM-2026-0002</td><td class="num">¥ 42,000</td><td class="muted" style="font-size:11px;max-width:160px;">瓦斯监测仪检修计量，安全合规要求</td><td><span class="badge amber dot">紧急会签中</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">📋 本月参会签到</div>
+                <div class="muted" id="meeting-period-label" style="font-size:11px;"></div>
+              </div>
+              <div class="card-body">
+                <table class="data" style="font-size:12px;">
+                  <thead><tr><th>角色</th><th>姓名</th><th>签到时间</th><th>结果</th></tr></thead>
+                  <tbody>
+                    <tr><td>财务部</td><td>陈雪</td><td class="muted">10:02</td><td><span class="badge green dot">出席</span></td></tr>
+                    <tr><td>物资公司</td><td>李宁</td><td class="muted">10:05</td><td><span class="badge green dot">出席</span></td></tr>
+                    <tr><td>集团副总</td><td>张国强</td><td class="muted">10:08</td><td><span class="badge green dot">出席</span></td></tr>
+                    <tr><td>法务部（旁听）</td><td>刘海明</td><td class="muted">10:10</td><td><span class="badge blue dot">旁听</span></td></tr>
+                    <tr><td>会议记录</td><td>王雯</td><td class="muted">10:00</td><td><span class="badge gray dot">记录员</span></td></tr>
+                  </tbody>
+                </table>
+                <div style="margin-top:10px;padding:8px 12px;background:var(--green-50);border-radius:4px;font-size:12px;color:#064e3b;">
+                  <strong>✓ 三方出席齐备</strong>，决议有效。详设 05 §8.5 要求财务部 + 物资公司 + 集团副总三方必到。
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="title">📤 名单输出预览（决议清单）</div>
+                <div class="actions"><button class="btn btn-sm" onclick="alert('演示模式：导出 PDF《XX 月度付款审批清单》— 实际系统输出含水印、审计编号、参会签字。');">导出 PDF</button></div>
+              </div>
+              <div class="card-body" style="font-size:12px;">
+                <div style="border:1px dashed var(--border);padding:14px;border-radius:6px;background:#fafbfd;">
+                  <div style="text-align:center;font-weight:600;font-size:14px;margin-bottom:10px;" id="list-title">2026 年 5 月度付款审批清单</div>
+                  <div class="muted" style="text-align:center;margin-bottom:12px;">阜矿集团物资公司 · 月度集体决议 · 决议编号 <span class="code" id="list-meeting-id">COUNCIL-2026-05</span></div>
+                  <table class="data" style="font-size:11px;">
+                    <thead><tr><th>序</th><th>合同</th><th>供应商</th><th class="num">金额</th><th>付款条件</th></tr></thead>
+                    <tbody id="list-output-tbody"></tbody>
+                  </table>
+                  <div class="muted" style="margin-top:10px;font-size:10px;text-align:center;">出席人签字：陈雪　李宁　张国强（电子签章）　记录：王雯　决议时间：2026-05-15 10:00-12:30</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="title">🗂 历史决议归档（近 6 个月）</div></div>
+          <table class="data" style="font-size:12px;">
+            <thead><tr><th>决议编号</th><th>月份</th><th>决议日期</th><th>会议主持</th><th class="num">批准笔数</th><th class="num">批准金额</th><th class="num">实付完成率</th><th>归档</th></tr></thead>
+            <tbody>
+              <tr><td class="code">COUNCIL-2026-04</td><td>2026-04</td><td class="muted">2026-04-15</td><td>张国强</td><td class="num">28</td><td class="num">¥ 4,860,000</td><td class="num">100%</td><td><a>查看</a> · <a>下载</a></td></tr>
+              <tr><td class="code">COUNCIL-2026-03</td><td>2026-03</td><td class="muted">2026-03-15</td><td>张国强</td><td class="num">31</td><td class="num">¥ 5,420,000</td><td class="num">100%</td><td><a>查看</a> · <a>下载</a></td></tr>
+              <tr><td class="code">COUNCIL-2026-02</td><td>2026-02</td><td class="muted">2026-02-17</td><td>张国强</td><td class="num">25</td><td class="num">¥ 3,980,000</td><td class="num">100%</td><td><a>查看</a> · <a>下载</a></td></tr>
+              <tr><td class="code">COUNCIL-2026-01</td><td>2026-01</td><td class="muted">2026-01-15</td><td>张国强</td><td class="num">22</td><td class="num">¥ 3,260,000</td><td class="num">100%</td><td><a>查看</a> · <a>下载</a></td></tr>
+              <tr><td class="code">COUNCIL-2025-12</td><td>2025-12</td><td class="muted">2025-12-15</td><td>张国强</td><td class="num">35</td><td class="num">¥ 6,180,000</td><td class="num">100%</td><td><a>查看</a> · <a>下载</a></td></tr>
+              <tr><td class="code">COUNCIL-2025-11</td><td>2025-11</td><td class="muted">2025-11-17</td><td>张国强</td><td class="num">29</td><td class="num">¥ 4,720,000</td><td class="num">100%</td><td><a>查看</a> · <a>下载</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+
         <div class="card">
           <div class="card-header"><div class="title">⚖ 月度集体决议规则</div></div>
           <div class="card-body" style="font-size:12px;line-height:1.7;">
@@ -230,7 +315,54 @@
       } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
     }
 
-    function refresh() { renderKpis(); renderContractList(); renderC08(); }
+    function renderCalendar() {
+      var now = SC.time && SC.time.now ? SC.time.now() : new Date();
+      var months = [];
+      for (var i = -2; i <= 1; i++) {
+        var d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+        var period = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        months.push(period);
+      }
+      var c08 = SC.store.list('C-08');
+      document.getElementById('meeting-cal-tbody').innerHTML = months.reverse().map(function (period) {
+        var batch = c08.filter(function (r) { return r.period === period; });
+        var batchAmt = batch.reduce(function (a, r) { return a + (r.amount || 0); }, 0);
+        var status, color;
+        var nowPeriod = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+        if (period > nowPeriod) { status = '未到期'; color = 'gray'; }
+        else if (period === nowPeriod) { status = batch.length > 0 ? '本月已决议' : '本月待决议'; color = batch.length > 0 ? 'green' : 'amber'; }
+        else { status = '已归档'; color = 'gray'; }
+        return '<tr>' +
+          '<td class="code">' + period + '</td>' +
+          '<td class="muted">' + period + '-15（每月 15 日）</td>' +
+          '<td>' + SC.badge(status, color, true) + '</td>' +
+          '<td class="num">' + (period === nowPeriod ? '5/5' : '5/5') + '</td>' +
+          '<td class="num">' + batch.length + '</td>' +
+          '<td class="num">' + SC.fmtMoney(batchAmt) + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function renderListOutput() {
+      var period = (SC.time && SC.time.iso ? SC.time.iso() : new Date().toISOString()).slice(0, 7);
+      document.getElementById('meeting-period-label').textContent = period + ' · 决议日 ' + period + '-15';
+      document.getElementById('list-title').textContent = period.replace('-', ' 年 ') + ' 月度付款审批清单';
+      document.getElementById('list-meeting-id').textContent = 'COUNCIL-' + period;
+      var rows = SC.store.list('C-08').filter(function (r) { return r.period === period; });
+      document.getElementById('list-output-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="5" class="muted" style="text-align:center;padding:8px;font-style:italic;">本月尚未发起决议（在上方"待决议合同"勾选并批准）</td></tr>'
+        : rows.map(function (r, i) {
+            return '<tr>' +
+              '<td>' + (i + 1) + '</td>' +
+              '<td class="code">C-02 #' + r.contract_id + '</td>' +
+              '<td>' + (supMap[r.supplier_id] || '—') + '</td>' +
+              '<td class="num"><strong>' + SC.fmtMoney(r.amount || 0) + '</strong></td>' +
+              '<td class="muted">进度款（按合同约定）</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function refresh() { renderKpis(); renderContractList(); renderC08(); renderCalendar(); renderListOutput(); }
     ['C-02', 'C-08', 'C-10', 'F-01'].forEach(function (e) { SC.store.subscribe(e, refresh); });
     refresh();
   </script>
