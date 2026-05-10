@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>档 A 引擎烟雾测试 — SupplyCore</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    body { padding: 20px; }
+    .test-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .test-card { border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; background: #fff; }
+    .test-card h3 { margin: 0 0 10px; font-size: 14px; }
+    .test-card .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .test-card pre { background: #0f1419; color: #d4e2f0; padding: 10px; border-radius: 4px; font-size: 11px; max-height: 280px; overflow: auto; line-height: 1.55; margin: 0; }
+    .test-card .stat { font-size: 12px; color: var(--text-2); margin-bottom: 6px; }
+    .pill { display: inline-block; padding: 2px 6px; background: #eef3fb; border-radius: 3px; font-size: 11px; font-family: ui-monospace, Menlo, monospace; color: var(--brand); margin: 2px; }
+    .header-banner { background: linear-gradient(90deg,#0a2540 0%,#1f3b66 100%); color: #fff; padding: 14px 18px; border-radius: 6px; margin-bottom: 16px; }
+    .header-banner h1 { margin: 0; font-size: 16px; }
+    .header-banner .meta { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+    @media (max-width: 1100px) { .test-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="header-banner">
+    <h1>档 A 一期 · Week 1 · 引擎层烟雾测试</h1>
+    <div class="meta">
+      <span class="pill">store.js</span>
+      <span class="pill">statemachine.js</span>
+      <span class="pill">linkage.js</span>
+      <span class="pill">seed-data.js</span>
+      验证：CRUD + 持久化 + 状态机迁移 + 联动级联 + BroadcastChannel 跨页广播
+    </div>
+  </div>
+
+  <div class="test-grid">
+    <div class="test-card">
+      <h3>① Seed 主数据状态</h3>
+      <div class="stat" id="seed-stat">—</div>
+      <div class="actions">
+        <button class="btn btn-sm" onclick="refreshAll()">刷新</button>
+        <button class="btn btn-sm btn-danger" onclick="resetAll()">重置 (reset)</button>
+      </div>
+      <pre id="seed-out">—</pre>
+    </div>
+
+    <div class="test-card">
+      <h3>② P-01 需求 CRUD + 状态迁移</h3>
+      <div class="actions">
+        <button class="btn btn-sm btn-primary" onclick="createP01()">+ 创建 P-01 草稿</button>
+        <button class="btn btn-sm" onclick="submitP01()">提交审批</button>
+        <button class="btn btn-sm" onclick="approveP01()">审批通过</button>
+      </div>
+      <pre id="p01-out">—</pre>
+    </div>
+
+    <div class="test-card">
+      <h3>③ P-02 计划审批 → linkage 自动生成 P-05 草稿</h3>
+      <div class="actions">
+        <button class="btn btn-sm btn-primary" onclick="approveP02()">审批 P-02#1（生成 P-05）</button>
+        <button class="btn btn-sm" onclick="confirmDecompose()">分解 P-05 草稿（路径分流）</button>
+      </div>
+      <pre id="p02-out">—</pre>
+    </div>
+
+    <div class="test-card">
+      <h3>④ 状态机引擎</h3>
+      <div class="stat">已注册的状态机 + 当前 P-01#1 可执行 events</div>
+      <pre id="sm-out">—</pre>
+    </div>
+
+    <div class="test-card">
+      <h3>⑤ 联动总线（linkage）</h3>
+      <div class="stat">已订阅的事件 + 触发计数</div>
+      <pre id="linkage-out">—</pre>
+    </div>
+
+    <div class="test-card">
+      <h3>⑥ BroadcastChannel 跨页广播</h3>
+      <div class="stat">在另一个标签页打开本页 → 在任一页操作 → 这里实时收到</div>
+      <pre id="bus-out" style="max-height:200px;">等待跨页消息…</pre>
+    </div>
+  </div>
+
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script>
+    /* 帮助函数 */
+    function fmt(v) { return JSON.stringify(v, null, 2); }
+    function summary(entity) {
+      var items = SC.store.list(entity);
+      return entity + '(' + items.length + ')' + (items.length > 0 ? ': ' + items.map(function(i){return '#'+i.id;}).join(' ') : '');
+    }
+
+    /* ① Seed 状态 */
+    function refreshSeedStat() {
+      var s = SC.store.stats();
+      var entries = Object.keys(s).sort().map(function(k){ return k + ': ' + s[k]; });
+      document.getElementById('seed-stat').textContent = '已 seed ' + Object.keys(s).length + ' 个实体；总记录数 ' + Object.values(s).reduce(function(a,b){return a+b;}, 0);
+      document.getElementById('seed-out').textContent = entries.join('\n');
+    }
+
+    function resetAll() {
+      if (!confirm('确认重置 LocalStorage 到 seed 状态？')) return;
+      SC.store.reset();
+      refreshAll();
+    }
+
+    /* ② P-01 操作 */
+    function refreshP01() {
+      var items = SC.store.list('P-01');
+      document.getElementById('p01-out').textContent = items.length === 0 ? '(无 P-01)' : items.map(function (p) {
+        return '#' + p.id + ' [' + p.state + '] ' + (p.request_no || '草稿') + ' · ' + (p.purpose || '—') + ' · 金额 ' + (p.amount || 0);
+      }).join('\n');
+    }
+
+    function createP01() {
+      var p = SC.store.create('P-01', {
+        request_no: SC.store.nextNo('XQ'),
+        org_id: 3,
+        material_id: 8,
+        quantity: Math.floor(Math.random() * 200 + 50),
+        amount: Math.floor(Math.random() * 100000 + 30000),
+        purpose: '烟雾测试 — 由 _engine-test.html 创建',
+        urgency: '普通',
+        state: '草稿',
+        applicant: '测试用户',
+        submit_date: new Date().toISOString().slice(0, 10),
+      });
+      console.log('created', p);
+      refreshAll();
+    }
+
+    function submitP01() {
+      var drafts = SC.store.list('P-01', { state: '草稿' });
+      if (drafts.length === 0) { alert('没有草稿态 P-01；先点「创建 P-01 草稿」'); return; }
+      var p = drafts[drafts.length - 1];
+      try {
+        SC.sm.transition('P-01', p.id, '提交审批');
+      } catch (e) { alert('迁移失败：' + e.message); }
+      refreshAll();
+    }
+
+    function approveP01() {
+      var pending = SC.store.list('P-01', { state: '待审' });
+      if (pending.length === 0) { alert('没有待审 P-01；先点「提交审批」'); return; }
+      var p = pending[0];
+      try {
+        SC.sm.transition('P-01', p.id, '审批通过');
+      } catch (e) { alert('迁移失败：' + e.message); }
+      refreshAll();
+    }
+
+    /* ③ P-02 操作 */
+    function refreshP02() {
+      var plans = SC.store.list('P-02');
+      var tasks = SC.store.list('P-05');
+      var lines = SC.store.list('P-03');
+      var t01 = SC.store.list('T-01');
+      var s01 = SC.store.list('S-01');
+      var lines_str = plans.map(function (p) {
+        return '#' + p.id + ' [' + p.state + '] ' + p.plan_no + ' · 金额 ' + (p.amount || 0);
+      }).join('\n');
+      document.getElementById('p02-out').textContent =
+        'P-02 计划：\n' + (lines_str || '(无)') +
+        '\n\nP-03 计划行：' + lines.length +
+        '\n\nP-05 任务：' + tasks.length + (tasks.length > 0 ? '\n' + tasks.map(function(t){return '  #'+t.id+' ['+t.task_state+'] '+t.task_no+(t.tender_type?' '+t.tender_type:'');}).join('\n') : '') +
+        '\n\nT-01 招标申请：' + t01.length +
+        '\nS-01 采购申请：' + s01.length;
+    }
+
+    function approveP02() {
+      var plan = SC.store.list('P-02', { state: '已审' })[0] || SC.store.list('P-02', { state: '草稿' })[0];
+      if (!plan) { alert('没有可操作的 P-02'); return; }
+      if (plan.state === '草稿') {
+        try { SC.sm.transition('P-02', plan.id, '提交审批'); plan = SC.store.get('P-02', plan.id); } catch (e) { alert('提交失败：' + e.message); return; }
+      }
+      if (plan.state === '待审') {
+        try { SC.sm.transition('P-02', plan.id, '审批通过'); } catch (e) { alert('审批失败：' + e.message); return; }
+      } else if (plan.state === '已审') {
+        // 重新触发已审事件（演示 linkage 已经跑过）— 直接调 emit
+        SC.linkage.emit('P-02:已审', plan);
+      }
+      refreshAll();
+    }
+
+    function confirmDecompose() {
+      var draft = SC.store.list('P-05', { task_state: '草稿' })[0];
+      if (!draft) { alert('没有 P-05 草稿；先审批 P-02'); return; }
+      // 随机选一个 tender_type
+      var types = ['招标', '直采'];
+      SC.store.update('P-05', draft.id, { tender_type: types[Math.floor(Math.random() * types.length)] });
+      try {
+        SC.sm.transition('P-05', draft.id, '确认分解');
+      } catch (e) { alert('分解失败：' + e.message); }
+      refreshAll();
+    }
+
+    /* ④ 状态机 */
+    function refreshSm() {
+      var dbg = SC.sm.debug();
+      var lines = Object.keys(dbg).map(function (e) {
+        return e + ': ' + dbg[e].states.join(' / ');
+      });
+      var p01 = SC.store.list('P-01')[0];
+      if (p01) {
+        lines.push('');
+        lines.push('当前 P-01#' + p01.id + ' 状态: ' + p01.state);
+        lines.push('可执行 events: [' + SC.sm.getAllowedEvents('P-01', p01).join(', ') + ']');
+      }
+      document.getElementById('sm-out').textContent = lines.join('\n');
+    }
+
+    /* ⑤ Linkage */
+    function refreshLinkage() {
+      var dbg = SC.linkage.debug();
+      var lines = Object.keys(dbg).sort().map(function (k) { return k + ': ' + dbg[k] + ' handler'; });
+      document.getElementById('linkage-out').textContent = lines.join('\n');
+    }
+
+    /* ⑥ BroadcastChannel 监听 */
+    var busLog = [];
+    ['P-01', 'P-02', 'P-05', 'T-01', 'S-01'].forEach(function (entity) {
+      SC.store.subscribe(entity, function (msg) {
+        busLog.unshift('[' + new Date().toISOString().slice(11, 19) + '] ' + msg.entity + ' ' + msg.event + (msg.item ? ' #' + msg.item.id : ''));
+        if (busLog.length > 30) busLog.pop();
+        document.getElementById('bus-out').textContent = busLog.join('\n');
+      });
+    });
+
+    function refreshAll() {
+      refreshSeedStat();
+      refreshP01();
+      refreshP02();
+      refreshSm();
+      refreshLinkage();
+    }
+
+    refreshAll();
+    console.log('[engine-test] ready · 在另一个标签页打开本页验证 BroadcastChannel');
+  </script>
+</body>
+</html>
