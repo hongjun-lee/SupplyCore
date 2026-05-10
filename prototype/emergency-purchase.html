@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>应急采购 (P-01 紧急通道) — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 04 §8.2.2 应急采购通道 + 详设 09 ALR-PUR-EMERGENCY-001/002 + 业务方 Q-D2 答复（应急采购 3 工作日补办 + 100% 准确率要求）。<br>
+            <strong>🛤 链路：</strong>P-01 标记 is_emergency=true → 应急通道审批（一级即可，不走集体决策）→ linkage 自动设置 3 工作日补办 P-02 期限 + emit ALR-PUR-EMERGENCY-001 提醒 → 期限内完成补办 → 转入正常流程；逾期未补办触发 ALR-PUR-EMERGENCY-002 升级。
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="ep-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · 应急采购清单（is_emergency = true 的 P-01）</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineCreateEmergency()">+ 创建应急 P-01（自动通过审批）</button>
+              <a class="btn btn-sm" href="requirement-list.html">← P-01 全量列表</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>需求号</th>
+                  <th>申请单位</th>
+                  <th>物料 / 数量</th>
+                  <th class="num">金额</th>
+                  <th>应急原因</th>
+                  <th>提交日</th>
+                  <th>补办期限</th>
+                  <th>补办状态</th>
+                </tr>
+              </thead>
+              <tbody id="engine-emergency-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              P-01 审批通过 + is_emergency = true → linkage 自动设 3 工作日补办期限 + emit ALR-PUR-EMERGENCY-001 提醒。逾期未补办由月度审计抽样检查（要求 100% 准确率）。
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">⚖ 应急采购触发条件（详设 04 §8.2.2）</div></div>
+              <div class="card-body" style="font-size:12px;line-height:1.7;">
+                <strong>合格触发场景：</strong><br>
+                • <strong>井下安全应急</strong>：瓦斯监测仪故障、防爆设备失效、安全监测系统异常<br>
+                • <strong>生产事故应急</strong>：综采机故障停产、运输系统故障、通风系统异常<br>
+                • <strong>突发事件</strong>：不可预见的紧急维修、应急救援物资<br>
+                • <strong>政策合规应急</strong>：监管检查临时要求、行业新规突发实施<br>
+                <hr style="border:none;border-top:1px dashed var(--border);margin:8px 0;">
+                <strong>不允许的滥用场景（审计重点）：</strong><br>
+                • 计划缺失：日常应有的物资但未在月度计划中（应走计划补充而非应急）<br>
+                • 串通供应商：故意拖延正常审批后改走应急（化整为零的变形）<br>
+                • 个人偏好：单纯赶时间不属于应急
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">📊 应急采购合规指标（月度）</div></div>
+              <div class="card-body">
+                <table class="data" style="font-size:12px;">
+                  <thead><tr><th>指标</th><th class="num">目标</th><th class="num">本月实际</th><th>达标</th></tr></thead>
+                  <tbody>
+                    <tr><td>3 工作日内补办率</td><td class="num">100%</td><td class="num" id="ep-followup-rate">—</td><td id="ep-followup-pass">—</td></tr>
+                    <tr><td>应急占比（占 P-01 总数）</td><td class="num">≤ 5%</td><td class="num" id="ep-emergency-ratio">—</td><td id="ep-ratio-pass">—</td></tr>
+                    <tr><td>滥用嫌疑（人工抽样）</td><td class="num">0 笔</td><td class="num">0 笔</td><td><span class="badge green dot">达标</span></td></tr>
+                  </tbody>
+                </table>
+                <div style="margin-top:10px;padding:8px 12px;background:var(--amber-50, #fffbeb);border-radius:4px;font-size:11px;color:#78350f;border:1px solid #fde68a;">
+                  <strong>⚠ 审计：</strong>月末由内审随机抽样 10% 应急 P-01 → 检查应急原因是否真实 + 补办是否完整 + 供应商是否合规；不达标记录入下月督办。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/time.js"></script>
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    SC.layout({
+      page: 'emergency-purchase',
+      crumbs: ['二期', 'A13 应急采购'],
+      title: '应急采购（P-01 紧急通道 + 3 工作日补办）',
+      desc: '档 A 二期 A13：详设 04 §8.2.2 + 09 ALR-PUR-EMERGENCY — is_emergency 标记 + 自动 3 日补办期限',
+    });
+
+    var orgMap = {}; SC.store.list('M-01').forEach(function (o) { orgMap[o.id] = o.name; });
+    var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m; });
+
+    function renderKpis() {
+      var emergencies = SC.store.list('P-01').filter(function (r) { return r.is_emergency; });
+      var allP01 = SC.store.list('P-01');
+      var followupCompleted = emergencies.filter(function (r) { return r.followup_state === '已补办'; });
+      var ratio = allP01.length > 0 ? Math.round(emergencies.length / allP01.length * 100) : 0;
+      document.getElementById('ep-kpis').innerHTML = [
+        ['本月应急 P-01', emergencies.length, '占比 ' + ratio + '%'],
+        ['补办期限内', followupCompleted.length + '/' + emergencies.length, '3 工作日内补办 P-02'],
+        ['ALR-PUR-EMERGENCY', SC.store.list('R-05', { alert_code: 'ALR-PUR-EMERGENCY-001' }).length, '应急通道提醒'],
+        ['月度合规率', emergencies.length === 0 ? '—' : Math.round(followupCompleted.length / emergencies.length * 100) + '%', '目标 100%'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
+      // 合规指标
+      var followupRate = emergencies.length === 0 ? '—' : Math.round(followupCompleted.length / emergencies.length * 100) + '%';
+      var followupPass = emergencies.length === 0 || followupCompleted.length === emergencies.length ? '<span class="badge green dot">达标</span>' : '<span class="badge red dot">未达标</span>';
+      document.getElementById('ep-followup-rate').textContent = followupRate;
+      document.getElementById('ep-followup-pass').innerHTML = followupPass;
+      var ratioPass = ratio <= 5 ? '<span class="badge green dot">达标</span>' : '<span class="badge red dot">超标</span>';
+      document.getElementById('ep-emergency-ratio').textContent = ratio + '%';
+      document.getElementById('ep-ratio-pass').innerHTML = ratioPass;
+    }
+
+    function renderEmergency() {
+      var rows = SC.store.list('P-01').filter(function (r) { return r.is_emergency; });
+      document.getElementById('engine-emergency-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px;">无应急 P-01 · 点 + 创建应急 P-01 演示</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var stateColor = r.state === '已审' ? 'green' : 'gray';
+            var followupState = r.followup_state || '待补办';
+            var followupColor = followupState === '已补办' ? 'green' : followupState === '已逾期' ? 'red' : 'amber';
+            return '<tr>' +
+              '<td class="code">' + r.request_no + '</td>' +
+              '<td>' + (orgMap[r.org_id] || '—') + '</td>' +
+              '<td>' + ((matMap[r.material_id] || {}).name || '—') + '<div class="muted" style="font-size:11px;">' + (r.quantity || 0) + '</div></td>' +
+              '<td class="num">' + SC.fmtMoney(r.amount || 0) + '</td>' +
+              '<td class="muted" style="font-size:11px;max-width:160px;">' + (r.emergency_reason || '—') + '</td>' +
+              '<td class="muted">' + r.submit_date + '</td>' +
+              '<td class="muted">' + (r.followup_deadline || '—') + '</td>' +
+              '<td>' + SC.badge(followupState, followupColor, true) + '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineCreateEmergency() {
+      var orgs = SC.store.list('M-01').filter(function (o) { return o.org_type === 'MINE'; });
+      var org = orgs[Math.floor(Math.random() * orgs.length)];
+      var mats = SC.store.list('M-05');
+      var mat = mats[Math.floor(Math.random() * mats.length)];
+      var reasons = ['井下瓦斯监测仪故障，需立即更换', '综采机减速箱异响，48h 内停产', '通风系统异常，安环要求紧急处置', '运输皮带断裂，影响出煤'];
+      var amount = Math.floor(Math.random() * 80000 + 20000);
+      var today = (SC.time && SC.time.iso ? SC.time.iso() : new Date().toISOString()).slice(0, 10);
+      var p01 = SC.store.create('P-01', {
+        request_no: SC.store.nextNo('XQ'),
+        org_id: org.id,
+        material_id: mat.id,
+        quantity: Math.floor(Math.random() * 50 + 5),
+        amount: amount,
+        purpose: '紧急采购演示',
+        urgency: '紧急',
+        is_emergency: true,
+        emergency_reason: reasons[Math.floor(Math.random() * reasons.length)],
+        state: '草稿',
+        applicant: SC.roles.currentInfo().label,
+        submit_date: today,
+      });
+      // 自动一键审批通过
+      try {
+        SC.sm.transition('P-01', p01.id, '提交审批');
+        SC.sm.transition('P-01', p01.id, '审批通过');
+        SC.ui.toast('应急 P-01 ' + p01.request_no + ' 一键审批通过 → linkage 设 3 工作日补办期限 + ALR-PUR-EMERGENCY-001', 'success');
+      } catch (e) { SC.ui.toast('迁移失败：' + e.message, 'error'); }
+    }
+
+    function refresh() { renderKpis(); renderEmergency(); }
+    ['P-01', 'R-05'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
+  </script>
+</body>
+</html>

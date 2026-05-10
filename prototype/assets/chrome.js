@@ -247,6 +247,40 @@ SC.demoScenarios = {
       { id: 'base-archive', file: 'base-archive.html', label: '基础档案', desc: 'M-01/M-02 组织 / 仓库' },
     ],
   },
+  'scrap-disposal': {
+    label: '废旧处置',
+    desc: '4 类处置（报废 / 变卖 / 回收 / 销毁）+ BIZ-010/011/012',
+    steps: [
+      { id: 'scrap-disposal', file: 'scrap-disposal.html', label: 'S-19 处置', desc: '申请 → 审批 → 执行' },
+      { id: 'inventory', file: 'inventory.html', label: 'S-13 减库存', desc: '出库流水' },
+      { id: 'nc-interface', file: 'nc-interface.html', label: 'BIZ-010/011/012', desc: 'NC 凭证' },
+    ],
+  },
+  'direct-delivery': {
+    label: '直达使用单位',
+    desc: '不进 S-13 库存，三方验收 + BIZ-005A 一次性销售凭证',
+    steps: [
+      { id: 'purchase-orders', file: 'purchase-orders.html', label: 'S-02 直达', desc: 'fulfillment_type=直达' },
+      { id: 'direct-delivery', file: 'direct-delivery.html', label: 'S-23 签收挂账', desc: '三方验收 + 财务挂账' },
+      { id: 'nc-interface', file: 'nc-interface.html', label: 'BIZ-005A', desc: '对厂矿销售凭证' },
+    ],
+  },
+  'emergency': {
+    label: '应急采购',
+    desc: 'is_emergency 紧急通道 + 3 工作日补办 P-02 + 100% 准确率',
+    steps: [
+      { id: 'emergency-purchase', file: 'emergency-purchase.html', label: '应急 P-01', desc: '一键审批通过' },
+      { id: 'requirement-list', file: 'requirement-list.html', label: 'P-01 全量', desc: '见紧急标记' },
+      { id: 'alert-rules', file: 'alert-rules.html', label: 'ALR-PUR-EMERGENCY', desc: '补办期限提醒' },
+    ],
+  },
+  'snapshot': {
+    label: '演示快照 / 数据导入导出',
+    desc: 'B2/B6 — 跨设备演示 + 多场景切换 + 培训重置 + 故障恢复',
+    steps: [
+      { id: 'demo-snapshot', file: 'demo-snapshot.html', label: '快照管理', desc: '保存 / 还原 / 导入导出' },
+    ],
+  },
 };
 
 SC.SCENARIO_KEY = 'sc.scenario';

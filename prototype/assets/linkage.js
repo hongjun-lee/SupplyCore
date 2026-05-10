@@ -831,6 +831,91 @@
     }
   });
 
+  /* ========================================================
+   * 二期 P2 引擎接入（v0.20 — A6 废旧 + A11 直达 + A13 应急）
+   * ======================================================== */
+
+  /* A6 废旧处置：S-19:已处置 → S-21 出库流水 + S-13 减 + F-01 BIZ-010/011/012 */
+  SC.linkage.on('S-19:已处置', function (req) {
+    var bizCode = req.disposal_type === '报废' ? 'BIZ-010' :
+                  req.disposal_type === '变卖' ? 'BIZ-011' :
+                  req.disposal_type === '回收' ? 'BIZ-012' : 'BIZ-010';
+    SC.store.transaction(['S-21', 'S-13', 'F-01'], function () {
+      SC.store.create('S-21', {
+        transaction_no: SC.store.nextNo('IT'),
+        transaction_type: '废旧处置',
+        material_id: req.material_id,
+        warehouse_id: req.warehouse_id,
+        org_id: req.org_id,
+        quantity_delta: -(req.quantity || 0),
+        amount_delta: -(req.amount || 0),
+        source_bill_type: 'S-19',
+        source_bill_id: req.id,
+      });
+      var inv = SC.store.list('S-13').filter(function (i) {
+        return i.material_id === req.material_id && i.warehouse_id === req.warehouse_id;
+      })[0];
+      if (inv) {
+        SC.store.update('S-13', inv.id, {
+          quantity: (inv.quantity || 0) - req.quantity,
+          total_amount: (inv.total_amount || 0) - req.amount,
+        });
+      }
+      var ncSwitch = SC.store.list('F-13', { switch_code: bizCode + '-switch' })[0];
+      if (!ncSwitch || ncSwitch.switch_status === '开') {
+        var task = SC.store.create('F-01', {
+          task_no: SC.store.nextNo('FT'),
+          interface_id: bizCode,
+          source_bill_no: req.disposal_no,
+          source_bill_type: 'S-19',
+          source_bill_id: req.id,
+          task_state: '待推送',
+          retry_count: 0,
+        });
+        if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+      }
+    });
+    console.log('[linkage] S-19:' + req.id + ' 已处置 → S-21 + S-13 减 + F-01 ' + bizCode);
+  });
+
+  /* A11 直达使用单位：S-23:已挂账 → 财务挂账（不进 S-13）+ F-01 BIZ-005A 对厂矿销售 */
+  SC.linkage.on('S-23:已挂账', function (rec) {
+    var ncSwitch = SC.store.list('F-13', { switch_code: 'BIZ-005-switch' })[0];
+    if (!ncSwitch || ncSwitch.switch_status === '开') {
+      var task = SC.store.create('F-01', {
+        task_no: SC.store.nextNo('FT'),
+        interface_id: 'BIZ-005A',
+        source_bill_no: rec.delivery_no,
+        source_bill_type: 'S-23',
+        source_bill_id: rec.id,
+        task_state: '待推送',
+        retry_count: 0,
+      });
+      if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+    }
+    console.log('[linkage] S-23:' + rec.id + ' 已挂账 → F-01 BIZ-005A 对厂矿销售（不进 S-13）');
+  });
+
+  /* A13 应急采购：P-01:已审 + is_emergency → 标记 3 工作日补办期限 + emit 应急预警 */
+  SC.linkage.on('P-01:已审', function (req) {
+    if (!req.is_emergency) return;
+    var followupDeadline = (SC.time && SC.time.now ? SC.time.now() : new Date());
+    followupDeadline.setDate(followupDeadline.getDate() + 3);
+    SC.store.update('P-01', req.id, {
+      followup_deadline: followupDeadline.toISOString().slice(0, 10),
+      followup_state: '待补办',
+    });
+    emitAlert({
+      alert_code: 'ALR-PUR-EMERGENCY-001',
+      level: '一般',
+      source_entity: 'P-01',
+      source_id: req.id,
+      title: '应急采购补办提醒',
+      message: 'P-01 #' + req.id + ' 已通过应急通道审批，须在 ' + followupDeadline.toISOString().slice(0, 10) + ' 前完成 P-02 计划补办（详设 04 §8.2.2）',
+    });
+    console.log('[linkage] P-01:' + req.id + ' 应急通道审批 → 3 工作日补办期限 ' + followupDeadline.toISOString().slice(0, 10));
+  });
+
   /* 暴露给页面调用：mock 触发审批超时（无时间穿越的替代）*/
   SC.linkage.mockTriggerWFTimeout = function () {
     var pending = []

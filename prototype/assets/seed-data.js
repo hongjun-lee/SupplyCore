@@ -73,7 +73,10 @@
       { id: 4, switch_code: 'BIZ-007-switch', interface_name: '调拨（内部往来对冲）',     switch_status: '开', remark: '二期 P1 A3 调拨主线' },
       { id: 5, switch_code: 'BIZ-008-switch', interface_name: '盘盈（增加库存）',         switch_status: '开', remark: '二期 P1 A5 盘点 — 盘盈调整凭证' },
       { id: 6, switch_code: 'BIZ-009-switch', interface_name: '盘亏（减少库存）',         switch_status: '开', remark: '二期 P1 A5 盘点 — 盘亏调整凭证' },
-      { id: 7, switch_code: 'BIZ-013-switch', interface_name: '付款执行',                 switch_status: '开', remark: '二期 A4b 付款链路 — NC 实付回写' },
+      { id: 7, switch_code: 'BIZ-010-switch', interface_name: '废旧报废',                 switch_status: '开', remark: '二期 P2 A6 废旧处置 — 报废凭证' },
+      { id: 8, switch_code: 'BIZ-011-switch', interface_name: '废旧变卖',                 switch_status: '开', remark: '二期 P2 A6 废旧处置 — 变卖收入凭证' },
+      { id: 9, switch_code: 'BIZ-012-switch', interface_name: '废旧回收',                 switch_status: '开', remark: '二期 P2 A6 废旧处置 — 回收凭证' },
+      { id: 10, switch_code: 'BIZ-013-switch', interface_name: '付款执行',                 switch_status: '开', remark: '二期 A4b 付款链路 — NC 实付回写' },
     ],
 
     /* P-01 示例需求（演示用，v0.16 改为草稿态 — 让用户从最起点演示

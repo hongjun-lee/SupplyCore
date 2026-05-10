@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>演示数据快照 (B2/B6) — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>02 V0.4 §3.3 二期 B2 数据导入导出 + B6 演示快照（保存 / 还原）— 演示场景切换 + 跨设备演示 + 故障恢复。<br>
+            <strong>🛤 链路：</strong>当前 SC.store LocalStorage 全量序列化为 JSON → 下载文件（B2）/ 命名保存到内置快照（B6）→ 在另一台演示机或新会话中导入还原 → 1:1 重现演示场景。
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="ds-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · B6 演示快照（命名保存到 LocalStorage）</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="snapshotSave()">💾 保存当前快照</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>快照名称</th>
+                  <th>保存时间</th>
+                  <th class="num">实体数</th>
+                  <th class="num">记录数</th>
+                  <th class="num">大小</th>
+                  <th>说明</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="snapshot-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · B2 数据导入导出（JSON 文件）</div>
+          </div>
+          <div class="card-body" style="font-size:12px;">
+            <div class="cols-2" style="gap:16px;">
+              <div>
+                <div style="font-weight:600;margin-bottom:8px;">📤 导出当前数据</div>
+                <button class="btn btn-primary" onclick="exportJson()">📥 下载 JSON 文件</button>
+                <div class="muted" style="font-size:11px;margin-top:6px;">下载所有 SC.store 实体（含 P-01 / P-02 / S-XX / C-XX / F-XX / R-05 / M-XX 等）的全量 JSON 快照。文件名格式：sc-snapshot-YYYYMMDD-HHmm.json。</div>
+              </div>
+              <div>
+                <div style="font-weight:600;margin-bottom:8px;">📥 导入 JSON 还原</div>
+                <input type="file" id="import-file" accept=".json" onchange="importJson(event)" style="font-size:12px;">
+                <div class="muted" style="font-size:11px;margin-top:6px;">选择 JSON 文件 → 替换当前 SC.store 全部数据。<strong style="color:var(--red);">注意：当前数据将被覆盖</strong>，确认前请先保存快照。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · 重置数据（回到 seed 初始状态）</div>
+          </div>
+          <div class="card-body" style="font-size:12px;">
+            <button class="btn btn-danger" onclick="resetAll()">🗑 重置到 seed 初始状态</button>
+            <div class="muted" style="font-size:11px;margin-top:6px;">删除所有 SC.store 实体记录 + 重新 seed 主数据（M-01/02/05/09/12 + F-13 + P-01 草稿种子）。**这是不可逆操作**，建议先导出 JSON 备份。</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="title">⚖ 数据快照 / 导入导出规则</div></div>
+          <div class="card-body" style="font-size:12px;line-height:1.7;">
+            <strong>使用场景：</strong><br>
+            • <strong>跨设备演示</strong>：A 设备保存快照 → JSON 文件传到 B 设备 → 导入还原 → 1:1 重现演示场景<br>
+            • <strong>多场景切换</strong>：保存"采购入库主线-演示完整"、"暂估闭环-演示中"、"流标场景-演示完整"等多个快照，按需切换<br>
+            • <strong>培训演示</strong>：保存培训用初始快照，每次开课前还原<br>
+            • <strong>故障恢复</strong>：演示中误操作 → 还原到上次保存点<br>
+            <hr style="border:none;border-top:1px dashed var(--border);margin:10px 0;">
+            <strong>边界与限制：</strong><br>
+            • LocalStorage 配额限制（5 MB），单浏览器最多保存 ~5-8 个快照<br>
+            • JSON 导入会完全替换当前数据，<strong style="color:var(--red);">不会合并</strong><br>
+            • 快照不含图片 / 文件附件（仅数据）<br>
+            • 快照与代码版本绑定 — 升级到不兼容的代码后旧快照可能加载失败
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/time.js"></script>
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    SC.layout({
+      page: 'demo-snapshot',
+      crumbs: ['二期', 'B2/B6 演示快照'],
+      title: '演示数据快照（B2 导入导出 + B6 命名快照）',
+      desc: '档 A 二期 B2 + B6：跨设备演示 / 多场景切换 / 培训重置 / 故障恢复',
+    });
+
+    var SNAPSHOT_LIST_KEY = 'sc:_snapshots';
+
+    function getSnapshots() {
+      try { return JSON.parse(localStorage.getItem(SNAPSHOT_LIST_KEY) || '[]'); } catch (e) { return []; }
+    }
+    function setSnapshots(list) {
+      localStorage.setItem(SNAPSHOT_LIST_KEY, JSON.stringify(list));
+    }
+
+    function exportSnapshot() {
+      var snap = {};
+      var stats = SC.store.stats();
+      Object.keys(stats).forEach(function (entity) {
+        snap[entity] = SC.store.list(entity);
+      });
+      return snap;
+    }
+
+    function applySnapshot(snap) {
+      // 清除现有 sc:* 前缀（保留 sc:_snapshots / sc:_seq:*）
+      for (var i = localStorage.length - 1; i >= 0; i--) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf('sc:') === 0 && k !== SNAPSHOT_LIST_KEY && k.indexOf('sc:_seq:') !== 0 && k !== 'sc.role' && k !== 'sc.scenario' && k !== 'sc:_mockTime') {
+          localStorage.removeItem(k);
+        }
+      }
+      Object.keys(snap).forEach(function (entity) {
+        localStorage.setItem('sc:' + entity, JSON.stringify(snap[entity]));
+      });
+    }
+
+    function renderKpis() {
+      var stats = SC.store.stats();
+      var totalRecords = Object.values(stats).reduce(function (a, b) { return a + b; }, 0);
+      document.getElementById('ds-kpis').innerHTML = [
+        ['当前实体', Object.keys(stats).length, 'SC.store keys'],
+        ['当前记录数', totalRecords, '所有实体合计'],
+        ['已保存快照', getSnapshots().length, 'B6 命名快照'],
+        ['LocalStorage', '~' + Math.round(JSON.stringify(localStorage).length / 1024) + ' KB', '配额 5 MB'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
+    }
+
+    function renderSnapshots() {
+      var list = getSnapshots();
+      document.getElementById('snapshot-tbody').innerHTML = list.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">无快照 · 点 💾 保存当前快照 创建</td></tr>'
+        : list.slice().reverse().map(function (s, idx) {
+            var realIdx = list.length - 1 - idx;
+            return '<tr>' +
+              '<td class="code">' + s.name + '</td>' +
+              '<td class="muted">' + s.saved_at + '</td>' +
+              '<td class="num">' + s.entity_count + '</td>' +
+              '<td class="num">' + s.record_count + '</td>' +
+              '<td class="num muted">' + Math.round(s.size / 1024) + ' KB</td>' +
+              '<td class="muted" style="font-size:11px;max-width:200px;">' + (s.note || '—') + '</td>' +
+              '<td class="actions">' +
+                '<a href="javascript:void(0)" onclick="snapshotRestore(' + realIdx + ')">还原</a>' +
+                '<a href="javascript:void(0)" onclick="snapshotDelete(' + realIdx + ')" style="color:var(--red);">删除</a>' +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function snapshotSave() {
+      SC.ui.prompt('快照名称', { default: '快照-' + new Date().toISOString().slice(0, 16).replace('T', ' '), placeholder: '如：付款链路演示完毕' }).then(function (name) {
+        if (!name) return;
+        SC.ui.prompt('备注（可空）', { default: '', placeholder: '说明当前演示状态' }).then(function (note) {
+          var snap = exportSnapshot();
+          var json = JSON.stringify(snap);
+          var list = getSnapshots();
+          list.push({
+            name: name,
+            saved_at: new Date().toISOString().slice(0, 16).replace('T', ' '),
+            entity_count: Object.keys(snap).length,
+            record_count: Object.values(snap).reduce(function (a, b) { return a + (b.length || 0); }, 0),
+            size: json.length,
+            note: note || '',
+            data_key: 'sc:_snapshot_data:' + Date.now(),
+          });
+          // 数据单独存
+          localStorage.setItem(list[list.length - 1].data_key, json);
+          setSnapshots(list);
+          SC.ui.toast('快照「' + name + '」已保存', 'success');
+          renderKpis();
+          renderSnapshots();
+        });
+      });
+    }
+
+    function snapshotRestore(idx) {
+      var list = getSnapshots();
+      var s = list[idx];
+      if (!s) return;
+      SC.ui.confirm('确认还原快照「' + s.name + '」？当前 SC.store 数据将被覆盖。', { title: '还原快照' }).then(function (ok) {
+        if (!ok) return;
+        try {
+          var json = localStorage.getItem(s.data_key);
+          if (!json) { SC.ui.toast('快照数据丢失', 'error'); return; }
+          var snap = JSON.parse(json);
+          applySnapshot(snap);
+          SC.ui.toast('快照「' + s.name + '」已还原 · 刷新页面查看', 'success');
+          setTimeout(function () { location.reload(); }, 1500);
+        } catch (e) { SC.ui.toast('还原失败：' + e.message, 'error'); }
+      });
+    }
+
+    function snapshotDelete(idx) {
+      var list = getSnapshots();
+      var s = list[idx];
+      if (!s) return;
+      SC.ui.confirm('确认删除快照「' + s.name + '」？').then(function (ok) {
+        if (!ok) return;
+        localStorage.removeItem(s.data_key);
+        list.splice(idx, 1);
+        setSnapshots(list);
+        SC.ui.toast('快照已删除', 'info');
+        renderKpis();
+        renderSnapshots();
+      });
+    }
+
+    function exportJson() {
+      var snap = exportSnapshot();
+      var json = JSON.stringify(snap, null, 2);
+      var blob = new Blob([json], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'sc-snapshot-' + new Date().toISOString().slice(0, 16).replace(/[T:]/g, '-') + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      SC.ui.toast('JSON 已导出（' + Math.round(json.length / 1024) + ' KB）', 'success');
+    }
+
+    function importJson(ev) {
+      var file = ev.target.files[0];
+      if (!file) return;
+      SC.ui.confirm('导入「' + file.name + '」将完全覆盖当前数据，先导出备份再导入更稳妥。继续？', { title: '导入 JSON' }).then(function (ok) {
+        if (!ok) { ev.target.value = ''; return; }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            var snap = JSON.parse(e.target.result);
+            applySnapshot(snap);
+            SC.ui.toast('JSON 已导入 · 刷新页面查看', 'success');
+            setTimeout(function () { location.reload(); }, 1500);
+          } catch (err) { SC.ui.toast('JSON 解析失败：' + err.message, 'error'); }
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    function resetAll() {
+      SC.ui.confirm('确认重置所有数据到 seed 初始状态？\n\n这会删除所有引擎产生的业务数据（P-01 / P-02 / S-XX / C-XX / F-XX / R-05 等），仅保留主数据 seed。', { title: '重置数据' }).then(function (ok) {
+        if (!ok) return;
+        SC.store.reset();
+        SC.ui.toast('已重置到 seed · 刷新页面查看', 'info');
+        setTimeout(function () { location.reload(); }, 1500);
+      });
+    }
+
+    function refresh() { renderKpis(); renderSnapshots(); }
+    refresh();
+  </script>
+</body>
+</html>
