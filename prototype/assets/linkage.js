@@ -72,15 +72,33 @@
       });
       console.log('[linkage] P-01:' + req.id + ' 已审 → 新建 P-02 #' + plan.id + '（' + period + ' / org#' + orgId + '）');
     }
-    // 幂等：检查是否已有同 source_request_no 的 P-03
-    var existingLine = SC.store.list('P-03').filter(function (l) {
-      return l.plan_id === plan.id && l.source_request_no === req.request_no;
+    var planLines = SC.store.list('P-03', { plan_id: plan.id });
+    var alreadyMerged = planLines.filter(function (l) {
+      return l.source_request_no === req.request_no ||
+        (l.source_request_nos && l.source_request_nos.indexOf(req.request_no) >= 0);
     })[0];
-    if (existingLine) {
-      console.log('[linkage] P-01:' + req.id + ' 已聚合到 P-02 #' + plan.id + '（P-03 #' + existingLine.id + ' 已存在，跳过）');
+    if (alreadyMerged) {
+      console.log('[linkage] P-01:' + req.id + ' 已聚合到 P-02 #' + plan.id + '（P-03 #' + alreadyMerged.id + ' 已存在来源，跳过）');
       return;
     }
-    var lineCount = SC.store.list('P-03', { plan_id: plan.id }).length;
+    // D5：同期间、同组织、同物料先合并到同一 P-03，后续由计划员在 P-05 页人工拆/合任务。
+    var mergeLine = planLines.filter(function (l) {
+      return l.material_id === req.material_id;
+    })[0];
+    if (mergeLine) {
+      var mergedSources = mergeLine.source_request_nos || (mergeLine.source_request_no ? [mergeLine.source_request_no] : []);
+      mergedSources.push(req.request_no);
+      SC.store.update('P-03', mergeLine.id, {
+        quantity: (mergeLine.quantity || 0) + (req.quantity || 0),
+        amount: (mergeLine.amount || 0) + (req.amount || 0),
+        source_request_no: mergedSources.join(','),
+        source_request_nos: mergedSources,
+      });
+      SC.store.update('P-02', plan.id, { amount: (plan.amount || 0) + (req.amount || 0) });
+      console.log('[linkage] P-01:' + req.id + ' 已审 → 合并到 P-03 #' + mergeLine.id + '（同物料）');
+      return;
+    }
+    var lineCount = planLines.length;
     SC.store.create('P-03', {
       plan_id: plan.id,
       plan_line_no: plan.plan_no + '-' + String(lineCount + 1).padStart(2, '0'),
@@ -89,6 +107,7 @@
       amount: req.amount,
       tender_type: '招标', // 默认招采，计划员可在 P-02 审批后于任务分解页改
       source_request_no: req.request_no,
+      source_request_nos: [req.request_no],
     });
     SC.store.update('P-02', plan.id, { amount: (plan.amount || 0) + (req.amount || 0) });
     console.log('[linkage] P-01:' + req.id + ' 已审 → P-02 #' + plan.id + ' 加 P-03 行（金额累计 ' + ((plan.amount || 0) + (req.amount || 0)) + '）');
@@ -134,41 +153,57 @@
    * 修复同事评审 P1-3：原只处理招采/直采，合同采购页面允许选但 linkage 没处理 */
   SC.linkage.on('P-05:草稿→已分解', function (task) {
     if (task.tender_type === '招标' || task.tender_type === '招采') {
-      SC.store.create('T-01', {
-        application_no: SC.store.nextNo('TA'),
-        task_id: task.id,
-        plan_id: task.plan_id,
-        material_id: task.material_id,
-        amount: task.amount,
-        state: '待申请',
-      });
-      console.log('[linkage] P-05:' + task.id + ' 已分解 (招采) → 创建 T-01');
+      var existingTender = SC.store.list('T-01', { task_id: task.id })[0];
+      if (!existingTender) {
+        SC.store.create('T-01', {
+          application_no: SC.store.nextNo('TA'),
+          task_id: task.id,
+          plan_id: task.plan_id,
+          material_id: task.material_id,
+          amount: task.amount,
+          state: '待申请',
+        });
+      }
+      console.log('[linkage] P-05:' + task.id + ' 已分解 (招采) → ' + (existingTender ? '复用' : '创建') + ' T-01');
     } else if (task.tender_type === '直采' || task.tender_type === '直接采购') {
-      SC.store.create('S-01', {
-        request_no: SC.store.nextNo('PR'),
-        task_id: task.id,
-        plan_id: task.plan_id,
-        material_id: task.material_id,
-        amount: task.amount,
-        state: '草稿',
-      });
-      console.log('[linkage] P-05:' + task.id + ' 已分解 (直采) → 创建 S-01');
+      var existingDirect = SC.store.list('S-01', { task_id: task.id })[0];
+      if (!existingDirect) {
+        SC.store.create('S-01', {
+          request_no: SC.store.nextNo('PR'),
+          task_id: task.id,
+          plan_id: task.plan_id,
+          material_id: task.material_id,
+          amount: task.amount,
+          state: '待审',
+          purchase_route: '直采',
+          quantity: task.quantity,
+          source_type: 'P-05',
+          source_id: task.id,
+        });
+      }
+      console.log('[linkage] P-05:' + task.id + ' 已分解 (直采) → ' + (existingDirect ? '复用' : '创建') + ' S-01 待审');
     } else if (task.tender_type === '合同采购') {
       // 找现有已签 / 执行中合同；找不到也创建 S-01 但 contract_id=null（提示需关联）
       var contract = SC.store.list('C-02').filter(function (c) {
         return c.state === '已签' || c.state === '执行中';
       })[0];
-      SC.store.create('S-01', {
-        request_no: SC.store.nextNo('PR'),
-        task_id: task.id,
-        plan_id: task.plan_id,
-        material_id: task.material_id,
-        amount: task.amount,
-        contract_id: contract ? contract.id : null,
-        state: '草稿',
-        purchase_route: '合同采购',
-      });
-      console.log('[linkage] P-05:' + task.id + ' 已分解 (合同采购) → 创建 S-01 关联 C-02 #' + (contract ? contract.id : 'null'));
+      var existingContractReq = SC.store.list('S-01', { task_id: task.id })[0];
+      if (!existingContractReq) {
+        SC.store.create('S-01', {
+          request_no: SC.store.nextNo('PR'),
+          task_id: task.id,
+          plan_id: task.plan_id,
+          material_id: task.material_id,
+          amount: task.amount,
+          contract_id: contract ? contract.id : null,
+          state: '待审',
+          purchase_route: '合同采购',
+          quantity: task.quantity,
+          source_type: 'P-05',
+          source_id: task.id,
+        });
+      }
+      console.log('[linkage] P-05:' + task.id + ' 已分解 (合同采购) → ' + (existingContractReq ? '复用' : '创建') + ' S-01 待审，关联 C-02 #' + (contract ? contract.id : 'null'));
     }
 
     // V0.4a：检查所属 P-02 全部 P-05 是否都已脱离草稿态；满足则触发 P-02 自动转已分解
@@ -186,12 +221,20 @@
   /* S-01 采购申请审批通过 → 自动创建 S-02 订单（v0.16 补 P1-3）
    * 衔接直采 / 合同采购 路径直达订单 */
   SC.linkage.on('S-01:已审', function (req) {
+    var existingOrder = SC.store.list('S-02').filter(function (o) {
+      return o.request_id === req.id || (req.task_id && o.task_id === req.task_id);
+    })[0];
+    if (existingOrder) {
+      console.log('[linkage] S-01:' + req.id + ' 已审 → S-02 #' + existingOrder.id + ' 已存在，跳过');
+      return;
+    }
     SC.store.create('S-02', {
       order_no: SC.store.nextNo('CG'),
       request_id: req.id,
       contract_id: req.contract_id || null,
       task_id: req.task_id,
       material_id: req.material_id,
+      quantity: req.quantity,
       amount: req.amount,
       order_state: '草稿',
       purchase_route: req.purchase_route || '直采',
@@ -199,9 +242,27 @@
     console.log('[linkage] S-01:' + req.id + ' 已审 → 创建 S-02 订单（' + (req.purchase_route || '直采') + '）');
   });
 
+  /* S-02 订单下达 → 订单同步 NC mock 标记（页面/审批中心都走统一副作用） */
+  SC.linkage.on('S-02:已下达', function (order) {
+    if (order.nc_synced) {
+      console.log('[linkage] S-02:' + order.id + ' 已下达 → NC 同步标记已存在，跳过');
+      return;
+    }
+    SC.store.update('S-02', order.id, {
+      nc_synced: true,
+      nc_sync_time: new Date().toISOString(),
+    });
+    console.log('[linkage] S-02:' + order.id + ' 已下达 → NC mock 订单同步标记成功');
+  });
+
   /* C-01 会签通过 → 自动创建 C-02 已签（v0.16 补 P2-1）
    * 修复同事评审 P2-1：C-01 会签通过原是手工按钮，没走统一引擎 */
   SC.linkage.on('C-01:已批准', function (approval) {
+    var existingContract = SC.store.list('C-02', { approval_id: approval.id })[0];
+    if (existingContract) {
+      console.log('[linkage] C-01:' + approval.id + ' 已批准 → C-02 #' + existingContract.id + ' 已存在，跳过');
+      return;
+    }
     var contract = SC.store.create('C-02', {
       contract_no: SC.store.nextNo('HT'),
       approval_id: approval.id,
@@ -210,11 +271,17 @@
       payment_terms: '30% 预付 + 60% 验收 + 10% 质保（一期 payment_terms 文本，二期 A4 落 C-04 实体）',
       state: '已签',
     });
+    SC.linkage.emit('C-02:已签', contract);
     console.log('[linkage] C-01:' + approval.id + ' 已批准 → 自动创建 C-02 #' + contract.id);
   });
 
   /* T-05 中标结果验证通过 → 自动创建 C-01 合同会签 */
   SC.linkage.on('T-05:已验证', function (result) {
+    var existingApproval = SC.store.list('C-01', { tender_result_id: result.id })[0];
+    if (existingApproval) {
+      console.log('[linkage] T-05:' + result.id + ' 已验证 → C-01 #' + existingApproval.id + ' 已存在，跳过');
+      return;
+    }
     SC.store.create('C-01', {
       approval_no: SC.store.nextNo('CA'),
       tender_result_id: result.id,

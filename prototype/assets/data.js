@@ -522,7 +522,7 @@ SC.data = {
       { state: 'done', title: '主管副总审批', who: '张国强', time: '2026-03-11 17:40', comment: '同意。' },
       { state: 'done', title: '签订入库', who: '李宁', time: '2026-03-12 14:20', comment: '电子签章已完成。' },
     ],
-    /* 履约节点（C-04 履约视角，区别于 payNodes 付款视角；按计划 vs 实际履约对比） */
+    /* 履约节点（一期 A 静态履约视角；按计划 vs 实际履约对比，不建 C-04 实体） */
     milestones: [
       { no: 1, name: '合同生效 + 预付款 30%', planDate: '2026-03-12', actDate: '2026-03-12', state: '已完成', color: 'green', compliance: '准时', detail: '已签订并完成预付 ¥1,284,000' },
       { no: 2, name: '首批到货 50%（30 日账期）', planDate: '2026-05-10', actDate: '2026-05-08', state: '到货 → 验收中', color: 'amber', compliance: '提前 2 日', detail: '到货 DH-2026-0508 部分到货 412,800；待质检入库' },
@@ -531,13 +531,13 @@ SC.data = {
     ],
     /* 合同变更单 C-05（含数量变更已生效 + 付款条件变更待审两条） */
     changes: [
-      { changeNo: 'CC-2026-0042-01', seq: 1, type: '数量变更', reason: '艾友综采一队上报矿用电缆需求增加 800 米（井下回风顺槽延长）', delta: 480000, oldAmount: 4280000, newAmount: 4760000, effectDate: '2026-04-22', state: '已审', color: 'green', operator: '李宁（采购科）', submitDate: '2026-04-18', approvalNote: '合同金额由 ¥4,280,000 升至 ¥4,760,000，C-04 节点 #2 #3 同步上调' },
-      { changeNo: 'CC-2026-0042-02', seq: 2, type: '付款条件变更', reason: '财务对账周期由 30 日调整为 45 日（与集团 2026 Q2 资金计划同步）', delta: 0, oldAmount: 4760000, newAmount: 4760000, effectDate: '—', state: '待审', color: 'amber', operator: '陈雪（财务部）', submitDate: '2026-05-08', approvalNote: '不改金额；改 C-04 节点 #2 #3 计划付款日；待集团副总财务审批' },
+      { changeNo: 'CC-2026-0042-01', seq: 1, type: '数量变更', reason: '艾友综采一队上报矿用电缆需求增加 800 米（井下回风顺槽延长）', delta: 480000, oldAmount: 4280000, newAmount: 4760000, effectDate: '2026-04-22', state: '已审', color: 'green', operator: '李宁（采购科）', submitDate: '2026-04-18', approvalNote: '合同金额由 ¥4,280,000 升至 ¥4,760,000；一期同步修订 C-02 金额与 payment_terms 文本' },
+      { changeNo: 'CC-2026-0042-02', seq: 2, type: '付款条件变更', reason: '财务对账周期由 30 日调整为 45 日（与集团 2026 Q2 资金计划同步）', delta: 0, oldAmount: 4760000, newAmount: 4760000, effectDate: '—', state: '待审', color: 'amber', operator: '陈雪（财务部）', submitDate: '2026-05-08', approvalNote: '不改金额；仅修订 C-02 payment_terms 文本；付款节点实体二期 A4 再建' },
     ],
-    /* 变更冻结状态（待审变更生效前，受影响付款节点暂停修改） */
+    /* 变更冻结状态（一期 A 只冻结 payment_terms 文本展示；付款节点链路移二期 A4） */
     paymentLockState: {
       isLocked: true,
-      reason: '存在 1 笔待审变更（CC-2026-0042-02 付款条件变更），变更生效前付款节点 #2 / #3 暂不允许编辑或新建付款申请',
+      reason: '存在 1 笔待审变更（CC-2026-0042-02 付款条件变更），变更生效前 C-02 payment_terms 暂不允许编辑；付款申请链路移二期 A4',
       affectedNodes: [2, 3],
       lockedSince: '2026-05-08',
       ownedBy: '财务部',

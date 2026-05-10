@@ -228,10 +228,17 @@
               source_receipt_id: q.receipt_id,
               order_id: q.order_id,
               qc_id: id,
-              warehouse_id: 2,
-              org_id: 3,
+              warehouse_id: q.warehouse_id || 2,
+              org_id: q.org_id || 3,
               quantity: q.quantity,
               state: '草稿',
+            });
+            SC.store.create('S-25', {
+              receipt_id: receipt.id,
+              material_id: q.material_id || null,
+              quantity: q.quantity || 0,
+              line_amount: q.amount || 0,
+              batch_id: null,
             });
             SC.ui.toast('S-04 #' + id + ' 三类全合格 → 自动生成 S-05 #' + receipt.id, 'success');
           } else {

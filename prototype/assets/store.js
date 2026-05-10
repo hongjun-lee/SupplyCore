@@ -76,14 +76,13 @@
         console.warn('[store] reset: no seed registered');
         return;
       }
+      for (var j = localStorage.length - 1; j >= 0; j--) {
+        var oldKey = localStorage.key(j);
+        if (oldKey && oldKey.indexOf(KEY_PREFIX) === 0) localStorage.removeItem(oldKey);
+      }
       Object.keys(seedRef).forEach(function (entity) {
         write(entity, JSON.parse(JSON.stringify(seedRef[entity])));
       });
-      // 清序号
-      for (var i = localStorage.length - 1; i >= 0; i--) {
-        var k = localStorage.key(i);
-        if (k && k.indexOf(SEQ_PREFIX) === 0) localStorage.removeItem(k);
-      }
       Object.keys(seedRef).forEach(function (entity) {
         notify(entity, 'reset', null);
       });

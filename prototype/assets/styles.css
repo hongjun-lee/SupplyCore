@@ -195,6 +195,107 @@ a:hover { text-decoration: underline; }
   display: flex; gap: 8px;
 }
 
+/* 单行 sticky 浮动主流程导航条（v0.16 演示用 chrome）
+ * top 贴 .app-header（自身已 sticky top:0，高 var(--header-h)）下方 */
+.demo-flow-nav {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -8px -4px 12px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: saturate(140%) blur(6px);
+  -webkit-backdrop-filter: saturate(140%) blur(6px);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--brand);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.demo-flow-badge {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--brand);
+  background: var(--brand-50);
+  padding: 4px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.demo-flow-pager {
+  flex-shrink: 0;
+  display: flex;
+  gap: 4px;
+}
+.demo-flow-pager .btn {
+  min-width: 28px;
+  padding: 4px 8px;
+}
+.demo-flow-steps {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.demo-flow-steps::-webkit-scrollbar { height: 4px; }
+.demo-flow-steps::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+.demo-flow-step {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-2);
+  background: var(--gray-50);
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.demo-flow-step:hover {
+  text-decoration: none;
+  border-color: var(--brand);
+  color: var(--brand);
+}
+.demo-flow-step .num {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--border-strong);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+.demo-flow-step.done {
+  color: var(--green);
+  background: var(--green-50);
+  border-color: #bbf7d0;
+}
+.demo-flow-step.done .num {
+  color: #fff;
+  background: var(--green);
+  border-color: var(--green);
+}
+.demo-flow-step.current {
+  color: var(--brand);
+  background: var(--brand-50);
+  border-color: #bfdbfe;
+  font-weight: 600;
+}
+.demo-flow-step.current .num {
+  color: #fff;
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
 /* ─── 卡片 ─── */
 .card {
   background: var(--panel);
@@ -824,6 +925,10 @@ table.matrix .note-col { color: var(--text-2); font-size: 11px; }
   .app-main { padding: 12px 12px 24px; }
   .page-header { flex-direction: column; gap: 8px; }
   .page-header .actions { margin-left: 0; flex-wrap: wrap; }
+  .demo-flow-nav { gap: 6px; padding: 5px 8px; }
+  .demo-flow-badge { font-size: 10px; padding: 3px 6px; }
+  .demo-flow-step { padding: 3px 6px; font-size: 11px; }
+  .demo-flow-step .num { width: 14px; height: 14px; font-size: 9px; }
   .filter-bar { padding: 10px 12px; }
   .filter-bar .form-field { min-width: 120px; flex: 1 1 calc(50% - 8px); }
   .filter-bar .filter-actions { width: 100%; justify-content: flex-end; }

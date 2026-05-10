@@ -274,7 +274,9 @@
       var receipt = SC.store.create('S-03', {
         receipt_no: SC.store.nextNo('DH'),
         order_id: o.id,
-        quantity: 100,
+        material_id: o.material_id || null,
+        quantity: o.quantity || 100,
+        amount: o.amount || 0,
         warehouse_id: 2,
         org_id: 3,
         state: '待验收',
@@ -298,7 +300,11 @@
               qc_no: SC.store.nextNo('QC'),
               receipt_id: id,
               order_id: r.order_id,
+              material_id: r.material_id || null,
               quantity: r.quantity,
+              amount: r.amount || 0,
+              warehouse_id: r.warehouse_id,
+              org_id: r.org_id,
               state: '待检',
             });
             SC.ui.toast('S-03 #' + id + ' 已验收 → 创建 S-04 #' + qc.id + ' 进入质检', 'success');
@@ -312,6 +318,13 @@
               org_id: r.org_id,
               quantity: r.quantity,
               state: '草稿',
+            });
+            SC.store.create('S-25', {
+              receipt_id: receipt.id,
+              material_id: r.material_id || null,
+              quantity: r.quantity || 0,
+              line_amount: r.amount || 0,
+              batch_id: null,
             });
             SC.ui.toast('S-03 #' + id + ' 已验收（跳过 D3 质检）→ 直接生成 S-05 #' + receipt.id, 'success');
           }

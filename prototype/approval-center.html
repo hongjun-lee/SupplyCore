@@ -244,7 +244,7 @@
           '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
           '<td class="actions">' +
             (currentTab === 'todo'
-              ? events.filter(function (e) { return /通过|审批|批准/.test(e); }).map(function (e) {
+              ? events.filter(function (e) { return /通过|审批|批准|下达/.test(e); }).map(function (e) {
                   return '<a href="javascript:void(0)" onclick="engineApproveTodo(\'' + r.entity + '\', ' + r.item.id + ', \'' + e + '\')" style="color:var(--green);">' + e + '</a>';
                 }).concat(events.filter(function (e) { return /驳回/.test(e); }).map(function (e) {
                   return '<a href="javascript:void(0)" onclick="engineApproveTodo(\'' + r.entity + '\', ' + r.item.id + ', \'' + e + '\')" style="color:var(--red);">' + e + '</a>';

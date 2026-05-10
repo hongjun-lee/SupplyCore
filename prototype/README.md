@@ -5,14 +5,22 @@
 
 ## 一、如何打开
 
-直接双击任一 HTML 文件，或在浏览器中打开：
+**两种方式**：
 
-- 入口：`prototype/index.html`（工作台）
+1. **直接双击**（开发 / 单页查看）：file:// 协议，打开任一 HTML 文件即可，无需构建
+2. **本地 HTTP 服务**（**演示推荐**）：`python3 -m http.server 4175 --bind 127.0.0.1`，然后访问 `http://127.0.0.1:4175/prototype/`
+
+> **为什么演示要用 http.server**：档 A 引擎层使用 LocalStorage 持久化和 BroadcastChannel 跨页同步，`file://` 下的 origin 隔离规则在不同浏览器（Chrome/Edge/Safari/Firefox）行为不一致，可能导致跨标签页数据不同步；通过 `http://127.0.0.1:4175` 把所有页面纳入同一 origin，行为最稳定。
+
+**入口建议**：
+
+- 工作台：`prototype/index.html`
+- **档 A 引擎演示**：`prototype/requirement-list.html`（从最起点 P-01 跑完整链路，每页顶部有"档 A · N/12"主流程导航条）
 - 大屏：`prototype/dashboard-bigscreen.html`（适合 1920×1080 投屏）
 - AI 助理：`prototype/ai-assistant.html`（可输入互动）/ `ai-write-flow.html`（写操作完整链路演示）
 - 移动演示：`prototype/mobile-stocktake.html`（手持端 PDA 扫码盘点）
 - 信创矩阵：`prototype/xinchuang-matrix.html`（招标响应与选型决策）
-- 无需任何构建步骤、无需联网；样式与脚本均为本地文件
+- 引擎烟雾测试：`prototype/_engine-test.html`（含 reset 数据按钮）
 - 兼容 Chrome / Edge / Safari 现代版本
 
 ## 二、本版覆盖范围（v0.16 = v0.15 + 档 A 一期同事评审 5 项 P1/P2 修复）

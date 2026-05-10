@@ -146,8 +146,9 @@
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
           <div class="card-header">
-            <div class="title">📡 档 A 引擎接入 · P-05 任务分解（人工合并/拆分 + 路径分流 linkage）</div>
+            <div class="title">📡 档 A 引擎接入 · P-05 任务分解（人工合并/拆分 + 采购路径选择 linkage）</div>
             <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineMergeSelectedTasks()">合并选中为招采任务</button>
               <a class="btn btn-sm" href="purchase-planning.html">← P-02 计划</a>
               <a class="btn btn-sm" href="tender.html">→ T-01 招标</a>
             </div>
@@ -156,6 +157,7 @@
             <table class="data">
               <thead>
                 <tr>
+                  <th style="width:32px;"></th>
                   <th>任务编号</th>
                   <th>来源 P-02 / 计划行</th>
                   <th>物料 / 数量</th>
@@ -168,8 +170,8 @@
               <tbody id="engine-p05-tbody"></tbody>
             </table>
             <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
-              <span class="badge blue dot">分流规则</span>
-              选 tender_type → 点"确认分解" → linkage 自动按路径生成 T-01（招采）/ S-01（直采）/ S-01 + 关联 C-02（合同采购）；S-01 审批通过 linkage 自动 create S-02 订单（v0.16 三路径全跑通）；P-02 全部分解完毕则自动转「已分解」（V0.4a 收口）。
+              <span class="badge blue dot">采购路径规则</span>
+              可先勾选多条草稿 P-05 合并为一个招采任务，再点"确认分解"；linkage 自动生成 T-01。直采/合同采购仍生成 S-01，审批后生成 S-02；P-02 全部分解完毕则自动转「已分解」。
             </div>
           </div>
         </div>
@@ -203,7 +205,7 @@
               <div class="node done"><span class="step-num">3.1</span> 计划审批通过</div>
               <div class="node done"><span class="step-num">3.2</span> 计划行锁定</div>
               <div class="node current"><span class="step-num">3.3</span> 分解 P-05 任务</div>
-              <div class="node"><span class="step-num">3.4</span> 路径分流</div>
+              <div class="node"><span class="step-num">3.4</span> 采购路径选择</div>
               <div class="node"><span class="step-num">3.5</span> 生成标包 / 采购申请</div>
             </div>
           </div>
@@ -297,7 +299,7 @@
             </div>
 
             <div class="card">
-              <div class="card-header"><div class="title">路径分流结果</div></div>
+              <div class="card-header"><div class="title">采购路径结果</div></div>
               <div class="card-body">
                 <div class="route-summary" id="route-summary"></div>
               </div>
@@ -345,28 +347,36 @@
       var matMap = {}; mats.forEach(function (m) { matMap[m.id] = m.name; });
 
       document.getElementById('engine-p05-tbody').innerHTML = tasks.length === 0
-        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">暂无 P-05 记录 · 先到「采购计划编排」审批 P-02 → linkage 自动生成 P-05 草稿</td></tr>'
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px;">暂无 P-05 记录 · 先到「采购计划编排」审批 P-02 → linkage 自动生成 P-05 草稿</td></tr>'
         : tasks.map(function (t) {
             var line = lineMap[t.plan_line_id] || {};
             var events = SC.sm.getAllowedEvents('P-05', t);
+            var visibleEvents = events.filter(function (e) {
+              return e !== '合并' && e !== '路径分流';
+            });
             var stateColor = t.task_state === '已完成' ? 'green' : t.task_state === '已分解' ? 'blue' : t.task_state === '草稿' ? 'gray' : 'amber';
             var typeOpts = ['招采', '直采', '合同采购'].map(function (opt) {
               return '<option value="' + opt + '"' + (t.tender_type === opt ? ' selected' : '') + '>' + opt + '</option>';
             }).join('');
+            var sourceReq = line.source_request_no || (line.source_request_nos ? line.source_request_nos.join(',') : '—');
+            var splitAction = (t.task_state === '草稿' && (t.quantity || 0) > 1)
+              ? '<a href="javascript:void(0)" onclick="engineSplitTask(' + t.id + ')" style="color:var(--brand);">拆分</a>'
+              : '';
             return '<tr>' +
+              '<td><input type="checkbox" class="engine-p05-select" value="' + t.id + '" ' + (t.task_state !== '草稿' ? 'disabled' : '') + '></td>' +
               '<td class="code">' + (t.task_no || '#' + t.id) + '</td>' +
-              '<td class="muted" style="font-size:11px;">P-02#' + t.plan_id + ' / ' + (line.plan_line_no || '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">P-02#' + t.plan_id + ' / ' + (line.plan_line_no || '—') + '<div>来源 ' + sourceReq + '</div></td>' +
               '<td>' + (matMap[t.material_id] || '—') + '<div class="muted" style="font-size:11px;">数量 ' + (t.quantity || 0) + '</div></td>' +
               '<td>' + (t.task_state === '草稿'
                 ? '<select onchange="engineSetTenderType(' + t.id + ', this.value)"><option value="">未选</option>' + typeOpts + '</select>'
                 : '<span class="badge ' + (t.tender_type === '招采' ? 'blue' : t.tender_type === '直采' ? 'teal' : 'gray') + '">' + (t.tender_type || '—') + '</span>') +
               '</td>' +
               '<td>' + SC.badge(t.task_state, stateColor, true) + '</td>' +
-              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="muted" style="font-size:11px;">[' + visibleEvents.join(', ') + ']</td>' +
               '<td class="actions">' +
-                events.map(function (e) {
+                visibleEvents.map(function (e) {
                   return '<a href="javascript:void(0)" onclick="engineP05Transition(' + t.id + ', \'' + e + '\')">' + e + '</a>';
-                }).join('') +
+                }).join('') + splitAction +
               '</td>' +
             '</tr>';
           }).join('');
@@ -375,6 +385,88 @@
     function engineSetTenderType(id, value) {
       SC.store.update('P-05', id, { tender_type: value });
       SC.ui.toast('P-05 #' + id + ' 采购方式: ' + (value || '清除'), 'info');
+    }
+
+    function engineMergeSelectedTasks() {
+      var ids = Array.from(document.querySelectorAll('.engine-p05-select:checked')).map(function (cb) {
+        return parseInt(cb.value, 10);
+      }).filter(Boolean);
+      if (ids.length < 2) {
+        SC.ui.toast('请至少勾选两条草稿 P-05 再合并', 'warning');
+        return;
+      }
+      var tasks = ids.map(function (id) { return SC.store.get('P-05', id); }).filter(Boolean);
+      if (tasks.length !== ids.length || tasks.some(function (t) { return t.task_state !== '草稿'; })) {
+        SC.ui.toast('只能合并草稿态 P-05', 'warning');
+        return;
+      }
+      var base = tasks[0];
+      var compatible = tasks.every(function (t) {
+        return t.plan_id === base.plan_id && t.material_id === base.material_id;
+      });
+      if (!compatible) {
+        SC.ui.toast('只能合并同计划、同物料的 P-05 任务', 'warning');
+        return;
+      }
+      var totalQty = tasks.reduce(function (sum, t) { return sum + (t.quantity || 0); }, 0);
+      var totalAmount = Math.round(tasks.reduce(function (sum, t) { return sum + (t.amount || 0); }, 0) * 100) / 100;
+      var mergedTaskNos = tasks.map(function (t) { return t.task_no || ('#' + t.id); });
+      SC.store.update('P-05', base.id, {
+        quantity: totalQty,
+        amount: totalAmount,
+        tender_type: '招采',
+        merged_task_nos: mergedTaskNos,
+        merge_note: '由 ' + mergedTaskNos.join(',') + ' 合并为招采任务',
+      });
+      tasks.slice(1).forEach(function (t) {
+        SC.store.remove('P-05', t.id);
+      });
+      SC.ui.toast('已合并为 P-05 #' + base.id + '（招采），下一步点"确认分解"生成 T-01 招标申请', 'success');
+      renderEngineP05();
+    }
+
+    function engineSplitTask(id) {
+      var task = SC.store.get('P-05', id);
+      if (!task || task.task_state !== '草稿') {
+        SC.ui.toast('只有草稿态 P-05 可以拆分', 'warning');
+        return;
+      }
+      var maxQty = task.quantity || 0;
+      if (maxQty <= 1) {
+        SC.ui.toast('数量不足，不能拆分', 'warning');
+        return;
+      }
+      var defaultQty = String(Math.floor(maxQty / 2));
+      SC.ui.prompt('拆出数量（原任务数量 ' + maxQty + '）', { default: defaultQty, placeholder: '数量' }).then(function (val) {
+        if (val === null) return;
+        var splitQty = parseInt(val, 10);
+        if (!splitQty || splitQty <= 0 || splitQty >= maxQty) {
+          SC.ui.toast('拆出数量必须大于 0 且小于原任务数量', 'warning');
+          return;
+        }
+        var unitAmount = (task.amount || 0) / maxQty;
+        var splitAmount = Math.round(unitAmount * splitQty * 100) / 100;
+        var remainQty = maxQty - splitQty;
+        var remainAmount = Math.round(((task.amount || 0) - splitAmount) * 100) / 100;
+        SC.store.update('P-05', id, {
+          quantity: remainQty,
+          amount: remainAmount,
+          split_from_task_id: task.split_from_task_id || task.id,
+        });
+        SC.store.create('P-05', {
+          task_no: SC.store.nextNo('PT'),
+          plan_id: task.plan_id,
+          plan_line_id: task.plan_line_id,
+          material_id: task.material_id,
+          quantity: splitQty,
+          amount: splitAmount,
+          task_state: '草稿',
+          tender_type: task.tender_type || null,
+          split_from_task_id: task.split_from_task_id || task.id,
+        });
+        SC.ui.toast('P-05 #' + id + ' 已拆分：保留 ' + remainQty + '，拆出 ' + splitQty + '；可分别选择招采/直采/合同采购', 'success');
+        renderEngineP05();
+      });
     }
 
     function engineP05Transition(id, event) {
@@ -388,8 +480,8 @@
         if (event === '确认分解') {
           var msg = '已确认分解 → ';
           if (task.tender_type === '招采') msg += 'linkage 自动创建 T-01 招标申请';
-          else if (task.tender_type === '直采') msg += 'linkage 自动创建 S-01 采购申请';
-          else msg += '路径分流';
+          else if (task.tender_type === '直采') msg += 'linkage 自动创建 S-01 待审采购申请（去审批中心通过后生成 S-02）';
+          else msg += 'linkage 自动创建 S-01 待审采购申请（合同采购，审批后生成 S-02）';
           SC.ui.toast(msg, 'success');
         } else {
           SC.ui.toast('P-05 #' + id + ' → ' + event + ' 成功', 'success');
@@ -421,7 +513,7 @@
       page: 'purchase-task-decomposition',
       crumbs: ['采购协同', '采购任务分解'],
       title: '采购任务分解',
-      desc: '对齐详设 04 V1.1：P-03 计划行 → P-05 采购任务，按业务流向 + 路径 + 管控分流（含合并/拆分案例）',
+      desc: '对齐详设 04 V1.1：P-03 计划行 → P-05 采购任务，按业务流向、采购路径和管控要求拆分或合并（含合并/拆分案例）',
       actions: [{ label: '分解规则配置' }, { label: '确认生成 P-05', primary: true }],
     });
 

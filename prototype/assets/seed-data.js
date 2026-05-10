@@ -83,6 +83,9 @@
       { id: 2, request_no: 'XQ-2026-0427', org_id: 4, material_id: 3, quantity: 800, amount: 55000,
         purpose: '东梁矿掘进备件月度补充', urgency: '普通', state: '草稿',
         applicant: '王志刚', submit_date: '2026-04-20' },
+      { id: 3, request_no: 'XQ-2026-0430', org_id: 3, material_id: 8, quantity: 120, amount: 57372,
+        purpose: '艾友矿 1309 工作面追加支护（同物料合并演示）', urgency: '普通', state: '草稿',
+        applicant: '赵明', submit_date: '2026-04-16' },
     ],
 
     /* v0.16 不再 seed P-02 / P-03 — 由 P-01 已审 linkage 自动聚合 */

@@ -17,6 +17,8 @@
             <div class="title">📡 档 A 引擎接入 · P-01 需求（SC.store + SC.sm）</div>
             <div class="actions">
               <button class="btn btn-sm" onclick="engineCreate()">+ 创建 P-01 草稿</button>
+              <button class="btn btn-sm btn-primary" onclick="engineBatchApproveSelected()">批量审批选中需求</button>
+              <a class="btn btn-sm" href="purchase-planning.html">→ P-02 计划编排</a>
               <button class="btn btn-sm" onclick="engineReset()">重置引擎数据</button>
               <a class="btn btn-sm" href="_engine-test.html">引擎测试页 →</a>
             </div>
@@ -25,6 +27,7 @@
             <table class="data" id="engine-tbody-wrap">
               <thead>
                 <tr>
+                  <th style="width:32px;"><input type="checkbox" onchange="engineToggleAll(this.checked)"></th>
                   <th>需求单号</th>
                   <th>申请单位</th>
                   <th>物料 / 数量</th>
@@ -38,7 +41,7 @@
             </table>
             <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
               <span class="badge blue dot">引擎说明</span>
-              此面板数据来自 LocalStorage（<code>sc:P-01</code>），与下方静态列表独立。状态迁移走 <code>SC.sm.transition('P-01', id, event)</code>，刷新页面后数据保留；BroadcastChannel 跨页同步。详见 <code>02-档A增强原型实施方案-V0.4.md</code> §4.2 / §6.2。
+              可勾选多条需求并批量审批；审批通过后进入 P-02 计划编排，同期间、同组织、同物料会合并成同一条 P-03 计划行，后续在 P-05 页再人工拆分采购任务。状态迁移走 <code>SC.sm.transition('P-01', id, event)</code>，刷新页面后数据保留。
             </div>
           </div>
         </div>
@@ -165,11 +168,12 @@
       var matMap = {}; mats.forEach(function (m) { matMap[m.id] = m.name; });
 
       document.getElementById('engine-p01-tbody').innerHTML = items.length === 0
-        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">暂无 P-01 记录 · 点上方"+ 创建 P-01 草稿"</td></tr>'
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px;">暂无 P-01 记录 · 点上方"+ 创建 P-01 草稿"</td></tr>'
         : items.map(function (p) {
             var events = SC.sm.getAllowedEvents('P-01', p);
             var stateColor = p.state === '已审' ? 'green' : p.state === '待审' ? 'amber' : p.state === '已驳回' ? 'red' : 'gray';
             return '<tr>' +
+              '<td><input type="checkbox" class="engine-p01-select" value="' + p.id + '" ' + (p.state === '已审' || p.state === '已作废' ? 'disabled' : '') + '></td>' +
               '<td class="code">' + (p.request_no || ('#' + p.id)) + '</td>' +
               '<td>' + (orgMap[p.org_id] || '—') + '</td>' +
               '<td>' + (matMap[p.material_id] || '—') + '<div class="muted" style="font-size:11px;">数量 ' + (p.quantity || 0) + '</div></td>' +
@@ -219,6 +223,46 @@
       } catch (e) {
         SC.ui.toast('迁移失败：' + e.message, 'error');
       }
+    }
+
+    function engineToggleAll(checked) {
+      Array.from(document.querySelectorAll('.engine-p01-select:not(:disabled)')).forEach(function (cb) {
+        cb.checked = checked;
+      });
+    }
+
+    function engineBatchApproveSelected() {
+      var ids = Array.from(document.querySelectorAll('.engine-p01-select:checked')).map(function (cb) {
+        return parseInt(cb.value, 10);
+      }).filter(Boolean);
+      if (ids.length === 0) {
+        SC.ui.toast('请先勾选至少一条 P-01 需求', 'warning');
+        return;
+      }
+      var ok = 0, skipped = 0, failed = 0;
+      ids.forEach(function (id) {
+        var item = SC.store.get('P-01', id);
+        if (!item) { failed++; return; }
+        try {
+          if (item.state === '草稿') {
+            SC.sm.transition('P-01', id, '提交审批');
+            item = SC.store.get('P-01', id);
+          }
+          if (item.state === '待审') {
+            SC.sm.transition('P-01', id, '审批通过');
+            ok++;
+          } else if (item.state === '已审') {
+            skipped++;
+          } else {
+            skipped++;
+          }
+        } catch (e) {
+          console.warn('[engineBatchApproveSelected]', id, e);
+          failed++;
+        }
+      });
+      SC.ui.toast('批量审批完成：通过 ' + ok + ' 条，跳过 ' + skipped + ' 条，失败 ' + failed + ' 条；同物料需求已进入 P-03 合并逻辑', failed ? 'warning' : 'success');
+      renderEngineList();
     }
 
     function engineReset() {

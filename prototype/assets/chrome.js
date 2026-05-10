@@ -78,8 +78,63 @@ SC.layout = function (opts) {
   if (area && (opts.crumbs || opts.title)) {
     area.insertAdjacentHTML('afterbegin', SC.renderPageHeader(opts));
   }
+  SC.renderDemoFlow(opts);
   SC.bindRoleSwitch();
   SC.renderFooter();
+};
+
+SC.demoFlow = [
+  { id: 'requirement-list', file: 'requirement-list.html', label: 'P-01 需求', desc: '基层提报与审批', aliases: ['requirement-detail.html'] },
+  { id: 'purchase-planning', file: 'purchase-planning.html', label: 'P-02 计划', desc: '计划汇总 / P-03 聚合' },
+  { id: 'purchase-task-decomposition', file: 'purchase-task-decomposition.html', label: 'P-05 任务', desc: '合并拆分与采购路径选择' },
+  { id: 'tender', file: 'tender.html', label: 'T 招采', desc: '招标申请 / 标包 / 中标回传' },
+  { id: 'contract-detail', file: 'contract-detail.html', label: 'C 合同', desc: 'C-01 会签与 C-02 执行', aliases: ['contract-list.html'] },
+  { id: 'purchase-orders', file: 'purchase-orders.html', label: 'S-02 订单', desc: '采购订单下达' },
+  { id: 'goods-receipt', file: 'goods-receipt.html', label: 'S-03 到货', desc: '到货验收与质检开关' },
+  { id: 'quality-check', file: 'quality-check.html', label: 'S-04 质检', desc: '三类验收串行 / 可跳过' },
+  { id: 'purchase-receipt', file: 'purchase-receipt.html', label: 'S-05 入库', desc: '入库审核与库存原子事务' },
+  { id: 'inventory', file: 'inventory.html', label: 'S-13 库存', desc: '库存余额 / 流水追溯' },
+  { id: 'nc-interface', file: 'nc-interface.html', label: 'F-01 NC', desc: '接口推送与异常重试', aliases: ['nc-interface-detail.html'] },
+  { id: 'reports', file: 'reports.html', label: 'R 报表', desc: '报表汇总与演示收口', aliases: ['report-detail.html'] },
+];
+
+SC.renderDemoFlow = function (opts) {
+  const area = document.getElementById('page-area');
+  if (!area || document.getElementById('demo-flow-nav')) return;
+  const file = (location.pathname.split('/').pop() || 'index.html');
+  const currentPage = opts && opts.page;
+  const steps = SC.demoFlow || [];
+  const idx = steps.findIndex(s =>
+    s.id === currentPage ||
+    s.file === file ||
+    (s.aliases || []).indexOf(file) >= 0
+  );
+  if (idx < 0) return;
+
+  const cur = steps[idx];
+  const prev = steps[idx - 1];
+  const next = steps[idx + 1];
+  const links = steps.map((s, i) => {
+    const cls = ['demo-flow-step'];
+    if (i < idx) cls.push('done');
+    if (i === idx) cls.push('current');
+    return `<a class="${cls.join(' ')}" href="${s.file}" title="${s.desc}">
+      <span class="num">${i + 1}</span><span class="txt">${s.label}</span>
+    </a>`;
+  }).join('');
+
+  const prevBtn = prev ? `<a class="btn btn-sm" href="${prev.file}" title="${prev.desc}">←</a>` : '';
+  const nextBtn = next ? `<a class="btn btn-sm btn-primary" href="${next.file}" title="${next.desc}">→</a>` : '';
+  const html = `
+    <div class="demo-flow-nav" id="demo-flow-nav" title="档 A 演示主流程 · 当前 ${idx + 1}/${steps.length}：${cur.label} · ${cur.desc}">
+      <span class="demo-flow-badge">档 A · ${idx + 1}/${steps.length}</span>
+      <div class="demo-flow-steps">${links}</div>
+      <div class="demo-flow-pager">${prevBtn}${nextBtn}</div>
+    </div>`;
+
+  const header = area.querySelector('.page-header');
+  if (header) header.insertAdjacentHTML('afterend', html);
+  else area.insertAdjacentHTML('afterbegin', html);
 };
 
 SC.renderHeader = function () {
@@ -278,31 +333,31 @@ SC.renderTimeWidget = function () {
     `;
 
     // 绑定事件
-    document.getElementById('sc-tw-header').onclick = function () {
+    w.querySelector('#sc-tw-header').onclick = function () {
       w.dataset.expanded = expanded ? '0' : '1';
       render();
     };
     if (expanded) {
-      const inp = document.getElementById('sc-tw-date');
+      const inp = w.querySelector('#sc-tw-date');
       const cur = SC.time.now();
       inp.value = cur.getFullYear() + '-' +
         String(cur.getMonth() + 1).padStart(2, '0') + '-' +
         String(cur.getDate()).padStart(2, '0') + 'T' +
         String(cur.getHours()).padStart(2, '0') + ':' +
         String(cur.getMinutes()).padStart(2, '0');
-      document.getElementById('sc-tw-set').onclick = function () {
+      w.querySelector('#sc-tw-set').onclick = function () {
         if (inp.value) {
           SC.time.setMock(new Date(inp.value));
           render();
         }
       };
-      Array.from(document.getElementsByClassName('sc-tw-adv')).forEach(function (b) {
+      Array.from(w.getElementsByClassName('sc-tw-adv')).forEach(function (b) {
         b.onclick = function () {
           SC.time.advance(parseInt(b.dataset.d, 10));
           render();
         };
       });
-      document.getElementById('sc-tw-reset').onclick = function () {
+      w.querySelector('#sc-tw-reset').onclick = function () {
         if (confirm('确认回到真实时间？mock 时间会被清除。')) {
           SC.time.clearMock();
           render();
