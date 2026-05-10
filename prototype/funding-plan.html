@@ -94,7 +94,7 @@
           <div class="card-header"><div class="title">⚖ 月度资金计划生成规则（详设 05 §5）</div></div>
           <div class="card-body" style="font-size:12px;line-height:1.7;">
             <strong>1️⃣ 数据来源：</strong>合同 C-04 节点（按月聚合应付）+ E-13 租赁月度费用汇总+ 履约保证金到期退还（SENS-CON-003）<br>
-            <strong>2️⃣ 财务调整：</strong>财务部审核物资公司报送的月度计划 → 调整额度 / 节奏 → 发布至 C-05 付款计划<br>
+            <strong>2️⃣ 财务调整：</strong>财务部审核物资公司报送的月度计划 → 调整额度 / 节奏 → 发布至 C-07 付款计划<br>
             <strong>3️⃣ 申请触发：</strong>临期 7 日 → 物资公司发起 C-08 付款申请 → 4 级审批（采购员 / 主任 / 财务总监 / 总经理 — 按金额分级）<br>
             <strong>4️⃣ 付款执行：</strong>已审 → 出纳 C-10 执行 → 银行回单 → 记账完成 → BIZ-013 NC 实付回写<br>
             <strong>5️⃣ 月结对账：</strong>本月已付 (C-10) vs NC 实付（F-12 月结）→ 差异自动 emit ALR-FIN-RECON-001
@@ -104,7 +104,7 @@
         <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
           <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
           <div class="card-body" style="font-size:13px;line-height:1.7;">
-            <strong>📋 业务依据：</strong>详设 05 V1.1 §第 5 章 月度资金计划 + C-04 付款节点 + C-05 付款计划 + C-08 付款申请 + C-10 付款执行（对应 BIZ-013 NC 实付回写）+ E-13 租赁费用汇总。<br>
+            <strong>📋 业务依据：</strong>详设 05 V1.1 §第 5 章 月度资金计划 + C-04 付款节点 + C-07 付款计划 + C-08 付款申请 + C-10 付款执行（对应 BIZ-013 NC 实付回写）+ E-13 租赁费用汇总。<br>
             <strong>🛤 链路：</strong>合同 C-04 节点（按月）+ E-13 租赁月结费用 → 自动聚合月度资金计划 → 财务调整发布 → 物资公司 C-08 申请 → 财务审批 → 出纳 C-10 执行 → BIZ-013 NC 实付回写 → 月结对账 (F-12)。<br>
             <strong>🛡 节奏控制：</strong>临期节点（7 日内）红色提示；待发起 → 5 日内未推进自动 emit ALR-CON-FUND-001。
           </div>

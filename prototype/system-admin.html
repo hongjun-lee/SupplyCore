@@ -199,7 +199,7 @@
           <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
           <div class="card-body" style="font-size:13px;line-height:1.7;">
             <strong>📋 业务依据：</strong>详设 10 V1.2a §权限矩阵 + 详设 11 V1.0 §1 信创 + §13 操作审计 + Nova Platform SSO + 集团统筹层统一权限。<br>
-            <strong>🛤 链路：</strong>Nova SSO 用户 → 本系统业务角色映射（SC.roles）→ 8 类角色（采购员 / 计划员 / 仓管员 / 财务接口管理员 / 出纳 / 物资管理 / 合规官 / 审计员）→ 数据范围 + 操作权限矩阵 → 操作日志（5 年留存）。<br>
+            <strong>🛤 链路：</strong>Nova SSO 用户 → 本系统业务角色映射（SC.roles）→ 6 类角色（buyer 采购员 / planner 计划员 / storage_mgr 物资主管 / finance 财务 / it / group_committee 集团委员会）→ 数据范围 + 操作权限矩阵 → 操作日志（5 年留存）。<br>
             <strong>🛡 高敏感操作：</strong>SENS-CON-003/004 + 黑名单 + 火工品双人审批 → 二次确认 + 副本归档 + 审计抽查。
           </div>
         </div>
@@ -219,40 +219,42 @@
   <script src="assets/roles.js"></script>
   <script src="assets/ui-helper.js"></script>
   <script>
-    /* 引擎接入：角色切换器 */
+    /* 引擎接入：角色切换器（对齐 roles.js capabilities — 6 个角色 id） */
     var ROLE_DESC = {
-      '采购员': { scope: '本部门 P-01/P-02 + 关联 P-05', ops: '需求提报 / 计划编辑 / 任务分解', sens: '禁直接付款 + 禁主数据维护' },
-      '计划员': { scope: '物资公司全口径 P-01~P-05', ops: '聚合 / 拆包 / 任务分配', sens: '禁付款 + 禁敏感主数据' },
-      '仓管员': { scope: '本仓 S-13/S-14/S-21 + 入出库', ops: '入库验收 / 出库执行 / 盘点', sens: '火工品需双人 + 禁财务凭证查询' },
-      '财务接口管理员': { scope: 'F-01/F-08 + NC-MD-001~005', ops: '接口监控 / 重推 / 主数据下推', sens: 'F-08 重推须二次审批' },
-      '出纳': { scope: 'C-08/C-10 + 银行账户', ops: '付款执行 / 银行回单录入', sens: '不可超付 + 不可抢付 + 双人复核' },
-      '物资管理（领导）': { scope: '物资公司全口径', ops: '审批 / 集体决议 / 督办', sens: '高敏感操作签字 + 月报抽查' },
-      '合规官': { scope: '所有高敏感场景', ops: 'SENS-CON-003/004 + 黑名单审批', sens: '双签 + 副本归档' },
-      '审计员（只读）': { scope: '全口径只读 + 5 年历史', ops: '查询 / 导出（带水印）', sens: '禁任何写操作' },
+      'buyer':            { label: '采购员',     scope: '本部门 P-01/P-02 + 关联 P-05', ops: '需求接收 / 采购单创建 / 招标录入 / 到货跟踪', sens: '禁直接付款 + 禁主数据维护' },
+      'planner':          { label: '计划员',     scope: '物资公司全口径 P-01~P-05',     ops: '需求归集 / 计划汇总 / 任务分解 / 标包编排', sens: '禁付款 + 禁敏感主数据' },
+      'storage_mgr':      { label: '物资主管',   scope: '本矿 S-13/S-14/S-21 + 入出库', ops: '入库审核 / 库存管理 / 盘点 / 废旧处置 / 供应商履约', sens: '火工品需双人 + 禁财务凭证查询' },
+      'finance':          { label: '财务',       scope: 'C-04~C-10 + F-01/F-08',         ops: '合同会签 / 付款审批 / 三单匹配 / NC 接口监控', sens: 'F-08 重推须二次审批 + 禁超付 / 抢付' },
+      'it':               { label: 'IT',         scope: 'F-01/F-08 + NC-MD-001~005',     ops: 'NC 接口运维 / 系统配置 / 信创适配 / 预警规则', sens: '高敏感操作只读 + 配置变更需审批' },
+      'group_committee':  { label: '集团委员会', scope: '集团全口径只读 + 大额审批',     ops: '大额审批 / 月度集体决议 / 汇报视图', sens: '高敏感签字 + 月报抽查' },
     };
     function renderRoleSelect() {
       var sel = document.getElementById('engine-role-select');
       if (!sel) return;
-      sel.innerHTML = Object.keys(ROLE_DESC).map(function (r) {
-        return '<option value="' + r + '">' + r + '</option>';
+      sel.innerHTML = Object.keys(ROLE_DESC).map(function (id) {
+        return '<option value="' + id + '">' + ROLE_DESC[id].label + '（' + id + '）</option>';
       }).join('');
-      var current = SC.getRole().label;
+      var current = (SC.roles && SC.roles.current) ? SC.roles.current() : 'planner';
       if (Object.prototype.hasOwnProperty.call(ROLE_DESC, current)) sel.value = current;
       renderRoleInfo(sel.value);
     }
-    function renderRoleInfo(role) {
-      var d = ROLE_DESC[role];
+    function renderRoleInfo(roleId) {
+      var d = ROLE_DESC[roleId];
       if (!d) return;
       document.getElementById('engine-role-info').innerHTML =
-        '<div><strong style="color:var(--brand);">当前角色：' + role + '</strong></div>' +
+        '<div><strong style="color:var(--brand);">当前角色：' + d.label + '（' + roleId + '）</strong></div>' +
         '<div style="margin-top:6px;"><strong>📊 数据范围：</strong>' + d.scope + '</div>' +
         '<div><strong>🛠 可执行操作：</strong>' + d.ops + '</div>' +
         '<div><strong>🛡 高敏感约束：</strong>' + d.sens + '</div>';
     }
     function engineRoleApply() {
-      var role = document.getElementById('engine-role-select').value;
-      try { SC.setRole(role); SC.ui.toast('已切换至 ' + role, 'success'); renderRoleInfo(role); }
-      catch (e) { SC.ui.toast('切换失败：' + e.message, 'error'); }
+      var roleId = document.getElementById('engine-role-select').value;
+      try {
+        var ok = SC.roles.set(roleId);
+        if (!ok) { SC.ui.toast('未知角色 id：' + roleId, 'error'); return; }
+        SC.ui.toast('已切换至 ' + ROLE_DESC[roleId].label + '（' + roleId + '）', 'success');
+        renderRoleInfo(roleId);
+      } catch (e) { SC.ui.toast('切换失败：' + e.message, 'error'); }
     }
     document.addEventListener('DOMContentLoaded', renderRoleSelect);
     setTimeout(renderRoleSelect, 100);
