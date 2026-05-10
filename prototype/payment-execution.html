@@ -12,14 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 05 §8.2 四层付款控制链路（C-04 → C-07 → C-08 → C-10，一期 C-10 即可演示）+ 详设 08 BIZ-013 付款执行 NC 实付回写。<br>
-            <strong>🛤 链路：</strong>C-08 付款申请已审 → linkage 自动 create C-10 待执行 → 出纳触发"执行" → mock-nc 推送 BIZ-013 → NC 实付回写 → C-10 已记账 → 应付消减（C-02 paid_amount 累加）。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="pe-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -146,12 +138,17 @@
             </div>
 
             <div class="card">
-              <div class="card-header"><div class="title">🔗 BIZ-013 / 014 / 015 / 020 联动占位</div></div>
+              <div class="card-header">
+                <div class="title">🔗 BIZ-013 / 014 / 015 / 020 联动</div>
+                <div class="actions">
+                  <button class="btn btn-sm btn-primary" onclick="engineRunMonthlyReduction()">▶ 触发本月 BIZ-020 月度消减</button>
+                </div>
+              </div>
               <div class="card-body" style="font-size:12px;line-height:1.7;">
-                <div><strong style="color:var(--green);">✓ BIZ-013</strong> 付款执行（一期 A 已演示） — C-10 已记账触发，应付消减</div>
-                <div><strong style="color:var(--text-3);">○ BIZ-014</strong> 预付款转应付（待扩展）— 预付时 C-08 走 BIZ-014，到货后转 BIZ-015</div>
-                <div><strong style="color:var(--text-3);">○ BIZ-015</strong> 应付暂估转正式（待扩展）— S-07 暂估冲销后正式发票入账走 BIZ-015，与 BIZ-001 区分</div>
-                <div><strong style="color:var(--text-3);">○ BIZ-020</strong> 月度应付消减（待扩展）— 月末批量消减已付应付，与 BIZ-013 实付逐笔消减并行</div>
+                <div><strong style="color:var(--green);">✓ BIZ-013</strong> 付款执行 — C-10 普通节点（验收/质保）已记账触发，应付逐笔消减</div>
+                <div><strong style="color:var(--green);">✓ BIZ-014</strong> 预付款转应付 — C-04 节点序号=1（合同签订/预付款）的 C-10 自动走 BIZ-014</div>
+                <div><strong style="color:var(--green);">✓ BIZ-015</strong> 应付暂估转正式 — S-07 已冲销 + invoice_received=true 自动触发</div>
+                <div><strong style="color:var(--green);">✓ BIZ-020</strong> 月度应付消减 — 手动触发本月已记账 C-10 批量汇总推送 NC（与 BIZ-013 逐笔并行）</div>
               </div>
             </div>
 
@@ -176,13 +173,18 @@
         <div class="card">
           <div class="card-header"><div class="title">⚖ NC 凭证规则（BIZ-013 / 014 / 015 / 020）</div></div>
           <div class="card-body" style="font-size:12px;line-height:1.7;">
-            <strong>BIZ-013 付款执行（一期 A 演示用）：</strong><br>
-            借 1122 应收账款 / 6602 财务费用（汇兑差额）<br>
-            贷 1002 银行存款<br>
-            <hr style="border:none;border-top:1px dashed var(--border);margin:8px 0;">
-            <strong>BIZ-014 预付款转应付（计划扩展）：</strong>预付时入账，到货验收时转应付<br>
-            <strong>BIZ-015 应付暂估转正式（计划扩展）：</strong>S-07 暂估冲销后正式发票入账<br>
-            <strong>BIZ-020 月度应付消减（计划扩展）：</strong>月末批量消减已付应付
+            <strong>BIZ-013 付款执行：</strong>普通节点付款 — 借 2202 应付账款 / 贷 1002 银行存款<br>
+            <strong>BIZ-014 预付款转应付：</strong>预付节点（payment_node_no=1）付款 — 借 1123 预付账款 / 贷 1002 银行存款；到货验收后预付转应付（详设 08 V1.1）<br>
+            <strong>BIZ-015 应付暂估转正式：</strong>S-07 冲销 + 发票到 — 借 2181 应付暂估 / 贷 2202 应付账款（与 BIZ-001 普通采购入库区分）<br>
+            <strong>BIZ-020 月度应付消减：</strong>月末批量汇总当月已记账 C-10 → 一笔月度凭证推送（与 BIZ-013 逐笔并行，财务对账用）
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 05 §8.2 四层付款控制链路（C-04 → C-07 → C-08 → C-10，一期 C-10 即可演示）+ 详设 08 BIZ-013 付款执行 NC 实付回写。<br>
+            <strong>🛤 链路：</strong>C-08 付款申请已审 → linkage 自动 create C-10 待执行 → 出纳触发"执行" → mock-nc 推送 BIZ-013 → NC 实付回写 → C-10 已记账 → 应付消减（C-02 paid_amount 累加）。
           </div>
         </div>
 
@@ -252,8 +254,16 @@
           }).join('');
     }
 
+    function engineRunMonthlyReduction() {
+      var r = SC.linkage.runMonthlyPayableReduction();
+      if (!r.ok) { SC.ui.toast('未触发：' + r.reason, 'warning'); return; }
+      SC.ui.toast('BIZ-020 月度消减已触发：' + r.month + ' 共 ' + r.count + ' 笔 / ¥' + r.amount + '，NC 任务 #' + r.task.id + ' 推送中', 'success');
+    }
+
     function renderF01() {
-      var rows = SC.store.list('F-01', { interface_id: 'BIZ-013' });
+      var rows = SC.store.list('F-01').filter(function (t) {
+        return ['BIZ-013', 'BIZ-014', 'BIZ-015', 'BIZ-020'].indexOf(t.interface_id) >= 0;
+      });
       document.getElementById('engine-f01-pay-tbody').innerHTML = rows.length === 0
         ? '<tr><td colspan="6" class="muted" style="text-align:center;padding:8px;">无 BIZ-013 推送任务</td></tr>'
         : rows.slice().reverse().map(function (t) {

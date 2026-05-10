@@ -11,15 +11,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 05 V1.1 §7 付款申请（C-08）+ §三单匹配 + 详设 08 V1.0 BIZ-013 NC 付款回写 + 详设 11 §13 履约保证金 SENS-CON-003。<br>
-            <strong>🛤 链路：</strong>合同 C-04 节点临期 → C-08 申请 (草稿 → 待审 → 已审) → 三单匹配（合同 / 入库 / 发票）→ 业务复核 → 财务复核 → 主管特批（按金额）→ 出纳 C-10 执行 → BIZ-013 NC 实付。<br>
-            <strong>🛡 控制点：</strong>未到货部分提前付款 → 主管副总特批；超付（已付 &gt; 合同金额）→ 阻止；变更冻结期间 → 节点临时不允许新建申请。
-          </div>
-        </div>
-
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
           <div class="card-header">
             <div class="title">📡 档 A 引擎接入 · C-08 付款申请实时清单</div>
@@ -164,6 +155,15 @@
                 <div><strong>质保金边界：</strong>质保金属于合同质量保证安排，与履约保证金分开展示、分开审批。</div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 05 V1.1 §7 付款申请（C-08）+ §三单匹配 + 详设 08 V1.0 BIZ-013 NC 付款回写 + 详设 11 §13 履约保证金 SENS-CON-003。<br>
+            <strong>🛤 链路：</strong>合同 C-04 节点临期 → C-08 申请 (草稿 → 待审 → 已审) → 三单匹配（合同 / 入库 / 发票）→ 业务复核 → 财务复核 → 主管特批（按金额）→ 出纳 C-10 执行 → BIZ-013 NC 实付。<br>
+            <strong>🛡 控制点：</strong>未到货部分提前付款 → 主管副总特批；超付（已付 &gt; 合同金额）→ 阻止；变更冻结期间 → 节点临时不允许新建申请。
           </div>
         </div>
 

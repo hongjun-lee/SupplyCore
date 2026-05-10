@@ -80,7 +80,6 @@
                 <option>全部</option><option>有效</option><option>临期</option><option>过期</option>
                 <option>冻结</option><option>作废</option>
               </select>
-              <small class="muted" style="margin-top:2px;">字段：batch_state</small>
             </div>
             <div class="filter-actions">
               <button class="btn">重置</button>
@@ -106,7 +105,7 @@
                 <th>计量单位</th>
                 <th class="num">现存量</th>
                 <th>批次 / 保质期</th>
-                <th>批次状态</th>
+                <th>批次状态<br><span class="muted" style="font-size:11px;font-weight:400;">M-15.batch_state</span></th>
                 <th class="num">安全库存</th>
                 <th>储备控制</th>
                 <th class="num">平均成本</th>
@@ -136,6 +135,7 @@
             <span style="display:block;margin-top:4px;">· <strong>库存唯一事实源原则</strong>：所有库存数量与价值以 <span class="font-mono">S-13 库存台账</span> 为准；批次维度信息见 <span class="font-mono">S-14 批次账</span>；任意一笔出入库须在同事务原子写入 <span class="font-mono">S-21 库存事务流水</span>。</span>
             <span style="display:block;">· <strong>低储 / 超储口径</strong>：低库存按物料档案 <span class="font-mono">safety_stock</span>；超储按储备资金预算 110% + 安全周转周期双维度，不再使用单一最高库存字段。</span>
             <span style="display:block;">· <strong>火工品 / 化工品强制批次</strong>：分类前缀 <span class="font-mono">HG/HX</span> 必须按批次维度记账，并支持双人双锁专管库。</span>
+            <span style="display:block;">· <strong>批次状态字段口径</strong>：取值"有效 / 临期 / 过期 / 冻结 / 作废"由 <span class="font-mono">M-15 material_batch.batch_state</span> 唯一维护（详设 03 V1.1 §批次状态机 + 06 V1.1a §6 line 560）；S-13 库存台账与 S-14 批次账<strong>不另设状态字段</strong>，本列展示通过 batch_id 关联 M-15 取得；过期/冻结/作废批次禁止出库（详设 06 §line 1127）。</span>
           </div>
         </div>
 

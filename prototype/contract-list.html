@@ -12,15 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 05 V1.1 §4.2.1 合同主页 + C-02 合同 8 状态机 + 详设 11 §13 高敏感留痕（SENS-CON-003 / SENS-CON-004）。<br>
-            <strong>🛤 链路：</strong>T-05 中标 → C-01 会签 → C-02 草稿 → 会签中 → 已签 → 执行中 → 已完成 / 已变更 / 已终止 (8 状态)；外委合同 → 40% 原值上限校验 (WF-CON-OVERLIMIT-001) → SENS-CON-004 高敏感留痕；履约保证金没收 → SENS-CON-003。<br>
-            <strong>🛡 四层付款控制：</strong>C-04 付款节点 → C-05 付款计划 → C-08 付款申请 → C-07 付款执行（防止超付 / 抢付 / 错付）。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="cl-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -71,7 +62,6 @@
                 <option>已签</option><option>执行中</option>
                 <option>已完成</option><option>已变更</option><option>已终止</option>
               </select>
-              <small class="muted" style="margin-top:2px;">字段：C-02 8 状态机</small>
             </div>
             <div class="filter-actions">
               <button class="btn">重置</button>
@@ -131,6 +121,15 @@
               <strong>WF-CON-OVERLIMIT-001：</strong>超限合同自动加 2 级审批 (财务总监 + 总经理)<br>
               <strong>支付控制：</strong>已付金额 &gt; 已执行金额 → 阻止 (防止抢付)；累计付款 &gt; 合同金额 → 阻止 (防止超付)
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 05 V1.1 §4.2.1 合同主页 + C-02 合同 8 状态机 + 详设 11 §13 高敏感留痕（SENS-CON-003 / SENS-CON-004）。<br>
+            <strong>🛤 链路：</strong>T-05 中标 → C-01 会签 → C-02 草稿 → 会签中 → 已签 → 执行中 → 已完成 / 已变更 / 已终止 (8 状态)；外委合同 → 40% 原值上限校验 (WF-CON-OVERLIMIT-001) → SENS-CON-004 高敏感留痕；履约保证金没收 → SENS-CON-003。<br>
+            <strong>🛡 四层付款控制：</strong>C-04 付款节点 → C-05 付款计划 → C-08 付款申请 → C-07 付款执行（防止超付 / 抢付 / 错付）。
           </div>
         </div>
 

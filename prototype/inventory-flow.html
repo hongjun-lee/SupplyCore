@@ -12,15 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 06 V1.1a 实物流转闭环 + 详设 11 §13 操作日志（一期边界：单据驱动 + 同事务原子写入 S-13/S-14/S-21 + NC 接口任务）。<br>
-            <strong>🛤 链路汇总：</strong>本页是 <strong>领用 / 退料 / 调拨 / 盘点 / 废旧</strong> 五条流转主路径的<strong>统一汇聚视图</strong>，详细操作进各专项页（material-issuance / inventory-transfer / stocktake / scrap-disposal）。<br>
-            <strong>🔒 高敏感：</strong>火工品 / 危险化学品 / 跨组织调拨 / 已结账期间冲红 → 强制审批流 + 水印导出。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="if-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -115,6 +106,15 @@
               <strong>原子写入约束：</strong>S-13 库存台账（实时数量 / 金额）+ S-14 批次账（FIFO/批次追溯）+ S-21 库存事务流水（不可修改）必须在同一个事务内成功，任一失败整体回滚（详设 06 §6.4）。<br>
               <strong>事务边界：</strong>store.snapshot() / store.rollback() 演示同事务原子性；F-01 NC 任务在事务提交后异步推送（容许 NC 失败重试）。
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 06 V1.1a 实物流转闭环 + 详设 11 §13 操作日志（一期边界：单据驱动 + 同事务原子写入 S-13/S-14/S-21 + NC 接口任务）。<br>
+            <strong>🛤 链路汇总：</strong>本页是 <strong>领用 / 退料 / 调拨 / 盘点 / 废旧</strong> 五条流转主路径的<strong>统一汇聚视图</strong>，详细操作进各专项页（material-issuance / inventory-transfer / stocktake / scrap-disposal）。<br>
+            <strong>🔒 高敏感：</strong>火工品 / 危险化学品 / 跨组织调拨 / 已结账期间冲红 → 强制审批流 + 水印导出。
           </div>
         </div>
 

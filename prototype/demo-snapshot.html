@@ -12,14 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>02 V0.4 §3.3 数据导入导出 + 演示快照（保存 / 还原）— 演示场景切换 + 跨设备演示 + 故障恢复。<br>
-            <strong>🛤 链路：</strong>当前 SC.store LocalStorage 全量序列化为 JSON → 下载文件（B2）/ 命名保存到内置快照（B6）→ 在另一台演示机或新会话中导入还原 → 1:1 重现演示场景。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="ds-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -91,6 +83,14 @@
             • JSON 导入会完全替换当前数据，<strong style="color:var(--red);">不会合并</strong><br>
             • 快照不含图片 / 文件附件（仅数据）<br>
             • 快照与代码版本绑定 — 升级到不兼容的代码后旧快照可能加载失败
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>02 V0.4 §3.3 数据导入导出 + 演示快照（保存 / 还原）— 演示场景切换 + 跨设备演示 + 故障恢复。<br>
+            <strong>🛤 链路：</strong>当前 SC.store LocalStorage 全量序列化为 JSON → 下载文件（B2）/ 命名保存到内置快照（B6）→ 在另一台演示机或新会话中导入还原 → 1:1 重现演示场景。
           </div>
         </div>
 

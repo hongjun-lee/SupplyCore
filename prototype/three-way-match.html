@@ -57,16 +57,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 08 V1.1 F-09 三单匹配 + 详设 06 V1.1a §6.5 暂估闭环 + 详设 05 V1.1 §合同账期联动。<br>
-            <strong>🛤 链路：</strong>P-05 采购订单 ←→ S-02 入库单 ←→ F-08 发票 → 容差自动判定（数量 / 单价 / 金额 / 税率）→ 全匹配 / 差异挂账 / 拒付。<br>
-            <strong>⚖ 容差：</strong>金额 ±0.5%（含税）/ 数量 ±0.5%（按计量单位）/ 单价 ±1% / 税率必须一致；超容差 → 进人工复核 → 例外审批留痕。<br>
-            <strong>🛡 暂估闭环：</strong>S-02 入库无发票 → BIZ-002 暂估 → 发票到 → BIZ-003 红字冲销 + BIZ-001 正式入账（详设 06 §6.5）。
-          </div>
-        </div>
-
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
           <div class="card-header">
             <div class="title">📡 档 A 引擎接入 · 三单数据源实时计数 + 暂估闭环演示</div>
@@ -108,7 +98,6 @@
                 <option>待匹配</option><option>匹配通过</option>
                 <option>有差异</option><option>已拒付</option><option>例外通过</option>
               </select>
-              <small class="muted" style="margin-top:2px;">字段名：three_way_match_state</small>
             </div>
             <div class="form-field"><label>差异类型</label>
               <select>
@@ -388,6 +377,16 @@
                 <strong>不影响业务执行状态：</strong>采购订单的 <span class="font-mono">order_state</span> 与 <span class="font-mono">three_way_match_state</span> 解耦，匹配未通过不阻塞订单履约。
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 08 V1.1 F-09 三单匹配 + 详设 06 V1.1a §6.5 暂估闭环 + 详设 05 V1.1 §合同账期联动。<br>
+            <strong>🛤 链路：</strong>P-05 采购订单 ←→ S-02 入库单 ←→ F-08 发票 → 容差自动判定（数量 / 单价 / 金额 / 税率）→ 全匹配 / 差异挂账 / 拒付。<br>
+            <strong>⚖ 容差：</strong>金额 ±0.5%（含税）/ 数量 ±0.5%（按计量单位）/ 单价 ±1% / 税率必须一致；超容差 → 进人工复核 → 例外审批留痕。<br>
+            <strong>🛡 暂估闭环：</strong>S-02 入库无发票 → BIZ-002 暂估 → 发票到 → BIZ-003 红字冲销 + BIZ-001 正式入账（详设 06 §6.5）。
           </div>
         </div>
 

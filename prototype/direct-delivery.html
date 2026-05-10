@@ -12,14 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 06 §7.7 直达验收 + 详设 04 §S-01 fulfillment_type（直达材料 / 直达设备 / 外购代储）+ 详设 08 BIZ-005A 对厂矿销售凭证 + 业务方 Q-08-2/Q-08-4 答复（2026-05-09）。<br>
-            <strong>🛤 链路：</strong>采购订单 fulfillment_type=直达 → 供应商直接送货到使用单位（不进物资公司中心库）→ 使用单位签收 + 验收 → 财务挂账（应收物资公司）→ NC BIZ-005A 对厂矿销售凭证（一次性完成销售 + 出库 + 应收）。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="dd-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -100,6 +92,14 @@
             <strong>分类 3 · 外购代储：</strong>物资公司持有但放在使用单位仓库，仍属物资公司库存（与直达区分，详设 04 §S-01）<br>
             <strong>NC 凭证 BIZ-005A：</strong>借 1122 应收账款（使用单位）/ 贷 6001 主营业务收入 + 2221 应交税费-销项税；同时 借 6401 主营业务成本 / 贷 1403 原材料（直达虚拟仓）<br>
             <strong>对账周期：</strong>月末物资公司 vs 使用单位三方对账（数量、金额、入账期间）；差异挂账纳入下月调整
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 06 §7.7 直达验收 + 详设 04 §S-01 fulfillment_type（直达材料 / 直达设备 / 外购代储）+ 详设 08 BIZ-005A 对厂矿销售凭证 + 业务方 Q-08-2/Q-08-4 答复（2026-05-09）。<br>
+            <strong>🛤 链路：</strong>采购订单 fulfillment_type=直达 → 供应商直接送货到使用单位（不进物资公司中心库）→ 使用单位签收 + 验收 → 财务挂账（应收物资公司）→ NC BIZ-005A 对厂矿销售凭证（一次性完成销售 + 出库 + 应收）。
           </div>
         </div>
 

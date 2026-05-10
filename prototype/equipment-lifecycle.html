@@ -11,15 +11,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 07 V1.0a §3 设备全生命周期 E-01 状态机 + E-02 维修工单 + E-04 外委检修 + E-08 设备租赁。<br>
-            <strong>🛤 链路：</strong>采购入库 (S-02) → 建档 (E-01 草稿) → 启用 → 在用 → (检修 E-02 / 外委 E-04 / 租赁 E-08 / 调拨) → 报废 (S-19) → 已注销。<br>
-            <strong>🛡 OEE 联动：</strong>设备状态变化（停机 / 故障 / 维修中）→ 影响 OEE 综合指标 → 报表 RPT-EQ-OEE。
-          </div>
-        </div>
-
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
           <div class="card-header">
             <div class="title">📡 档 A 引擎接入 · E-01 设备实时清单（接 SC.store）</div>
@@ -154,6 +145,15 @@
                 <div class="mt-8">· 退场触发 <strong>NC 资产/设备主数据下推 (NC-MD-005)</strong> 状态更新</div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 07 V1.0a §3 设备全生命周期 E-01 状态机 + E-02 维修工单 + E-04 外委检修 + E-08 设备租赁。<br>
+            <strong>🛤 链路：</strong>采购入库 (S-02) → 建档 (E-01 草稿) → 启用 → 在用 → (检修 E-02 / 外委 E-04 / 租赁 E-08 / 调拨) → 报废 (S-19) → 已注销。<br>
+            <strong>🛡 OEE 联动：</strong>设备状态变化（停机 / 故障 / 维修中）→ 影响 OEE 综合指标 → 报表 RPT-EQ-OEE。
           </div>
         </div>
 

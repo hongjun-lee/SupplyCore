@@ -12,14 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 04 §8.2.2 应急采购通道 + 详设 09 ALR-PUR-EMERGENCY-001/002 + 业务方 Q-D2 答复（应急采购 3 工作日补办 + 100% 准确率要求）。<br>
-            <strong>🛤 链路：</strong>P-01 标记 is_emergency=true → 应急通道审批（一级即可，不走集体决策）→ linkage 自动设置 3 工作日补办 P-02 期限 + emit ALR-PUR-EMERGENCY-001 提醒 → 期限内完成补办 → 转入正常流程；逾期未补办触发 ALR-PUR-EMERGENCY-002 升级。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="ep-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -89,6 +81,14 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 04 §8.2.2 应急采购通道 + 详设 09 ALR-PUR-EMERGENCY-001/002 + 业务方 Q-D2 答复（应急采购 3 工作日补办 + 100% 准确率要求）。<br>
+            <strong>🛤 链路：</strong>P-01 标记 is_emergency=true → 应急通道审批（一级即可，不走集体决策）→ linkage 自动设置 3 工作日补办 P-02 期限 + emit ALR-PUR-EMERGENCY-001 提醒 → 期限内完成补办 → 转入正常流程；逾期未补办触发 ALR-PUR-EMERGENCY-002 升级。
           </div>
         </div>
 

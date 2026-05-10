@@ -12,14 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 03 物料主数据 V1.1 + 详设 04 §4.1 供应商管理 + 详设 06 §3 仓库管理。<br>
-            <strong>🛤 链路：</strong>主数据增删改 → SC.store CRUD → 状态机校验（如 M-09 supplier_state：合格 / 暂停 / 黑名单）→ NC 主数据下推（NC-MD-001/002/003）→ 业务实体使用（不允许直接删除，停用即可）。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="md-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -105,6 +97,14 @@
             <strong>状态机：</strong>M-09 供应商状态（合格 → 暂停 / 黑名单 / 解除）走统一 SM transition；联动后评价 linkage（累计差评 ≥ 3 自动暂停）<br>
             <strong>软删除：</strong>所有主数据停用而非物理删除；保留历史业务关联（详设 03 §4 一物一码）<br>
             <strong>权限边界：</strong>主数据维护仅 IT 角色 + 物资管理 高级用户可见（详设 11 §11.3 数据权限）；本演示不限制
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 03 物料主数据 V1.1 + 详设 04 §4.1 供应商管理 + 详设 06 §3 仓库管理。<br>
+            <strong>🛤 链路：</strong>主数据增删改 → SC.store CRUD → 状态机校验（如 M-09 supplier_state：合格 / 暂停 / 黑名单）→ NC 主数据下推（NC-MD-001/002/003）→ 业务实体使用（不允许直接删除，停用即可）。
           </div>
         </div>
 

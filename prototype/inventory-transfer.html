@@ -12,14 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 06 §6 调拨管理（同组织 / 跨组织）+ 详设 08 BIZ-007 内部往来对冲凭证。<br>
-            <strong>🛤 链路：</strong>S-11 调拨申请 → 双方业务确认 → 调出方审批 → 调入方接收 → S-12 调拨执行 → 同事务双向写入（出库 S-21 + 入库 S-21 + S-13 双向更新）+ NC BIZ-007 内部往来对冲凭证（同集团内借贷自动对冲）。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="tr-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -135,6 +127,14 @@
             <strong>火工品 / 危险化学品：</strong>跨组织调拨须双方安全部门 + 物资主管 + 集团安环 三方会签（高敏感留痕，详设 06 §6.4）<br>
             <strong>调拨成本：</strong>采用调出方移动加权单价，不重新计价；调入方按调出 unit_cost 直接入库（避免内部利润虚增）<br>
             <strong>BIZ-007 凭证模板：</strong>借 1801 内部应收（调入方组织名）/ 贷 1801 内部应付（调出方组织名）；月末汇总对冲到 0
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 06 §6 调拨管理（同组织 / 跨组织）+ 详设 08 BIZ-007 内部往来对冲凭证。<br>
+            <strong>🛤 链路：</strong>S-11 调拨申请 → 双方业务确认 → 调出方审批 → 调入方接收 → S-12 调拨执行 → 同事务双向写入（出库 S-21 + 入库 S-21 + S-13 双向更新）+ NC BIZ-007 内部往来对冲凭证（同集团内借贷自动对冲）。
           </div>
         </div>
 

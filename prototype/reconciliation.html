@@ -12,14 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 11 §11.1 三对一致定期对账任务 INV_RECON_TRIPLE_CONSISTENCY（业务方 Q-C1 答复 2026-05-09）+ 详设 09 ALR-INV-RECON-001 对账异常预警 + 详设 09 §六 RPT-INV-RECON 月度报表。<br>
-            <strong>🛤 链路：</strong>财务系统 = 原型系统（S-13 余额）= 保管卡片（实物盘点）三方应一致 → 月度调度任务自动比对 → 不一致触发 ALR-INV-RECON-001 + RPT-INV-RECON 月报 → 物资管理督办对账。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="rec-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -99,6 +91,14 @@
             <hr style="border:none;border-top:1px dashed var(--border);margin:8px 0;">
             <strong>调度策略：</strong>每月最后一个工作日 22:00（避开业务高峰）；超时 24h 未完成发 IT 告警；对账数据归档 5 年（详设 11 §13 操作日志）<br>
             <strong>合规审计：</strong>季度内审 + 年度外部审计 抽检对账记录（INV_RECON_TRIPLE_CONSISTENCY 任务的执行结果是审计重点）
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 11 §11.1 三对一致定期对账任务 INV_RECON_TRIPLE_CONSISTENCY（业务方 Q-C1 答复 2026-05-09）+ 详设 09 ALR-INV-RECON-001 对账异常预警 + 详设 09 §六 RPT-INV-RECON 月度报表。<br>
+            <strong>🛤 链路：</strong>财务系统 = 原型系统（S-13 余额）= 保管卡片（实物盘点）三方应一致 → 月度调度任务自动比对 → 不一致触发 ALR-INV-RECON-001 + RPT-INV-RECON 月报 → 物资管理督办对账。
           </div>
         </div>
 

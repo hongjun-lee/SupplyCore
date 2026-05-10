@@ -11,15 +11,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 06 V1.1a §第 5 章盘点 S-15 + S-16 差异 + 详设 11 V1.0 §11 移动端友好（PWA / 离线 / 扫码）+ 一期边界（PDA + 手机扫码）。<br>
-            <strong>🛤 链路：</strong>仓管员手机扫码 → 实盘录入 → 与 S-13 账面对比 → S-16 差异 → 复核 → 盘盈 BIZ-008 / 盘亏 BIZ-009 → S-13/S-14/S-21 同事务调整 + NC 推送。<br>
-            <strong>🔌 离线支持：</strong>断网仍可扫码录入（IndexedDB 缓存）→ 联网后自动上传 → 服务端冲突检查（详设 11 §11.2 离线策略）。
-          </div>
-        </div>
-
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
           <div class="card-header">
             <div class="title">📡 档 A 引擎接入 · S-15 盘点单实时清单（接 SC.store · 与 stocktake.html 同源）</div>
@@ -189,6 +180,15 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 06 V1.1a §第 5 章盘点 S-15 + S-16 差异 + 详设 11 V1.0 §11 移动端友好（PWA / 离线 / 扫码）+ 一期边界（PDA + 手机扫码）。<br>
+            <strong>🛤 链路：</strong>仓管员手机扫码 → 实盘录入 → 与 S-13 账面对比 → S-16 差异 → 复核 → 盘盈 BIZ-008 / 盘亏 BIZ-009 → S-13/S-14/S-21 同事务调整 + NC 推送。<br>
+            <strong>🔌 离线支持：</strong>断网仍可扫码录入（IndexedDB 缓存）→ 联网后自动上传 → 服务端冲突检查（详设 11 §11.2 离线策略）。
           </div>
         </div>
 

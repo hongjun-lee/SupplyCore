@@ -12,14 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 10 V1.2 §6.2 WF-PAY-001 付款审批流 + 详设 05 §8.5 月度资金计划与集体决议规则（业务方 Q-13-1 答复 2026-05-09）。<br>
-            <strong>🛤 链路：</strong>已签合同 + 已执行 + 应付未付 → 月度集体决议（按月汇总批量审议）→ 决议批准的合同清单 → 自动 create C-08 付款申请 → 财务执行 → C-10 付款执行 + BIZ-013 NC 实付回写。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="cm-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -174,6 +166,14 @@
             • 名单制输出：决议结束后生成《XX 月度付款审批清单》，作为审计留痕<br>
             <strong>付款条件类型：</strong>预付（按合同 prepayment_ratio）/ 进度款（按 milestone）/ 验收款（按 acceptance）/ 质保金（质保期满）<br>
             <strong>资金优先级：</strong>合同到期日临近 + 高敏感供应商 + 大额验收款 → 优先决议
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 10 V1.2 §6.2 WF-PAY-001 付款审批流 + 详设 05 §8.5 月度资金计划与集体决议规则（业务方 Q-13-1 答复 2026-05-09）。<br>
+            <strong>🛤 链路：</strong>已签合同 + 已执行 + 应付未付 → 月度集体决议（按月汇总批量审议）→ 决议批准的合同清单 → 自动 create C-08 付款申请 → 财务执行 → C-10 付款执行 + BIZ-013 NC 实付回写。
           </div>
         </div>
 

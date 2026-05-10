@@ -66,15 +66,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 09 V1.2 §六 RPT-EQ-OEE 设备综合效率报表 + 详设 07 V1.0a §设备运行。<br>
-            <strong>📐 OEE 公式：</strong>OEE = <strong>可用率 × 性能率 × 良品率</strong>；可用率 = (计划 - 故障停机 - 计划停机) / 计划；性能率 = 实际产量 / (理论速度 × 实际工时)；良品率 = 合格 / 总产量。<br>
-            <strong>🛤 链路：</strong>E-01 设备状态变化 → 累计停机时长 → linkage 自动重算 OEE → R-05 预警（OEE &lt; 阈值 / 故障停机 &gt; 24h）→ 月度报表 RPT-EQ-OEE。
-          </div>
-        </div>
-
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
           <div class="card-header">
             <div class="title">📡 档 A 引擎接入 · E-01 状态聚合 → OEE 输入数据</div>
@@ -258,6 +249,15 @@
                 <div>OEE 数据用于 <strong>设备管理决策与维修优先级</strong>，不用于 KPI 考核口径，避免误用。</div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 09 V1.2 §六 RPT-EQ-OEE 设备综合效率报表 + 详设 07 V1.0a §设备运行。<br>
+            <strong>📐 OEE 公式：</strong>OEE = <strong>可用率 × 性能率 × 良品率</strong>；可用率 = (计划 - 故障停机 - 计划停机) / 计划；性能率 = 实际产量 / (理论速度 × 实际工时)；良品率 = 合格 / 总产量。<br>
+            <strong>🛤 链路：</strong>E-01 设备状态变化 → 累计停机时长 → linkage 自动重算 OEE → R-05 预警（OEE &lt; 阈值 / 故障停机 &gt; 24h）→ 月度报表 RPT-EQ-OEE。
           </div>
         </div>
 

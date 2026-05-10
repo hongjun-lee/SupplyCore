@@ -11,15 +11,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 02 V1.0 §基础档案 — M-01 组织 / M-02 仓库 / M-09 供应商 + Nova Platform 组织/人员同步（5 分钟内）+ 详设 11 §13 黑名单拒绝。<br>
-            <strong>🛤 边界：</strong>本页是<strong>只读浏览视图</strong>（含 Nova 同步状态、资质证照状态、库区货位 3 级嵌套）；<strong>主数据 CRUD</strong> 在 master-data-admin（管理员维护）。<br>
-            <strong>🛡 高敏感：</strong>火工品 / 危险化学品仓库 → 双人双锁专管；供应商黑名单 → 系统拒绝任何新订单（C-02 创建前置校验）。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="ba-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -137,6 +128,15 @@
             <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
               供应商资质状态 = 准入待审 / 合格 / 暂停 / 黑名单 / 已作废；信用等级 A/B/C 由历史履约自动计算（《03》M-10 状态字段）。"黑名单" 状态下系统拒绝任何新订单创建。
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 02 V1.0 §基础档案 — M-01 组织 / M-02 仓库 / M-09 供应商 + Nova Platform 组织/人员同步（5 分钟内）+ 详设 11 §13 黑名单拒绝。<br>
+            <strong>🛤 边界：</strong>本页是<strong>只读浏览视图</strong>（含 Nova 同步状态、资质证照状态、库区货位 3 级嵌套）；<strong>主数据 CRUD</strong> 在 master-data-admin（管理员维护）。<br>
+            <strong>🛡 高敏感：</strong>火工品 / 危险化学品仓库 → 双人双锁专管；供应商黑名单 → 系统拒绝任何新订单（C-02 创建前置校验）。
           </div>
         </div>
 

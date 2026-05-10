@@ -12,14 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 06 §委托加工 + 详设 04 §受托加工 + 详设 08 BIZ-019 加工费凭证。<br>
-            <strong>🛤 链路：</strong>OP-01 委托加工单 → 受托虚拟仓登记 → 原料投料（S-21 出库 + 受托方仓库标记）→ 标准损耗率监控 → 完工产出 → 三方联合验收（委托方 + 受托方 + 物资公司）→ 产品入库（含加工费）→ NC BIZ-019 加工费推送。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="op-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -87,6 +79,14 @@
                 <strong>NC 凭证 BIZ-019：</strong>借 1403 原材料（产成品入账）/ 贷 1403 原材料（原料）+ 6602 应付加工费
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 06 §委托加工 + 详设 04 §受托加工 + 详设 08 BIZ-019 加工费凭证。<br>
+            <strong>🛤 链路：</strong>OP-01 委托加工单 → 受托虚拟仓登记 → 原料投料（S-21 出库 + 受托方仓库标记）→ 标准损耗率监控 → 完工产出 → 三方联合验收（委托方 + 受托方 + 物资公司）→ 产品入库（含加工费）→ NC BIZ-019 加工费推送。
           </div>
         </div>
 

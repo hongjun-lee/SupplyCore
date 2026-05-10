@@ -11,15 +11,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 03 V1.0 物料主数据 + 编码规范 V1.7（M-04~M-17 + NC 映射三阶段过渡 + 火工品/化工品强制批次）。<br>
-            <strong>🛤 边界：</strong>本页是<strong>公司级只读「物料目录浏览」</strong>（生命周期可视 + 编码结构 + NC 映射状态）；<strong>新增 / 修改 / 状态变更</strong> 进 master-data-admin（管理员）；<strong>新物料申请 (M-17)</strong> 走采购员发起 → 物资公司审核 → NC 下推流程。<br>
-            <strong>🔍 三级查重：</strong>① 同义词比对 → ② 规格相似度 → ③ 历史使用穿透（防止一物多码）。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="mm-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -141,6 +132,15 @@
                 <span style="margin-left:8px;">M-NEW-099 当前未映射，启用后将通过映射告警 (F-11) 推送至接口管理员处理。</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 03 V1.0 物料主数据 + 编码规范 V1.7（M-04~M-17 + NC 映射三阶段过渡 + 火工品/化工品强制批次）。<br>
+            <strong>🛤 边界：</strong>本页是<strong>公司级只读「物料目录浏览」</strong>（生命周期可视 + 编码结构 + NC 映射状态）；<strong>新增 / 修改 / 状态变更</strong> 进 master-data-admin（管理员）；<strong>新物料申请 (M-17)</strong> 走采购员发起 → 物资公司审核 → NC 下推流程。<br>
+            <strong>🔍 三级查重：</strong>① 同义词比对 → ② 规格相似度 → ③ 历史使用穿透（防止一物多码）。
           </div>
         </div>
 

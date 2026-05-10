@@ -292,13 +292,73 @@
     console.log('[linkage] T-05:' + result.id + ' 已验证 → 创建 C-01 会签');
   });
 
-  /* C-02 已签 → 同步设置 executed_amount = 0 / paid_amount = 0 */
+  /* C-02 已签 → 同步设置 executed_amount = 0 / paid_amount = 0
+     + 二期 A4a：自动按 payment_terms 拆 3 个 C-04 付款节点（30%预付 / 60%验收 / 10%质保），
+       每个 C-04 同步生成对应的 C-07 付款计划（详设 05 §4.4 + §4.6）*/
   SC.linkage.on('C-02:已签', function (contract) {
     SC.store.update('C-02', contract.id, {
       executed_amount: 0,
       paid_amount: 0,
     });
     console.log('[linkage] C-02:' + contract.id + ' 已签 → 初始化执行/已付金额');
+
+    // A4a：自动建 3 节点 + 3 计划（幂等：已存在则跳过）
+    var existingNodes = SC.store.list('C-04', { contract_id: contract.id });
+    if (existingNodes.length > 0) {
+      console.log('[linkage] C-04 #' + contract.id + ' 已存在 ' + existingNodes.length + ' 节点，跳过自动生成');
+      return;
+    }
+    var amount = contract.amount || 0;
+    var today = new Date();
+    var nodes = [
+      { no: 1, condition: '合同签订', percentage: 30, dueOffset: 7,   label: '预付款 30%' },
+      { no: 2, condition: '验收合格', percentage: 60, dueOffset: 90,  label: '验收款 60%' },
+      { no: 3, condition: '质保期满', percentage: 10, dueOffset: 365, label: '质保金 10%' },
+    ];
+    nodes.forEach(function (n) {
+      var due = new Date(today); due.setDate(due.getDate() + n.dueOffset);
+      var c04 = SC.store.create('C-04', {
+        contract_id: contract.id,
+        payment_node_no: n.no,
+        payment_condition: n.condition,
+        payment_percentage: n.percentage,
+        payment_amount: Math.round(amount * n.percentage / 100),
+        due_date: due.toISOString().slice(0, 10),
+        node_label: n.label,
+        node_state: '待满足',
+      });
+      // 同步建 C-07 付款计划
+      SC.store.create('C-07', {
+        contract_id: contract.id,
+        payment_node_id: c04.id,
+        total_amount: c04.payment_amount,
+        cumulative_amount: 0,
+        condition_fulfilled: false,
+        plan_state: '待满足',
+      });
+    });
+    console.log('[linkage] C-02:' + contract.id + ' 已签 → 创建 3 个 C-04 节点 + 3 个 C-07 计划');
+  });
+
+  /* C-04:已满足 → 同步 C-07 计划 condition_fulfilled=true + plan_state=已满足 */
+  SC.linkage.on('C-04:已满足', function (node) {
+    var plan = SC.store.list('C-07', { payment_node_id: node.id })[0];
+    if (!plan) return;
+    SC.store.update('C-07', plan.id, { condition_fulfilled: true });
+    if (plan.plan_state === '待满足') {
+      SC.sm.transition('C-07', plan.id, '条件满足');
+    }
+    console.log('[linkage] C-04:' + node.id + ' 已满足 → C-07 #' + plan.id + ' 已满足');
+  });
+
+  /* C-04:已付款 → 同步 C-07 计划 plan_state=已完成 */
+  SC.linkage.on('C-04:已付款', function (node) {
+    var plan = SC.store.list('C-07', { payment_node_id: node.id })[0];
+    if (!plan) return;
+    if (plan.plan_state !== '已完成') {
+      try { SC.sm.transition('C-07', plan.id, '完成'); } catch (e) {}
+    }
+    console.log('[linkage] C-04:' + node.id + ' 已付款 → C-07 #' + plan.id + ' 已完成');
   });
 
   /* S-05 采购入库审核通过 → 库存原子事务（S-21 + S-13 + S-14）+ F-01 NC 接口任务 */
@@ -522,7 +582,7 @@
     console.log('[linkage] S-09:' + rec.id + ' 已出库 → S-21 流水 + S-13 余额减 + F-01 BIZ-005');
   });
 
-  /* A4b 付款链路：C-08:已审 → 自动 create C-10 付款执行 + 触发 NC mock BIZ-013 */
+  /* A4b 付款链路：C-08:已审 → 自动 create C-10 付款执行 + 累加 C-07 累计金额 */
   SC.linkage.on('C-08:已审', function (req) {
     var existing = SC.store.list('C-10').filter(function (e) { return e.request_id === req.id; })[0];
     if (existing) return;
@@ -532,12 +592,26 @@
       contract_id: req.contract_id,
       supplier_id: req.supplier_id,
       amount: req.amount,
+      payment_node_id: req.payment_node_id || null,
       state: '待执行',
     });
     console.log('[linkage] C-08:' + req.id + ' 已审 → 创建 C-10 待执行');
+
+    // A4a：累加到对应 C-07 计划的 cumulative_amount，并推动状态
+    if (req.payment_node_id) {
+      var plan = SC.store.list('C-07', { payment_node_id: req.payment_node_id })[0];
+      if (plan) {
+        var newCum = (plan.cumulative_amount || 0) + (req.amount || 0);
+        SC.store.update('C-07', plan.id, { cumulative_amount: newCum });
+        if (plan.plan_state === '已满足') {
+          SC.sm.transition('C-07', plan.id, '部分付款');
+        }
+        console.log('[linkage] C-08:' + req.id + ' 已审 → C-07 #' + plan.id + ' cumulative_amount += ' + req.amount);
+      }
+    }
   });
 
-  /* A4b 付款链路：C-10:已记账 → 应付消减 + 更新合同 paid_amount */
+  /* A4b 付款链路：C-10:已记账 → 应付消减 + 更新合同 paid_amount + 推动 C-04/C-07 完成 */
   SC.linkage.on('C-10:已记账', function (exec) {
     if (exec.contract_id) {
       var c = SC.store.get('C-02', exec.contract_id);
@@ -547,20 +621,43 @@
         });
       }
     }
+
+    // A4a：若 C-10 关联了 C-04 节点 → 推动 C-04:已付款 + C-07:已完成
+    if (exec.payment_node_id) {
+      var node = SC.store.get('C-04', exec.payment_node_id);
+      var plan = SC.store.list('C-07', { payment_node_id: exec.payment_node_id })[0];
+      if (plan) {
+        // 检查累计是否达到节点金额
+        if (plan.cumulative_amount >= plan.total_amount && plan.plan_state !== '已完成') {
+          try { SC.sm.transition('C-07', plan.id, '完成'); } catch (e) {}
+        }
+      }
+      if (node && node.node_state === '已满足') {
+        try { SC.sm.transition('C-04', node.id, '记账完成'); } catch (e) {}
+      }
+    }
     console.log('[linkage] C-10:' + exec.id + ' 已记账 → C-02 paid_amount += ' + exec.amount);
   });
 
-  /* C-10 触发 NC mock 推送：调用 SC.nc.push 即可（创建 F-01 任务）
-   * 需要在 C-10 状态变 '执行中' 时主动调 */
+  /* C-10 触发 NC mock 推送：根据节点类型决定 BIZ-013 实付 / BIZ-014 预付
+   * - 节点序号 1（合同签订/预付款）→ BIZ-014 预付款转应付
+   * - 其他节点 → BIZ-013 付款执行 */
   SC.linkage.on('C-10:执行中', function (exec) {
-    var ncSwitch = SC.store.list('F-13', { switch_code: 'BIZ-013-switch' })[0];
+    var bizCode = 'BIZ-013';
+    if (exec.payment_node_id) {
+      var node = SC.store.get('C-04', exec.payment_node_id);
+      if (node && node.payment_node_no === 1) {
+        bizCode = 'BIZ-014';  // 预付款转应付
+      }
+    }
+    var ncSwitch = SC.store.list('F-13', { switch_code: bizCode + '-switch' })[0];
     if (ncSwitch && ncSwitch.switch_status === '关') {
-      console.log('[linkage] C-10:' + exec.id + ' BIZ-013 开关=关，跳过 NC 推送');
+      console.log('[linkage] C-10:' + exec.id + ' ' + bizCode + ' 开关=关，跳过 NC 推送');
       return;
     }
     var task = SC.store.create('F-01', {
       task_no: SC.store.nextNo('FT'),
-      interface_id: 'BIZ-013',
+      interface_id: bizCode,
       source_bill_no: exec.execution_no,
       source_bill_type: 'C-10',
       source_bill_id: exec.id,
@@ -568,8 +665,59 @@
       retry_count: 0,
     });
     if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
-    console.log('[linkage] C-10:' + exec.id + ' 执行中 → F-01 BIZ-013 任务 + mock NC 推送');
+    console.log('[linkage] C-10:' + exec.id + ' 执行中 → F-01 ' + bizCode + ' 任务 + mock NC 推送');
   });
+
+  /* BIZ-015 应付暂估转正式：S-07:已冲销 后，若有正式发票则走 BIZ-015 入账（区别于 BIZ-001 普通采购入库） */
+  SC.linkage.on('S-07:已冲销', function (estimate) {
+    if (!estimate.invoice_received) return;  // 只在收到发票后走 BIZ-015
+    var ncSwitch = SC.store.list('F-13', { switch_code: 'BIZ-015-switch' })[0];
+    if (ncSwitch && ncSwitch.switch_status === '关') {
+      console.log('[linkage] S-07:' + estimate.id + ' BIZ-015 开关=关，跳过');
+      return;
+    }
+    var task = SC.store.create('F-01', {
+      task_no: SC.store.nextNo('FT'),
+      interface_id: 'BIZ-015',
+      source_bill_no: estimate.estimate_no,
+      source_bill_type: 'S-07',
+      source_bill_id: estimate.id,
+      task_state: '待推送',
+      retry_count: 0,
+    });
+    if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+    console.log('[linkage] S-07:' + estimate.id + ' 已冲销 + 发票到 → F-01 BIZ-015 + NC');
+  });
+
+  /* BIZ-020 月度应付消减：手动触发（在 payment-execution 页点按钮）→ 月末批量消减已付应付 */
+  SC.linkage.runMonthlyPayableReduction = function () {
+    var ncSwitch = SC.store.list('F-13', { switch_code: 'BIZ-020-switch' })[0];
+    if (ncSwitch && ncSwitch.switch_status === '关') {
+      return { ok: false, reason: 'BIZ-020 开关=关' };
+    }
+    var month = (SC.time && SC.time.iso ? SC.time.iso() : new Date().toISOString()).slice(0, 7);
+    // 找当月已记账 C-10 → 汇总到一笔月度消减
+    var c10s = SC.store.list('C-10').filter(function (r) {
+      return r.state === '已记账' && (r.created_at || '').slice(0, 7) === month;
+    });
+    var total = c10s.reduce(function (a, r) { return a + (r.amount || 0); }, 0);
+    if (c10s.length === 0) {
+      return { ok: false, reason: '本月无已记账 C-10' };
+    }
+    var task = SC.store.create('F-01', {
+      task_no: SC.store.nextNo('FT'),
+      interface_id: 'BIZ-020',
+      source_bill_no: 'PAYABLE-' + month,
+      source_bill_type: 'monthly',
+      source_bill_id: null,
+      task_state: '待推送',
+      retry_count: 0,
+      remark: '月度应付消减 ' + month + ' / 笔数 ' + c10s.length + ' / 金额 ' + total,
+    });
+    if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+    console.log('[linkage] BIZ-020 月度消减 ' + month + ' → ' + c10s.length + ' 笔 / ¥' + total);
+    return { ok: true, month: month, count: c10s.length, amount: total, task: task };
+  };
 
   /* A8 暂估：S-05:已审 时，如果 receipt.estimate_required = true 则自动创建 S-07 暂估 + BIZ-002 */
   SC.linkage.on('S-05:已审', function (receipt) {

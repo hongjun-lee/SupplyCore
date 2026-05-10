@@ -12,14 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 04 §8.3 反规避（化整为零禁止）+ 详设 09 §六 ALR-PUR-SPLIT-001 化整为零嫌疑 / ALR-PUR-DESIGNATE-001 指定供应商嫌疑。<br>
-            <strong>🛤 链路：</strong>P-01 审批通过 → linkage 检查 30 天累计同 org + 同 material 申请 → 累计金额超阈值 → 自动 emit ALR-PUR-SPLIT-001（重要级）→ R-05 预警台账 + 物资管理审计。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="sd-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -86,6 +78,14 @@
             • 触发：T-05 中标录入时检测<br>
             <strong>合规处置：</strong>预警发起 → 物资管理审核 → 拒绝 / 接受合理解释 / 升级法务<br>
             <strong>本期演示用：</strong>仅化整为零检测；指定供应商嫌疑作为占位
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 04 §8.3 反规避（化整为零禁止）+ 详设 09 §六 ALR-PUR-SPLIT-001 化整为零嫌疑 / ALR-PUR-DESIGNATE-001 指定供应商嫌疑。<br>
+            <strong>🛤 链路：</strong>P-01 审批通过 → linkage 检查 30 天累计同 org + 同 material 申请 → 累计金额超阈值 → 自动 emit ALR-PUR-SPLIT-001（重要级）→ R-05 预警台账 + 物资管理审计。
           </div>
         </div>
 

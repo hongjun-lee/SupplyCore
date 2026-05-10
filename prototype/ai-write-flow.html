@@ -11,15 +11,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 09 V1.2 §五 AI Tool 写操作约束 + 集团统筹层「统一 AI 入口」第 3 条权限要求 + 详设 11 §13 操作日志。<br>
-            <strong>🛤 链路：</strong>AI 对话式收集字段 → AI 生成草稿（不写库）→ 用户审阅 → 用户主动确认 → SC.store 写入 → 进入正常审批流（同人工提报无差别）。<br>
-            <strong>🛡 边界：</strong>AI 不可绕过审批流；不可越权（按当前角色权限）；写操作 100% 留痕（操作人 = 当前用户，非 AI）；高敏感操作（如黑名单 / SENS-CON-003）禁 AI 触发，必须人工通道。
-          </div>
-        </div>
-
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
           <div class="card-header">
             <div class="title">📡 档 A 引擎接入 · AI 写操作演示（生成 P-01 草稿 → 用户确认 → SC.store 写入）</div>
@@ -149,6 +140,15 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 09 V1.2 §五 AI Tool 写操作约束 + 集团统筹层「统一 AI 入口」第 3 条权限要求 + 详设 11 §13 操作日志。<br>
+            <strong>🛤 链路：</strong>AI 对话式收集字段 → AI 生成草稿（不写库）→ 用户审阅 → 用户主动确认 → SC.store 写入 → 进入正常审批流（同人工提报无差别）。<br>
+            <strong>🛡 边界：</strong>AI 不可绕过审批流；不可越权（按当前角色权限）；写操作 100% 留痕（操作人 = 当前用户，非 AI）；高敏感操作（如黑名单 / SENS-CON-003）禁 AI 触发，必须人工通道。
           </div>
         </div>
 

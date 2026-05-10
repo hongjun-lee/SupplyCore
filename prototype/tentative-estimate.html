@@ -12,14 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 06 V1.1a §7.6 暂估入库与冲销闭环（业务方 Q-05-2 答复 2026-05-09 — 6 个月窗口 + D-90/D-30/D-0/D+30 四阶段）+ 详设 09 ALR-INV-006/006B/007 + 详设 08 BIZ-002/003。<br>
-            <strong>🛤 链路：</strong>到货早于发票 → S-05 入库时勾选"含暂估"→ linkage 自动 create S-07 暂估单 + BIZ-002 NC 推送 → 发票到达 → S-07 冲销 → BIZ-003 红字 + BIZ-001 正式入账（暂估转正）。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="te-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -160,6 +152,14 @@
                 <strong>本月差异分析：</strong>3 笔已冲销，1 笔超 1% 转复核（演示用）
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 06 V1.1a §7.6 暂估入库与冲销闭环（业务方 Q-05-2 答复 2026-05-09 — 6 个月窗口 + D-90/D-30/D-0/D+30 四阶段）+ 详设 09 ALR-INV-006/006B/007 + 详设 08 BIZ-002/003。<br>
+            <strong>🛤 链路：</strong>到货早于发票 → S-05 入库时勾选"含暂估"→ linkage 自动 create S-07 暂估单 + BIZ-002 NC 推送 → 发票到达 → S-07 冲销 → BIZ-003 红字 + BIZ-001 正式入账（暂估转正）。
           </div>
         </div>
 

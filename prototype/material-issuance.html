@@ -12,14 +12,6 @@
     <div id="sidebar"></div>
     <div class="app-main">
       <div id="page-area">
-
-        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
-          <div class="card-body" style="font-size:13px;line-height:1.6;">
-            <strong>📋 业务依据：</strong>详设 06 §7.4 库存计价（全口径移动加权）+ §7.7 对厂矿出库销售凭证 + 详设 08 BIZ-005 / BIZ-005A 凭证拆分。<br>
-            <strong>🛤 链路：</strong>S-08 领料申请 → 按金额阈值审批 → S-09 领料出库执行 → 同事务原子写入（S-21 流水 + S-13 余额减）+ 成本归集到成本中心 → NC 推送（BIZ-005 自用消耗 / BIZ-005A 对厂矿销售）。
-          </div>
-        </div>
-
         <div class="kpi-grid" id="iss-kpis"></div>
 
         <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
@@ -101,6 +93,14 @@
                 <tbody id="cost-center-tbody"></tbody>
               </table>
             </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>📋 业务依据：</strong>详设 06 §7.4 库存计价（全口径移动加权）+ §7.7 对厂矿出库销售凭证 + 详设 08 BIZ-005 / BIZ-005A 凭证拆分。<br>
+            <strong>🛤 链路：</strong>S-08 领料申请 → 按金额阈值审批 → S-09 领料出库执行 → 同事务原子写入（S-21 流水 + S-13 余额减）+ 成本归集到成本中心 → NC 推送（BIZ-005 自用消耗 / BIZ-005A 对厂矿销售）。
           </div>
         </div>
 
