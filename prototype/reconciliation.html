@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>三对一致定期对账 (B4) — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 11 §11.1 三对一致定期对账任务 INV_RECON_TRIPLE_CONSISTENCY（业务方 Q-C1 答复 2026-05-09）+ 详设 09 ALR-INV-RECON-001 对账异常预警 + 详设 09 §六 RPT-INV-RECON 月度报表。<br>
+            <strong>🛤 链路：</strong>财务系统 = 原型系统（S-13 余额）= 保管卡片（实物盘点）三方应一致 → 月度调度任务自动比对 → 不一致触发 ALR-INV-RECON-001 + RPT-INV-RECON 月报 → 物资管理督办对账。
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="rec-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · 三对一致对账（手工触发演示）</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineRunReconciliation()">▶ 立即执行对账（演示用）</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>物料</th>
+                  <th>仓库</th>
+                  <th class="num">S-13 余额</th>
+                  <th class="num">S-21 累计</th>
+                  <th class="num">差异</th>
+                  <th>结果</th>
+                </tr>
+              </thead>
+              <tbody id="engine-rec-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">演示对账</span>
+              一期 A 演示用：仅对账 S-13 余额 vs S-21 累计（系统内自洽）；二期 P3 接入"财务系统对账数据"（mock）+ "保管卡片对账数据"（mock）做完整三对一致。
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">📅 月度调度日历（实际由系统定时任务）</div></div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>调度时间</th><th>任务</th><th>状态</th><th>下次</th></tr></thead>
+                <tbody>
+                  <tr><td class="muted">2026-05-31 22:00</td><td>三对一致对账（月度）</td><td><span class="badge gray">待调度</span></td><td>每月最后一个工作日 22:00</td></tr>
+                  <tr><td class="muted">2026-04-30 22:00</td><td>三对一致对账（月度）</td><td><span class="badge green dot">已完成</span></td><td>—</td></tr>
+                  <tr><td class="muted">2026-03-31 22:00</td><td>三对一致对账（月度）</td><td><span class="badge green dot">已完成</span></td><td>—</td></tr>
+                </tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+                调度由网信办运维监控；超时（24h 未完成）触发 IT 告警。
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">📊 历史对账归档</div></div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>月份</th><th class="num">总行</th><th class="num">不一致</th><th>对账结果</th><th>督办</th></tr></thead>
+                <tbody>
+                  <tr><td>2026-04</td><td class="num">486</td><td class="num">2</td><td><span class="badge amber dot">2 行待复核</span></td><td>已发起 → 已对齐</td></tr>
+                  <tr><td>2026-03</td><td class="num">472</td><td class="num">0</td><td><span class="badge green dot">完全一致</span></td><td>—</td></tr>
+                  <tr><td>2026-02</td><td class="num">468</td><td class="num">1</td><td><span class="badge amber dot">1 行待复核</span></td><td>已对齐</td></tr>
+                  <tr><td>2026-01</td><td class="num">455</td><td class="num">0</td><td><span class="badge green dot">完全一致</span></td><td>—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="title">⚖ 三对一致对账规则（详设 11 §11.1）</div></div>
+          <div class="card-body" style="font-size:12px;line-height:1.7;">
+            <strong>三方数据源：</strong><br>
+            • <strong>NC 财务账</strong>（NC-MD-008 月末科目余额）：1403 原材料按月余额<br>
+            • <strong>本系统 S-13 库存余额</strong>：实时聚合 S-21 流水<br>
+            • <strong>保管卡片</strong>（仓库实物盘点）：通过 S-15 月度盘点同步<br>
+            <hr style="border:none;border-top:1px dashed var(--border);margin:8px 0;">
+            <strong>差异处理：</strong><br>
+            • 三方差异 ≤ 千分之 5 → 系统标记"完全一致"<br>
+            • 千分之 5-1% → 物资管理员发起复核<br>
+            • &gt; 1% → 升级集团审计 + 月度报表标红<br>
+            <hr style="border:none;border-top:1px dashed var(--border);margin:8px 0;">
+            <strong>调度策略：</strong>每月最后一个工作日 22:00（避开业务高峰）；超时 24h 未完成发 IT 告警；对账数据归档 5 年（详设 11 §13 操作日志）<br>
+            <strong>合规审计：</strong>季度内审 + 年度外部审计 抽检对账记录（INV_RECON_TRIPLE_CONSISTENCY 任务的执行结果是审计重点）
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/time.js"></script>
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    SC.layout({
+      page: 'reconciliation',
+      crumbs: ['二期', 'B4 三对一致对账'],
+      title: '三对一致定期对账（INV_RECON_TRIPLE_CONSISTENCY）',
+      desc: '档 A 二期 B4：详设 11 §11.1 + 09 ALR-INV-RECON-001 + RPT-INV-RECON — 月度自动比对 + 异常预警',
+    });
+
+    var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m.name; });
+    var whMap = {}; SC.store.list('M-02').forEach(function (w) { whMap[w.id] = w.name; });
+
+    var lastResults = [];
+
+    function renderKpis() {
+      var inconsistent = lastResults.filter(function (r) { return !r.consistent; });
+      var alerts = SC.store.list('R-05', { alert_code: 'ALR-INV-RECON-001' });
+      document.getElementById('rec-kpis').innerHTML = [
+        ['本次对账行数', lastResults.length, lastResults.length === 0 ? '尚未执行' : '已扫描 S-13 ' + lastResults.length + ' 行'],
+        ['不一致行', inconsistent.length, inconsistent.length === 0 ? '✓ 完全一致' : '需复核'],
+        ['ALR-INV-RECON-001', alerts.length, '历史预警数'],
+        ['上次执行', lastResults.length === 0 ? '—' : '刚刚', '调度计划：月末'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
+    }
+
+    function renderResults() {
+      document.getElementById('engine-rec-tbody').innerHTML = lastResults.length === 0
+        ? '<tr><td colspan="6" class="muted" style="text-align:center;padding:18px;">尚未执行对账 · 点 ▶ 立即执行对账</td></tr>'
+        : lastResults.map(function (r) {
+            return '<tr>' +
+              '<td>' + (matMap[r.material_id] || '#' + r.material_id) + '</td>' +
+              '<td class="muted">' + (whMap[r.warehouse_id] || '#' + r.warehouse_id) + '</td>' +
+              '<td class="num">' + r.s13_qty + '</td>' +
+              '<td class="num">' + r.s21_sum + '</td>' +
+              '<td class="num" style="color:' + (r.diff === 0 ? 'var(--green)' : 'var(--red)') + ';font-weight:600;">' + (r.diff > 0 ? '+' : '') + r.diff + '</td>' +
+              '<td>' + (r.consistent ? '<span class="badge green dot">一致</span>' : '<span class="badge red dot">不一致</span>') + '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineRunReconciliation() {
+      lastResults = SC.linkage.runReconciliation();
+      var inconsistent = lastResults.filter(function (r) { return !r.consistent; });
+      if (inconsistent.length === 0) {
+        SC.ui.toast('对账完成：' + lastResults.length + ' 行全部一致 ✓', 'success');
+      } else {
+        SC.ui.toast('对账完成：' + lastResults.length + ' 行扫描，' + inconsistent.length + ' 行不一致 → 已 emit ALR-INV-RECON-001', 'warning');
+      }
+      renderKpis();
+      renderResults();
+    }
+
+    function refresh() { renderKpis(); renderResults(); }
+    ['S-13', 'S-21', 'R-05'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
+  </script>
+</body>
+</html>

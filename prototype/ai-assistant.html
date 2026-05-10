@@ -24,6 +24,28 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · AI Tool 实时数据查询（B5 · 接 SC.store）</div>
+            <div class="actions">
+              <button class="btn btn-sm" onclick="aiAsk('库存余额')">📦 当前库存余额</button>
+              <button class="btn btn-sm" onclick="aiAsk('待审 P-02')">📋 待审采购计划</button>
+              <button class="btn btn-sm" onclick="aiAsk('NC 失败')">⚠ NC 推送失败</button>
+              <button class="btn btn-sm" onclick="aiAsk('未读预警')">🚨 当前未读预警</button>
+              <button class="btn btn-sm" onclick="aiAsk('合同金额')">💰 合同金额合计</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="ai-engine-output" style="font-size:13px;line-height:1.7;background:#fafbfd;padding:14px;border-radius:6px;min-height:80px;">
+              <span class="muted">点上方按钮 → AI Tool 查询 SC.store 实时数据 + 自然语言响应。</span>
+            </div>
+            <div style="margin-top:10px;font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">边界</span>
+              AI 查询会带当前角色权限上下文（详设 09 §五 AI Tool 权限隔离）；写操作类指令需用户确认；导出会进 R-10 审计表（含水印）。
+            </div>
+          </div>
+        </div>
+
         <div class="ai-layout">
           <!-- 左：历史 + 能力 -->
           <div>
@@ -96,6 +118,68 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* AI Tool 查询 SC.store — B5 演示 */
+    function aiAsk(question) {
+      var out = document.getElementById('ai-engine-output');
+      var html = '<div style="margin-bottom:8px;color:var(--text-2);font-size:12px;">用户: <strong>"' + question + '"</strong></div>';
+      var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m.name; });
+
+      if (question.indexOf('库存') >= 0) {
+        var s13 = SC.store.list('S-13');
+        var total = s13.reduce(function (a, r) { return a + (r.qty_onhand || 0) * (r.unit_cost || 0); }, 0);
+        html += '<div style="background:#fff;padding:10px;border-radius:4px;border:1px solid var(--border);">' +
+          '<div style="color:var(--brand);font-weight:600;margin-bottom:6px;">🤖 AI Tool: query_inventory_balance()</div>' +
+          '<div>当前库存共 <strong>' + s13.length + '</strong> 个物料-仓库组合，账面金额合计 <strong style="color:var(--brand);">' + SC.fmtMoney(total) + '</strong>。</div>' +
+          (s13.length ? '<div style="margin-top:6px;font-size:11px;color:var(--text-2);">最近 3 个：' + s13.slice(0, 3).map(function (r) {
+            return (matMap[r.material_id] || '#' + r.material_id) + ' × ' + (r.qty_onhand || 0);
+          }).join('；') + '</div>' : '') +
+        '</div>';
+      } else if (question.indexOf('P-02') >= 0 || question.indexOf('计划') >= 0) {
+        var pending = SC.store.list('P-02', { state: '待审' });
+        html += '<div style="background:#fff;padding:10px;border-radius:4px;border:1px solid var(--border);">' +
+          '<div style="color:var(--brand);font-weight:600;margin-bottom:6px;">🤖 AI Tool: query_pending_plans()</div>' +
+          '<div>当前 <strong>待审</strong> 采购计划 <strong style="color:var(--amber);">' + pending.length + '</strong> 单。</div>' +
+          (pending.length ? '<div style="margin-top:6px;font-size:11px;color:var(--text-2);">' + pending.slice(0, 3).map(function (r) {
+            return r.plan_no + ' / ' + (matMap[r.material_id] || '#' + r.material_id) + ' × ' + r.quantity;
+          }).join('；') + '</div>' : '<div style="margin-top:6px;color:var(--green);font-size:12px;">✓ 当前无待审计划，审批顺畅</div>') +
+        '</div>';
+      } else if (question.indexOf('NC') >= 0) {
+        var failed = SC.store.list('F-01', { state: '失败' });
+        html += '<div style="background:#fff;padding:10px;border-radius:4px;border:1px solid var(--border);">' +
+          '<div style="color:var(--brand);font-weight:600;margin-bottom:6px;">🤖 AI Tool: query_nc_failures()</div>' +
+          '<div>NC 推送失败队列 <strong style="color:' + (failed.length ? 'var(--red)' : 'var(--green)') + ';">' + failed.length + '</strong> 条。</div>' +
+          (failed.length ? '<div style="margin-top:6px;font-size:11px;color:var(--text-2);">' + failed.slice(0, 3).map(function (r) { return r.biz_code + ' / ' + r.business_no + ' (' + (r.fail_reason || '未知') + ')'; }).join('；') + '</div>' : '<div style="margin-top:6px;color:var(--green);font-size:12px;">✓ 无失败队列</div>') +
+        '</div>';
+      } else if (question.indexOf('预警') >= 0 || question.indexOf('未读') >= 0) {
+        var alerts = SC.store.list('R-05', { read: false });
+        html += '<div style="background:#fff;padding:10px;border-radius:4px;border:1px solid var(--border);">' +
+          '<div style="color:var(--brand);font-weight:600;margin-bottom:6px;">🤖 AI Tool: query_unread_alerts()</div>' +
+          '<div>未读预警 <strong style="color:' + (alerts.length ? 'var(--amber)' : 'var(--green)') + ';">' + alerts.length + '</strong> 条。</div>' +
+          (alerts.length ? '<div style="margin-top:6px;font-size:11px;color:var(--text-2);">' + alerts.slice(-3).map(function (r) { return (r.alert_code || 'ALR') + ' [' + (r.level || '黄') + ']'; }).join('；') + '</div>' : '<div style="margin-top:6px;color:var(--green);font-size:12px;">✓ 无未读预警</div>') +
+        '</div>';
+      } else if (question.indexOf('合同') >= 0 || question.indexOf('金额') >= 0) {
+        var contracts = SC.store.list('C-02');
+        var amt = contracts.reduce(function (a, r) { return a + (r.amount || 0); }, 0);
+        var executed = contracts.reduce(function (a, r) { return a + (r.executed_amount || 0); }, 0);
+        html += '<div style="background:#fff;padding:10px;border-radius:4px;border:1px solid var(--border);">' +
+          '<div style="color:var(--brand);font-weight:600;margin-bottom:6px;">🤖 AI Tool: query_contracts()</div>' +
+          '<div>当前合同 <strong>' + contracts.length + '</strong> 份，签约金额合计 <strong style="color:var(--brand);">' + SC.fmtMoney(amt) + '</strong>，已执行 <strong>' + SC.fmtMoney(executed) + '</strong>（' + (amt ? (executed/amt*100).toFixed(1) : 0) + '%）。</div>' +
+        '</div>';
+      } else {
+        html += '<div style="background:#fff;padding:10px;border-radius:4px;border:1px solid var(--border);color:var(--text-2);">未识别问题，请试试上方按钮。</div>';
+      }
+      html += '<div style="margin-top:8px;font-size:11px;color:var(--text-3);">⏱ 查询用时 ~12ms · 当前角色：' + SC.getRole().label + '（数据已按权限过滤）</div>';
+      out.innerHTML = html;
+    }
+  </script>
   <script>
     SC.layout({
       page: 'ai-assistant',

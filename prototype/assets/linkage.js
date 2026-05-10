@@ -916,6 +916,167 @@
     console.log('[linkage] P-01:' + req.id + ' 应急通道审批 → 3 工作日补办期限 ' + followupDeadline.toISOString().slice(0, 10));
   });
 
+  /* ========================================================
+   * 二期 P2 第二批引擎接入（v0.21 — A7 + A9 + A10）
+   * ======================================================== */
+
+  /* A7 设备租赁：E-08:在租 → 月底自动 trigger 月度费用 BIZ-019 */
+  SC.linkage.on('E-08:在租', function (rec) {
+    var period = (SC.time && SC.time.iso ? SC.time.iso() : new Date().toISOString()).slice(0, 7);
+    var existing = SC.store.list('E-13').filter(function (f) { return f.registration_id === rec.id && f.period === period; })[0];
+    if (existing) return;
+    SC.store.create('E-13', {
+      fee_no: SC.store.nextNo('LF'),
+      registration_id: rec.id,
+      contract_id: rec.contract_id,
+      supplier_id: rec.supplier_id,
+      equipment_id: rec.equipment_id,
+      period: period,
+      monthly_amount: rec.monthly_rate || 5000,
+      state: '已生成',
+    });
+    console.log('[linkage] E-08:' + rec.id + ' 在租 → 当月 E-13 月度费用已生成（BIZ-019 推送占位）');
+  });
+
+  /* A7 设备租赁：E-08:已结算 → F-01 BIZ-019 推送 */
+  SC.linkage.on('E-08:已结算', function (rec) {
+    var ncSwitch = SC.store.list('F-13', { switch_code: 'BIZ-019-switch' })[0];
+    if (!ncSwitch || ncSwitch.switch_status === '开') {
+      var task = SC.store.create('F-01', {
+        task_no: SC.store.nextNo('FT'),
+        interface_id: 'BIZ-019',
+        source_bill_no: rec.registration_no,
+        source_bill_type: 'E-08',
+        source_bill_id: rec.id,
+        task_state: '待推送',
+        retry_count: 0,
+      });
+      if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+    }
+    console.log('[linkage] E-08:' + rec.id + ' 已结算 → F-01 BIZ-019 租赁费用 NC 推送');
+  });
+
+  /* A10 外委检修：E-04:已审 → 检查 40% 原值上限 → 如超阈值 emit 高敏感预警 + WF-CON-OVERLIMIT-001 */
+  SC.linkage.on('E-04:已审', function (req) {
+    if (req.amount && req.original_value && req.amount > 0.4 * req.original_value) {
+      emitAlert({
+        alert_code: 'ALR-CON-OVERLIMIT-001',
+        level: '紧急',
+        source_entity: 'E-04',
+        source_id: req.id,
+        title: '外委检修合同超 40% 原值',
+        message: 'E-04 #' + req.id + ' 检修金额 ¥' + req.amount + ' / 设备原值 ¥' + req.original_value + ' = ' + ((req.amount / req.original_value * 100).toFixed(1)) + '% > 40%；触发 WF-CON-OVERLIMIT-001 加签 + SENS-CON-004 高敏感留痕（详设 07 V1.0a + 10 V1.2）',
+      });
+      console.log('[linkage] E-04:' + req.id + ' 超 40% 原值上限 → ALR-CON-OVERLIMIT-001');
+    }
+  });
+
+  /* A10 外委检修：E-04:已结算 → F-01 BIZ-018 外委检修结算（占位，实际 NC 凭证待财务确认）*/
+  SC.linkage.on('E-04:已结算', function (req) {
+    console.log('[linkage] E-04:' + req.id + ' 已结算 → NC 凭证待财务确认（详设 07 V1.0a + 详设 08 占位项）');
+  });
+
+  /* A9 委托加工：OP-01:已投料 → S-21 出库流水（投料原料从主库到受托虚拟仓）+ S-13 减原料 */
+  SC.linkage.on('OP-01:已投料', function (op) {
+    SC.store.transaction(['S-21', 'S-13'], function () {
+      SC.store.create('S-21', {
+        transaction_no: SC.store.nextNo('IT'),
+        transaction_type: '委托投料',
+        material_id: op.raw_material_id,
+        warehouse_id: op.from_warehouse_id,
+        quantity_delta: -(op.raw_quantity || 0),
+        amount_delta: -(op.raw_amount || 0),
+        source_bill_type: 'OP-01',
+        source_bill_id: op.id,
+      });
+      var inv = SC.store.list('S-13').filter(function (i) {
+        return i.material_id === op.raw_material_id && i.warehouse_id === op.from_warehouse_id;
+      })[0];
+      if (inv) {
+        SC.store.update('S-13', inv.id, {
+          quantity: (inv.quantity || 0) - op.raw_quantity,
+          total_amount: (inv.total_amount || 0) - op.raw_amount,
+        });
+      }
+    });
+    console.log('[linkage] OP-01:' + op.id + ' 已投料 → S-21 出库 + S-13 减原料');
+  });
+
+  /* A9 委托加工：OP-01:已入库 → S-21 入库流水（产品 + 加工费）+ S-13 加产品 + F-01 BIZ-019 加工费 */
+  SC.linkage.on('OP-01:已入库', function (op) {
+    SC.store.transaction(['S-21', 'S-13', 'F-01'], function () {
+      // 产品入库（含加工费）
+      var totalAmount = (op.raw_amount || 0) + (op.processing_fee || 0);
+      SC.store.create('S-21', {
+        transaction_no: SC.store.nextNo('IT'),
+        transaction_type: '委托产成',
+        material_id: op.product_material_id,
+        warehouse_id: op.to_warehouse_id,
+        quantity_delta: op.product_quantity || 0,
+        amount_delta: totalAmount,
+        source_bill_type: 'OP-01',
+        source_bill_id: op.id,
+      });
+      var prodInv = SC.store.upsert('S-13',
+        { warehouse_id: op.to_warehouse_id, material_id: op.product_material_id },
+        {});
+      var newQty = (prodInv.quantity || 0) + (op.product_quantity || 0);
+      var newAmount = (prodInv.total_amount || 0) + totalAmount;
+      SC.store.update('S-13', prodInv.id, {
+        quantity: newQty,
+        total_amount: newAmount,
+        unit_cost: newQty > 0 ? newAmount / newQty : 0,
+      });
+      // F-01 加工费 NC 推送
+      var ncSwitch = SC.store.list('F-13', { switch_code: 'BIZ-019-switch' })[0];
+      if (!ncSwitch || ncSwitch.switch_status === '开') {
+        var task = SC.store.create('F-01', {
+          task_no: SC.store.nextNo('FT'),
+          interface_id: 'BIZ-019',
+          source_bill_no: op.op_no,
+          source_bill_type: 'OP-01',
+          source_bill_id: op.id,
+          task_state: '待推送',
+          retry_count: 0,
+        });
+        if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+      }
+    });
+    console.log('[linkage] OP-01:' + op.id + ' 已入库 → S-21 产品入库 + S-13 加产品（含加工费）+ F-01 BIZ-019');
+  });
+
+  /* B4 三对一致：暴露手工触发函数（账实对账 + 系统对账）— 演示用，实际是月度调度 */
+  SC.linkage.runReconciliation = function () {
+    var s13 = SC.store.list('S-13');
+    var s21 = SC.store.list('S-21');
+    var results = [];
+    s13.forEach(function (i) {
+      var related = s21.filter(function (t) { return t.material_id === i.material_id && t.warehouse_id === i.warehouse_id; });
+      var sum = related.reduce(function (a, t) { return a + (t.quantity_delta || 0); }, 0);
+      var diff = (i.quantity || 0) - sum;
+      results.push({
+        material_id: i.material_id,
+        warehouse_id: i.warehouse_id,
+        s13_qty: i.quantity || 0,
+        s21_sum: sum,
+        diff: diff,
+        consistent: diff === 0,
+      });
+    });
+    var inconsistent = results.filter(function (r) { return !r.consistent; });
+    if (inconsistent.length > 0) {
+      emitAlert({
+        alert_code: 'ALR-INV-RECON-001',
+        level: '重要',
+        source_entity: 'S-13',
+        source_id: 0,
+        title: '三对一致对账异常',
+        message: 'S-13 余额 vs S-21 流水累计 ' + inconsistent.length + ' 行不一致；详设 11 §11.1 INV_RECON_TRIPLE_CONSISTENCY 月度调度任务',
+      });
+    }
+    return results;
+  };
+
   /* 暴露给页面调用：mock 触发审批超时（无时间穿越的替代）*/
   SC.linkage.mockTriggerWFTimeout = function () {
     var pending = []

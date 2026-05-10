@@ -281,6 +281,46 @@ SC.demoScenarios = {
       { id: 'demo-snapshot', file: 'demo-snapshot.html', label: '快照管理', desc: '保存 / 还原 / 导入导出' },
     ],
   },
+  'equipment-rental': {
+    label: '设备租赁',
+    desc: 'A7 — E-08 在租 / 已结算 + BIZ-019 月度租赁费',
+    steps: [
+      { id: 'equipment-rent', file: 'equipment-rent.html', label: 'E-08 租赁', desc: '在租 → 月结 → 已结算' },
+      { id: 'nc-interface', file: 'nc-interface.html', label: 'BIZ-019', desc: '租赁费凭证' },
+    ],
+  },
+  'outsourced-processing': {
+    label: '委托加工',
+    desc: 'A9 — OP-01 投料 → 产出 → 入库 + 标准损耗率 + 三方联合验收',
+    steps: [
+      { id: 'outsourced-processing', file: 'outsourced-processing.html', label: 'OP-01 加工单', desc: '投料 → 产出 → 入库' },
+      { id: 'inventory', file: 'inventory.html', label: 'S-13/S-21', desc: '原料出 + 产品入' },
+      { id: 'nc-interface', file: 'nc-interface.html', label: 'BIZ-019', desc: '加工费凭证' },
+    ],
+  },
+  'external-repair': {
+    label: '外委检修',
+    desc: 'A10 — E-04 检修单 + 40% 原值上限 + WF-CON-OVERLIMIT-001 加签',
+    steps: [
+      { id: 'maintenance-order', file: 'maintenance-order.html', label: 'E-04 检修', desc: '审批 + 阈值检查' },
+      { id: 'alert-rules', file: 'alert-rules.html', label: 'ALR-CON-OVERLIMIT', desc: '超阈值预警' },
+    ],
+  },
+  'reconciliation': {
+    label: '三对一致对账',
+    desc: 'B4 — 财务 + 系统 S-13 + 保管卡片 月度比对 + ALR-INV-RECON-001',
+    steps: [
+      { id: 'reconciliation', file: 'reconciliation.html', label: '对账演示', desc: '手工触发 + 历史归档' },
+      { id: 'alert-rules', file: 'alert-rules.html', label: 'ALR-INV-RECON', desc: '不一致预警' },
+    ],
+  },
+  'ai-tool': {
+    label: 'AI Tool 调用',
+    desc: 'B5 — AI 助理实时查询 SC.store + 自然语言响应',
+    steps: [
+      { id: 'ai-assistant', file: 'ai-assistant.html', label: 'AI 助理', desc: '查询库存 / 计划 / 预警' },
+    ],
+  },
 };
 
 SC.SCENARIO_KEY = 'sc.scenario';

@@ -58,6 +58,38 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · E-08 租赁登记（全生命周期 + BIZ-019 月度费用）</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineCreateE08()">+ 创建租赁登记</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>登记号</th>
+                  <th>设备</th>
+                  <th>承租方</th>
+                  <th>出租方</th>
+                  <th class="num">月租金</th>
+                  <th>状态</th>
+                  <th>本月费用</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-e08-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              E-08:在租 → linkage 当月生成 E-13 月度费用；E-08:已结算 → F-01 推 BIZ-019 NC 推送（详设 07 + 详设 08 BIZ-019）。
+            </div>
+          </div>
+        </div>
+
+
         <div class="card">
           <div class="flow-strip">
             <div class="node done"><span class="step-num">1</span> 租赁申请 (E-07)</div>
@@ -269,6 +301,69 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* 引擎接入：E-08 租赁登记 */
+    function renderE08() {
+      var rows = SC.store.list('E-08');
+      var fees = SC.store.list('E-13');
+      var supMap = {}; SC.store.list('M-09').forEach(function (s) { supMap[s.id] = s.name; });
+      var period = (SC.time && SC.time.iso ? SC.time.iso() : new Date().toISOString()).slice(0, 7);
+      document.getElementById('engine-e08-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="9" class="muted" style="text-align:center;padding:18px;">无 E-08 · 点 + 创建租赁登记</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('E-08', r);
+            var stateColor = r.state === '在租' ? 'green' : r.state === '已结算' ? 'blue' : r.state === '已退租' ? 'amber' : 'gray';
+            var monthFee = fees.filter(function (f) { return f.registration_id === r.id && f.period === period; })[0];
+            return '<tr>' +
+              '<td class="code">' + r.registration_no + '</td>' +
+              '<td>' + (r.equipment_name || '设备 #' + r.equipment_id) + '</td>' +
+              '<td class="muted">' + (r.lessee || '—') + '</td>' +
+              '<td class="muted">' + (supMap[r.supplier_id] || '—') + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.monthly_rate || 0) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (monthFee ? '已生成 ' + period : '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineE08(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+    function engineCreateE08() {
+      var supplier = SC.store.list('M-09')[0];
+      SC.store.create('E-08', {
+        registration_no: SC.store.nextNo('LZ'),
+        equipment_id: 1,
+        equipment_name: '采煤机 EBZ200（演示）',
+        supplier_id: supplier.id,
+        lessee: '艾友矿综采队',
+        monthly_rate: 12000,
+        contract_id: 1,
+        state: '草稿',
+      });
+      SC.ui.toast('E-08 租赁登记已创建', 'success');
+    }
+    function engineE08(id, event) {
+      try {
+        SC.sm.transition('E-08', id, event);
+        if (event === '起租') SC.ui.toast('E-08 #' + id + ' 在租 → linkage 自动生成 E-13 月度费用', 'success');
+        else if (event === '结算完成') SC.ui.toast('E-08 #' + id + ' 已结算 → linkage F-01 推 BIZ-019', 'success');
+        else SC.ui.toast('E-08 #' + id + ' → ' + event, 'success');
+        setTimeout(renderE08, 500);
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+    SC.store.subscribe('E-08', renderE08);
+    SC.store.subscribe('E-13', renderE08);
+    SC.store.subscribe('F-01', renderE08);
+    setTimeout(renderE08, 100);
+  </script>
   <script>
     SC.layout({
       page: 'equipment-rent',

@@ -77,6 +77,7 @@
       { id: 8, switch_code: 'BIZ-011-switch', interface_name: '废旧变卖',                 switch_status: '开', remark: '二期 P2 A6 废旧处置 — 变卖收入凭证' },
       { id: 9, switch_code: 'BIZ-012-switch', interface_name: '废旧回收',                 switch_status: '开', remark: '二期 P2 A6 废旧处置 — 回收凭证' },
       { id: 10, switch_code: 'BIZ-013-switch', interface_name: '付款执行',                 switch_status: '开', remark: '二期 A4b 付款链路 — NC 实付回写' },
+      { id: 11, switch_code: 'BIZ-019-switch', interface_name: '租赁费用 / 加工费',        switch_status: '开', remark: '二期 P2 A7 设备租赁 + A9 委托加工 — 月度费用结算' },
     ],
 
     /* P-01 示例需求（演示用，v0.16 改为草稿态 — 让用户从最起点演示

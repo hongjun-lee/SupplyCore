@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>委托加工 (OP-01) — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 06 §委托加工 + 详设 04 §受托加工 + 详设 08 BIZ-019 加工费凭证 + 02 V0.4 二期 A9。<br>
+            <strong>🛤 链路：</strong>OP-01 委托加工单 → 受托虚拟仓登记 → 原料投料（S-21 出库 + 受托方仓库标记）→ 标准损耗率监控 → 完工产出 → 三方联合验收（委托方 + 受托方 + 物资公司）→ 产品入库（含加工费）→ NC BIZ-019 加工费推送。
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="op-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · OP-01 委托加工单</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineCreateOP()">+ 创建委托加工单</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>加工号</th>
+                  <th>受托方</th>
+                  <th>原料 → 产品</th>
+                  <th class="num">原料 / 产品数量</th>
+                  <th class="num">加工费</th>
+                  <th>损耗率</th>
+                  <th>状态</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-op-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              已投料 → linkage S-21 投料流水 + S-13 减原料；已入库 → S-21 产品入库（含加工费）+ S-13 加产品（unit_cost = (原料金额+加工费)/产品数量）+ F-01 BIZ-019。
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">🏭 受托虚拟仓 + 标准损耗率</div></div>
+              <div class="card-body" style="font-size:12px;line-height:1.7;">
+                <strong>受托虚拟仓：</strong>原料投料后挂在受托方虚拟仓（不在物资公司主库），便于追踪在途原料和产成品。<br>
+                <strong>标准损耗率：</strong>按物料类别配置；超过损耗率需说明原因（例：金属切削加工 ≤ 5%，化工分馏 ≤ 8%）。<br>
+                <hr style="border:none;border-top:1px dashed var(--border);margin:8px 0;">
+                <table class="data" style="font-size:11px;">
+                  <thead><tr><th>类别</th><th class="num">标准损耗率</th><th class="num">报警阈值</th></tr></thead>
+                  <tbody>
+                    <tr><td>金属切削</td><td class="num">5%</td><td class="num">7%</td></tr>
+                    <tr><td>金属铸造</td><td class="num">8%</td><td class="num">12%</td></tr>
+                    <tr><td>化工分馏</td><td class="num">8%</td><td class="num">12%</td></tr>
+                    <tr><td>其他</td><td class="num">3%</td><td class="num">5%</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">👥 三方联合验收</div></div>
+              <div class="card-body" style="font-size:12px;line-height:1.7;">
+                <strong>委托方（物资公司）：</strong>核对原料投料数量 + 加工费金额 + 损耗率<br>
+                <strong>受托方（加工厂）：</strong>提供加工记录 + 损耗清单 + 产成品质检报告<br>
+                <strong>使用单位（终端）：</strong>验收产成品物理状态 + 数量 + 入实物账<br>
+                <hr style="border:none;border-top:1px dashed var(--border);margin:8px 0;">
+                <strong>验收要求：</strong>三方签字（电子签章）+ 拍照留痕 + 必要时第三方检验报告（如金属硬度、化工纯度）<br>
+                <strong>异常处理：</strong>损耗率超阈值 → 受托方需提供书面说明 + 物资公司补缺料或核减加工费<br>
+                <strong>NC 凭证 BIZ-019：</strong>借 1403 原材料（产成品入账）/ 贷 1403 原材料（原料）+ 6602 应付加工费
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/time.js"></script>
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    SC.layout({
+      page: 'outsourced-processing',
+      crumbs: ['二期', 'A9 委托加工'],
+      title: '委托加工（OP-01 + BIZ-019）',
+      desc: '档 A 二期 A9：详设 06 + 08 — 受托虚拟仓 + 标准损耗率 + 三方联合验收 + 加工费成本归集',
+    });
+
+    var supMap = {}; SC.store.list('M-09').forEach(function (s) { supMap[s.id] = s.name; });
+    var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m; });
+
+    function renderKpis() {
+      var rows = SC.store.list('OP-01');
+      var inProgress = rows.filter(function (r) { return r.state === '已投料' || r.state === '已产出'; });
+      var done = rows.filter(function (r) { return r.state === '已入库'; });
+      var totalFee = rows.reduce(function (a, r) { return a + (r.processing_fee || 0); }, 0);
+      document.getElementById('op-kpis').innerHTML = [
+        ['OP-01 委托加工单', rows.length, '草稿 ' + rows.filter(function (x) { return x.state === '草稿'; }).length],
+        ['加工中', inProgress.length, '已投料 / 已产出'],
+        ['已入库（产成品）', done.length, '本月完成'],
+        ['累计加工费', SC.fmtMoney(totalFee), 'BIZ-019 NC 推送'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
+    }
+
+    function renderOP() {
+      var rows = SC.store.list('OP-01');
+      document.getElementById('engine-op-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="9" class="muted" style="text-align:center;padding:18px;">无 OP-01 · 点上方"+ 创建委托加工单"</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('OP-01', r);
+            var stateColor = r.state === '已入库' ? 'green' : r.state === '已产出' ? 'blue' : r.state === '已投料' ? 'amber' : 'gray';
+            var loss = r.product_quantity && r.raw_quantity ?
+              ((1 - r.product_quantity / r.raw_quantity) * 100).toFixed(1) + '%' : '—';
+            var lossColor = r.product_quantity && r.raw_quantity && (1 - r.product_quantity / r.raw_quantity) > 0.05 ? 'amber' : 'gray';
+            return '<tr>' +
+              '<td class="code">' + r.op_no + '</td>' +
+              '<td>' + (supMap[r.supplier_id] || '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + ((matMap[r.raw_material_id] || {}).name || '—') + ' → ' + ((matMap[r.product_material_id] || {}).name || '—') + '</td>' +
+              '<td class="num">' + (r.raw_quantity || 0) + ' → ' + (r.product_quantity || '—') + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.processing_fee || 0) + '</td>' +
+              '<td><span class="badge ' + lossColor + '">' + loss + '</span></td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineOP(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineCreateOP() {
+      var supplier = SC.store.list('M-09')[1] || SC.store.list('M-09')[0];
+      var rawMat = SC.store.list('M-05')[5];
+      var prodMat = SC.store.list('M-05')[6];
+      var rawQty = 100;
+      var rawAmount = rawQty * 80;
+      var prodQty = 95; // 5% 损耗
+      SC.store.create('OP-01', {
+        op_no: SC.store.nextNo('OP'),
+        supplier_id: supplier.id,
+        raw_material_id: rawMat.id,
+        product_material_id: prodMat.id,
+        raw_quantity: rawQty,
+        raw_amount: rawAmount,
+        product_quantity: prodQty,
+        processing_fee: 8000,
+        from_warehouse_id: 1,
+        to_warehouse_id: 1,
+        state: '草稿',
+      });
+      SC.ui.toast('OP-01 委托加工单已创建（' + supplier.name + ' 加工 ' + rawQty + ' → ' + prodQty + '，损耗 5%）', 'success');
+    }
+
+    function engineOP(id, event) {
+      try {
+        SC.sm.transition('OP-01', id, event);
+        if (event === '原料投料') {
+          SC.ui.toast('OP-01 #' + id + ' 已投料 → linkage S-21 出库 + S-13 减原料', 'success');
+          setTimeout(refresh, 1000);
+        } else if (event === '验收入库') {
+          SC.ui.toast('OP-01 #' + id + ' 已入库 → linkage S-21 产品入库（含加工费） + S-13 加产品 + F-01 BIZ-019', 'success');
+          setTimeout(refresh, 1500);
+        } else {
+          SC.ui.toast('OP-01 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function refresh() { renderKpis(); renderOP(); }
+    ['OP-01', 'S-13', 'S-21', 'F-01'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
+  </script>
+</body>
+</html>

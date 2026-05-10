@@ -12,6 +12,36 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · E-04 外委检修（含 40% 原值上限校验 + WF-CON-OVERLIMIT-001）</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineCreateE04()">+ 创建检修单（含超阈值演示）</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>检修号</th>
+                  <th>设备</th>
+                  <th class="num">检修金额</th>
+                  <th class="num">设备原值</th>
+                  <th class="num">占比</th>
+                  <th>状态</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-e04-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              E-04:已审 → linkage 检查 amount &gt; 40% × original_value → 超阈值 emit ALR-CON-OVERLIMIT-001（紧急级）+ WF-CON-OVERLIMIT-001 加签 + SENS-CON-004 高敏感留痕（详设 07 V1.0a + 10 V1.2）。
+            </div>
+          </div>
+        </div>
+
         <div class="kpi-grid">
           <div class="kpi"><div class="label">本月工单</div><div class="value">5</div><div class="trend">3 已关单 · 1 检修中 · 1 待派工</div></div>
           <div class="kpi"><div class="label">本月费用合计</div><div class="value">¥ 14.86 万</div><div class="trend">含外委检修申请</div></div>
@@ -204,6 +234,70 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* 引擎接入：E-04 外委检修 */
+    function renderE04() {
+      var rows = SC.store.list('E-04');
+      document.getElementById('engine-e04-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px;">无 E-04 · 点 + 创建检修单</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('E-04', r);
+            var stateColor = r.state === '已结算' ? 'green' : r.state === '已审' ? 'blue' : r.state === '待审' ? 'amber' : 'gray';
+            var ratio = r.amount && r.original_value ? (r.amount / r.original_value * 100).toFixed(1) + '%' : '—';
+            var ratioColor = r.amount && r.original_value && r.amount > 0.4 * r.original_value ? 'red' : 'gray';
+            return '<tr>' +
+              '<td class="code">' + r.repair_no + '</td>' +
+              '<td>' + (r.equipment_name || '设备 #' + r.equipment_id) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.amount || 0) + '</td>' +
+              '<td class="num muted">' + SC.fmtMoney(r.original_value || 0) + '</td>' +
+              '<td><span class="badge ' + ratioColor + ' dot">' + ratio + '</span></td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineE04(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+    function engineCreateE04() {
+      var overLimit = Math.random() > 0.5; // 50% 概率超阈值演示
+      var origVal = 500000;
+      var amount = overLimit ? Math.floor(origVal * 0.45) : Math.floor(origVal * 0.3);
+      SC.store.create('E-04', {
+        repair_no: SC.store.nextNo('JX'),
+        equipment_id: 1,
+        equipment_name: '采煤机 EBZ200（演示）',
+        amount: amount,
+        original_value: origVal,
+        state: '草稿',
+      });
+      SC.ui.toast('E-04 检修单已创建（金额 ¥' + amount + ' / 原值 ¥' + origVal + ' = ' + (amount/origVal*100).toFixed(1) + '%）' + (overLimit ? ' — 已审后将触发 40% 超阈值预警' : ''), 'success');
+    }
+    function engineE04(id, event) {
+      try {
+        SC.sm.transition('E-04', id, event);
+        if (event === '审批通过') {
+          var r = SC.store.get('E-04', id);
+          if (r.amount > 0.4 * r.original_value) {
+            SC.ui.toast('E-04 #' + id + ' 已审 → 超 40% 原值上限 → ALR-CON-OVERLIMIT-001 紧急 + WF-CON-OVERLIMIT-001 加签', 'warning');
+          } else {
+            SC.ui.toast('E-04 #' + id + ' 已审（金额未超 40%，正常）', 'success');
+          }
+        } else SC.ui.toast('E-04 #' + id + ' → ' + event, 'success');
+        setTimeout(renderE04, 500);
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+    SC.store.subscribe('E-04', renderE04);
+    SC.store.subscribe('R-05', renderE04);
+    setTimeout(renderE04, 100);
+  </script>
   <script>
     SC.layout({
       page: 'maintenance-order',
