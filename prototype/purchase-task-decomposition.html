@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>采购任务分解 — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .task-split-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .source-panel {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 12px;
+    }
+    .source-item {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      background: #fafbfd;
+    }
+    .source-item .label {
+      color: var(--text-3);
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    .source-item .value {
+      color: var(--text);
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .step3-meta {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-top: 4px;
+    }
+    .step3-meta strong { color: var(--brand); }
+    .case-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .case-card {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--case-color, #3b82f6);
+      border-radius: 6px;
+      padding: 12px 14px;
+      background: #fff;
+      cursor: default;
+      transition: box-shadow 0.15s ease;
+    }
+    .case-card.merge { --case-color: #3b82f6; }
+    .case-card.split { --case-color: #ef4444; }
+    .case-card .case-label {
+      font-size: 11px;
+      color: var(--case-color, #3b82f6);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .case-card .case-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .case-card .case-body {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.55;
+    }
+    .case-card.grp-active {
+      box-shadow: 0 0 0 2px var(--case-color, #3b82f6);
+    }
+    /* 计划行 / 任务行的 group 色块（左 border） + hover 联动 */
+    tr[data-group] td:first-child {
+      position: relative;
+    }
+    tr[data-group] td:first-child::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--row-color, transparent);
+    }
+    tr.grp-active {
+      background: rgba(59, 130, 246, 0.06) !important;
+    }
+    tr.grp-active td:first-child::before {
+      width: 6px;
+    }
+    .grp-mark {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      vertical-align: middle;
+    }
+    .rule-list, .route-summary { display: grid; gap: 10px; }
+    .rule-card, .route-summary .route-item {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .rule-card { background: #fff; }
+    .route-summary .route-item { background: #fafbfd; }
+    .rule-card strong {
+      display: block;
+      color: var(--text);
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .route-item .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .route-item .amount { font-weight: 600; color: var(--text); }
+    .task-tags {
+      display: inline-flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    @media (max-width: 1200px) {
+      .task-split-layout, .source-panel { grid-template-columns: 1fr; }
+      .case-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="kpi-grid" id="task-kpis"></div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="title">来源采购计划（P-02）</div>
+            <div class="actions">
+              <a class="btn btn-sm" href="purchase-planning.html">返回采购计划</a>
+              <button class="btn btn-sm" onclick="alert('演示模式：重新预分解动作不实际生效。');">重新预分解</button>
+              <button class="btn btn-sm btn-primary" onclick="alert('演示模式：5 个 P-05 草稿已生成（见下方任务表）。');">确认生成 P-05</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="source-panel" id="source-plan"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="title">放大视图：全流程 Step 3 — 分解采购任务</div>
+            <div class="actions"><a class="btn btn-sm" href="purchase-planning.html">查看全流程 7 步</a></div>
+          </div>
+          <div class="card-body">
+            <div class="step3-meta">
+              全流程：基层需求审批 → 计划汇总 → <strong>分解任务（本页）</strong> → 标包编排 → 招采平台 → 结果回传 → 采购申请订单
+            </div>
+            <div class="flow-strip" style="margin-top:12px;">
+              <div class="node done"><span class="step-num">3.1</span> 计划审批通过</div>
+              <div class="node done"><span class="step-num">3.2</span> 计划行锁定</div>
+              <div class="node current"><span class="step-num">3.3</span> 分解 P-05 任务</div>
+              <div class="node"><span class="step-num">3.4</span> 路径分流</div>
+              <div class="node"><span class="step-num">3.5</span> 生成标包 / 采购申请</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="title">分解动作典型案例</div>
+            <div class="text-2 muted" style="font-size:12px;">同色块 = 同一 P-05 任务的来源；鼠标悬停案例卡或表格行可联动高亮。</div>
+          </div>
+          <div class="card-body">
+            <div class="case-grid" id="case-grid"></div>
+          </div>
+        </div>
+
+        <div class="task-split-layout">
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">待分解计划行（P-03）</div>
+                <div class="actions">
+                  <button class="btn btn-sm" onclick="alert('演示模式：将勾选的同色组计划行合并为单个 P-05 任务（见 PT-001 合并案例）。');">合并为任务</button>
+                  <button class="btn btn-sm" onclick="alert('演示模式：拆分已合并的计划行为独立 P-05 任务。');">拆分任务</button>
+                </div>
+              </div>
+              <table class="data" id="plan-table">
+                <thead>
+                  <tr>
+                    <th style="width:24px;"></th>
+                    <th style="width:32px;"><input type="checkbox" checked></th>
+                    <th>计划行</th>
+                    <th>来源需求</th>
+                    <th>单位</th>
+                    <th>物资范围</th>
+                    <th class="num">金额</th>
+                    <th>建议路径</th>
+                    <th>分解原因</th>
+                    <th>任务</th>
+                  </tr>
+                </thead>
+                <tbody id="plan-line-tbody"></tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="title">分解后采购任务（P-05）</div>
+                <div class="actions">
+                  <button class="btn btn-sm">导出任务清单</button>
+                  <button class="btn btn-sm btn-primary" onclick="alert('演示模式：批量生成 T-01 / S-01 后续单据。');">批量生成后续单据</button>
+                </div>
+              </div>
+              <table class="data" id="task-table">
+                <thead>
+                  <tr>
+                    <th style="width:24px;"></th>
+                    <th>任务编号</th>
+                    <th>任务名称 / 管控</th>
+                    <th>来源 + 组织</th>
+                    <th class="num">任务金额</th>
+                    <th>路径</th>
+                    <th>业务流向</th>
+                    <th>计划交付</th>
+                    <th>紧急度</th>
+                    <th>供应商 / 合同范围</th>
+                    <th>后续单据</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody id="task-tbody"></tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+                <span class="badge blue dot">口径</span>
+                <div class="text-2">
+                  P-05 是采购计划进入执行的分水岭。采购任务本身不是招标项目、合同或订单；它只决定路径并承接来源追溯。
+                  招采任务继续生成 T-01/T-03/T-07，直采和合同采购任务生成 S-01/S-02。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">分解规则</div></div>
+              <div class="card-body">
+                <div class="rule-list" id="split-rules"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">路径分流结果</div></div>
+              <div class="card-body">
+                <div class="route-summary" id="route-summary"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">操作留痕</div></div>
+              <div class="card-body">
+                <div class="timeline" id="audit-trail"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">下一步演示入口</div></div>
+              <div class="card-body" style="display:flex;gap:8px;flex-wrap:wrap;">
+                <a class="btn btn-primary" href="tender.html">进入招投标</a>
+                <a class="btn" href="purchase-orders.html">进入采购订单</a>
+                <a class="btn" href="contract-list.html">查看合同</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    var d = SC.data.purchaseTaskDecomposition;
+    var GROUP_COLORS = { A: '#3b82f6', B: '#8b5cf6', C: '#10b981', D: '#f59e0b', E: '#ef4444' };
+    function groupColor(g) { return GROUP_COLORS[g] || '#9ca3af'; }
+    function routeColor(r) { return r === '招采' ? 'blue' : r === '直采' ? 'teal' : r === '合同采购' ? 'green' : 'gray'; }
+    function priorityColor(p) { return p === '紧急' ? 'red' : p === '高' ? 'amber' : 'gray'; }
+    function fulfillColor(f) {
+      if (f === '外委检修') return 'red';
+      if (f === '直达设备' || f === '直达材料') return 'amber';
+      if (f === '外购代储') return 'teal';
+      return 'gray';
+    }
+
+    SC.layout({
+      page: 'purchase-task-decomposition',
+      crumbs: ['采购协同', '采购任务分解'],
+      title: '采购任务分解',
+      desc: '对齐详设 04 V1.1：P-03 计划行 → P-05 采购任务，按业务流向 + 路径 + 管控分流（含合并/拆分案例）',
+      actions: [{ label: '分解规则配置' }, { label: '确认生成 P-05', primary: true }],
+    });
+
+    /* KPI */
+    document.getElementById('task-kpis').innerHTML = d.kpis.map(function (k) {
+      return '<div class="kpi"><div class="label">' + k.label + '</div><div class="value">' + k.value + '</div><div class="trend">' + k.trend + '</div></div>';
+    }).join('');
+
+    /* 来源计划面板 */
+    var plan = d.sourcePlan;
+    document.getElementById('source-plan').innerHTML = [
+      ['计划编号', plan.code],
+      ['计划名称', plan.name],
+      ['计划状态', SC.badge(plan.state, 'green', true)],
+      ['审批时间', plan.approvedAt],
+      ['计划金额', SC.fmtMoney(plan.amount)],
+    ].map(function (item) {
+      return '<div class="source-item"><div class="label">' + item[0] + '</div><div class="value">' + item[1] + '</div></div>';
+    }).join('');
+
+    /* 案例卡片 */
+    document.getElementById('case-grid').innerHTML = d.cases.map(function (c) {
+      return '<div class="case-card ' + c.kind + '" data-group="' + c.group + '">' +
+        '<div class="case-label">' + (c.kind === 'merge' ? '◢ 合并案例' : '◣ 拆分案例') + '</div>' +
+        '<div class="case-title">' + c.title + '</div>' +
+        '<div class="case-body">' + c.body + '</div>' +
+      '</div>';
+    }).join('');
+
+    /* 计划行表 */
+    document.getElementById('plan-line-tbody').innerHTML = d.planLines.map(function (p) {
+      return '<tr data-group="' + p.mergeGroup + '" style="--row-color:' + groupColor(p.mergeGroup) + ';">' +
+        '<td><span class="grp-mark" style="background:' + groupColor(p.mergeGroup) + ';"></span></td>' +
+        '<td><input type="checkbox" checked></td>' +
+        '<td class="code">' + p.line + '</td>' +
+        '<td class="muted">' + p.source + '</td>' +
+        '<td>' + p.org + '</td>' +
+        '<td>' + p.material + '</td>' +
+        '<td class="num">' + SC.fmtMoney(p.amount) + '</td>' +
+        '<td>' + SC.badge(p.suggested, p.color, true) + '</td>' +
+        '<td class="muted" style="font-size:11px;">' + p.reason + '</td>' +
+        '<td class="code">' + p.task + '</td>' +
+      '</tr>';
+    }).join('');
+
+    /* 任务表 */
+    document.getElementById('task-tbody').innerHTML = d.tasks.map(function (t) {
+      return '<tr data-group="' + t.mergeGroup + '" style="--row-color:' + groupColor(t.mergeGroup) + ';">' +
+        '<td><span class="grp-mark" style="background:' + groupColor(t.mergeGroup) + ';"></span></td>' +
+        '<td class="code">' + t.code + '</td>' +
+        '<td>' + t.name + '<div class="muted" style="font-size:11px;">' + t.control + '</div></td>' +
+        '<td class="muted" style="font-size:11px;"><span class="code">' + t.sourceLines + '</span><div>' + t.orgScope + '</div></td>' +
+        '<td class="num">' + SC.fmtMoney(t.amount) + '</td>' +
+        '<td>' + SC.badge(t.route, routeColor(t.route), true) + '</td>' +
+        '<td>' + SC.badge(t.fulfillment, fulfillColor(t.fulfillment), true) + '</td>' +
+        '<td class="muted">' + t.deliverDeadline + '</td>' +
+        '<td>' + SC.badge(t.priority, priorityColor(t.priority), true) + '</td>' +
+        '<td class="muted" style="font-size:11px;">' + t.supplierScope + '</td>' +
+        '<td class="muted" style="font-size:11px;">' + t.nextDoc + '</td>' +
+        '<td>' + SC.badge(t.state, t.color, true) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    /* 分解规则 */
+    document.getElementById('split-rules').innerHTML = d.rules.map(function (r) {
+      return '<div class="rule-card"><strong>' + r.title + '</strong><span class="muted">' + r.desc + '</span></div>';
+    }).join('');
+
+    /* 路径分流 */
+    document.getElementById('route-summary').innerHTML = d.routeSummary.map(function (r) {
+      return '<div class="route-item">' +
+        '<div class="top"><span>' + SC.badge(r.route, routeColor(r.route), true) + '</span><span class="amount">' + SC.fmtMoney(r.amount) + '</span></div>' +
+        '<div class="muted">' + r.count + ' 个任务 · ' + r.next + '</div>' +
+      '</div>';
+    }).join('');
+
+    /* 留痕 timeline */
+    document.getElementById('audit-trail').innerHTML = d.auditTrail.map(function (a) {
+      return '<div class="step ' + a.state + '"><div class="title">' + a.title + '</div><div class="meta">' + a.who + ' · ' + a.time + '</div><div class="comment">' + a.comment + '</div></div>';
+    }).join('');
+
+    /* hover 联动：同 group 高亮 */
+    document.querySelectorAll('[data-group]').forEach(function (el) {
+      el.addEventListener('mouseenter', function () {
+        var g = el.dataset.group;
+        document.querySelectorAll('[data-group="' + g + '"]').forEach(function (ee) { ee.classList.add('grp-active'); });
+      });
+      el.addEventListener('mouseleave', function () {
+        var g = el.dataset.group;
+        document.querySelectorAll('[data-group="' + g + '"]').forEach(function (ee) { ee.classList.remove('grp-active'); });
+      });
+    });
+  </script>
+</body>
+</html>

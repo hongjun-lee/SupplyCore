@@ -85,6 +85,108 @@ SC.data = {
     ],
   },
 
+  /* 采购计划汇总、采购任务与标包编排（对齐 04 · P-02/P-03/P-05/T-01/T-03/T-07） */
+  purchasePlanning: {
+    kpis: [
+      { label: '本月已审需求', value: '126', trend: '纳入计划 118 · 待汇总 8' },
+      { label: '采购计划', value: '12', trend: '已审 9 · 待审 3' },
+      { label: '采购任务', value: '34', trend: '招采 14 · 直采 12 · 合同采购 8' },
+      { label: '待编排标包', value: '6', trend: '含 2 个公开招标包' },
+    ],
+    flow: [
+      { no: 1, title: '基层需求审批通过', entity: 'P-01/P-06', desc: '区队、厂矿提交需求，经审批后进入待汇总池。' },
+      { no: 2, title: '物资部门汇总计划', entity: 'P-02/P-03', desc: '按月份、组织、物料、业务流向聚合；计划审批后锁定。' },
+      { no: 3, title: '分解采购任务', entity: 'P-05', desc: '计划行拆成采购任务，确定招采、直采或合同采购路径。' },
+      { no: 4, title: '标包编排 / 招标申请', entity: 'T-01/T-03/T-07', desc: '同类、同周期、同方式可打包；跨专业或不同路径拆包。' },
+      { no: 5, title: '招采平台执行', entity: 'T-04/T-06', desc: '系统生成采购文件并归档；开评标在能源集团招采平台完成。' },
+      { no: 6, title: '结果回传与合同', entity: 'T-05/C-02', desc: '中标结果验证后生成合同，标包结案。' },
+      { no: 7, title: '采购申请与订单', entity: 'S-01/S-02', desc: '合同或直采路径生成采购申请和采购订单，进入到货入库。' },
+    ],
+    planLines: [
+      { line: 'PP-202605-001-01', source: 'XQ-2026-0421 / XQ-2026-0427', org: '艾友矿 + 东梁矿', material: '综采 / 掘进备件', amount: 150620, method: '公开采购', route: '招采', state: '待编包', color: 'amber' },
+      { line: 'PP-202605-001-02', source: 'XQ-2026-0423', org: '东梁矿', material: '安全监测设备', amount: 158600, method: '应招标', route: '招采', state: '已生成标包', color: 'blue' },
+      { line: 'PP-202605-001-03', source: 'XQ-2026-0426', org: '五龙矿', material: '火工品月度补充', amount: 24800, method: '竞争性采购', route: '直采', state: '待采购申请', color: 'gray' },
+      { line: 'PP-202605-001-04', source: 'ZL-2026-0215', org: '新邱矿', material: '通风机续租', amount: 12500, method: '合同采购', route: '合同采购', state: '关联合同', color: 'green' },
+      { line: 'PP-202605-001-05', source: 'WX-2026-042', org: '东梁矿', material: '掘进机外委检修', amount: 120000, method: '应招标 / 外委检修', route: '招采', state: '外委审批中', color: 'red' },
+    ],
+    packages: [
+      { code: 'TB-2026-0501', name: '5 月综采与掘进备件采购包', method: '公开采购', lines: 2, amount: 150620, supplierRule: '合格供应商 ≥ 3', state: '待发标', color: 'amber' },
+      { code: 'TB-2026-0502', name: '东梁矿安全监测设备直达包', method: '应招标', lines: 1, amount: 158600, supplierRule: '目录外直达已走 WF-DIR-001', state: '招标申请待审', color: 'blue' },
+      { code: 'TB-2026-0503', name: '掘进机 EBZ200 外委检修包', method: '应招标 / 外委检修', lines: 1, amount: 120000, supplierRule: 'WF-RPR-001 + SENS-CON-004', state: '外委审批中', color: 'red' },
+    ],
+    routeRules: [
+      { rule: '先计划后采购', desc: '除紧急采购外，S-01/S-02 必须继承已审 P-02/P-05 来源。' },
+      { rule: '能合则合', desc: '同月、同类、同采购方式、同交付周期的计划行可合并成同一标包。' },
+      { rule: '该拆则拆', desc: '不同采购方式、不同专业控制、不同供应商范围或不同合同路径应拆包。' },
+      { rule: '反规避', desc: '同单位同物料 30 天累计超过阈值时，触发化整为零嫌疑预警。' },
+      { rule: '平台边界', desc: '本系统编排和归档，开标、投标、评标仍在能源集团招采平台完成。' },
+    ],
+  },
+
+  /* 采购任务分解（对齐 04 V1.1 · P-03 → P-05 → T-01/S-01；含合并/拆分案例 + 业务流向 + 交付期 + 紧急度 + 供应商或合同范围 + mergeGroup 联动色块） */
+  purchaseTaskDecomposition: {
+    kpis: [
+      { label: '待分解计划行', value: '18', trend: '本批 6 条 → 5 任务（含 1 合并）' },
+      { label: '本批生成任务', value: '5', trend: 'P-05 草稿 · 待计划员确认' },
+      { label: '进入招采路径', value: '3', trend: '42.9 万 · 生成 T-01 / T-03' },
+      { label: '直采或合同', value: '2', trend: '3.7 万 · 生成 S-01 / S-02' },
+    ],
+    sourcePlan: {
+      code: 'PP-202605-001',
+      name: '2026 年 5 月第一批采购计划',
+      state: '已审',
+      approvedAt: '2026-05-07 17:42',
+      owner: '集团物资部 · 计划员',
+      amount: 466520,
+    },
+    cases: [
+      {
+        kind: 'merge',
+        group: 'A',
+        title: '合并案例 — PT-202605-001 把两条计划行合一',
+        body: 'PP-202605-001-01a（艾友矿综采备件 9.56 万）+ PP-202605-001-01b（东梁矿掘进备件 5.5 万）同月、同类、同采购方式、同交付周期，按"能合则合"合并为单个 P-05 任务，进入同一标包（TB-2026-0501），减少标包数量、降低采购管理成本。',
+      },
+      {
+        kind: 'split',
+        group: 'E',
+        title: '拆分案例 — PT-202605-005 外委检修独立成任务',
+        body: 'PP-202605-001-05（掘进机 EBZ200 外委检修 12 万）虽属招采金额段，但外委检修属特殊管控（WF-RPR-001 + 40% 原值上限校验 + SENS-CON-004 高敏感留痕），按"按管控拆分"独立成单任务，不与其他备件合包。',
+      },
+    ],
+    planLines: [
+      { line: 'PP-202605-001-01a', source: 'XQ-2026-0421 综采备件', org: '艾友矿', material: '综采备件', amount: 95620, suggested: '招采', reason: '与 01b 同月同类、同采购方式，建议合并', task: 'PT-202605-001', mergeGroup: 'A', color: 'blue' },
+      { line: 'PP-202605-001-01b', source: 'XQ-2026-0427 掘进备件', org: '东梁矿', material: '掘进备件', amount: 55000, suggested: '招采', reason: '与 01a 同月同类、同采购方式，建议合并', task: 'PT-202605-001', mergeGroup: 'A', color: 'blue' },
+      { line: 'PP-202605-001-02', source: 'XQ-2026-0423', org: '东梁矿', material: '安全监测设备', amount: 158600, suggested: '招采', reason: '专业属性独立、目录外直达，按管控独立成任务', task: 'PT-202605-002', mergeGroup: 'B', color: 'blue' },
+      { line: 'PP-202605-001-03', source: 'XQ-2026-0426', org: '五龙矿', material: '火工品月度补充', amount: 24800, suggested: '直采', reason: '低额月度补充、火工品专管，路径独立', task: 'PT-202605-003', mergeGroup: 'C', color: 'teal' },
+      { line: 'PP-202605-001-04', source: 'ZL-2026-0215', org: '新邱矿', material: '通风机续租', amount: 12500, suggested: '合同采购', reason: '已有续租合同 C-02-2024-0188，关联合同直发申请', task: 'PT-202605-004', mergeGroup: 'D', color: 'green' },
+      { line: 'PP-202605-001-05', source: 'WX-2026-042', org: '东梁矿', material: '掘进机外委检修', amount: 120000, suggested: '招采', reason: '外委检修按管控独立（WF-RPR-001 + 40% 上限）', task: 'PT-202605-005', mergeGroup: 'E', color: 'red' },
+    ],
+    tasks: [
+      { code: 'PT-202605-001', name: '5 月综采与掘进备件采购任务', sourceLines: 'PP-202605-001-01a + 01b（合并）', orgScope: '艾友矿 + 东梁矿', amount: 150620, route: '招采', fulfillment: '外购入库', deliverDeadline: '2026-06-30', priority: '普通', supplierScope: '合格供应商 ≥ 3 家（沈阳安泰 / 辽宁中煤 / 抚顺电缆）', nextDoc: 'T-01 招标申请 / T-03 标包', state: '待编包', color: 'amber', control: '合格供应商 ≥ 3；同类备件可合包', mergeGroup: 'A' },
+      { code: 'PT-202605-002', name: '东梁矿安全监测设备采购任务', sourceLines: 'PP-202605-001-02', orgScope: '东梁矿', amount: 158600, route: '招采', fulfillment: '直达设备', deliverDeadline: '2026-06-15', priority: '高', supplierScope: '目录外直达（已 WF-DIR-001 通过）+ 公开招采', nextDoc: 'T-01 招标申请 / T-03 标包', state: '招标申请待审', color: 'blue', control: '目录外直达已触发 WF-DIR-001', mergeGroup: 'B' },
+      { code: 'PT-202605-003', name: '五龙矿火工品月度补充采购任务', sourceLines: 'PP-202605-001-03', orgScope: '五龙矿', amount: 24800, route: '直采', fulfillment: '外购入库', deliverDeadline: '2026-05-25', priority: '紧急', supplierScope: '阜新本地协作单位（火工品专管目录内）', nextDoc: 'S-01 采购申请 / S-02 订单', state: '待采购申请', color: 'gray', control: '安全部门会签；不进入标包', mergeGroup: 'C' },
+      { code: 'PT-202605-004', name: '新邱矿通风机续租采购任务', sourceLines: 'PP-202605-001-04', orgScope: '新邱矿', amount: 12500, route: '合同采购', fulfillment: '外购代储', deliverDeadline: '2026-05-31', priority: '普通', supplierScope: '关联合同 C-02-2024-0188（沈阳通风设备）', nextDoc: 'S-01 采购申请 / 合同执行', state: '关联合同', color: 'green', control: '引用 C-02 合同与租赁条款', mergeGroup: 'D' },
+      { code: 'PT-202605-005', name: '掘进机 EBZ200 外委检修采购任务', sourceLines: 'PP-202605-001-05', orgScope: '东梁矿', amount: 120000, route: '招采', fulfillment: '外委检修', deliverDeadline: '2026-06-10', priority: '紧急', supplierScope: '集团合格外委单位 ≥ 2（太原重工 / 西安重工）', nextDoc: 'T-01 招标申请 / T-03 标包', state: '外委审批中', color: 'red', control: 'WF-RPR-001 + 40% 原值上限校验 + SENS-CON-004', mergeGroup: 'E' },
+    ],
+    routeSummary: [
+      { route: '招采', count: 3, amount: 429220, next: '生成 T-01，再按 T-03/T-07 编包' },
+      { route: '直采', count: 1, amount: 24800, next: '生成 S-01，审批后生成 S-02' },
+      { route: '合同采购', count: 1, amount: 12500, next: '关联合同 C-02，生成 S-01/S-02' },
+    ],
+    rules: [
+      { title: '按路径拆分', desc: '招采、直采、合同采购不能混在同一 P-05 任务里。' },
+      { title: '按管控拆分', desc: '火工品、外委检修、直达例外等特殊控制单独成任务。' },
+      { title: '可合并任务', desc: '同月、同类、同交付周期、同采购方式的计划行可合并。' },
+      { title: '来源可追溯', desc: 'P-05 必须保留 P-02/P-03 来源，后续 T-07/S-22 回填。' },
+    ],
+    auditTrail: [
+      { state: 'done', title: '采购计划审批通过', who: '供应链管理委员会', time: '2026-05-07 17:42', comment: 'P-02 状态由待审转为已审，P-03 计划行锁定。' },
+      { state: 'done', title: '系统预分解', who: '系统规则引擎', time: '2026-05-08 09:12', comment: '按采购方式、物资类别、金额阈值、合同可用性、业务流向生成 5 个 P-05 草稿（含 1 合并 + 1 特殊拆分）。' },
+      { state: 'current', title: '计划员确认分解', who: '集团物资部 · 计划员', time: '待处理', comment: '确认合包 / 拆包、路径分流和特殊审批后，生成正式采购任务。' },
+      { state: 'pending', title: '后续单据生成', who: '系统 + 采购员', time: '—', comment: '招采任务生成 T-01/T-03；直采和合同采购生成 S-01/S-02。' },
+    ],
+  },
+
   /* 采购订单（对齐 04 / S-23） */
   purchaseOrders: [
     { code: 'CG-2026-0312', supplier: '沈阳安泰电子有限公司', src: 'XQ-2026-0419',

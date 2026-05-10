@@ -30,6 +30,8 @@ SC.nav = [
     { id: 'mobile-stocktake',  href: 'mobile-stocktake.html',   label: '移动端盘点（演示）', icon: '▢' },
   ]},
   { title: '采购协同', items: [
+    { id: 'purchase-planning', href: 'purchase-planning.html', label: '采购计划编排', icon: '☷' },
+    { id: 'purchase-task-decomposition', href: 'purchase-task-decomposition.html', label: '采购任务分解', icon: '⇢' },
     { id: 'tender',            href: 'tender.html',             label: '招投标', icon: '◐' },
     { id: 'tender-archive',    href: 'tender-archive.html',     label: '招投标归档', icon: '▣' },
   ]},

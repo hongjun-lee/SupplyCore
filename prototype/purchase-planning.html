@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>采购计划编排 — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .proc-flow {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(120px, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+    .proc-step {
+      position: relative;
+      min-height: 130px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .proc-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      font-weight: 600;
+      z-index: 1;
+    }
+    .proc-step .num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--brand);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .proc-step .name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.35;
+    }
+    .proc-step .entity {
+      font-size: 11px;
+      color: var(--brand);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .proc-step .desc {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+    .route-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 10px;
+    }
+    .route-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      background: #fafbfd;
+      font-size: 12px;
+    }
+    .route-card strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+    @media (max-width: 1200px) {
+      .proc-flow { grid-template-columns: 1fr; }
+      .proc-step:not(:last-child)::after { display: none; }
+      .route-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 700px) {
+      .route-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="kpi-grid" id="planning-kpis"></div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="title">全流程图：需求审批后如何进入采购</div>
+            <div class="actions">
+              <a class="btn btn-sm" href="requirement-list.html">需求计划</a>
+              <a class="btn btn-sm" href="tender.html">招投标</a>
+              <a class="btn btn-sm" href="purchase-orders.html">采购订单</a>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="proc-flow" id="proc-flow"></div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">采购计划行汇总（P-03）</div>
+                <div class="actions">
+                  <button class="btn">计划调整</button>
+                  <a class="btn btn-primary" href="purchase-task-decomposition.html">生成采购任务</a>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>计划行</th>
+                    <th>来源需求</th>
+                    <th>单位</th>
+                    <th>物资范围</th>
+                    <th class="num">预算金额</th>
+                    <th>采购方式</th>
+                    <th>路径</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody id="plan-lines"></tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="title">标包编排（T-03 / T-07）</div>
+                <div class="actions">
+                  <button class="btn">拆分标包</button>
+                  <button class="btn btn-primary">生成招标申请</button>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>标包编号</th>
+                    <th>标包名称</th>
+                    <th>采购方式</th>
+                    <th class="num">计划行</th>
+                    <th class="num">预算金额</th>
+                    <th>供应商 / 审批规则</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody id="packages"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">打包与分流规则</div></div>
+              <div class="card-body">
+                <div class="route-grid" id="route-rules"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">系统判断逻辑</div></div>
+              <div class="card-body" style="font-size:12px;color:var(--text-2);">
+                <div class="timeline">
+                  <div class="step done">
+                    <div class="title">需求不是直接招标</div>
+                    <div class="comment">基层需求审批通过后先进入计划池，由物资部门按月度节点汇总。</div>
+                  </div>
+                  <div class="step done">
+                    <div class="title">采购计划审批后才能分解</div>
+                    <div class="comment">P-02 审批通过后，P-03 计划行才允许生成 P-05 采购任务。</div>
+                  </div>
+                  <div class="step current">
+                    <div class="title">P-05 决定路径</div>
+                    <div class="comment">采购任务按金额阈值、物资类别、合同可用性、业务流向决定走招采、直采或合同采购。</div>
+                  </div>
+                  <div class="step">
+                    <div class="title">招采路径再打包</div>
+                    <div class="comment">只有进入招采路径的任务才创建 T-01，并按标包规则生成 T-03/T-07。</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+                <span class="badge blue dot">边界</span>
+                <div class="text-2">
+                  本页表达物资系统的计划、任务、标包和采购文件编排；开标、投标、评标仍在能源集团招采平台完成，结果回传后再联动合同与采购订单。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    var d = SC.data.purchasePlanning;
+    SC.layout({
+      page: 'purchase-planning',
+      crumbs: ['采购协同', '采购计划编排'],
+      title: '采购计划与标包编排',
+      desc: '对齐详设 04 V1.1：P-02/P-03 采购计划、P-05 采购任务、T-01/T-03/T-07 招采标包',
+      actions: [{ label: '导出计划' }, { label: '生成招标申请', primary: true }],
+    });
+
+    document.getElementById('planning-kpis').innerHTML = d.kpis.map(function (k) {
+      return '<div class="kpi">' +
+        '<div class="label">' + k.label + '</div>' +
+        '<div class="value">' + k.value + '</div>' +
+        '<div class="trend">' + k.trend + '</div>' +
+      '</div>';
+    }).join('');
+
+    document.getElementById('proc-flow').innerHTML = d.flow.map(function (s) {
+      return '<div class="proc-step">' +
+        '<span class="num">' + s.no + '</span>' +
+        '<div class="name">' + s.title + '</div>' +
+        '<div class="entity">' + s.entity + '</div>' +
+        '<div class="desc">' + s.desc + '</div>' +
+      '</div>';
+    }).join('');
+
+    document.getElementById('plan-lines').innerHTML = d.planLines.map(function (p) {
+      return '<tr>' +
+        '<td class="code">' + p.line + '</td>' +
+        '<td class="muted">' + p.source + '</td>' +
+        '<td>' + p.org + '</td>' +
+        '<td>' + p.material + '</td>' +
+        '<td class="num">' + SC.fmtMoney(p.amount) + '</td>' +
+        '<td><span class="badge gray">' + p.method + '</span></td>' +
+        '<td>' + p.route + '</td>' +
+        '<td>' + SC.badge(p.state, p.color, true) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('packages').innerHTML = d.packages.map(function (p) {
+      return '<tr>' +
+        '<td class="code">' + p.code + '</td>' +
+        '<td>' + p.name + '</td>' +
+        '<td><span class="badge gray">' + p.method + '</span></td>' +
+        '<td class="num">' + p.lines + '</td>' +
+        '<td class="num">' + SC.fmtMoney(p.amount) + '</td>' +
+        '<td class="muted">' + p.supplierRule + '</td>' +
+        '<td>' + SC.badge(p.state, p.color, true) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('route-rules').innerHTML = d.routeRules.map(function (r) {
+      return '<div class="route-card"><strong>' + r.rule + '</strong><span>' + r.desc + '</span></div>';
+    }).join('');
+  </script>
+</body>
+</html>
