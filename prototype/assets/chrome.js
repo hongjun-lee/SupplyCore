@@ -81,6 +81,50 @@ SC.layout = function (opts) {
   SC.renderDemoFlow(opts);
   SC.bindRoleSwitch();
   SC.renderFooter();
+  SC.mountEngineDock();
+};
+
+/* 底部引擎面板抽屉（v0.17 仿 DevTools dock）
+ * 自动识别页内"📡 档 A 引擎接入"卡片（蓝/黄两色 inline style 标记）→ 移到底部固定 dock
+ * 默认收起 36px 状态条，点击展开 45vh 可滚动 */
+SC.mountEngineDock = function () {
+  if (document.getElementById('engine-dock')) return;
+  const all = document.querySelectorAll('#page-area .card');
+  const panels = Array.from(all).filter(c => {
+    const s = (c.getAttribute('style') || '').replace(/\s+/g, '').toLowerCase();
+    return (s.includes('border-left:4pxsolidvar(--brand)') && s.includes('background:#f0f7ff')) ||
+           (s.includes('border-left:4pxsolidvar(--amber)') && s.includes('background:#fffbf3'));
+  });
+  if (panels.length === 0) return;
+
+  const dock = document.createElement('div');
+  dock.id = 'engine-dock';
+  dock.dataset.expanded = '0';
+  dock.innerHTML = `
+    <div class="engine-dock-bar" id="engine-dock-bar">
+      <span class="engine-dock-icon">📡</span>
+      <span class="engine-dock-title">档 A 引擎面板</span>
+      <span class="engine-dock-count" id="engine-dock-count">${panels.length} 个</span>
+      <span class="engine-dock-hint">演示工具 · 业务视图请收起</span>
+      <span class="engine-dock-toggle" id="engine-dock-toggle">展开 ↑</span>
+    </div>
+    <div class="engine-dock-body" id="engine-dock-body"></div>
+  `;
+  document.body.appendChild(dock);
+
+  const body = document.getElementById('engine-dock-body');
+  panels.forEach(p => {
+    // 移走引擎面板自身的 sticky-friendly inline 边框（保留 4px 左色条作为视觉分隔）
+    body.appendChild(p);
+  });
+
+  const bar = document.getElementById('engine-dock-bar');
+  const toggle = document.getElementById('engine-dock-toggle');
+  bar.addEventListener('click', function () {
+    const expanded = dock.dataset.expanded === '1';
+    dock.dataset.expanded = expanded ? '0' : '1';
+    toggle.textContent = expanded ? '展开 ↑' : '收起 ↓';
+  });
 };
 
 SC.demoFlow = [
