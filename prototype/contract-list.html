@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>合同管理 — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -12,11 +13,44 @@
     <div class="app-main">
       <div id="page-area">
 
-        <div class="kpi-grid">
-          <div class="kpi"><div class="label">在执行合同</div><div class="value">3</div><div class="trend">含 1 框架协议</div></div>
-          <div class="kpi"><div class="label">本月合同金额</div><div class="value">¥ 414 万</div><div class="trend up">较上月 ↑ 8.2%</div></div>
-          <div class="kpi"><div class="label">付款节点临期</div><div class="value" style="color:var(--amber)">5</div><div class="trend">7 日内需付款</div></div>
-          <div class="kpi"><div class="label">外委超限</div><div class="value" style="color:var(--red)">1</div><div class="trend">触发 SENS-CON-004</div></div>
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 05 V1.1 §4.2.1 合同主页 + C-02 合同 8 状态机 + 详设 11 §13 高敏感留痕（SENS-CON-003 / SENS-CON-004）。<br>
+            <strong>🛤 链路：</strong>T-05 中标 → C-01 会签 → C-02 草稿 → 会签中 → 已签 → 执行中 → 已完成 / 已变更 / 已终止 (8 状态)；外委合同 → 40% 原值上限校验 (WF-CON-OVERLIMIT-001) → SENS-CON-004 高敏感留痕；履约保证金没收 → SENS-CON-003。<br>
+            <strong>🛡 四层付款控制：</strong>C-04 付款节点 → C-05 付款计划 → C-08 付款申请 → C-07 付款执行（防止超付 / 抢付 / 错付）。
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="cl-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · C-02 合同 8 状态机</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineCreateC02()">+ 创建草稿合同</button>
+              <button class="btn btn-sm" onclick="engineSimulateLifecycle()">▶ 模拟全生命周期（草稿 → 已完成）</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>合同号</th>
+                  <th>供应商</th>
+                  <th class="num">金额</th>
+                  <th class="num">已执行 / 已付</th>
+                  <th>状态</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-c02-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              草稿 → 提交会签 → 会签中 → 会签通过 → 已签 → 执行 → 执行中 → (完成 / 发起变更 / 终止) ; C-02:已签 linkage 自动初始化 executed_amount=0 / paid_amount=0。
+            </div>
+          </div>
         </div>
 
         <div class="card">
@@ -31,11 +65,13 @@
               </select>
             </div>
             <div class="form-field"><label>状态</label>
-              <select>
-                <option>全部</option><option>草稿</option><option>会签中</option>
-                <option>待签订</option><option>执行中</option><option>已完成</option><option>已终止</option>
+              <select id="ct-filter-state">
+                <option value="">全部</option>
+                <option>草稿</option><option>会签中</option>
+                <option>已签</option><option>执行中</option>
+                <option>已完成</option><option>已变更</option><option>已终止</option>
               </select>
-              <small class="muted" style="margin-top:2px;">字段：contract_state（C-01 8 状态机）</small>
+              <small class="muted" style="margin-top:2px;">字段：C-02 8 状态机</small>
             </div>
             <div class="filter-actions">
               <button class="btn">重置</button>
@@ -44,7 +80,7 @@
           </div>
 
           <div class="card-header">
-            <div class="title">合同列表</div>
+            <div class="title">合同列表（演示样例 + SC.store 真实合同合并展示）</div>
             <div class="actions">
               <button class="btn">导出</button>
               <button class="btn">合同模板</button>
@@ -72,11 +108,28 @@
           </table>
         </div>
 
-        <div class="card">
-          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
-            <span class="badge blue dot">说明</span>
-            <div class="text-2">
-              <strong>四层付款控制链路：</strong>合同付款节点 (C-04) → 付款计划 (C-05) → 付款申请 (C-06) → 付款执行 (C-07)。外委检修合同额原则上不超过设备原值 40%，超限触发 WF-CON-OVERLIMIT-001 + SENS-CON-004；履约保证金没收纳入 SENS-CON-003。详见《05-合同与资金详细设计 V1.1》。
+        <div class="cols-2">
+          <div class="card">
+            <div class="card-header"><div class="title">⚖ C-02 8 状态机详细规则（详设 05 §4.2.1）</div></div>
+            <div class="card-body" style="font-size:12px;line-height:1.7;">
+              <strong>1️⃣ 草稿 → 会签中：</strong>采购员发起会签 (法务 + 财务 + 业务负责人)<br>
+              <strong>2️⃣ 会签中 → 已签：</strong>会签全部通过 + 双方电子签章 (NC-MD-007 同步)<br>
+              <strong>3️⃣ 会签中 → 草稿：</strong>会签驳回，回滚至草稿态 (允许修改后重提)<br>
+              <strong>4️⃣ 已签 → 执行中：</strong>合同生效日到 / 首笔订单触发<br>
+              <strong>5️⃣ 执行中 → 已完成：</strong>验收 + 付款 + 履约保证金退还全部完成<br>
+              <strong>6️⃣ 执行中 → 已变更：</strong>履行期间金额 / 期限 / 范围调整 (变更需按原会签流重走)<br>
+              <strong>7️⃣ 已变更 → 执行中：</strong>变更生效后回到执行态<br>
+              <strong>8️⃣ 执行中 → 已终止：</strong>违约 / 协商终止 (履约保证金按 SENS-CON-003 处理)
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="title">🛡 高敏感控制点</div></div>
+            <div class="card-body" style="font-size:12px;line-height:1.7;">
+              <strong>SENS-CON-003 履约保证金没收：</strong>合同终止 + 履约不达标 → 双签 (合规官 + 财务总监) + 副本归档 + 月度审计抽查<br>
+              <strong>SENS-CON-004 外委检修超限：</strong>外委检修合同金额 &gt; 设备原值 40% → WF-CON-OVERLIMIT-001 加签 + 季度内审重点抽查<br>
+              <strong>WF-CON-OVERLIMIT-001：</strong>超限合同自动加 2 级审批 (财务总监 + 总经理)<br>
+              <strong>支付控制：</strong>已付金额 &gt; 已执行金额 → 阻止 (防止抢付)；累计付款 &gt; 合同金额 → 阻止 (防止超付)
             </div>
           </div>
         </div>
@@ -88,37 +141,169 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
     SC.layout({
       page: 'contract-list',
       crumbs: ['合同与资金', '合同管理'],
-      title: '合同管理',
-      desc: '对齐《05-合同与资金详细设计 V1.1》— 合同 8 状态机、付款控制、履约保证金与外委检修上限',
-      actions: [{ label: '导出 Excel' }, { label: '+ 新建合同', primary: true }],
+      title: '合同管理（C-02 8 状态机主页）',
+      desc: '对齐《05 V1.1》— 8 状态机、四层付款控制、SENS-CON 高敏感留痕、外委 40% 原值上限',
     });
 
-    var tbody = document.getElementById('ct-tbody');
-    tbody.innerHTML = SC.data.contracts.map(function (c) {
-      var paidRatio = c.amount > 0 ? Math.round(c.paid / c.amount * 100) : 0;
-      return '<tr>' +
-        '<td class="code"><a href="contract-detail.html">' + c.code + '</a></td>' +
-        '<td>' + c.name + '</td>' +
-        '<td>' + c.supplier + '</td>' +
-        '<td><span class="badge gray">' + c.type + '</span></td>' +
-        '<td class="num">' + SC.fmtMoney(c.amount) + '</td>' +
-        '<td class="num">' + SC.fmtMoney(c.paid) + '<div class="muted" style="font-size:11px;">待付 ' + SC.fmtMoney(c.pendingPay) + '</div></td>' +
-        '<td class="muted">' + c.signed + '<br>' + c.expire + '</td>' +
-        '<td>' + (c.changeCount > 0
-          ? '<a href="contract-detail.html"><span class="badge ' + (c.hasPendingChange ? 'amber' : 'gray') + ' dot">' + c.changeCount + ' 次' + (c.hasPendingChange ? ' · 待审' : '') + '</span></a>'
-          : '<span class="muted">—</span>') + '</td>' +
-        '<td class="muted" style="max-width:220px;">' + (c.control || '—') + '</td>' +
-        '<td>' + SC.badge(c.state, c.color, true) + '</td>' +
-        '<td class="actions"><a href="contract-detail.html">查看</a>' +
-          (c.state === '执行中' ? '<a>付款申请</a>' : '') +
-          (c.state === '草稿' ? '<a>编辑</a>' : '') +
-        '</td>' +
-      '</tr>';
-    }).join('');
+    var supMap = {}; SC.store.list('M-09').forEach(function (s) { supMap[s.id] = s.name; });
+
+    function renderKpis() {
+      var contracts = SC.store.list('C-02');
+      var executing = contracts.filter(function (c) { return c.state === '执行中'; });
+      var totalAmt = contracts.reduce(function (a, c) { return a + (c.amount || 0); }, 0);
+      var paidAmt = contracts.reduce(function (a, c) { return a + (c.paid_amount || 0); }, 0);
+      var changing = contracts.filter(function (c) { return c.state === '已变更'; });
+      document.getElementById('cl-kpis').innerHTML = [
+        ['合同总数', contracts.length, '8 状态机'],
+        ['执行中', executing.length, '占 ' + (contracts.length ? Math.round(executing.length / contracts.length * 100) : 0) + '%'],
+        ['累计金额 / 已付', SC.fmtMoney(totalAmt), '已付 ' + SC.fmtMoney(paidAmt) + ' (' + (totalAmt ? Math.round(paidAmt / totalAmt * 100) : 0) + '%)'],
+        ['变更中', changing.length, '已变更待重新生效'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
+    }
+
+    function renderC02() {
+      var rows = SC.store.list('C-02').slice().reverse();
+      document.getElementById('engine-c02-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">无 C-02 · 点 + 创建草稿合同 或 ▶ 模拟全生命周期</td></tr>'
+        : rows.map(function (r) {
+            var events = SC.sm.getAllowedEvents('C-02', r);
+            var stateColor = r.state === '已完成' ? 'green' : r.state === '已终止' ? 'gray' :
+                             r.state === '执行中' ? 'blue' : r.state === '已变更' ? 'amber' :
+                             r.state === '已签' ? 'green' : r.state === '会签中' ? 'amber' : 'gray';
+            return '<tr>' +
+              '<td class="code">' + (r.contract_no || '#' + r.id) + '</td>' +
+              '<td>' + (supMap[r.supplier_id] || '—') + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.amount || 0) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.executed_amount || 0) + ' / ' + SC.fmtMoney(r.paid_amount || 0) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineC02(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function renderListTable() {
+      var sample = (SC.data && SC.data.contracts) || [];
+      var stored = SC.store.list('C-02');
+      var combined = sample.map(function (c) {
+        return {
+          isStatic: true,
+          code: c.code,
+          name: c.name,
+          supplier: c.supplier,
+          type: c.type,
+          amount: c.amount,
+          paid: c.paid,
+          pendingPay: c.pendingPay,
+          signed: c.signed,
+          expire: c.expire,
+          changeCount: c.changeCount,
+          hasPendingChange: c.hasPendingChange,
+          control: c.control,
+          state: c.state,
+          color: c.color,
+        };
+      }).concat(stored.map(function (r) {
+        return {
+          isStatic: false,
+          code: r.contract_no || ('C-02 #' + r.id),
+          name: r.contract_name || '档 A 引擎合同',
+          supplier: supMap[r.supplier_id] || '—',
+          type: r.contract_type || '物资订单',
+          amount: r.amount || 0,
+          paid: r.paid_amount || 0,
+          pendingPay: (r.amount || 0) - (r.paid_amount || 0),
+          signed: r.signed_date || '—',
+          expire: r.expire_date || '—',
+          changeCount: 0,
+          hasPendingChange: false,
+          control: '档 A 引擎演示',
+          state: r.state,
+          color: r.state === '执行中' ? 'blue' : r.state === '已签' ? 'green' : r.state === '已完成' ? 'green' : 'gray',
+        };
+      }));
+      var filterState = document.getElementById('ct-filter-state').value;
+      if (filterState) combined = combined.filter(function (c) { return c.state === filterState; });
+      document.getElementById('ct-tbody').innerHTML = combined.length === 0
+        ? '<tr><td colspan="11" class="muted" style="text-align:center;padding:18px;">无合同</td></tr>'
+        : combined.map(function (c) {
+            return '<tr>' +
+              '<td class="code">' + (c.isStatic ? '<a href="contract-detail.html">' + c.code + '</a>' : c.code) + (c.isStatic ? '' : ' <span class="badge blue" style="font-size:9px;">引擎</span>') + '</td>' +
+              '<td>' + c.name + '</td>' +
+              '<td>' + c.supplier + '</td>' +
+              '<td><span class="badge gray">' + c.type + '</span></td>' +
+              '<td class="num">' + SC.fmtMoney(c.amount) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(c.paid) + '<div class="muted" style="font-size:11px;">待付 ' + SC.fmtMoney(c.pendingPay) + '</div></td>' +
+              '<td class="muted">' + c.signed + '<br>' + c.expire + '</td>' +
+              '<td>' + (c.changeCount > 0
+                ? '<span class="badge ' + (c.hasPendingChange ? 'amber' : 'gray') + ' dot">' + c.changeCount + ' 次' + (c.hasPendingChange ? ' · 待审' : '') + '</span>'
+                : '<span class="muted">—</span>') + '</td>' +
+              '<td class="muted" style="max-width:220px;">' + (c.control || '—') + '</td>' +
+              '<td>' + SC.badge(c.state, c.color, true) + '</td>' +
+              '<td class="actions"><a href="contract-detail.html">查看</a></td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineCreateC02() {
+      var supplier = SC.store.list('M-09')[Math.floor(Math.random() * 5)];
+      SC.store.create('C-02', {
+        contract_no: SC.store.nextNo('HT'),
+        supplier_id: supplier.id,
+        amount: 200000 + Math.floor(Math.random() * 800000),
+        executed_amount: 0,
+        paid_amount: 0,
+        signed_date: new Date().toISOString().slice(0, 10),
+        state: '草稿',
+      });
+      SC.ui.toast('C-02 草稿合同已创建（' + supplier.name + '）', 'success');
+    }
+
+    function engineC02(id, event) {
+      try {
+        SC.sm.transition('C-02', id, event);
+        if (event === '会签通过') SC.ui.toast('C-02 #' + id + ' 已签 → linkage 初始化 executed/paid = 0', 'success');
+        else SC.ui.toast('C-02 #' + id + ' → ' + event, 'success');
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function engineSimulateLifecycle() {
+      engineCreateC02();
+      var rows = SC.store.list('C-02');
+      var last = rows[rows.length - 1];
+      if (!last) return;
+      var seq = ['提交会签', '会签通过', '执行', '完成'];
+      var i = 0;
+      function step() {
+        if (i >= seq.length) return;
+        try { SC.sm.transition('C-02', last.id, seq[i]); } catch (e) {}
+        i++;
+        if (i < seq.length) setTimeout(step, 500);
+        else SC.ui.toast('C-02 #' + last.id + ' 全生命周期完成', 'success');
+      }
+      setTimeout(step, 400);
+    }
+
+    document.getElementById('ct-filter-state').addEventListener('change', renderListTable);
+
+    function refresh() { renderKpis(); renderC02(); renderListTable(); }
+    SC.store.subscribe('C-02', refresh);
+    refresh();
   </script>
 </body>
 </html>

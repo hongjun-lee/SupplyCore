@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>资金计划 — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -12,40 +13,59 @@
     <div class="app-main">
       <div id="page-area">
 
-        <div class="kpi-grid">
-          <div class="kpi accent">
-            <div class="label">5 月资金计划合计</div>
-            <div class="value" id="kpi-total"></div>
-            <div class="trend">阜矿 · 全口径</div>
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 05 V1.1 §第 5 章 月度资金计划 + C-04 付款节点 + C-05 付款计划 + C-08 付款申请 + C-10 付款执行（对应 BIZ-013 NC 实付回写）+ E-13 租赁费用汇总。<br>
+            <strong>🛤 链路：</strong>合同 C-04 节点（按月）+ E-13 租赁月结费用 → 自动聚合月度资金计划 → 财务调整发布 → 物资公司 C-08 申请 → 财务审批 → 出纳 C-10 执行 → BIZ-013 NC 实付回写 → 月结对账 (F-12)。<br>
+            <strong>🛡 节奏控制：</strong>临期节点（7 日内）红色提示；待发起 → 5 日内未推进自动 emit ALR-CON-FUND-001。
           </div>
-          <div class="kpi">
-            <div class="label">已支付</div>
-            <div class="value" id="kpi-paid" style="color:var(--green);"></div>
-            <div class="trend up" id="kpi-paid-pct"></div>
+        </div>
+
+        <div class="kpi-grid" id="fp-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · C-08 付款申请实时聚合 + 临期 C-04 节点（&lt;= 7 日）</div>
+            <div class="actions">
+              <a href="payment-request.html" class="btn btn-sm">→ 付款申请</a>
+              <a href="payment-execution.html" class="btn btn-sm">→ 出纳工作台</a>
+              <button class="btn btn-sm btn-primary" onclick="engineCreateC08()">+ 模拟付款申请</button>
+            </div>
           </div>
-          <div class="kpi">
-            <div class="label">已批准·待付</div>
-            <div class="value" id="kpi-appr" style="color:var(--brand);"></div>
-            <div class="trend">含 1 项审批通过待付款</div>
-          </div>
-          <div class="kpi">
-            <div class="label">待发起申请</div>
-            <div class="value" id="kpi-pend" style="color:var(--amber);"></div>
-            <div class="trend down">含 5 项需于本月内推进</div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>申请号</th>
+                  <th>合同 / 节点</th>
+                  <th class="num">金额</th>
+                  <th>计划日期</th>
+                  <th>距临期</th>
+                  <th>状态</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-c08-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动</span>
+              C-08:已审 → 出纳工作台可见 → 执行付款 → C-10 创建 → 执行 → 记账完成 → linkage F-01 BIZ-013 → NC 实付回写。
+            </div>
           </div>
         </div>
 
         <div class="card">
           <div class="card-header">
-            <div class="title">月度执行率</div>
+            <div class="title">月度执行率（演示样例）</div>
             <div class="actions">
-              <button class="btn">切换至日历视图</button>
-              <button class="btn">切换至按供应商汇总</button>
+              <button class="btn btn-sm">切换至日历视图</button>
+              <button class="btn btn-sm">切换至按供应商汇总</button>
             </div>
           </div>
           <div class="card-body">
             <div class="bar"><div class="track"><div class="fill green" id="exec-fill" style="width:17%;"></div></div><div class="pct" id="exec-pct">17%</div></div>
-            <div class="text-2 mt-8" style="font-size:12px;">已支付占比；已批准·待付预计本周内执行；待发起项需在 5/10 前完成审批以保障付款节奏。</div>
+            <div class="text-2 mt-8" style="font-size:12px;">已支付占比；已批准·待付预计本周内执行；待发起项需在本月 10 日前完成审批以保障付款节奏。</div>
           </div>
         </div>
 
@@ -69,10 +89,10 @@
           </div>
 
           <div class="card-header">
-            <div class="title">按周分布（5 月共 5 周）</div>
+            <div class="title">按周分布（5 月共 5 周 · 演示样例）</div>
             <div class="actions">
-              <button class="btn">导出 Excel</button>
-              <button class="btn">提交月计划至财务</button>
+              <button class="btn btn-sm">导出 Excel</button>
+              <button class="btn btn-sm">提交月计划至财务</button>
             </div>
           </div>
 
@@ -80,12 +100,13 @@
         </div>
 
         <div class="card">
-          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
-            <span class="badge blue dot">说明</span>
-            <div class="text-2">
-              资金计划基于 <span class="font-mono">合同付款节点 (C-04)</span> 和 <span class="font-mono">租赁费用汇总 (E-13)</span> 自动生成，再由财务调整发布；
-              已支付项与 <span class="font-mono">付款执行 (C-07)</span> 双向回写，与 <span class="font-mono">NC 月结对账 (F-12)</span> 联动统计差异。详见《05》第 5 章。
-            </div>
+          <div class="card-header"><div class="title">⚖ 月度资金计划生成规则（详设 05 §5）</div></div>
+          <div class="card-body" style="font-size:12px;line-height:1.7;">
+            <strong>1️⃣ 数据来源：</strong>合同 C-04 节点（按月聚合应付）+ E-13 租赁月度费用汇总（A7 二期）+ 履约保证金到期退还（SENS-CON-003）<br>
+            <strong>2️⃣ 财务调整：</strong>财务部审核物资公司报送的月度计划 → 调整额度 / 节奏 → 发布至 C-05 付款计划<br>
+            <strong>3️⃣ 申请触发：</strong>临期 7 日 → 物资公司发起 C-08 付款申请 → 4 级审批（采购员 / 主任 / 财务总监 / 总经理 — 按金额分级）<br>
+            <strong>4️⃣ 付款执行：</strong>已审 → 出纳 C-10 执行 → 银行回单 → 记账完成 → BIZ-013 NC 实付回写<br>
+            <strong>5️⃣ 月结对账：</strong>本月已付 (C-10) vs NC 实付（F-12 月结）→ 差异自动 emit ALR-FIN-RECON-001
           </div>
         </div>
 
@@ -96,29 +117,120 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
     SC.layout({
       page: 'funding-plan',
       crumbs: ['合同与资金', '资金计划'],
-      title: '资金计划（5 月）',
-      desc: '对齐《05》— C-04 付款节点 + C-07 付款执行 + 月度资金视图',
-      actions: [{ label: '导出' }, { label: '提交至财务', primary: true }],
+      title: '资金计划（C-04 → C-08 → C-10）',
+      desc: '对齐《05 V1.1》§5 — 月度聚合 + C-08 实时申请 + 临期节点提示',
     });
 
-    var p = SC.data.fundingPlan;
-    document.getElementById('kpi-total').textContent = '¥ ' + (p.totalPlan / 10000).toFixed(1) + ' 万';
-    document.getElementById('kpi-paid').textContent  = '¥ ' + (p.totalPaid / 10000).toFixed(1) + ' 万';
-    document.getElementById('kpi-appr').textContent  = '¥ ' + (p.totalApproved / 10000).toFixed(1) + ' 万';
-    document.getElementById('kpi-pend').textContent  = '¥ ' + (p.totalPending / 10000).toFixed(1) + ' 万';
-    var pct = Math.round(p.totalPaid / p.totalPlan * 100);
-    document.getElementById('exec-fill').style.width = pct + '%';
-    document.getElementById('exec-pct').textContent = pct + '%';
-    document.getElementById('kpi-paid-pct').textContent = '占月计划 ' + pct + '%';
+    var supMap = {}; SC.store.list('M-09').forEach(function (s) { supMap[s.id] = s.name; });
+    var contractMap = {}; SC.store.list('C-02').forEach(function (c) { contractMap[c.id] = c; });
 
+    /* 演示样例数据保留（用于按周分布） */
+    var p = SC.data.fundingPlan;
+
+    function renderKpis() {
+      var c08 = SC.store.list('C-08');
+      var c10 = SC.store.list('C-10');
+      var planTotal = p.totalPlan;
+      var paidTotal = p.totalPaid + c10.filter(function (r) { return r.state === '已记账'; }).reduce(function (a, r) { return a + (r.amount || 0); }, 0);
+      var apprTotal = p.totalApproved + c08.filter(function (r) { return r.state === '已审'; }).reduce(function (a, r) { return a + (r.amount || 0); }, 0);
+      var pendTotal = p.totalPending + c08.filter(function (r) { return r.state === '草稿' || r.state === '待审'; }).reduce(function (a, r) { return a + (r.amount || 0); }, 0);
+      var pct = planTotal ? Math.round(paidTotal / planTotal * 100) : 0;
+      document.getElementById('fp-kpis').innerHTML = [
+        ['5 月资金计划合计', '¥ ' + (planTotal / 10000).toFixed(1) + ' 万', '阜矿 · 全口径'],
+        ['已支付', '¥ ' + (paidTotal / 10000).toFixed(1) + ' 万', '占月计划 ' + pct + '%（含 C-10 已记账）'],
+        ['已批准·待付', '¥ ' + (apprTotal / 10000).toFixed(1) + ' 万', 'C-08 已审 ' + c08.filter(function (r) { return r.state === '已审'; }).length + ' 单'],
+        ['待发起', '¥ ' + (pendTotal / 10000).toFixed(1) + ' 万', 'C-08 草稿/待审 ' + c08.filter(function (r) { return r.state === '草稿' || r.state === '待审'; }).length + ' 单'],
+      ].map(function (k, i) {
+        return '<div class="kpi' + (i === 0 ? ' accent' : '') + '"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
+      document.getElementById('exec-fill').style.width = pct + '%';
+      document.getElementById('exec-pct').textContent = pct + '%';
+    }
+
+    function renderC08() {
+      var rows = SC.store.list('C-08').slice().reverse();
+      var today = new Date();
+      document.getElementById('engine-c08-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px;">无 C-08 · 点 + 模拟付款申请</td></tr>'
+        : rows.map(function (r) {
+            var events = SC.sm.getAllowedEvents('C-08', r);
+            var stateColor = r.state === '已支付' ? 'green' : r.state === '已审' ? 'blue' : r.state === '待审' ? 'amber' : r.state === '已驳回' ? 'red' : 'gray';
+            var planDate = r.plan_date ? new Date(r.plan_date) : null;
+            var daysLeft = planDate ? Math.round((planDate - today) / 86400000) : null;
+            var dueLabel = daysLeft === null ? '—' :
+                            daysLeft < 0 ? '<span class="badge red dot">超期 ' + (-daysLeft) + ' 天</span>' :
+                            daysLeft <= 7 ? '<span class="badge amber dot">' + daysLeft + ' 天</span>' :
+                            '<span class="badge gray">' + daysLeft + ' 天</span>';
+            var contract = contractMap[r.contract_id];
+            return '<tr>' +
+              '<td class="code">' + (r.request_no || '#' + r.id) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (contract ? (contract.contract_no || 'C-02 #' + r.contract_id) : '—') + ' / ' + (r.payment_node || '—') + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.amount || 0) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (r.plan_date || '—') + '</td>' +
+              '<td>' + dueLabel + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineC08(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineCreateC08() {
+      var contracts = SC.store.list('C-02').filter(function (c) { return c.state === '执行中' || c.state === '已签'; });
+      var contract = contracts[0] || SC.store.list('C-02')[0];
+      if (!contract) { SC.ui.toast('请先到 contract-list 创建 C-02 合同', 'warning'); return; }
+      var amount = 50000 + Math.floor(Math.random() * 200000);
+      var daysAhead = Math.floor(Math.random() * 14) - 3; // -3 ~ +10 天
+      var planDate = new Date();
+      planDate.setDate(planDate.getDate() + daysAhead);
+      SC.store.create('C-08', {
+        request_no: SC.store.nextNo('FK'),
+        contract_id: contract.id,
+        supplier_id: contract.supplier_id,
+        amount: amount,
+        payment_node: '验收 60% 节点',
+        plan_date: planDate.toISOString().slice(0, 10),
+        state: '草稿',
+      });
+      SC.ui.toast('C-08 付款申请已创建（' + (daysAhead < 0 ? '超期 ' + (-daysAhead) : '剩余 ' + daysAhead) + ' 天）', 'success');
+    }
+
+    function engineC08(id, event) {
+      try {
+        SC.sm.transition('C-08', id, event);
+        if (event === '执行付款') {
+          var r = SC.store.get('C-08', id);
+          SC.store.create('C-10', {
+            payment_no: SC.store.nextNo('PE'),
+            request_id: id,
+            contract_id: r.contract_id,
+            supplier_id: r.supplier_id,
+            amount: r.amount,
+            state: '待执行',
+          });
+          SC.ui.toast('C-08 #' + id + ' → 已支付 + 创建 C-10 待执行（→ 出纳工作台）', 'success');
+        } else SC.ui.toast('C-08 #' + id + ' → ' + event, 'success');
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    /* 演示样例：周分布表 */
     var weeksArea = document.getElementById('weeks-area');
     weeksArea.innerHTML = p.weeks.map(function (w) {
       var weekTotal = w.items.reduce(function (a, b) { return a + b.amount; }, 0);
-      var rows = w.items.map(function (it) {
+      var rowsHtml = w.items.map(function (it) {
         return '<tr>' +
           '<td class="muted">' + it.date + '</td>' +
           '<td>' + it.supplier + '</td>' +
@@ -129,7 +241,7 @@
           '<td class="actions">' +
             (it.state === '待发起' ? '<a>发起申请</a>' :
              it.state === '审批中' ? '<a href="payment-request.html">查看</a>' :
-             it.state === '已批准·待付' ? '<a>执行付款</a>' :
+             it.state === '已批准·待付' ? '<a href="payment-execution.html">执行付款</a>' :
              it.state === '已支付' ? '<a>查凭证</a>' : '<a>查看</a>') +
           '</td>' +
         '</tr>';
@@ -141,13 +253,17 @@
           '<span class="week-total">本周计划：<strong style="color:var(--text);">' + SC.fmtMoney(weekTotal) + '</strong></span>' +
         '</div>' +
         '<div class="week-body">' +
-          '<table class="data"><thead><tr>' +
+          '<table class="data" style="font-size:12px;"><thead><tr>' +
             '<th>计划日期</th><th>供应商</th><th>合同</th><th>付款节点</th>' +
             '<th class="num">金额</th><th>状态</th><th>操作</th>' +
-          '</tr></thead><tbody>' + rows + '</tbody></table>' +
+          '</tr></thead><tbody>' + rowsHtml + '</tbody></table>' +
         '</div>' +
       '</div>';
     }).join('');
+
+    function refresh() { renderKpis(); renderC08(); }
+    ['C-08', 'C-10', 'C-02'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
   </script>
 </body>
 </html>

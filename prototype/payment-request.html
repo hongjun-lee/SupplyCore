@@ -12,6 +12,45 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 05 V1.1 §7 付款申请（C-08）+ §三单匹配 + 详设 08 V1.0 BIZ-013 NC 付款回写 + 详设 11 §13 履约保证金 SENS-CON-003。<br>
+            <strong>🛤 链路：</strong>合同 C-04 节点临期 → C-08 申请 (草稿 → 待审 → 已审) → 三单匹配（合同 / 入库 / 发票）→ 业务复核 → 财务复核 → 主管特批（按金额）→ 出纳 C-10 执行 → BIZ-013 NC 实付。<br>
+            <strong>🛡 控制点：</strong>未到货部分提前付款 → 主管副总特批；超付（已付 &gt; 合同金额）→ 阻止；变更冻结期间 → 节点临时不允许新建申请。
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · C-08 付款申请实时清单</div>
+            <div class="actions">
+              <a href="funding-plan.html" class="btn btn-sm">→ 资金计划</a>
+              <a href="payment-execution.html" class="btn btn-sm">→ 出纳工作台</a>
+              <button class="btn btn-sm btn-primary" onclick="engineCreatePR()">+ 模拟新建</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>申请号</th>
+                  <th>合同</th>
+                  <th>付款节点</th>
+                  <th class="num">金额</th>
+                  <th>状态</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-pr-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动</span>
+              C-08:已审 → 出纳 C-10 创建 → 执行 → 记账完成 → linkage F-01 BIZ-013（详设 08 § BIZ-013 NC 实付回写）。下方为静态详情演示样例。
+            </div>
+          </div>
+        </div>
+
         <div class="card" style="border-left:4px solid var(--amber);background:#fffbf3;">
           <div class="card-body" style="display:flex;gap:12px;align-items:flex-start;">
             <span class="badge amber dot" style="flex-shrink:0;">变更冻结提示</span>
@@ -135,6 +174,72 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* 引擎接入：C-08 付款申请实时清单 */
+    var supMapPR = {}; SC.store.list('M-09').forEach(function (s) { supMapPR[s.id] = s.name; });
+    var contractMapPR = {}; SC.store.list('C-02').forEach(function (c) { contractMapPR[c.id] = c; });
+    function renderPR() {
+      var rows = SC.store.list('C-08').slice().reverse();
+      document.getElementById('engine-pr-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">无 C-08 · 点 + 模拟新建</td></tr>'
+        : rows.map(function (r) {
+            var events = SC.sm.getAllowedEvents('C-08', r);
+            var stateColor = r.state === '已支付' ? 'green' : r.state === '已审' ? 'blue' : r.state === '待审' ? 'amber' : r.state === '已驳回' ? 'red' : 'gray';
+            var contract = contractMapPR[r.contract_id];
+            return '<tr>' +
+              '<td class="code">' + (r.request_no || '#' + r.id) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (contract ? contract.contract_no || 'C-02 #' + r.contract_id : '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (r.payment_node || '—') + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.amount || 0) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="enginePR(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+    function engineCreatePR() {
+      var contract = SC.store.list('C-02').find(function (c) { return c.state === '执行中' || c.state === '已签'; }) || SC.store.list('C-02')[0];
+      if (!contract) { SC.ui.toast('请先到 contract-list 创建 C-02 合同', 'warning'); return; }
+      SC.store.create('C-08', {
+        request_no: SC.store.nextNo('FK'),
+        contract_id: contract.id,
+        supplier_id: contract.supplier_id,
+        amount: 60000 + Math.floor(Math.random() * 200000),
+        payment_node: '验收 60% 节点',
+        plan_date: new Date().toISOString().slice(0, 10),
+        state: '草稿',
+      });
+      SC.ui.toast('C-08 付款申请已创建', 'success');
+    }
+    function enginePR(id, event) {
+      try {
+        SC.sm.transition('C-08', id, event);
+        if (event === '执行付款') {
+          var r = SC.store.get('C-08', id);
+          SC.store.create('C-10', {
+            payment_no: SC.store.nextNo('PE'),
+            request_id: id,
+            contract_id: r.contract_id,
+            supplier_id: r.supplier_id,
+            amount: r.amount,
+            state: '待执行',
+          });
+          SC.ui.toast('C-08 #' + id + ' → 已支付 + C-10 待执行', 'success');
+        } else SC.ui.toast('C-08 #' + id + ' → ' + event, 'success');
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+    SC.store.subscribe('C-08', renderPR);
+    setTimeout(renderPR, 100);
+  </script>
   <script>
     var d = SC.data.paymentRequest;
     SC.layout({

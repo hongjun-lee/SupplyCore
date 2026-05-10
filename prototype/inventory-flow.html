@@ -3,86 +3,199 @@
 <head>
   <meta charset="utf-8">
   <title>库存流转 — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
   <div id="header"></div>
-  <div class="app-layout"><div id="sidebar"></div><div class="app-main"><div id="page-area">
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
 
-    <div class="kpi-grid">
-      <div class="kpi"><div class="label">今日领料申请</div><div class="value">18</div><div class="trend">待审 4 / 待出库 6 / 已完成 8</div></div>
-      <div class="kpi"><div class="label">今日出库价值</div><div class="value">¥ 12.6 万</div><div class="trend">按成本中心归集</div></div>
-      <div class="kpi"><div class="label">退料待验收</div><div class="value" style="color:var(--amber)">3</div><div class="trend down">需确认可再利用状态</div></div>
-      <div class="kpi"><div class="label">调拨在途</div><div class="value">5</div><div class="trend">跨仓 3 / 跨组织 2</div></div>
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 06 V1.1a 实物流转闭环 + 详设 11 §13 操作日志（一期边界：单据驱动 + 同事务原子写入 S-13/S-14/S-21 + NC 接口任务）。<br>
+            <strong>🛤 链路汇总：</strong>本页是 <strong>领用 / 退料 / 调拨 / 盘点 / 废旧</strong> 五条流转主路径的<strong>统一汇聚视图</strong>，详细操作进各专项页（material-issuance / inventory-transfer / stocktake / scrap-disposal）。<br>
+            <strong>🔒 高敏感：</strong>火工品 / 危险化学品 / 跨组织调拨 / 已结账期间冲红 → 强制审批流 + 水印导出。
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="if-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · S-21 库存事务流水（最近 10 条 · 实时聚合）</div>
+            <div class="actions">
+              <a href="material-issuance.html" class="btn btn-sm">→ 领料出库</a>
+              <a href="inventory-transfer.html" class="btn btn-sm">→ 调拨</a>
+              <a href="stocktake.html" class="btn btn-sm">→ 盘点</a>
+              <a href="scrap-disposal.html" class="btn btn-sm">→ 废旧处置</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>流水号</th>
+                  <th>类型</th>
+                  <th>物料</th>
+                  <th>仓库</th>
+                  <th class="num">数量变动</th>
+                  <th>来源单据</th>
+                  <th>NC</th>
+                </tr>
+              </thead>
+              <tbody id="engine-s21-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">演示</span>
+              S-21 流水汇聚来自所有出入库 / 调拨 / 盘点 / 废旧操作；实际生产同事务写 S-13 库存台账 + S-14 批次账 + 触发 F-01 NC 任务（详设 06 §6.4 原子写入约束）。
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="tabs" id="tabs">
+            <div class="tab active" data-tab="issue">领料出库（演示样例）</div>
+            <div class="tab" data-tab="return">退料入库（演示样例）</div>
+            <div class="tab" data-tab="transfer">调拨单（演示样例）</div>
+          </div>
+
+          <div class="tab-pane active" id="tab-issue">
+            <div class="card-header"><div class="title">领料申请 / 出库单（→ 详见 material-issuance）</div></div>
+            <table class="data" style="font-size:12px;">
+              <thead><tr><th>单据编号</th><th>使用单位</th><th>物料</th><th class="num">数量</th><th>审批</th><th>NC</th></tr></thead>
+              <tbody>
+                <tr><td class="code">CK-2026-0521</td><td>艾友矿综采一队</td><td>矿用电缆 MYJV22</td><td class="num">320 米</td><td><span class="badge amber dot">队长待审</span></td><td class="muted">未生成</td></tr>
+                <tr><td class="code">CK-2026-0518</td><td>五龙矿机电科</td><td>隔爆开关配件包</td><td class="num">6 套</td><td><span class="badge blue dot">待出库</span></td><td>待触发</td></tr>
+                <tr><td class="code">CK-2026-0509</td><td>东梁矿通风区</td><td>便携式甲烷检测仪</td><td class="num">4 台</td><td><span class="badge green dot">已完成</span></td><td><span class="badge green">已推送</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tab-pane" id="tab-return">
+            <div class="card-header"><div class="title">退料入库（S-07 退料 · 二期 P1）</div></div>
+            <table class="data" style="font-size:12px;">
+              <thead><tr><th>退料单号</th><th>原领料单</th><th>退料单位</th><th>物料</th><th class="num">数量</th><th>质量</th><th>状态</th></tr></thead>
+              <tbody>
+                <tr><td class="code">TL-2026-0112</td><td class="code">CK-2026-0476</td><td>艾友矿掘进队</td><td>液压支架密封件</td><td class="num">18 件</td><td><span class="badge amber dot">待验收</span></td><td><span class="badge blue dot">仓库待收</span></td></tr>
+                <tr><td class="code">TL-2026-0108</td><td class="code">CK-2026-0432</td><td>五龙矿机电科</td><td>剩余电缆</td><td class="num">46 米</td><td><span class="badge green dot">可再利用</span></td><td><span class="badge green dot">已入库</span></td></tr>
+                <tr><td class="code">TL-2026-0101</td><td class="code">CK-2026-0399</td><td>东梁矿采煤队</td><td>磨损钻头</td><td class="num">12 个</td><td><span class="badge red dot">不可用</span></td><td><span class="badge gray dot">转废旧</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tab-pane" id="tab-transfer">
+            <div class="card-header"><div class="title">调拨单（→ 详见 inventory-transfer）</div></div>
+            <table class="data" style="font-size:12px;">
+              <thead><tr><th>调拨单号</th><th>调出</th><th>调入</th><th>物料</th><th class="num">数量</th><th>类型</th><th>状态</th></tr></thead>
+              <tbody>
+                <tr><td class="code">DB-2026-0068</td><td>艾友矿主仓</td><td>五龙矿主仓</td><td>乳化油</td><td class="num">2.5 吨</td><td><span class="badge amber">跨组织</span></td><td><span class="badge amber dot">物资公司待审</span></td></tr>
+                <tr><td class="code">DB-2026-0063</td><td>五龙矿设备库</td><td>五龙矿维修库</td><td>掘进机截齿</td><td class="num">80 件</td><td><span class="badge blue">仓间</span></td><td><span class="badge blue dot">运输中</span></td></tr>
+                <tr><td class="code">DB-2026-0059</td><td>东梁矿安全器材库</td><td>东梁矿主仓</td><td>自救器</td><td class="num">20 台</td><td><span class="badge blue">仓间</span></td><td><span class="badge green dot">已完成</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="title">⚖ 流转 6 步通用约束（详设 06 §6.4 + §13）</div></div>
+          <div class="card-body">
+            <div class="flow-strip">
+              <div class="node done"><span class="step-num">1</span> 申请填报</div>
+              <div class="node done"><span class="step-num">2</span> 库存校核</div>
+              <div class="node done"><span class="step-num">3</span> 审批 / 双人复核</div>
+              <div class="node"><span class="step-num">4</span> 出入库执行</div>
+              <div class="node"><span class="step-num">5</span> S-13/S-14/S-21 原子写</div>
+              <div class="node"><span class="step-num">6</span> F-01 NC 任务</div>
+            </div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.6;margin-top:8px;">
+              <strong>原子写入约束：</strong>S-13 库存台账（实时数量 / 金额）+ S-14 批次账（FIFO/批次追溯）+ S-21 库存事务流水（不可修改）必须在同一个事务内成功，任一失败整体回滚（详设 06 §6.4）。<br>
+              <strong>事务边界：</strong>store.snapshot() / store.rollback() 演示同事务原子性；F-01 NC 任务在事务提交后异步推送（容许 NC 失败重试）。
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="flow-strip">
-        <div class="node done"><span class="step-num">1</span> 申请填报</div>
-        <div class="node done"><span class="step-num">2</span> 库存校核</div>
-        <div class="node current"><span class="step-num">3</span> 审批 / 双人复核</div>
-        <div class="node"><span class="step-num">4</span> 出入库执行</div>
-        <div class="node"><span class="step-num">5</span> 台账 + 流水原子写入</div>
-        <div class="node"><span class="step-num">6</span> NC 接口任务</div>
-      </div>
-      <div class="card-body" style="font-size:12px;color:var(--text-2);">
-        <span class="badge blue dot">链路说明</span>
-        <span style="margin-left:8px;">领料、退料、调拨均以合法单据驱动库存变化；审核通过后同事务写入 <span class="font-mono">S-13 库存台账</span>、<span class="font-mono">S-14 批次账</span> 与 <span class="font-mono">S-21 库存事务流水</span>，按业务类型生成 NC 接口任务。</span>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="tabs" id="tabs">
-        <div class="tab active" data-tab="issue">领料出库</div>
-        <div class="tab" data-tab="return">退料入库</div>
-        <div class="tab" data-tab="transfer">调拨单</div>
-      </div>
-
-      <div class="tab-pane active" id="tab-issue">
-        <div class="card-header"><div class="title">领料申请 / 出库单</div><div class="actions"><button class="btn">导出</button><button class="btn btn-primary">+ 新建领料申请</button></div></div>
-        <table class="data">
-          <thead><tr><th>单据编号</th><th>使用单位 / 成本中心</th><th>物料</th><th class="num">申请数量</th><th>来源库存</th><th>审批状态</th><th>库存影响</th><th>NC 触发</th><th>操作</th></tr></thead>
-          <tbody>
-            <tr><td class="code">CK-2026-0521</td><td>艾友矿综采一队<div class="muted">成本中心：AY-ZC-01</div></td><td>矿用电缆 MYJV22<div class="muted">M-DL-2026-0018</div></td><td class="num">320 米</td><td>艾友矿主仓 / A-02-08</td><td><span class="badge amber dot">队长待审</span></td><td>待审核，不影响库存</td><td><span class="muted">未生成</span></td><td class="actions"><a>查看</a><a>审批</a></td></tr>
-            <tr><td class="code">CK-2026-0518</td><td>五龙矿机电科<div class="muted">成本中心：WL-JD-02</div></td><td>隔爆开关配件包<div class="muted">M-BJ-2026-0091</div></td><td class="num">6 套</td><td>五龙矿设备库 / B-01-03</td><td><span class="badge blue dot">待出库</span></td><td>出库确认后减少库存</td><td>材料出库成本归集</td><td class="actions"><a>出库</a><a>打印</a></td></tr>
-            <tr><td class="code">CK-2026-0509</td><td>东梁矿通风区<div class="muted">成本中心：DL-TF-01</div></td><td>便携式甲烷检测仪<div class="muted">M-AQ-2026-0007</div></td><td class="num">4 台</td><td>东梁矿安全器材库</td><td><span class="badge green dot">已完成</span></td><td>已扣减库存，流水 S21-7782</td><td><span class="badge green">已推送</span></td><td class="actions"><a>追溯</a></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="tab-pane" id="tab-return">
-        <div class="card-header"><div class="title">退料入库 / 可再利用确认</div><div class="actions"><button class="btn">退料验收规则</button><button class="btn btn-primary">+ 新建退料</button></div></div>
-        <table class="data">
-          <thead><tr><th>退料单号</th><th>原领料单</th><th>退料单位</th><th>退回物料</th><th class="num">数量</th><th>质量状态</th><th>处理方式</th><th>状态</th></tr></thead>
-          <tbody>
-            <tr><td class="code">TL-2026-0112</td><td class="code">CK-2026-0476</td><td>艾友矿掘进队</td><td>液压支架密封件</td><td class="num">18 件</td><td><span class="badge amber dot">待验收</span></td><td>验收合格后回补库存</td><td><span class="badge blue dot">仓库待收</span></td></tr>
-            <tr><td class="code">TL-2026-0108</td><td class="code">CK-2026-0432</td><td>五龙矿机电科</td><td>剩余电缆</td><td class="num">46 米</td><td><span class="badge green dot">可再利用</span></td><td>退回原批次 / 单独标识</td><td><span class="badge green dot">已入库</span></td></tr>
-            <tr><td class="code">TL-2026-0101</td><td class="code">CK-2026-0399</td><td>东梁矿采煤队</td><td>磨损钻头</td><td class="num">12 个</td><td><span class="badge red dot">不可用</span></td><td>转废旧处置申请</td><td><span class="badge gray dot">已转办</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="tab-pane" id="tab-transfer">
-        <div class="card-header"><div class="title">仓间 / 组织间调拨</div><div class="actions"><button class="btn">调拨规则</button><button class="btn btn-primary">+ 新建调拨单</button></div></div>
-        <table class="data">
-          <thead><tr><th>调拨单号</th><th>调出</th><th>调入</th><th>物料</th><th class="num">数量</th><th>调拨类型</th><th>审批状态</th><th>库存状态</th></tr></thead>
-          <tbody>
-            <tr><td class="code">DB-2026-0068</td><td>艾友矿主仓</td><td>五龙矿主仓</td><td>乳化油</td><td class="num">2.5 吨</td><td><span class="badge amber">跨组织</span></td><td><span class="badge amber dot">物资公司待审</span></td><td>未出库</td></tr>
-            <tr><td class="code">DB-2026-0063</td><td>五龙矿设备库</td><td>五龙矿维修库</td><td>掘进机截齿</td><td class="num">80 件</td><td><span class="badge blue">仓间</span></td><td><span class="badge blue dot">运输中</span></td><td>在途库存</td></tr>
-            <tr><td class="code">DB-2026-0059</td><td>东梁矿安全器材库</td><td>东梁矿主仓</td><td>自救器</td><td class="num">20 台</td><td><span class="badge blue">仓间</span></td><td><span class="badge green dot">已完成</span></td><td>已转入目标仓</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card"><div class="card-body" style="display:flex;gap:12px;align-items:start;"><span class="badge red dot">高敏感控制</span><div class="text-2">火工品、危险化学品、盘亏调整、跨组织调拨、已结账期间冲红等操作必须进入审批流；导出和打印带水印并记录审计日志。</div></div></div>
-
-  </div></div></div>
   <script src="assets/time.js"></script>
-  <script src="assets/data.js"></script><script src="assets/chrome.js"></script>
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
-    SC.layout({ page:'inventory-flow', crumbs:['库存实物流转','领用 / 退料 / 调拨'], title:'库存流转', desc:'补齐库存减少、回补和仓间/组织间流转闭环，对齐《06-库存实物流转详细设计 V1.0》', actions:[{label:'库存事务流水'},{label:'+ 新建领料申请', primary:true}] });
-    document.querySelectorAll('#tabs .tab').forEach(function(t){ t.addEventListener('click', function(){ document.querySelectorAll('#tabs .tab').forEach(function(x){x.classList.remove('active')}); document.querySelectorAll('.tab-pane').forEach(function(x){x.classList.remove('active')}); t.classList.add('active'); document.getElementById('tab-'+t.dataset.tab).classList.add('active'); }); });
+    SC.layout({
+      page: 'inventory-flow',
+      crumbs: ['库存实物流转', '领用 / 退料 / 调拨'],
+      title: '库存流转（统一汇聚）',
+      desc: '对齐《06 V1.1a》— 5 路径汇聚 + S-21 流水实时聚合 + 原子写入约束',
+      actions: [],
+    });
+
+    var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m.name; });
+    var whMap = {}; SC.store.list('M-02').forEach(function (w) { whMap[w.id] = w.name; });
+
+    function renderKpis() {
+      var s21 = SC.store.list('S-21');
+      var today = new Date().toISOString().slice(0, 10);
+      var todayFlux = s21.filter(function (r) { return (r.created_at || '').slice(0, 10) === today; });
+      var issueCnt = s21.filter(function (r) { return (r.txn_type || '').indexOf('出库') >= 0; }).length;
+      var transferCnt = s21.filter(function (r) { return (r.txn_type || '').indexOf('调拨') >= 0; }).length;
+      var ncTasks = SC.store.list('F-01').length;
+      document.getElementById('if-kpis').innerHTML = [
+        ['今日 S-21 流水', todayFlux.length, '累计 ' + s21.length + ' 条'],
+        ['出库类流水', issueCnt, '领料 / 直发'],
+        ['调拨类流水', transferCnt, '仓间 + 跨组织'],
+        ['F-01 NC 任务', ncTasks, '已推送 ' + SC.store.list('F-01', { state: '已推送' }).length],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
+    }
+
+    function renderS21() {
+      var rows = SC.store.list('S-21').slice().reverse().slice(0, 10);
+      document.getElementById('engine-s21-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px;">暂无 S-21 流水 · 通过领料 / 调拨 / 盘点 / 废旧 各专项页触发</td></tr>'
+        : rows.map(function (r) {
+            var qtyDelta = (r.qty_in || 0) - (r.qty_out || 0);
+            var qtyColor = qtyDelta > 0 ? 'var(--green)' : qtyDelta < 0 ? 'var(--red)' : 'var(--text-2)';
+            var typeColor = (r.txn_type || '').indexOf('出库') >= 0 ? 'red' : (r.txn_type || '').indexOf('入库') >= 0 ? 'green' : 'blue';
+            var nc = SC.store.list('F-01').find(function (f) { return f.business_no === r.txn_no; });
+            return '<tr>' +
+              '<td class="muted" style="font-size:11px;">' + (r.created_at || '').slice(5, 16).replace('T', ' ') + '</td>' +
+              '<td class="code" style="font-size:11px;">' + (r.txn_no || '—') + '</td>' +
+              '<td><span class="badge ' + typeColor + ' dot">' + (r.txn_type || '—') + '</span></td>' +
+              '<td>' + (matMap[r.material_id] || '#' + r.material_id) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (whMap[r.warehouse_id] || '#' + r.warehouse_id) + '</td>' +
+              '<td class="num" style="color:' + qtyColor + ';font-weight:600;">' + (qtyDelta > 0 ? '+' : '') + qtyDelta + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (r.source_entity || '—') + (r.source_id ? ' #' + r.source_id : '') + '</td>' +
+              '<td>' + (nc ? '<span class="badge ' + (nc.state === '已推送' ? 'green' : nc.state === '失败' ? 'red' : 'amber') + '">' + nc.state + '</span>' : '<span class="muted">—</span>') + '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    /* tabs */
+    document.querySelectorAll('#tabs .tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        document.querySelectorAll('#tabs .tab').forEach(function (x) { x.classList.remove('active'); });
+        document.querySelectorAll('.tab-pane').forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+      });
+    });
+
+    function refresh() { renderKpis(); renderS21(); }
+    ['S-21', 'S-13', 'F-01'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
   </script>
 </body>
 </html>

@@ -1,67 +1,257 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><title>招投标过程归档 — 阜矿物资供应管理系统（原型）</title><link rel="stylesheet" href="assets/styles.css"></head>
-<body><div id="header"></div><div class="app-layout"><div id="sidebar"></div><div class="app-main"><div id="page-area">
-  <div class="kpi-grid">
-    <div class="kpi"><div class="label">待归档项目</div><div class="value" style="color:var(--amber)">3</div><div class="trend down">缺评委签字表 1 项</div></div>
-    <div class="kpi"><div class="label">本月归档完成</div><div class="value">12</div><div class="trend">自动校验通过 10 项</div></div>
-    <div class="kpi"><div class="label">合同已生成</div><div class="value">8</div><div class="trend">由中标结果联动</div></div>
-    <div class="kpi"><div class="label">审计抽查问题</div><div class="value" style="color:var(--red)">1</div><div class="trend down">附件缺失待补录</div></div>
-  </div>
+<head>
+  <meta charset="utf-8">
+  <title>招投标过程归档 — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
 
-  <div class="card">
-    <div class="flow-strip">
-      <div class="node done"><span class="step-num">1</span> 计划来源</div>
-      <div class="node done"><span class="step-num">2</span> 标包拆分</div>
-      <div class="node done"><span class="step-num">3</span> 采购文件</div>
-      <div class="node done"><span class="step-num">4</span> 平台开评标</div>
-      <div class="node current"><span class="step-num">5</span> 结果回传归档</div>
-      <div class="node"><span class="step-num">6</span> 合同生成</div>
-    </div>
-    <div class="card-body" style="font-size:12px;color:var(--text-2);"><span class="badge blue dot">一期边界</span><span style="margin-left:8px;">开标、投标、评标过程仍在能源集团电子商务/招采平台完成；本系统负责采购文件生成、资料回传归档、审计留痕和合同联动。</span></div>
-  </div>
-
-  <div class="cols-2">
-    <div class="card">
-      <div class="card-header"><div class="title">项目归档清单</div><div class="actions"><button class="btn">归档校验</button><button class="btn btn-primary">上传资料</button></div></div>
-      <table class="data">
-        <thead><tr><th>资料类型</th><th>文件名称</th><th>来源</th><th>状态</th><th>留痕</th><th>操作</th></tr></thead>
-        <tbody>
-          <tr><td>采购文件</td><td>主通风机备件采购文件.pdf</td><td>系统生成</td><td><span class="badge green dot">已归档</span></td><td>2026-05-06 09:21 张伟</td><td class="actions"><a>预览</a><a>下载</a></td></tr>
-          <tr><td>公告回执</td><td>招采平台公告回执.xml</td><td>平台回传</td><td><span class="badge green dot">已归档</span></td><td>接口任务 IF-7782</td><td class="actions"><a>查看</a></td></tr>
-          <tr><td>开标记录</td><td>开标记录单.pdf</td><td>平台回传</td><td><span class="badge green dot">已归档</span></td><td>带电子签章</td><td class="actions"><a>预览</a></td></tr>
-          <tr><td>评标报告</td><td>评标报告-主通风机备件.pdf</td><td>平台回传</td><td><span class="badge green dot">已归档</span></td><td>哈希校验通过</td><td class="actions"><a>预览</a></td></tr>
-          <tr><td>评委签字表</td><td>—</td><td>人工补录</td><td><span class="badge red dot">缺失</span></td><td>已提醒负责人</td><td class="actions"><a>补传</a></td></tr>
-          <tr><td>中标通知书</td><td>中标通知书.pdf</td><td>平台回传</td><td><span class="badge blue dot">待确认</span></td><td>待采购负责人确认</td><td class="actions"><a>确认</a></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div>
-      <div class="card">
-        <div class="card-header"><div class="title">标包与合同联动</div></div>
-        <table class="data">
-          <thead><tr><th>标包</th><th>中标供应商</th><th class="num">中标金额</th><th>合同状态</th></tr></thead>
-          <tbody>
-            <tr><td>包 1：主通风机备件</td><td>辽宁矿安设备有限公司</td><td class="num">¥ 486,000.00</td><td><span class="badge amber dot">合同草稿</span></td></tr>
-            <tr><td>包 2：隔爆开关配件</td><td>沈阳华通电缆集团</td><td class="num">¥ 231,500.00</td><td><span class="badge green dot">已生成合同</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="title">归档校验规则</div></div>
-        <div class="card-body">
-          <div class="timeline-vert">
-            <div class="tl-item done"><div class="tl-title">完整性校验</div><div class="tl-desc">采购文件、公告回执、开标记录、评标报告、中标通知书必须齐全。</div></div>
-            <div class="tl-item done"><div class="tl-title">一致性校验</div><div class="tl-desc">标包、供应商、金额与合同草稿保持一致。</div></div>
-            <div class="tl-item current"><div class="tl-title">审计留痕</div><div class="tl-desc">资料上传、替换、删除均记录操作人、时间、原因和水印。</div></div>
-            <div class="tl-item"><div class="tl-title">合同联动</div><div class="tl-desc">归档通过后允许生成合同；缺关键资料时仅允许保存草稿。</div></div>
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 04 §4.10 招投标过程 V1.1a + 详设 05 §合同生成 V1.1 + 一期边界（开评标在能源集团电子商务/招采平台完成）。<br>
+            <strong>🛤 链路：</strong>P-05 任务分解（tender_type=招标）→ 自动创建 T-01 招标申请 → 标包 T-03 → 平台开评标（外部）→ 中标结果 T-05 → 验证通过 → linkage 自动创建 C-01 会签 → 批准 → C-02 合同已签。<br>
+            <strong>🔒 一期边界：</strong>本系统不参与开标/投标/评标过程，只负责采购文件生成、平台资料归档、审计留痕、合同联动。
           </div>
         </div>
+
+        <div class="kpi-grid" id="ta-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · T-03 标包 → T-05 中标 → C-01/C-02 自动联动</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineCreateT03()">+ 创建标包</button>
+              <button class="btn btn-sm" onclick="engineSimulateAward()">▶ 模拟全链路（标包 → 中标 → 合同）</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>标包号</th>
+                  <th>标包名称</th>
+                  <th class="num">预算金额</th>
+                  <th>状态</th>
+                  <th>events</th>
+                  <th>已联动</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-t03-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              T-03:直录中标 → linkage 创建 T-05 中标结果（state=已验证）→ 自动 C-01 会签 → 批准后 C-02 已签 + 初始化 executed_amount/paid_amount。流标走 ALR-PUR-002 重新发标须重走集体决策。
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">📂 归档资料清单（演示项目：主通风机备件采购）</div>
+                <div class="actions">
+                  <button class="btn btn-sm">归档校验</button>
+                  <button class="btn btn-sm btn-primary">上传资料</button>
+                </div>
+              </div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>资料类型</th><th>文件名称</th><th>来源</th><th>状态</th><th>留痕</th></tr></thead>
+                <tbody>
+                  <tr><td>采购文件</td><td>主通风机备件采购文件.pdf</td><td>系统生成</td><td><span class="badge green dot">已归档</span></td><td class="muted" style="font-size:11px;">2026-05-06 09:21 张伟</td></tr>
+                  <tr><td>公告回执</td><td>招采平台公告回执.xml</td><td>平台回传</td><td><span class="badge green dot">已归档</span></td><td class="muted" style="font-size:11px;">接口任务 IF-7782</td></tr>
+                  <tr><td>开标记录</td><td>开标记录单.pdf</td><td>平台回传</td><td><span class="badge green dot">已归档</span></td><td class="muted" style="font-size:11px;">带电子签章</td></tr>
+                  <tr><td>评标报告</td><td>评标报告-主通风机备件.pdf</td><td>平台回传</td><td><span class="badge green dot">已归档</span></td><td class="muted" style="font-size:11px;">哈希校验通过</td></tr>
+                  <tr><td>评委签字表</td><td class="muted">—</td><td>人工补录</td><td><span class="badge red dot">缺失</span></td><td class="muted" style="font-size:11px;">已提醒负责人</td></tr>
+                  <tr><td>中标通知书</td><td>中标通知书.pdf</td><td>平台回传</td><td><span class="badge blue dot">待确认</span></td><td class="muted" style="font-size:11px;">待采购负责人确认</td></tr>
+                </tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+                归档要求：6 类必备资料齐全 → 才允许 T-05 验证通过 → 才允许生成合同；缺关键资料时仅允许保存草稿。
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">⚖ 归档校验规则（详设 04 §4.10.6）</div></div>
+              <div class="card-body" style="font-size:12px;line-height:1.7;">
+                <strong>1️⃣ 完整性校验：</strong>采购文件、公告回执、开标记录、评标报告、中标通知书、评委签字表 必须齐全。<br>
+                <strong>2️⃣ 一致性校验：</strong>标包号、中标供应商、中标金额 必须与合同草稿保持一致；不一致则阻止合同生成。<br>
+                <strong>3️⃣ 审计留痕：</strong>资料上传 / 替换 / 删除 均记录操作人 / 时间 / 原因 / 水印（详设 11 §13）。<br>
+                <strong>4️⃣ 合同联动：</strong>归档通过 → T-05 已验证 → linkage 自动创建 C-01 会签；缺关键资料时仅允许保存草稿。<br>
+                <hr style="border:none;border-top:1px dashed var(--border);margin:8px 0;">
+                <strong>异常分支：</strong><br>
+                · <strong>流标</strong>（T-03 流标）→ emit ALR-PUR-002 → 重新发标须重走集体决策。<br>
+                · <strong>评委签字表缺失</strong>→ 阻止 T-05 验证通过 → 物资管理督办补传。<br>
+                · <strong>金额不一致</strong>→ 阻止合同生成 → 由采购负责人核对纠正。
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="title">🔗 标包 → 合同生成历史</div></div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>标包</th><th>中标供应商</th><th class="num">中标金额</th><th>合同状态</th></tr></thead>
+                <tbody id="engine-contract-link-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
-</div></div></div>
-<script src="assets/time.js"></script>
-  <script src="assets/data.js"></script><script src="assets/chrome.js"></script><script>SC.layout({page:'tender-archive',crumbs:['采购协同','招投标过程归档'],title:'招投标过程归档',desc:'补齐标包、采购文件、开评标资料、评标报告和合同生成的审计链路',actions:[{label:'归档校验'},{label:'生成合同草稿',primary:true}]});</script>
-</body></html>
+
+  <script src="assets/time.js"></script>
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    SC.layout({
+      page: 'tender-archive',
+      crumbs: ['采购协同', '招投标过程归档'],
+      title: '招投标过程归档（T-03 → T-05 → C-01 → C-02）',
+      desc: '对齐《04 V1.1a》§4.10 + 《05 V1.1》合同生成 — 标包 / 平台开评标 / 资料归档 / 合同联动',
+    });
+
+    var supMap = {}; SC.store.list('M-09').forEach(function (s) { supMap[s.id] = s.name; });
+
+    function renderKpis() {
+      var packages = SC.store.list('T-03');
+      var pending = packages.filter(function (p) { return p.state === '待标'; });
+      var awarded = packages.filter(function (p) { return p.state === '已结案'; });
+      var failed = packages.filter(function (p) { return p.state === '流标'; });
+      var contracts = SC.store.list('C-02').filter(function (c) { return c.tender_result_id; });
+      document.getElementById('ta-kpis').innerHTML = [
+        ['T-03 标包', packages.length, '在标 ' + pending.length + ' / 已结案 ' + awarded.length + ' / 流标 ' + failed.length],
+        ['本月归档完成', awarded.length, '自动校验通过'],
+        ['合同已生成', contracts.length, '由 T-05 已验证联动'],
+        ['流标待复议', failed.length, failed.length === 0 ? '✓ 顺畅' : 'ALR-PUR-002 已 emit'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
+    }
+
+    function renderT03() {
+      var rows = SC.store.list('T-03');
+      document.getElementById('engine-t03-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">无 T-03 · 点 + 创建标包 或 ▶ 模拟全链路</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('T-03', r);
+            var stateColor = r.state === '已结案' ? 'green' : r.state === '流标' ? 'red' : r.state === '已终止' ? 'gray' : 'amber';
+            var t05 = SC.store.list('T-05', { package_id: r.id })[0];
+            var c01 = t05 ? SC.store.list('C-01', { tender_result_id: t05.id })[0] : null;
+            var c02 = c01 ? SC.store.list('C-02').find(function (c) { return c.amount === c01.contract_amount && c.supplier_id === c01.supplier_id; }) : null;
+            var linked = [
+              t05 ? 'T-05 #' + t05.id : '',
+              c01 ? 'C-01 #' + c01.id : '',
+              c02 ? 'C-02 #' + c02.id : '',
+            ].filter(Boolean).join(' → ');
+            return '<tr>' +
+              '<td class="code">' + (r.package_no || '—') + '</td>' +
+              '<td>' + (r.package_name || '—') + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.budget_amount || 0) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="muted" style="font-size:11px;">' + (linked || '—') + '</td>' +
+              '<td class="actions">' +
+                events.map(function (e) {
+                  if (e === '直录中标') return '<a href="javascript:void(0)" onclick="engineT03Award(' + r.id + ')">' + e + '</a>';
+                  return '<a href="javascript:void(0)" onclick="engineT03(' + r.id + ', \'' + e + '\')">' + e + '</a>';
+                }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function renderContractLink() {
+      var rows = SC.store.list('T-03').filter(function (r) { return r.state === '已结案'; });
+      document.getElementById('engine-contract-link-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="4" class="muted" style="text-align:center;padding:14px;">尚无中标 → 合同记录</td></tr>'
+        : rows.map(function (r) {
+            var t05 = SC.store.list('T-05', { package_id: r.id })[0];
+            var c01 = t05 ? SC.store.list('C-01', { tender_result_id: t05.id })[0] : null;
+            var c02 = c01 ? SC.store.list('C-02').find(function (c) { return c.amount === c01.contract_amount && c.supplier_id === c01.supplier_id; }) : null;
+            var stateLabel = c02 ? '<span class="badge green dot">' + c02.state + '</span>' :
+                             c01 ? '<span class="badge amber dot">会签中</span>' : '<span class="badge gray">待生成</span>';
+            return '<tr>' +
+              '<td>' + (r.package_no || '') + ' / ' + (r.package_name || '') + '</td>' +
+              '<td>' + (supMap[t05 && t05.supplier_id] || '—') + '</td>' +
+              '<td class="num">' + SC.fmtMoney((t05 && t05.winning_amount) || r.budget_amount || 0) + '</td>' +
+              '<td>' + stateLabel + '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineCreateT03() {
+      var idx = SC.store.list('T-03').length + 1;
+      SC.store.create('T-03', {
+        package_no: SC.store.nextNo('TP'),
+        package_name: '主通风机备件标包' + idx,
+        budget_amount: 480000 + Math.floor(Math.random() * 50000),
+        state: '待标',
+      });
+      SC.ui.toast('T-03 标包已创建', 'success');
+    }
+
+    function engineT03(id, event) {
+      try {
+        SC.sm.transition('T-03', id, event);
+        if (event === '流标') SC.ui.toast('T-03 #' + id + ' 流标 → ALR-PUR-002 已 emit', 'warning');
+        else SC.ui.toast('T-03 #' + id + ' → ' + event, 'success');
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function engineT03Award(id) {
+      try {
+        var pkg = SC.store.get('T-03', id);
+        var supplier = SC.store.list('M-09')[Math.floor(Math.random() * 5)];
+        SC.sm.transition('T-03', id, '直录中标');
+        var t05 = SC.store.create('T-05', {
+          result_no: SC.store.nextNo('TR'),
+          package_id: id,
+          supplier_id: supplier.id,
+          winning_amount: pkg.budget_amount,
+          state: '已验证',
+        });
+        SC.linkage.emit('T-05:已验证', t05);
+        setTimeout(function () {
+          var c01 = SC.store.list('C-01', { tender_result_id: t05.id })[0];
+          if (c01) {
+            SC.sm.transition('C-01', c01.id, '批准');
+            SC.ui.toast('T-03 #' + id + ' 直录中标 → T-05 → C-01 → C-02 链路完成', 'success');
+          } else {
+            SC.ui.toast('T-03 #' + id + ' 直录中标 → T-05 → C-01 创建', 'success');
+          }
+        }, 600);
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function engineSimulateAward() {
+      engineCreateT03();
+      setTimeout(function () {
+        var pkgs = SC.store.list('T-03', { state: '待标' });
+        var last = pkgs[pkgs.length - 1];
+        if (last) engineT03Award(last.id);
+      }, 400);
+    }
+
+    function refresh() { renderKpis(); renderT03(); renderContractLink(); }
+    ['T-03', 'T-05', 'C-01', 'C-02'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
+  </script>
+</body>
+</html>

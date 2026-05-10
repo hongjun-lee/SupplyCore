@@ -12,6 +12,37 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 02 V1.0 §基础档案 — M-01 组织 / M-02 仓库 / M-09 供应商 + Nova Platform 组织/人员同步（5 分钟内）+ 详设 11 §13 黑名单拒绝。<br>
+            <strong>🛤 边界：</strong>本页是<strong>只读浏览视图</strong>（含 Nova 同步状态、资质证照状态、库区货位 3 级嵌套）；<strong>主数据 CRUD</strong> 在 master-data-admin（管理员维护）。<br>
+            <strong>🛡 高敏感：</strong>火工品 / 危险化学品仓库 → 双人双锁专管；供应商黑名单 → 系统拒绝任何新订单（C-02 创建前置校验）。
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="ba-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · M-01 / M-02 / M-09 实时计数（接 SC.store 主数据）</div>
+            <div class="actions">
+              <a href="master-data-admin.html" class="btn btn-sm">→ 主数据维护</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr><th>实体</th><th>编码</th><th class="num">数量</th><th>来源 / 同步状态</th><th>说明</th></tr>
+              </thead>
+              <tbody id="engine-ba-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">演示</span>
+              一期：M-01 组织来自 Nova（5 分钟同步），本系统只读副本 + 缓存；M-02 / M-09 由 master-data-admin 维护并下推 NC（NC-MD-001/002/003）。
+            </div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="tabs" id="tabs">
             <div class="tab active" data-tab="org">组织架构（来自 Nova 同步）</div>
@@ -116,6 +147,49 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* 引擎接入：M-01/M-02/M-09 实时计数 */
+    function renderBaKpis() {
+      var orgs = SC.store.list('M-01');
+      var whs = SC.store.list('M-02');
+      var sups = SC.store.list('M-09');
+      var blacklist = sups.filter(function (s) { return s.state === '黑名单'; });
+      document.getElementById('ba-kpis').innerHTML = [
+        ['M-01 组织', orgs.length, '集团 → 物资公司 → 矿 (5 级)'],
+        ['M-02 仓库', whs.length, '含火工品专管 ' + whs.filter(function (w) { return w.special === 'EXPLOSIVE'; }).length],
+        ['M-09 供应商', sups.length, '合格 ' + sups.filter(function (s) { return s.state === '合格'; }).length + ' / 黑名单 ' + blacklist.length],
+        ['Nova 同步状态', '✓', '5 分钟内同步'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
+    }
+    function renderBaTable() {
+      var rows = [
+        { entity: 'M-01 组织', code: 'organization', count: SC.store.list('M-01').length, source: 'Nova Platform 同步', desc: '只读副本，5 分钟同步' },
+        { entity: 'M-02 仓库', code: 'warehouse', count: SC.store.list('M-02').length, source: '本地维护 + NC-MD-002', desc: '支持库区/货位 3 级嵌套' },
+        { entity: 'M-09 供应商', code: 'supplier', count: SC.store.list('M-09').length, source: '本地维护 + NC-MD-003', desc: '资质 / 信用 / 黑名单' },
+        { entity: 'M-12 成本中心', code: 'cost_center', count: SC.store.list('M-12').length, source: 'Nova + 本地映射', desc: '出库归集 / NC 借方主体' },
+      ];
+      document.getElementById('engine-ba-tbody').innerHTML = rows.map(function (r) {
+        return '<tr>' +
+          '<td><strong>' + r.entity + '</strong></td>' +
+          '<td class="code">' + r.code + '</td>' +
+          '<td class="num"><strong>' + r.count + '</strong></td>' +
+          '<td><span class="badge green dot">' + r.source + '</span></td>' +
+          '<td class="muted" style="font-size:11px;">' + r.desc + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+    ['M-01', 'M-02', 'M-09', 'M-12'].forEach(function (e) { SC.store.subscribe(e, function () { renderBaKpis(); renderBaTable(); }); });
+    setTimeout(function () { renderBaKpis(); renderBaTable(); }, 100);
+  </script>
   <script>
     SC.layout({
       page: 'base-archive',

@@ -12,10 +12,40 @@
     <div class="app-main">
       <div id="page-area">
 
-        <!-- 生命周期 7 状态机 -->
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 03 V1.0 物料主数据 + 编码规范 V1.7（M-04~M-17 + NC 映射三阶段过渡 + 火工品/化工品强制批次）。<br>
+            <strong>🛤 边界：</strong>本页是<strong>公司级只读「物料目录浏览」</strong>（生命周期可视 + 编码结构 + NC 映射状态）；<strong>新增 / 修改 / 状态变更</strong> 进 master-data-admin（管理员）；<strong>新物料申请 (M-17)</strong> 走采购员发起 → 物资公司审核 → NC 下推流程。<br>
+            <strong>🔍 三级查重：</strong>① 同义词比对 → ② 规格相似度 → ③ 历史使用穿透（防止一物多码）。
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="mm-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · M-05 物料实时清单（接 SC.store）</div>
+            <div class="actions">
+              <a href="master-data-admin.html" class="btn btn-sm">→ 主数据维护（增删改）</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr><th>编码</th><th>名称</th><th>规格</th><th>单位</th><th>类别</th><th>批次</th><th>火工标识</th></tr>
+              </thead>
+              <tbody id="engine-mm-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">实时</span>
+              本表来自 SC.store M-05；is_safety_special=true 的物料强制双人审批（火工品/危险化学品）；is_direct_eligible=true 的物料允许直达使用单位（不进 S-13）。
+            </div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-header">
-            <div class="title">物料生命周期 — 7 状态机</div>
+            <div class="title">物料生命周期 — 7 状态机（详设 03 §第 2 章）</div>
             <div class="actions">
               <span class="muted">字段：material_state</span>
             </div>
@@ -121,6 +151,48 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* 引擎接入：M-05 实时清单 */
+    function renderMmKpis() {
+      var mats = SC.store.list('M-05');
+      var batchReq = mats.filter(function (m) { return m.has_batch; });
+      var safeSpec = mats.filter(function (m) { return m.is_safety_special; });
+      var directEligible = mats.filter(function (m) { return m.is_direct_eligible; });
+      document.getElementById('mm-kpis').innerHTML = [
+        ['M-05 物料总数', mats.length, '一期种子 10 个，演示用'],
+        ['强制批次', batchReq.length, '化工 / 火工品 / 油料'],
+        ['安全管制', safeSpec.length, '火工品 / 危险化学品'],
+        ['允许直达', directEligible.length, 'is_direct_eligible=true'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
+    }
+    function renderMmTable() {
+      var mats = SC.store.list('M-05');
+      document.getElementById('engine-mm-tbody').innerHTML = mats.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:14px;">暂无物料</td></tr>'
+        : mats.map(function (m) {
+            return '<tr>' +
+              '<td class="code">' + m.code + '</td>' +
+              '<td>' + m.name + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (m.spec || '—') + '</td>' +
+              '<td>' + m.unit + '</td>' +
+              '<td><span class="badge gray">' + (m.category || '—') + '</span></td>' +
+              '<td>' + (m.has_batch ? '<span class="badge amber">批次</span>' : '<span class="muted">—</span>') + '</td>' +
+              '<td>' + (m.is_safety_special ? '<span class="badge red dot">安全管制</span>' : '<span class="muted">—</span>') + '</td>' +
+            '</tr>';
+          }).join('');
+    }
+    SC.store.subscribe('M-05', function () { renderMmKpis(); renderMmTable(); });
+    setTimeout(function () { renderMmKpis(); renderMmTable(); }, 100);
+  </script>
   <script>
     SC.layout({
       page: 'material-master',
