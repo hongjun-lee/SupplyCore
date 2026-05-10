@@ -12,6 +12,59 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · S-15 盘点单 + S-17 盘盈盘亏调整</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineCreateSheet()">+ 创建盘点单（演示数据）</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>盘点单</th>
+                  <th>仓库</th>
+                  <th>盘点行</th>
+                  <th>状态</th>
+                  <th>S-17 差异</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-s15-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              S-15 已审 → linkage 自动 create S-17 差异行（按账实对比）；S-17 已审 → 同事务原子写入：S-21 调整流水 + S-13 修正 + F-01 BIZ-008 盘盈 / BIZ-009 盘亏。
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · S-17 盘盈盘亏调整台账</div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>调整号</th>
+                  <th>来源 S-15</th>
+                  <th>物料</th>
+                  <th class="num">账实差</th>
+                  <th>类型</th>
+                  <th class="num">金额</th>
+                  <th>状态</th>
+                  <th>NC</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-s17-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
         <div class="card">
           <div class="flow-strip">
             <div class="node done"><span class="step-num">1</span> 盘点计划 (S-15)</div>
@@ -98,6 +151,122 @@
   </div>
 
   <script src="assets/time.js"></script>
+  <script src="assets/time.js"></script>
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m; });
+    var whMap = {}; SC.store.list('M-02').forEach(function (w) { whMap[w.id] = w; });
+
+    function renderS15() {
+      var rows = SC.store.list('S-15');
+      var s17all = SC.store.list('S-17');
+      document.getElementById('engine-s15-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">无 S-15 · 点上方"+ 创建盘点单"</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('S-15', r);
+            var stateColor = r.state === '已结案' ? 'green' : r.state === '已审' ? 'blue' : r.state === '已盘点' ? 'amber' : 'gray';
+            var diffs = s17all.filter(function (a) { return a.sheet_id === r.id; });
+            return '<tr>' +
+              '<td class="code">' + r.sheet_no + '</td>' +
+              '<td class="muted">' + ((whMap[r.warehouse_id] || {}).name || '—') + '</td>' +
+              '<td class="num">' + (r.lines ? r.lines.length : 0) + ' 行</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted code" style="font-size:11px;">' + (diffs.length > 0 ? diffs.length + ' 笔差异' : '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineS15(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function renderS17() {
+      var rows = SC.store.list('S-17');
+      var f01 = SC.store.list('F-01').filter(function (t) { return t.interface_id === 'BIZ-008' || t.interface_id === 'BIZ-009'; });
+      document.getElementById('engine-s17-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="9" class="muted" style="text-align:center;padding:18px;">无 S-17 · 先创建 S-15 + 完成盘点 + 审批通过自动生成</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('S-17', r);
+            var stateColor = r.state === '已调整' ? 'green' : r.state === '已审' ? 'blue' : r.state === '待审' ? 'amber' : 'gray';
+            var task = f01.filter(function (t) { return t.source_bill_id === r.id; })[0];
+            var ncCell = task ? (task.task_state === '推送成功' ? '<span class="badge green dot">' + task.push_voucher_no + '</span>' :
+              '<span class="badge amber dot">' + task.task_state + '</span>') : '<span class="muted">—</span>';
+            return '<tr>' +
+              '<td class="code">' + r.adjustment_no + '</td>' +
+              '<td class="muted code" style="font-size:11px;">S-15 #' + r.sheet_id + '</td>' +
+              '<td>' + ((matMap[r.material_id] || {}).name || '—') + '</td>' +
+              '<td class="num" style="color:' + (r.diff_quantity > 0 ? 'var(--green)' : 'var(--red)') + ';font-weight:600;">' + (r.diff_quantity > 0 ? '+' : '') + r.diff_quantity + '</td>' +
+              '<td><span class="badge ' + (r.adjustment_type === '盘盈' ? 'green' : 'red') + '">' + r.adjustment_type + '</span></td>' +
+              '<td class="num">' + SC.fmtMoney(r.amount || 0) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td>' + ncCell + '</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineS17(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineCreateSheet() {
+      var inv = SC.store.list('S-13').filter(function (i) { return i.quantity > 0; }).slice(0, 3);
+      if (inv.length === 0) { SC.ui.toast('S-13 库存为空，先到「采购入库审核」做 S-05 入库', 'warning'); return; }
+      // mock：创建一张盘点单，含 3 行，其中 1 行有差异
+      var lines = inv.map(function (i, idx) {
+        var actual = i.quantity + (idx === 0 ? -2 : idx === 1 ? 1 : 0); // 第 1 行盘亏 2，第 2 行盘盈 1，第 3 行账实一致
+        return {
+          material_id: i.material_id,
+          book_quantity: i.quantity,
+          actual_quantity: actual,
+          unit_cost: i.unit_cost || 100,
+        };
+      });
+      SC.store.create('S-15', {
+        sheet_no: SC.store.nextNo('PD'),
+        warehouse_id: inv[0].warehouse_id,
+        org_id: inv[0].org_id,
+        state: '草稿',
+        lines: lines,
+      });
+      SC.ui.toast('S-15 盘点单已创建（' + lines.length + ' 行 mock，含盘盈/盘亏）', 'success');
+    }
+
+    function engineS15(id, event) {
+      try {
+        SC.sm.transition('S-15', id, event);
+        if (event === '审批通过') {
+          SC.ui.toast('S-15 #' + id + ' 已审 → linkage 自动比对账实生成 S-17 差异行', 'success');
+        } else {
+          SC.ui.toast('S-15 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function engineS17(id, event) {
+      try {
+        SC.sm.transition('S-17', id, event);
+        if (event === '审批通过') {
+          SC.ui.toast('S-17 #' + id + ' 已审 → linkage S-21 调整流水 + S-13 修正 + F-01 BIZ-008/009', 'success');
+          setTimeout(refresh, 1500);
+        } else {
+          SC.ui.toast('S-17 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function refresh() { renderS15(); renderS17(); }
+    ['S-15', 'S-17', 'S-13', 'S-21', 'F-01'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
+  </script>
+
+  <!-- 原静态展示脚本继续 -->
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
   <script>

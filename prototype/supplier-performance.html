@@ -2,6 +2,38 @@
 <html lang="zh-CN">
 <head><meta charset="utf-8"><title>供应商履约画像 — 阜矿物资供应管理系统（原型）</title><link rel="stylesheet" href="assets/styles.css"></head>
 <body><div id="header"></div><div class="app-layout"><div id="sidebar"></div><div class="app-main"><div id="page-area">
+  <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+    <div class="card-header">
+      <div class="title">📡 档 A 引擎接入 · M-13 后评价 → M-09 供应商状态自动联动（A12）</div>
+      <div class="actions">
+        <button class="btn btn-sm btn-primary" onclick="engineCreateEval(2)">+ 模拟差评（2 星）</button>
+        <button class="btn btn-sm" onclick="engineCreateEval(5)">+ 模拟好评（5 星）</button>
+      </div>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <table class="data" style="font-size:12px;">
+        <thead><tr><th>评价号</th><th>供应商</th><th>类目</th><th class="num">评分</th><th>评价人</th><th>评价日</th><th>状态</th><th>events</th><th>操作</th></tr></thead>
+        <tbody id="engine-eval-tbody"></tbody>
+      </table>
+      <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+        <span class="badge blue dot">联动演示</span>
+        M-13 评价确认（≤ 2 星 = 差评）→ linkage 检查同供应商累计差评 ≥ 3 → 自动 emit ALR-SUP-REASSESS（重要级）+ 自动暂停接单（M-09 状态: 合格 → 暂停）。
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+    <div class="card-header">
+      <div class="title">📡 档 A 引擎接入 · M-09 供应商状态机（合格 / 暂停 / 黑名单）</div>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <table class="data" style="font-size:12px;">
+        <thead><tr><th>编码</th><th>名称</th><th>状态</th><th>累计差评</th><th>events</th><th>操作</th></tr></thead>
+        <tbody id="engine-sup09-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="kpi-grid">
     <div class="kpi"><div class="label">合格供应商</div><div class="value">126</div><div class="trend">A 级 32 / B 级 78 / C 级 16</div></div>
     <div class="kpi"><div class="label">本月准入待审</div><div class="value" style="color:var(--amber)">7</div><div class="trend down">证照过期 2 家</div></div>
@@ -55,5 +87,101 @@
   <div class="card"><div class="card-body" style="font-size:12px;color:var(--text-2);"><span class="badge blue dot">边界</span><span style="margin-left:8px;">供应商基础信息可在基础档案维护；准入、评价、暂停、黑名单和履约画像作为供应商管理业务能力独立展示，并与招投标、合同、采购订单、质检后评价自动联动。差评累计或防爆 / 煤安异常触发 WF-SUP-REASSESS-001。</span></div></div>
 </div></div></div>
 <script src="assets/time.js"></script>
-  <script src="assets/data.js"></script><script src="assets/chrome.js"></script><script>SC.layout({page:'supplier-performance',crumbs:['基础数据','供应商管理'],title:'供应商履约画像',desc:'对齐详设 04 / 09 / 10：后评价自动反馈、证照异常和供应商重评估审批',actions:[{label:'资质证照库'},{label:'+ 准入申请',primary:true}]});</script>
+  <script src="assets/time.js"></script>
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    SC.layout({page:'supplier-performance',crumbs:['基础数据','供应商管理'],title:'供应商履约画像',desc:'对齐详设 04 / 09 / 10 + 二期 A12：后评价自动反馈 + WF-SUP-REASSESS 自动暂停',actions:[{label:'资质证照库'},{label:'+ 准入申请',primary:true}]});
+
+    var supMap = {}; SC.store.list('M-09').forEach(function (s) { supMap[s.id] = s; });
+
+    function renderEval() {
+      var rows = SC.store.list('M-13');
+      document.getElementById('engine-eval-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="9" class="muted" style="text-align:center;padding:18px;">无 M-13 评价</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('M-13', r);
+            var stateColor = r.state === '已确认' ? 'green' : r.state === '已争议' ? 'amber' : r.state === '已驳回' ? 'red' : 'gray';
+            var scoreColor = r.score <= 2 ? 'red' : r.score >= 4 ? 'green' : 'amber';
+            var sup = supMap[r.supplier_id] || { name: '#' + r.supplier_id };
+            return '<tr>' +
+              '<td class="code">EV-' + r.id + '</td>' +
+              '<td>' + sup.name + '</td>' +
+              '<td class="muted">' + (r.category || '—') + '</td>' +
+              '<td class="num"><span style="color:var(--' + scoreColor + ');font-weight:600;">' + r.score + ' ★</span></td>' +
+              '<td class="muted">' + (r.evaluator || '—') + '</td>' +
+              '<td class="muted">' + (r.evaluated_at || (r.created_at || '').slice(0, 10)) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineEval(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function renderSup09() {
+      var rows = SC.store.list('M-09');
+      var allEvals = SC.store.list('M-13', { state: '已确认' });
+      document.getElementById('engine-sup09-tbody').innerHTML = rows.map(function (r) {
+        var events = SC.sm.getAllowedEvents('M-09', r);
+        var bad = allEvals.filter(function (e) { return e.supplier_id === r.id && (e.score || 5) < 3; });
+        var stateColor = r.state === '合格' ? 'green' : r.state === '暂停' ? 'amber' : 'red';
+        return '<tr>' +
+          '<td class="code">' + r.code + '</td>' +
+          '<td>' + r.name + '</td>' +
+          '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+          '<td class="num"><span style="color:' + (bad.length >= 3 ? 'var(--red)' : 'var(--text-2)') + ';">' + bad.length + (bad.length >= 3 ? ' （超阈值！）' : '') + '</span></td>' +
+          '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+          '<td class="actions">' +
+            events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineSup09(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function engineCreateEval(score) {
+      var sup = SC.store.list('M-09').filter(function (s) { return s.state === '合格'; })[0]
+            || SC.store.list('M-09')[0];
+      if (!sup) return;
+      var ev = SC.store.create('M-13', {
+        supplier_id: sup.id,
+        score: score,
+        evaluator: SC.roles.currentInfo().label,
+        evaluated_at: (SC.time && SC.time.iso ? SC.time.iso() : new Date().toISOString()).slice(0, 10),
+        category: score <= 2 ? '交付质量' : '配合度',
+        remark: score <= 2 ? '演示差评（mock 触发供应商重评估）' : '演示好评',
+        state: '草稿',
+      });
+      SC.ui.toast('M-13 #' + ev.id + ' 已创建（' + sup.name + ' / ' + score + ' 星）→ 提交确认 → 已确认 即可触发 linkage', 'info');
+    }
+
+    function engineEval(id, event) {
+      try {
+        SC.sm.transition('M-13', id, event);
+        if (event === '确认评价') {
+          var ev = SC.store.get('M-13', id);
+          SC.ui.toast('M-13 #' + id + ' 已确认' + (ev.score < 3 ? '（差评）→ linkage 检查累计差评 → 阈值 ≥ 3 自动暂停接单' : ''), 'success');
+        } else {
+          SC.ui.toast('M-13 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function engineSup09(id, event) {
+      try { SC.sm.transition('M-09', id, event); SC.ui.toast('M-09 #' + id + ' → ' + event, 'success'); }
+      catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function refresh() { renderEval(); renderSup09(); supMap = {}; SC.store.list('M-09').forEach(function (s) { supMap[s.id] = s; }); }
+    ['M-09', 'M-13', 'R-05'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
+  </script>
 </body></html>

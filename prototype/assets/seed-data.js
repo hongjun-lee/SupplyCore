@@ -65,12 +65,15 @@
       { id: 4, code: 'CC-WLK-01', name: '五龙矿·运输二队',     org_id: 5 },
     ],
 
-    /* F-13 NC 接口开关（v0.18 二期 P0 引擎接入：BIZ-002/005/013 改"开"，让出库/暂估/付款链路 NC mock 跑通） */
+    /* F-13 NC 接口开关（v0.19 二期 P1：再加 BIZ-007 调拨 / BIZ-008 盘盈 / BIZ-009 盘亏） */
     'F-13': [
       { id: 1, switch_code: 'BIZ-001-switch', interface_name: '采购入库（正式）',         switch_status: '开' },
-      { id: 2, switch_code: 'BIZ-002-switch', interface_name: '采购入库（暂估）',         switch_status: '开', remark: '二期 A8 暂估闭环演示用 — BIZ-002 暂估 + BIZ-003 红字冲销' },
-      { id: 3, switch_code: 'BIZ-005-switch', interface_name: '出库（自用消耗）',         switch_status: '开', remark: '二期 A2 出库主线演示用' },
-      { id: 4, switch_code: 'BIZ-013-switch', interface_name: '付款执行',                 switch_status: '开', remark: '二期 A4b 付款链路演示用 — NC 实付回写' },
+      { id: 2, switch_code: 'BIZ-002-switch', interface_name: '采购入库（暂估）',         switch_status: '开', remark: '二期 A8 暂估闭环 — BIZ-002 暂估 + BIZ-003 红字冲销' },
+      { id: 3, switch_code: 'BIZ-005-switch', interface_name: '出库（自用消耗）',         switch_status: '开', remark: '二期 A2 出库主线' },
+      { id: 4, switch_code: 'BIZ-007-switch', interface_name: '调拨（内部往来对冲）',     switch_status: '开', remark: '二期 P1 A3 调拨主线' },
+      { id: 5, switch_code: 'BIZ-008-switch', interface_name: '盘盈（增加库存）',         switch_status: '开', remark: '二期 P1 A5 盘点 — 盘盈调整凭证' },
+      { id: 6, switch_code: 'BIZ-009-switch', interface_name: '盘亏（减少库存）',         switch_status: '开', remark: '二期 P1 A5 盘点 — 盘亏调整凭证' },
+      { id: 7, switch_code: 'BIZ-013-switch', interface_name: '付款执行',                 switch_status: '开', remark: '二期 A4b 付款链路 — NC 实付回写' },
     ],
 
     /* P-01 示例需求（演示用，v0.16 改为草稿态 — 让用户从最起点演示
@@ -96,6 +99,16 @@
         payment_terms: '30% 预付 + 60% 验收 + 10% 质保（一期 payment_terms 文本，二期 A4 落 C-04 实体）',
         executed_amount: 412800, paid_amount: 1284000,
         state: '执行中', signed_date: '2026-03-12' },
+    ],
+
+    /* v0.19 二期 P1 A12 后评价种子：3 笔已确认差评（演示供应商累计触发重评估）*/
+    'M-13': [
+      { id: 1, supplier_id: 3, score: 2, evaluator: '王志国', evaluated_at: '2026-04-12',
+        category: '交付质量', remark: '到货 5 套传感器中 2 套不合格，需要返修', state: '已确认' },
+      { id: 2, supplier_id: 3, score: 1, evaluator: '李正民', evaluated_at: '2026-04-25',
+        category: '交付时效', remark: '交付延期 7 天，影响下井计划', state: '已确认' },
+      { id: 3, supplier_id: 3, score: 5, evaluator: '陈雪',   evaluated_at: '2026-04-30',
+        category: '配合度',   remark: '响应快速、配合度高',          state: '已确认' },
     ],
   };
 

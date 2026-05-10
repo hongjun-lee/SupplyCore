@@ -210,6 +210,43 @@ SC.demoScenarios = {
       { id: 'alert-rules', file: 'alert-rules.html', label: '预警闭环', desc: '处置留痕' },
     ],
   },
+  'transfer': {
+    label: '调拨主线',
+    desc: '跨组织调拨 + 双向 S-21 流水 + BIZ-007 内部往来对冲',
+    steps: [
+      { id: 'inventory-transfer', file: 'inventory-transfer.html', label: 'S-11/S-12 调拨', desc: '申请 → 审批 → 执行' },
+      { id: 'inventory', file: 'inventory.html', label: 'S-13 双向变化', desc: '调出方减 / 调入方增' },
+      { id: 'nc-interface', file: 'nc-interface.html', label: 'BIZ-007 NC', desc: '内部往来对冲' },
+    ],
+  },
+  'stocktake': {
+    label: '盘点 → 盘盈盘亏',
+    desc: 'S-15 盘点单 → S-17 差异调整 → BIZ-008 盘盈 / BIZ-009 盘亏',
+    steps: [
+      { id: 'stocktake', file: 'stocktake.html', label: 'S-15 盘点', desc: '账实对比' },
+      { id: 'stocktake', file: 'stocktake.html', label: 'S-17 调整', desc: '盘盈 / 盘亏审批' },
+      { id: 'inventory', file: 'inventory.html', label: 'S-13 修正', desc: '账实一致' },
+      { id: 'nc-interface', file: 'nc-interface.html', label: 'BIZ-008/009', desc: 'NC 凭证' },
+    ],
+  },
+  'supplier-reassess': {
+    label: '供应商重评估',
+    desc: '后评价差评累计 → 自动 emit WF-SUP-REASSESS-001 → 暂停接单',
+    steps: [
+      { id: 'supplier-performance', file: 'supplier-performance.html', label: 'M-13 后评价', desc: '差评录入 + 确认' },
+      { id: 'alert-rules', file: 'alert-rules.html', label: 'ALR-SUP-REASSESS', desc: '累计 ≥3 差评触发' },
+      { id: 'supplier-performance', file: 'supplier-performance.html', label: 'M-09 状态', desc: '合格 → 暂停 / 黑名单' },
+    ],
+  },
+  'master-data': {
+    label: '主数据维护',
+    desc: 'M-02/M-05/M-09 增删改 + NC-MD-001/002/003 主数据下推',
+    steps: [
+      { id: 'master-data-admin', file: 'master-data-admin.html', label: '主数据维护', desc: '物料 / 供应商 / 仓库 CRUD' },
+      { id: 'material-master', file: 'material-master.html', label: '物料展示', desc: 'M-05 一物一码' },
+      { id: 'base-archive', file: 'base-archive.html', label: '基础档案', desc: 'M-01/M-02 组织 / 仓库' },
+    ],
+  },
 };
 
 SC.SCENARIO_KEY = 'sc.scenario';

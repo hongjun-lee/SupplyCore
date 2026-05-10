@@ -651,6 +651,186 @@
     }
   });
 
+  /* ========================================================
+   * 二期 P1 引擎接入（v0.19 — A3 调拨 + A5 盘点 + A12 后评价 + B3 主数据）
+   * ======================================================== */
+
+  /* A3 调拨：S-11:已审 → 自动 create S-12 调拨执行草稿 */
+  SC.linkage.on('S-11:已审', function (req) {
+    var existing = SC.store.list('S-12').filter(function (e) { return e.request_id === req.id; })[0];
+    if (existing) return;
+    SC.store.create('S-12', {
+      record_no: SC.store.nextNo('DB'),
+      request_id: req.id,
+      from_org_id: req.from_org_id,
+      to_org_id: req.to_org_id,
+      from_warehouse_id: req.from_warehouse_id,
+      to_warehouse_id: req.to_warehouse_id,
+      material_id: req.material_id,
+      quantity: req.quantity,
+      amount: req.amount,
+      state: '草稿',
+    });
+    console.log('[linkage] S-11:' + req.id + ' 已审 → 创建 S-12 调拨执行');
+  });
+
+  /* A3 调拨：S-12:已执行 → 双向 S-21 流水（出+入）+ S-13 双向更新 + F-01 BIZ-007 内部往来 */
+  SC.linkage.on('S-12:已执行', function (rec) {
+    SC.store.transaction(['S-21', 'S-13', 'F-01'], function () {
+      // 出库流水（from）
+      SC.store.create('S-21', {
+        transaction_no: SC.store.nextNo('IT'),
+        transaction_type: '调拨出',
+        material_id: rec.material_id,
+        warehouse_id: rec.from_warehouse_id,
+        org_id: rec.from_org_id,
+        quantity_delta: -(rec.quantity || 0),
+        amount_delta: -(rec.amount || 0),
+        source_bill_type: 'S-12',
+        source_bill_id: rec.id,
+      });
+      // 入库流水（to）
+      SC.store.create('S-21', {
+        transaction_no: SC.store.nextNo('IT'),
+        transaction_type: '调拨入',
+        material_id: rec.material_id,
+        warehouse_id: rec.to_warehouse_id,
+        org_id: rec.to_org_id,
+        quantity_delta: rec.quantity || 0,
+        amount_delta: rec.amount || 0,
+        source_bill_type: 'S-12',
+        source_bill_id: rec.id,
+      });
+      // S-13 from 减
+      var fromInv = SC.store.list('S-13').filter(function (i) {
+        return i.material_id === rec.material_id && i.warehouse_id === rec.from_warehouse_id;
+      })[0];
+      if (fromInv) {
+        SC.store.update('S-13', fromInv.id, {
+          quantity: (fromInv.quantity || 0) - rec.quantity,
+          total_amount: (fromInv.total_amount || 0) - rec.amount,
+        });
+      }
+      // S-13 to 增
+      var toInv = SC.store.upsert('S-13',
+        { org_id: rec.to_org_id, warehouse_id: rec.to_warehouse_id, material_id: rec.material_id },
+        {});
+      var fromUnitCost = fromInv ? (fromInv.unit_cost || 0) : (rec.amount / rec.quantity);
+      var newQty = (toInv.quantity || 0) + rec.quantity;
+      var newAmount = (toInv.total_amount || 0) + (rec.quantity * fromUnitCost);
+      SC.store.update('S-13', toInv.id, {
+        quantity: newQty,
+        total_amount: newAmount,
+        unit_cost: newQty > 0 ? newAmount / newQty : 0,
+      });
+      // F-01 BIZ-007 内部往来对冲
+      var ncSwitch = SC.store.list('F-13', { switch_code: 'BIZ-007-switch' })[0];
+      if (!ncSwitch || ncSwitch.switch_status === '开') {
+        var task = SC.store.create('F-01', {
+          task_no: SC.store.nextNo('FT'),
+          interface_id: 'BIZ-007',
+          source_bill_no: rec.record_no,
+          source_bill_type: 'S-12',
+          source_bill_id: rec.id,
+          task_state: '待推送',
+          retry_count: 0,
+        });
+        if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+      }
+    });
+    console.log('[linkage] S-12:' + rec.id + ' 已执行 → 双向 S-21 + S-13 + F-01 BIZ-007');
+  });
+
+  /* A5 盘点：S-15:已审（盘点完成审批通过）→ 比对账实差异 → 自动 create S-17 差异行 */
+  SC.linkage.on('S-15:已审', function (sheet) {
+    if (!sheet.lines || sheet.lines.length === 0) return;
+    sheet.lines.forEach(function (l) {
+      var diff = (l.actual_quantity || 0) - (l.book_quantity || 0);
+      if (diff === 0) return;
+      var existing = SC.store.list('S-17').filter(function (a) { return a.sheet_id === sheet.id && a.material_id === l.material_id; })[0];
+      if (existing) return;
+      SC.store.create('S-17', {
+        adjustment_no: SC.store.nextNo('PD'),
+        sheet_id: sheet.id,
+        material_id: l.material_id,
+        warehouse_id: sheet.warehouse_id,
+        book_quantity: l.book_quantity,
+        actual_quantity: l.actual_quantity,
+        diff_quantity: diff,
+        adjustment_type: diff > 0 ? '盘盈' : '盘亏',
+        amount: Math.abs(diff) * (l.unit_cost || 0),
+        state: '草稿',
+      });
+    });
+    console.log('[linkage] S-15:' + sheet.id + ' 已审 → 自动 create S-17 差异行（' + sheet.lines.length + ' 行扫描）');
+  });
+
+  /* A5 盘点：S-17:已审 → S-21 调整流水 + S-13 修正 + F-01 BIZ-008（盘盈）/ BIZ-009（盘亏）*/
+  SC.linkage.on('S-17:已审', function (adj) {
+    SC.store.transaction(['S-21', 'S-13', 'F-01'], function () {
+      SC.store.create('S-21', {
+        transaction_no: SC.store.nextNo('IT'),
+        transaction_type: adj.adjustment_type,
+        material_id: adj.material_id,
+        warehouse_id: adj.warehouse_id,
+        quantity_delta: adj.diff_quantity,
+        amount_delta: adj.adjustment_type === '盘盈' ? adj.amount : -adj.amount,
+        source_bill_type: 'S-17',
+        source_bill_id: adj.id,
+      });
+      var inv = SC.store.list('S-13').filter(function (i) {
+        return i.material_id === adj.material_id && i.warehouse_id === adj.warehouse_id;
+      })[0];
+      if (inv) {
+        SC.store.update('S-13', inv.id, {
+          quantity: (inv.quantity || 0) + adj.diff_quantity,
+          total_amount: (inv.total_amount || 0) + (adj.adjustment_type === '盘盈' ? adj.amount : -adj.amount),
+        });
+      }
+      var bizCode = adj.adjustment_type === '盘盈' ? 'BIZ-008' : 'BIZ-009';
+      var ncSwitch = SC.store.list('F-13', { switch_code: bizCode + '-switch' })[0];
+      if (!ncSwitch || ncSwitch.switch_status === '开') {
+        var task = SC.store.create('F-01', {
+          task_no: SC.store.nextNo('FT'),
+          interface_id: bizCode,
+          source_bill_no: adj.adjustment_no,
+          source_bill_type: 'S-17',
+          source_bill_id: adj.id,
+          task_state: '待推送',
+          retry_count: 0,
+        });
+        if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+      }
+    });
+    SC.store.update('S-17', adj.id, { state: '已调整' });
+    console.log('[linkage] S-17:' + adj.id + ' 已审 → S-21 + S-13 + F-01 ' + (adj.adjustment_type === '盘盈' ? 'BIZ-008' : 'BIZ-009'));
+  });
+
+  /* A12 后评价：M-13:已确认 → 累计差评 ≥ 3 → 触发 WF-SUP-REASSESS-001 重评估 */
+  SC.linkage.on('M-13:已确认', function (eval0) {
+    if (eval0.score >= 3) return; // 仅差评（≤ 2 星）触发
+    var REASSESS_THRESHOLD = 3;
+    var related = SC.store.list('M-13').filter(function (e) {
+      return e.supplier_id === eval0.supplier_id && e.state === '已确认' && (e.score || 5) < 3;
+    });
+    if (related.length >= REASSESS_THRESHOLD) {
+      emitAlert({
+        alert_code: 'ALR-SUP-REASSESS',
+        level: '重要',
+        source_entity: 'M-09',
+        source_id: eval0.supplier_id,
+        title: '供应商重评估',
+        message: '供应商 #' + eval0.supplier_id + ' 累计差评 ' + related.length + ' 次 ≥ ' + REASSESS_THRESHOLD + '，触发 WF-SUP-REASSESS-001 重评估流程；请考虑暂停接单 / 调降评级 / 加入黑名单',
+      });
+      // 自动暂停接单（mock）
+      var sup = SC.store.get('M-09', eval0.supplier_id);
+      if (sup && sup.state === '合格') {
+        SC.store.update('M-09', eval0.supplier_id, { state: '暂停' });
+        console.log('[linkage] 供应商 #' + eval0.supplier_id + ' 累计差评 ' + related.length + ' 次 → 自动暂停接单');
+      }
+    }
+  });
+
   /* 暴露给页面调用：mock 触发审批超时（无时间穿越的替代）*/
   SC.linkage.mockTriggerWFTimeout = function () {
     var pending = []

@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>主数据维护 (M-04/05/09) — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 03 物料主数据 V1.1 + 详设 04 §4.1 供应商管理 + 详设 06 §3 仓库管理。<br>
+            <strong>🛤 链路：</strong>主数据增删改 → SC.store CRUD → 状态机校验（如 M-09 supplier_state：合格 / 暂停 / 黑名单）→ NC 主数据下推（NC-MD-001/002/003）→ 业务实体使用（不允许直接删除，停用即可）。
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="md-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · M-09 供应商主数据（含状态机：合格 / 暂停 / 黑名单）</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineCreateSupplier()">+ 新增供应商</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>编码</th>
+                  <th>名称</th>
+                  <th>统一社会信用</th>
+                  <th>等级</th>
+                  <th>状态</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-sup-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · M-05 物料主数据</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineCreateMaterial()">+ 新增物料</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>编码</th>
+                  <th>名称</th>
+                  <th>规格</th>
+                  <th>单位</th>
+                  <th>类别</th>
+                  <th>属性</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-mat-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">规则</span>
+              一物一码（详设 03 §4）；停用不删除（保留历史业务关联）；新增物料须触发 NC-MD-001 主数据下推（mock）。
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · M-02 仓库主数据</div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>编码</th>
+                  <th>名称</th>
+                  <th>所属组织</th>
+                  <th>特殊属性</th>
+                  <th class="num">在库 SKU</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-wh-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="title">⚖ 主数据维护规则</div></div>
+          <div class="card-body" style="font-size:12px;line-height:1.7;">
+            <strong>新增触发：</strong>NC-MD-001 物料下推 / NC-MD-002 供应商下推 / NC-MD-003 组织 / 仓库下推（mock 演示用）<br>
+            <strong>变更审计：</strong>所有主数据变更须记录 actor / before / after / 时间（详设 11 §13 操作日志）<br>
+            <strong>状态机：</strong>M-09 供应商状态（合格 → 暂停 / 黑名单 / 解除）走统一 SM transition；联动后评价 linkage（累计差评 ≥ 3 自动暂停）<br>
+            <strong>软删除：</strong>所有主数据停用而非物理删除；保留历史业务关联（详设 03 §4 一物一码）<br>
+            <strong>权限边界：</strong>主数据维护仅 IT 角色 + 物资管理 高级用户可见（详设 11 §11.3 数据权限）；本演示不限制
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/time.js"></script>
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    SC.layout({
+      page: 'master-data-admin',
+      crumbs: ['二期', 'B3 主数据维护'],
+      title: '主数据维护（M-02 / M-05 / M-09）',
+      desc: '档 A 二期 B3：详设 03 + 04 + 06 — 物料 / 供应商 / 仓库 增删改 + 状态机',
+    });
+
+    function renderKpis() {
+      document.getElementById('md-kpis').innerHTML = [
+        ['物料 (M-05)', SC.store.list('M-05').length, '一物一码'],
+        ['供应商 (M-09)', SC.store.list('M-09').length, '合格 ' + SC.store.list('M-09', { state: '合格' }).length + ' / 暂停 ' + SC.store.list('M-09', { state: '暂停' }).length],
+        ['仓库 (M-02)', SC.store.list('M-02').length, '含火工品专管库'],
+        ['组织 (M-01)', SC.store.list('M-01').length, '4 级（集团 → 物资 → 矿）'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
+    }
+
+    function renderSupplier() {
+      var rows = SC.store.list('M-09');
+      document.getElementById('engine-sup-tbody').innerHTML = rows.map(function (r) {
+        var events = SC.sm.getAllowedEvents('M-09', r);
+        var stateColor = r.state === '合格' ? 'green' : r.state === '暂停' ? 'amber' : 'red';
+        return '<tr>' +
+          '<td class="code">' + r.code + '</td>' +
+          '<td>' + r.name + '</td>' +
+          '<td class="muted code" style="font-size:11px;">' + (r.tax_code || '—') + '</td>' +
+          '<td>' + (r.credit_level || '—') + '</td>' +
+          '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+          '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+          '<td class="actions">' +
+            events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineSup(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+            '<a href="javascript:void(0)" onclick="engineEditSup(' + r.id + ')">编辑</a>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function renderMaterial() {
+      var rows = SC.store.list('M-05');
+      document.getElementById('engine-mat-tbody').innerHTML = rows.map(function (r) {
+        var attrs = [];
+        if (r.has_batch) attrs.push('<span class="badge blue">批次</span>');
+        if (r.is_safety_special) attrs.push('<span class="badge red">高敏感</span>');
+        if (r.is_direct_eligible) attrs.push('<span class="badge amber">直达</span>');
+        return '<tr>' +
+          '<td class="code">' + r.code + '</td>' +
+          '<td>' + r.name + '</td>' +
+          '<td class="muted">' + (r.spec || '—') + '</td>' +
+          '<td>' + r.unit + '</td>' +
+          '<td class="muted">' + (r.category || '—') + '</td>' +
+          '<td>' + (attrs.join(' ') || '—') + '</td>' +
+          '<td class="actions"><a href="javascript:void(0)" onclick="engineEditMat(' + r.id + ')">编辑</a> · <a href="javascript:void(0)" onclick="engineDisableMat(' + r.id + ')" style="color:var(--red);">停用</a></td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function renderWarehouse() {
+      var rows = SC.store.list('M-02');
+      var s13 = SC.store.list('S-13');
+      document.getElementById('engine-wh-tbody').innerHTML = rows.map(function (r) {
+        var skuCount = s13.filter(function (i) { return i.warehouse_id === r.id && i.quantity > 0; }).length;
+        return '<tr>' +
+          '<td class="code">' + r.code + '</td>' +
+          '<td>' + r.name + '</td>' +
+          '<td class="muted">' + (SC.store.list('M-01').find(function (o) { return o.id === r.org_id; }) || {}).name + '</td>' +
+          '<td>' + (r.special === 'EXPLOSIVE' ? '<span class="badge red dot">火工品专管</span>' : '<span class="muted">—</span>') + '</td>' +
+          '<td class="num">' + skuCount + '</td>' +
+          '<td class="actions"><a href="javascript:void(0)" onclick="engineEditWh(' + r.id + ')">编辑</a></td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function engineCreateSupplier() {
+      SC.ui.prompt('新供应商名称', { default: '新供应商 ' + Date.now().toString().slice(-4) }).then(function (name) {
+        if (!name) return;
+        SC.ui.prompt('统一社会信用代码', { default: '912100' + Math.floor(Math.random() * 100000000) }).then(function (tax) {
+          if (!tax) return;
+          var max = SC.store.list('M-09').reduce(function (a, x) { return Math.max(a, parseInt((x.code || '').split('-')[1] || 0, 10)); }, 0);
+          var code = 'SUP-' + String(max + 1).padStart(3, '0');
+          SC.store.create('M-09', { code: code, name: name, tax_code: tax, state: '合格', credit_level: 'C', role_tags: ['新增'] });
+          SC.ui.toast('M-09 ' + code + ' 已创建 · 触发 NC-MD-002 主数据下推', 'success');
+        });
+      });
+    }
+
+    function engineCreateMaterial() {
+      SC.ui.prompt('新物料名称', { default: '新物料 ' + Date.now().toString().slice(-4) }).then(function (name) {
+        if (!name) return;
+        var max = SC.store.list('M-05').reduce(function (a, x) { return Math.max(a, x.id); }, 0);
+        var code = 'MAT-NEW-' + String(max + 1).padStart(4, '0');
+        SC.store.create('M-05', { code: code, name: name, spec: '—', unit: '个', category: '其他' });
+        SC.ui.toast('M-05 ' + code + ' 已创建 · 触发 NC-MD-001 主数据下推', 'success');
+      });
+    }
+
+    function engineSup(id, event) {
+      try { SC.sm.transition('M-09', id, event); SC.ui.toast('M-09 #' + id + ' → ' + event, 'success'); }
+      catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function engineEditSup(id) {
+      var s = SC.store.get('M-09', id);
+      SC.ui.prompt('修改供应商名称', { default: s.name }).then(function (name) {
+        if (!name) return;
+        SC.store.update('M-09', id, { name: name });
+        SC.ui.toast('M-09 #' + id + ' 已更新（已写审计日志）', 'success');
+      });
+    }
+
+    function engineEditMat(id) {
+      var m = SC.store.get('M-05', id);
+      SC.ui.prompt('修改物料名称', { default: m.name }).then(function (name) {
+        if (!name) return;
+        SC.store.update('M-05', id, { name: name });
+        SC.ui.toast('M-05 #' + id + ' 已更新', 'success');
+      });
+    }
+
+    function engineDisableMat(id) {
+      SC.ui.confirm('确认停用该物料？停用后不允许新业务引用，但保留历史关联（软删除）').then(function (ok) {
+        if (!ok) return;
+        SC.store.update('M-05', id, { is_disabled: true });
+        SC.ui.toast('M-05 #' + id + ' 已停用', 'info');
+      });
+    }
+
+    function engineEditWh(id) {
+      var w = SC.store.get('M-02', id);
+      SC.ui.prompt('修改仓库名称', { default: w.name }).then(function (name) {
+        if (!name) return;
+        SC.store.update('M-02', id, { name: name });
+        SC.ui.toast('M-02 #' + id + ' 已更新', 'success');
+      });
+    }
+
+    function refresh() { renderKpis(); renderSupplier(); renderMaterial(); renderWarehouse(); }
+    ['M-01', 'M-02', 'M-05', 'M-09', 'S-13'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
+  </script>
+</body>
+</html>

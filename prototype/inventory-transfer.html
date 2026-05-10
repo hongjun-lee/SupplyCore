@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>调拨主线 (S-11/S-12) — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 06 §6 调拨管理（同组织 / 跨组织）+ 详设 08 BIZ-007 内部往来对冲凭证。<br>
+            <strong>🛤 链路：</strong>S-11 调拨申请 → 双方业务确认 → 调出方审批 → 调入方接收 → S-12 调拨执行 → 同事务双向写入（出库 S-21 + 入库 S-21 + S-13 双向更新）+ NC BIZ-007 内部往来对冲凭证（同集团内借贷自动对冲）。
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="tr-kpis"></div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · S-11 调拨申请</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineCreateS11()">+ 创建调拨申请（跨矿）</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>申请号</th>
+                  <th>调出方</th>
+                  <th>调入方</th>
+                  <th>物料 / 数量</th>
+                  <th class="num">金额</th>
+                  <th>状态</th>
+                  <th>下游 S-12</th>
+                  <th>events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-s11-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · S-12 调拨执行 + 双向库存事务</div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>执行号</th>
+                  <th>来源 S-11</th>
+                  <th>路径</th>
+                  <th class="num">数量 / 金额</th>
+                  <th>状态</th>
+                  <th>S-21 / S-13 / NC 效应</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-s12-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              点 "执行调拨" → linkage 同事务原子完成：S-21 出库 + S-21 入库（双向流水）+ 调出 S-13 减 + 调入 S-13 增（unit_cost 沿用调出方移动加权）+ F-01 BIZ-007 NC 推送（内部往来对冲）。
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">🗺 跨组织调拨地图（mock）</div></div>
+              <div class="card-body" style="font-size:12px;">
+                <div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:8px;align-items:center;margin-bottom:6px;text-align:center;">
+                  <div style="background:var(--brand-50);padding:8px;border-radius:4px;">物资公司中心库</div>
+                  <div style="color:var(--text-3);">→</div>
+                  <div style="background:var(--green-50);padding:8px;border-radius:4px;">艾友矿主仓 / 东梁矿主仓 / 五龙矿主仓 / 新邱矿主仓</div>
+                </div>
+                <div class="muted" style="margin-bottom:8px;font-size:11px;">中心库 → 各矿（主流路径，约 70%）</div>
+                <hr style="border:none;border-top:1px dashed var(--border);">
+                <div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:8px;align-items:center;margin-top:6px;text-align:center;">
+                  <div style="background:var(--green-50);padding:8px;border-radius:4px;">艾友矿主仓</div>
+                  <div style="color:var(--text-3);">⇄</div>
+                  <div style="background:var(--green-50);padding:8px;border-radius:4px;">东梁矿主仓 / 五龙矿主仓</div>
+                </div>
+                <div class="muted" style="margin-top:4px;font-size:11px;">矿之间互调（应急路径，约 20%）</div>
+                <hr style="border:none;border-top:1px dashed var(--border);">
+                <div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:8px;align-items:center;margin-top:6px;text-align:center;">
+                  <div style="background:var(--amber-50, #fffbeb);padding:8px;border-radius:4px;border:1px solid #fde68a;">外购代储仓 / 外委加工仓</div>
+                  <div style="color:var(--text-3);">→</div>
+                  <div style="background:var(--green-50);padding:8px;border-radius:4px;">使用单位仓库</div>
+                </div>
+                <div class="muted" style="margin-top:4px;font-size:11px;">特殊路径（约 10%，需额外审批）</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">💰 内部往来对冲账户（NC BIZ-007）</div></div>
+              <div class="card-body" style="font-size:12px;">
+                <table class="data" style="font-size:11px;">
+                  <thead><tr><th>组织对</th><th class="num">本月调出</th><th class="num">本月调入</th><th class="num">差额</th></tr></thead>
+                  <tbody>
+                    <tr><td>物资 → 艾友</td><td class="num">¥ 1,280,000</td><td class="num">—</td><td class="num" style="color:var(--green);">+1,280,000</td></tr>
+                    <tr><td>物资 → 东梁</td><td class="num">¥ 860,000</td><td class="num">—</td><td class="num" style="color:var(--green);">+860,000</td></tr>
+                    <tr><td>物资 → 五龙</td><td class="num">¥ 540,000</td><td class="num">—</td><td class="num" style="color:var(--green);">+540,000</td></tr>
+                    <tr><td>艾友 → 东梁</td><td class="num">¥ 86,000</td><td class="num">¥ 12,500</td><td class="num" style="color:var(--green);">+73,500</td></tr>
+                    <tr style="background:#fafbfd;font-weight:600;"><td>本月合计</td><td class="num">¥ 2,766,000</td><td class="num">¥ 12,500</td><td class="num" style="color:var(--brand);">+2,753,500</td></tr>
+                  </tbody>
+                </table>
+                <div class="muted" style="margin-top:8px;font-size:11px;">
+                  <strong>NC 对冲：</strong>BIZ-007 借调出方往来 / 贷调入方往来；月末批量自动对冲，差额转下月。<br>
+                  <strong>一致性校验：</strong>调出累计 = 调入累计（避免单边记账）；本月 1 笔差额（艾友 → 东梁）等待对冲。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="title">⚖ 调拨规则（详设 06 §6 + 08 BIZ-007）</div></div>
+          <div class="card-body" style="font-size:12px;line-height:1.7;">
+            <strong>同组织内调拨：</strong>仅库存搬移，BIZ-007 简化处理（借调入方仓库 / 贷调出方仓库）<br>
+            <strong>跨组织调拨：</strong>必走 BIZ-007 内部往来对冲（借调入方往来 / 贷调出方往来）；月末批量对冲<br>
+            <strong>火工品 / 危险化学品：</strong>跨组织调拨须双方安全部门 + 物资主管 + 集团安环 三方会签（高敏感留痕，详设 06 §6.4）<br>
+            <strong>调拨成本：</strong>采用调出方移动加权单价，不重新计价；调入方按调出 unit_cost 直接入库（避免内部利润虚增）<br>
+            <strong>BIZ-007 凭证模板：</strong>借 1801 内部应收（调入方组织名）/ 贷 1801 内部应付（调出方组织名）；月末汇总对冲到 0
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/time.js"></script>
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    SC.layout({
+      page: 'inventory-transfer',
+      crumbs: ['二期', 'A3 调拨主线'],
+      title: '调拨主线（S-11 → S-12）',
+      desc: '档 A 二期 A3：详设 06 §6 + 08 BIZ-007 — 跨组织调拨 + 双向 S-21 流水 + 内部往来对冲',
+    });
+
+    var orgMap = {}; SC.store.list('M-01').forEach(function (o) { orgMap[o.id] = o.name; });
+    var whMap  = {}; SC.store.list('M-02').forEach(function (w) { whMap[w.id] = w; });
+    var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m; });
+
+    function renderKpis() {
+      var s11 = SC.store.list('S-11');
+      var s12Done = SC.store.list('S-12', { state: '已执行' });
+      var totalAmt = s12Done.reduce(function (a, r) { return a + (r.amount || 0); }, 0);
+      var biz007 = SC.store.list('F-01', { interface_id: 'BIZ-007' });
+      document.getElementById('tr-kpis').innerHTML = [
+        ['S-11 申请', s11.length, '草稿 ' + s11.filter(function (x) { return x.state === '草稿'; }).length + ' / 待审 ' + s11.filter(function (x) { return x.state === '待审'; }).length],
+        ['S-12 已执行', s12Done.length, '总金额 ' + SC.fmtMoney(totalAmt)],
+        ['BIZ-007 推送', biz007.length, '成功 ' + biz007.filter(function (t) { return t.task_state === '推送成功'; }).length],
+        ['内部往来差额', SC.fmtMoney(2753500), '本月待月末对冲'],
+      ].map(function (k) {
+        return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="value">' + k[1] + '</div><div class="trend">' + k[2] + '</div></div>';
+      }).join('');
+    }
+
+    function renderS11() {
+      var rows = SC.store.list('S-11');
+      var s12all = SC.store.list('S-12');
+      document.getElementById('engine-s11-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="9" class="muted" style="text-align:center;padding:18px;">无 S-11 · 点上方"+ 创建调拨申请"</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('S-11', r);
+            var stateColor = r.state === '已审' ? 'green' : r.state === '待审' ? 'amber' : r.state === '已调出' ? 'blue' : 'gray';
+            var s12 = s12all.filter(function (e) { return e.request_id === r.id; })[0];
+            return '<tr>' +
+              '<td class="code">' + r.request_no + '</td>' +
+              '<td>' + (orgMap[r.from_org_id] || '—') + '<div class="muted" style="font-size:11px;">' + ((whMap[r.from_warehouse_id] || {}).name || '') + '</div></td>' +
+              '<td>' + (orgMap[r.to_org_id] || '—') + '<div class="muted" style="font-size:11px;">' + ((whMap[r.to_warehouse_id] || {}).name || '') + '</div></td>' +
+              '<td>' + ((matMap[r.material_id] || {}).name || '—') + '<div class="muted" style="font-size:11px;">数量 ' + (r.quantity || 0) + '</div></td>' +
+              '<td class="num">' + SC.fmtMoney(r.amount || 0) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (s12 ? '<span class="code">S-12 #' + s12.id + ' [' + s12.state + ']</span>' : '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineS11(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function renderS12() {
+      var rows = SC.store.list('S-12');
+      var s21 = SC.store.list('S-21');
+      var f01 = SC.store.list('F-01', { interface_id: 'BIZ-007' });
+      document.getElementById('engine-s12-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">无 S-12 · 先在 S-11 审批通过自动创建</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var events = SC.sm.getAllowedEvents('S-12', r);
+            var stateColor = r.state === '已执行' ? 'green' : r.state === '已撤销' ? 'red' : 'gray';
+            var effects = '—';
+            if (r.state === '已执行') {
+              var rs21 = s21.filter(function (t) { return t.source_bill_type === 'S-12' && t.source_bill_id === r.id; });
+              var rf01 = f01.filter(function (t) { return t.source_bill_id === r.id; });
+              effects = (rs21.length > 0 ? '<span class="badge green dot">S-21 ×' + rs21.length + '</span> ' : '') +
+                        (rf01.length > 0 ? '<span class="badge ' + (rf01[0].task_state === '推送成功' ? 'green' : 'amber') + ' dot">F-01 ' + rf01[0].task_state + '</span>' : '');
+            }
+            return '<tr>' +
+              '<td class="code">' + r.record_no + '</td>' +
+              '<td class="muted code" style="font-size:11px;">S-11 #' + r.request_id + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (orgMap[r.from_org_id] || '') + ' → ' + (orgMap[r.to_org_id] || '') + '</td>' +
+              '<td class="num">' + (r.quantity || 0) + ' · ' + SC.fmtMoney(r.amount || 0) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td>' + effects + '</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineS12(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineCreateS11() {
+      var fromInv = SC.store.list('S-13').filter(function (i) { return i.quantity > 0; })[0];
+      if (!fromInv) { SC.ui.toast('S-13 库存为空，先到「采购入库审核」做一笔 S-05 入库', 'warning'); return; }
+      var toWhCandidate = SC.store.list('M-02').filter(function (w) { return w.id !== fromInv.warehouse_id; })[0];
+      if (!toWhCandidate) { SC.ui.toast('找不到目标仓库', 'error'); return; }
+      var qty = Math.min(10, fromInv.quantity);
+      var amount = qty * (fromInv.unit_cost || 100);
+      SC.store.create('S-11', {
+        request_no: SC.store.nextNo('DBSQ'),
+        from_org_id: fromInv.org_id || 2,
+        to_org_id: toWhCandidate.org_id,
+        from_warehouse_id: fromInv.warehouse_id,
+        to_warehouse_id: toWhCandidate.id,
+        material_id: fromInv.material_id,
+        quantity: qty,
+        amount: amount,
+        state: '草稿',
+      });
+      SC.ui.toast('S-11 调拨申请已创建（' + ((matMap[fromInv.material_id] || {}).name || '') + ' × ' + qty + '）', 'success');
+    }
+
+    function engineS11(id, event) {
+      try {
+        SC.sm.transition('S-11', id, event);
+        if (event === '审批通过') {
+          SC.ui.toast('S-11 #' + id + ' 已审 → linkage 自动 create S-12 调拨执行', 'success');
+        } else {
+          SC.ui.toast('S-11 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function engineS12(id, event) {
+      try {
+        SC.sm.transition('S-12', id, event);
+        if (event === '执行调拨') {
+          SC.ui.toast('S-12 #' + id + ' 已执行 → linkage 双向 S-21 + S-13 + F-01 BIZ-007', 'success');
+          setTimeout(refresh, 1500);
+          setTimeout(refresh, 3000);
+        } else {
+          SC.ui.toast('S-12 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    function refresh() { renderKpis(); renderS11(); renderS12(); }
+    ['S-11', 'S-12', 'S-13', 'S-21', 'F-01'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    refresh();
+  </script>
+</body>
+</html>
