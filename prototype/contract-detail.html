@@ -260,7 +260,7 @@
               </table>
               <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
                 <span class="badge blue dot">联动规则</span>
-                <span style="margin-left:6px;">变更已审后，服务层自动同步 C-02 字段、C-03 条款（旧条款 is_superseded=true）；<strong style="color:var(--red);">付款条件变更</strong>修订 C-02 <code>payment_terms</code> 文本；C-08 付款申请 / C-10 付款执行已落地，C-04 付款节点表实体为后续扩展项。金额变更超过 SY-02 配置阈值升级至项目领导小组。</span>
+                <span style="margin-left:6px;">变更已审后，服务层自动同步 C-02 字段、C-03 条款（旧条款 is_superseded=true）；<strong style="color:var(--red);">付款条件变更</strong>修订 C-02 <code>payment_terms</code> 文本，并联动重建 C-04 节点 + C-07 计划（已处于 <code>已满足/已付款</code> 的节点不允许修改）。金额变更超过 SY-02 配置阈值升级至项目领导小组。</span>
               </div>
             </div>
           </div>
@@ -289,7 +289,7 @@
                   <div class="k">归口部门</div><div class="v" id="lock-owner"></div>
                 </div>
                 <div class="text-2" style="margin-top:8px;font-size:12px;color:var(--text-2);">
-                  存在待审 / 已审未生效的付款条件变更时，先冻结 payment_terms 文本展示；C-08 付款申请也按当前 payment_terms 暂停发起，待变更生效后恢复（C-04 付款节点表实体为后续扩展项）。
+                  存在待审 / 已审未生效的付款条件变更时，先冻结 payment_terms 文本展示；受影响的 C-04 节点状态保持不变，对应 C-07 计划暂停推进、C-08 付款申请暂停发起，待变更生效后恢复（详设 05 §4.4 节点联动规则）。
                 </div>
               </div>
             </div>
@@ -301,7 +301,7 @@
           <div class="card-body" style="font-size:13px;line-height:1.7;">
             <strong>业务依据：</strong>详设 05 V1.1 §合同详情 + C-02 8 状态机 + payment_terms 文本字段 + 详设 11 §13 SENS-CON-003/004 高敏感留痕。<br>
             <strong>链路：</strong>C-01 会签 → C-02 草稿 → 会签中 → 已签 → 执行中 → (已完成 / 已变更 / 已终止)；C-03 条款 + payment_terms 文本字段记录付款条件；C-08 付款申请 / C-10 付款执行已落地（详见 <a href="payment-request.html">payment-request</a> / <a href="payment-execution.html">payment-execution</a>）。<br>
-            <strong>实现说明：</strong>变更已审后服务层自动同步 C-02 字段、C-03 条款（旧条款 is_superseded=true）；金额变更超过 SY-02 配置阈值升级至项目领导小组；C-04 付款节点表实体为后续扩展项（当前用 payment_terms 文本过渡）。
+            <strong>实现说明：</strong>四层付款控制（C-04 节点 → C-07 计划 → C-08 申请 → C-10 执行）已全部落地（详见上方"档 A 引擎接入"卡）；变更已审后服务层自动同步 C-02 字段、C-03 条款（旧条款 is_superseded=true），并按变更后的 payment_terms 重建 C-04 节点；金额变更超过 SY-02 配置阈值升级至项目领导小组。
           </div>
         </div>
 
@@ -463,7 +463,7 @@
       page: 'contract-list',
       crumbs: ['合同与资金', '合同管理', d.code],
       title: d.name,
-      desc: '对齐《05 V1.1》— C-02 合同 + payment_terms 文本字段 + 三单匹配 + 履约保证金 SENS-CON-003；C-08 付款申请 / C-10 付款执行已落地；C-04 节点表实体为后续扩展项',
+      desc: '对齐《05 V1.1》— C-02 合同 + 四层付款控制（C-04 节点 / C-07 计划 / C-08 申请 / C-10 执行）+ 三单匹配 + 履约保证金 SENS-CON-003',
     });
 
     document.getElementById('title-code').textContent = d.code;
