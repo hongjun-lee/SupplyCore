@@ -90,6 +90,34 @@ SC.layout = function (opts) {
   SC.bindRoleSwitch();
   SC.renderFooter();
   SC.mountEngineDock();
+  SC.checkSchemaCompat();
+};
+
+/* Schema 版本兼容性检查（v0.22）
+ * 若浏览器中残留旧 schema 数据 → 顶部弹 banner 提示一键重置 */
+SC.checkSchemaCompat = function () {
+  if (!SC.store || !SC.store.checkSchemaVersion) return;
+  var r = SC.store.checkSchemaVersion();
+  if (r.match) return;
+  if (document.getElementById('schema-compat-banner')) return;
+  var banner = document.createElement('div');
+  banner.id = 'schema-compat-banner';
+  banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;padding:10px 16px;background:#fff7ed;border-bottom:2px solid #f59e0b;color:#92400e;font-size:13px;display:flex;gap:10px;align-items:center;justify-content:center;';
+  banner.innerHTML =
+    '<span style="font-weight:600;">⚠ 本地数据 schema 版本（' + (r.stored || '未知') + '）与当前代码（' + r.current + '）不一致</span>' +
+    '<span>残留旧数据可能导致演示状态异常</span>' +
+    '<button id="schema-reset-btn" style="background:#f59e0b;color:#fff;border:0;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:12px;">一键重置到当前版本</button>' +
+    '<button id="schema-dismiss-btn" style="background:transparent;color:#92400e;border:1px solid #fcd34d;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:12px;">暂不重置</button>';
+  document.body.appendChild(banner);
+  document.getElementById('schema-reset-btn').addEventListener('click', function () {
+    if (confirm('将清空 LocalStorage 内全部演示数据并恢复 seed 状态，不可撤销。继续？')) {
+      SC.store.upgradeSchema();
+      location.reload();
+    }
+  });
+  document.getElementById('schema-dismiss-btn').addEventListener('click', function () {
+    banner.remove();
+  });
 };
 
 /* 底部引擎面板抽屉（v0.17 仿 DevTools dock）

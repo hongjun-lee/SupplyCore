@@ -41,7 +41,7 @@
             </div>
             <div style="margin-top:10px;font-size:12px;color:var(--text-2);">
               <span class="badge blue dot">边界</span>
-              AI 查询会带当前角色权限上下文（详设 09 §五 AI Tool 权限隔离）；写操作类指令需用户确认；导出会进 R-10 审计表（含水印）。
+              AI 查询会带当前角色权限上下文（详设 09 §五 AI Tool 权限隔离）；写操作类指令需用户确认；导出会进 R-10 审计表（含水印）。<strong>演示口径：</strong>原型按当前角色筛选界面可见数据，实际生产由 sub_group_id 完整过滤。
             </div>
           </div>
         </div>
@@ -116,7 +116,7 @@
           <div class="card-body" style="font-size:13px;line-height:1.7;">
             <strong>业务依据：</strong>详设 09 V1.2 §五 AI 助理 10 类 Tool + 集团统筹层「统一 AI 入口」+ 详设 10 V1.2a 角色权限隔离。<br>
             <strong>链路：</strong>用户提问 → 路由器识别意图 → 调用对应 Tool（按当前角色权限）→ 查询 SC.store 实时数据 → 返回自然语言响应 + 引用单据穿透链接。<br>
-            <strong>实现说明：</strong>查询 100% 按当前角色权限过滤；写操作必须用户主动确认（详见 ai-write-flow）；导出统一进 R-10 审计表（含水印）。
+            <strong>实现说明：</strong>演示口径下按当前角色筛选可见数据 + 加角色上下文；写操作必须用户主动确认（详见 ai-write-flow）；导出统一进 R-10 审计表（含水印）。<strong>实际生产数据范围以 sub_group_id 完整过滤为准</strong>，本原型仅展示交互界面与口径。
           </div>
         </div>
 
@@ -185,7 +185,7 @@
       } else {
         html += '<div style="background:#fff;padding:10px;border-radius:4px;border:1px solid var(--border);color:var(--text-2);">未识别问题，请试试上方按钮。</div>';
       }
-      html += '<div style="margin-top:8px;font-size:11px;color:var(--text-3);">⏱ 查询用时 ~12ms · 当前角色：' + SC.getRole().label + '（数据已按权限过滤）</div>';
+      html += '<div style="margin-top:8px;font-size:11px;color:var(--text-3);">⏱ 查询用时 ~12ms · 当前角色：' + SC.getRole().label + '（演示口径按当前角色筛选；实际过滤以 sub_group_id 为准）</div>';
       out.innerHTML = html;
     }
   </script>

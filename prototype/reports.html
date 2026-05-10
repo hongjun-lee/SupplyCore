@@ -101,7 +101,7 @@
               <div class="card-body" style="display:flex;gap:12px;align-items:start;">
                 <span class="badge blue dot">边界</span>
                 <div class="text-2">
-                  <div><strong>权限隔离：</strong>AI 助理调用任何 Tool 均按发起人当前账号、角色、数据范围执行；不会跨角色越权。</div>
+                  <div><strong>权限隔离原则：</strong>AI 助理调用任何 Tool 均按发起人当前账号、角色、数据范围执行（演示原型按角色筛选界面，实际生产由 sub_group_id 完整过滤；详见 ai-assistant 实现说明）。</div>
                   <div class="mt-8"><strong>导出审计：</strong>由 AI 触发的报表导出与人工导出共用 <span class="font-mono">09 导出审计 (R-10)</span> 表，含水印与下载明细。</div>
                   <div class="mt-8"><strong>对接位置：</strong>纳入集团统一 AI 入口（详见集团统筹层 AI 接入专题），不作为系统外挂。</div>
                 </div>

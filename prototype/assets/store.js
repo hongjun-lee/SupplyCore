@@ -13,6 +13,9 @@
   var KEY_PREFIX = 'sc:'; // LocalStorage key 前缀
   var SEQ_PREFIX = 'sc:_seq:';
   var BUS_NAME = 'sc-state-bus';
+  var SCHEMA_VERSION_KEY = 'sc:_schemaVersion';
+  // 当 seed 结构 / 状态机 / 字段口径有破坏性变更时，更新此版本号 → 自动提示用户重置
+  var CURRENT_SCHEMA_VERSION = '0.22';
 
   var bus = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel(BUS_NAME) : null;
   var subs = {};   // entity → [callback]
@@ -58,6 +61,30 @@
 
   SC.store = {
     KEY_PREFIX: KEY_PREFIX,
+    SCHEMA_VERSION: CURRENT_SCHEMA_VERSION,
+
+    /* ---------- Schema 版本检查 ---------- */
+    /* 启动时调用：如本地 schemaVersion 与代码不一致，提示用户重置（避免老数据 + 新代码的状态错乱）*/
+    checkSchemaVersion: function () {
+      var stored = localStorage.getItem(SCHEMA_VERSION_KEY);
+      if (!stored) {
+        // 首次访问 / 全新浏览器 → 直接写入当前版本
+        localStorage.setItem(SCHEMA_VERSION_KEY, CURRENT_SCHEMA_VERSION);
+        return { match: true, stored: null, current: CURRENT_SCHEMA_VERSION };
+      }
+      if (stored === CURRENT_SCHEMA_VERSION) {
+        return { match: true, stored: stored, current: CURRENT_SCHEMA_VERSION };
+      }
+      // 版本不一致 — 不自动重置（避免误清用户数据），返回信息让 UI 层决定
+      return { match: false, stored: stored, current: CURRENT_SCHEMA_VERSION };
+    },
+
+    /* 用户确认后的重置 + 升级版本号 */
+    upgradeSchema: function () {
+      SC.store.reset();
+      localStorage.setItem(SCHEMA_VERSION_KEY, CURRENT_SCHEMA_VERSION);
+      console.log('[store] schema upgraded → ' + CURRENT_SCHEMA_VERSION);
+    },
 
     /* ---------- 初始化 / 重置 ---------- */
     seed: function (seedData) {
@@ -78,8 +105,12 @@
       }
       for (var j = localStorage.length - 1; j >= 0; j--) {
         var oldKey = localStorage.key(j);
-        if (oldKey && oldKey.indexOf(KEY_PREFIX) === 0) localStorage.removeItem(oldKey);
+        if (oldKey && oldKey.indexOf(KEY_PREFIX) === 0 && oldKey !== SCHEMA_VERSION_KEY) {
+          localStorage.removeItem(oldKey);
+        }
       }
+      // 重置后回写当前版本号
+      localStorage.setItem(SCHEMA_VERSION_KEY, CURRENT_SCHEMA_VERSION);
       Object.keys(seedRef).forEach(function (entity) {
         write(entity, JSON.parse(JSON.stringify(seedRef[entity])));
       });
