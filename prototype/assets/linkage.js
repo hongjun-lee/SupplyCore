@@ -52,11 +52,53 @@
    * 预定义关键联动（对齐 02 V0.4 §6.2-6.3 + V0.4a 收口）
    * ==================================================== */
 
-  /* P-02 计划审批通过 → 按 P-03 计划行预生成 P-05 草稿 */
+  /* P-01 需求审批通过 → 自动归集到当月同 org P-02 草稿 + 创建 P-03 计划行（v0.16 补 P1-1）
+   * 修复同事评审 P1-1：原 P-01 已审是终态，没 linkage 进入 P-02 链路 */
+  SC.linkage.on('P-01:已审', function (req) {
+    var period = (req.submit_date || new Date().toISOString().slice(0, 10)).slice(0, 7); // YYYY-MM
+    var orgId = req.org_id;
+    // 找当月 + 同 org 的 P-02 草稿（幂等聚合）
+    var plan = SC.store.list('P-02').filter(function (p) {
+      return p.period === period && p.org_id === orgId && p.state === '草稿';
+    })[0];
+    if (!plan) {
+      plan = SC.store.create('P-02', {
+        plan_no: SC.store.nextNo('PP'),
+        period: period,
+        org_id: orgId,
+        amount: 0,
+        state: '草稿',
+        owner: '系统聚合（来自 P-01 审批）',
+      });
+      console.log('[linkage] P-01:' + req.id + ' 已审 → 新建 P-02 #' + plan.id + '（' + period + ' / org#' + orgId + '）');
+    }
+    // 幂等：检查是否已有同 source_request_no 的 P-03
+    var existingLine = SC.store.list('P-03').filter(function (l) {
+      return l.plan_id === plan.id && l.source_request_no === req.request_no;
+    })[0];
+    if (existingLine) {
+      console.log('[linkage] P-01:' + req.id + ' 已聚合到 P-02 #' + plan.id + '（P-03 #' + existingLine.id + ' 已存在，跳过）');
+      return;
+    }
+    var lineCount = SC.store.list('P-03', { plan_id: plan.id }).length;
+    SC.store.create('P-03', {
+      plan_id: plan.id,
+      plan_line_no: plan.plan_no + '-' + String(lineCount + 1).padStart(2, '0'),
+      material_id: req.material_id,
+      quantity: req.quantity,
+      amount: req.amount,
+      tender_type: '招标', // 默认招采，计划员可在 P-02 审批后于任务分解页改
+      source_request_no: req.request_no,
+    });
+    SC.store.update('P-02', plan.id, { amount: (plan.amount || 0) + (req.amount || 0) });
+    console.log('[linkage] P-01:' + req.id + ' 已审 → P-02 #' + plan.id + ' 加 P-03 行（金额累计 ' + ((plan.amount || 0) + (req.amount || 0)) + '）');
+  });
+
+  /* P-02 计划审批通过 → 按 P-03 计划行预生成 P-05 草稿（幂等，v0.16 补 P1-2）
+   * 修复同事评审 P1-2：原直接 create 没查重，重复 emit 会重复创建 */
   SC.linkage.on('P-02:已审', function (plan) {
     var lines = SC.store.list('P-03', { plan_id: plan.id });
     if (lines.length === 0 && plan.lines) {
-      // 嵌入式 lines 兼容
       lines = plan.lines.map(function (l, i) {
         return Object.assign({ id: -(i + 1) }, l);
       });
@@ -65,7 +107,14 @@
       console.warn('[linkage] P-02:' + plan.id + ' 已审，但无计划行可生成 P-05');
       return;
     }
+    // 幂等：先查已存在的 P-05（按 plan_line_id 索引）
+    var existingTasks = SC.store.list('P-05', { plan_id: plan.id });
+    var existingByLine = {};
+    existingTasks.forEach(function (t) { existingByLine[t.plan_line_id] = t; });
+
+    var created = 0, skipped = 0;
     lines.forEach(function (line) {
+      if (existingByLine[line.id]) { skipped++; return; }
       SC.store.create('P-05', {
         task_no: SC.store.nextNo('PT'),
         plan_id: plan.id,
@@ -74,15 +123,16 @@
         quantity: line.quantity,
         amount: line.amount,
         task_state: '草稿',
-        tender_type: line.tender_type || null, // 计划员后续手工选择
+        tender_type: line.tender_type || null,
       });
+      created++;
     });
-    console.log('[linkage] P-02:' + plan.id + ' 已审 → 生成 ' + lines.length + ' 个 P-05 草稿');
+    console.log('[linkage] P-02:' + plan.id + ' 已审 → P-05 created=' + created + ' skipped=' + skipped + '（幂等，按 plan_line_id 查重）');
   });
 
-  /* P-05 计划员确认分解 → 按采购方式分流 + 触发 P-02 自动转已分解 */
+  /* P-05 计划员确认分解 → 按采购方式分流（招采/直采/合同采购，v0.16 补 P1-3）
+   * 修复同事评审 P1-3：原只处理招采/直采，合同采购页面允许选但 linkage 没处理 */
   SC.linkage.on('P-05:草稿→已分解', function (task) {
-    // 路径分流：招采 → T-01；直采 → S-01
     if (task.tender_type === '招标' || task.tender_type === '招采') {
       SC.store.create('T-01', {
         application_no: SC.store.nextNo('TA'),
@@ -103,6 +153,22 @@
         state: '草稿',
       });
       console.log('[linkage] P-05:' + task.id + ' 已分解 (直采) → 创建 S-01');
+    } else if (task.tender_type === '合同采购') {
+      // 找现有已签 / 执行中合同；找不到也创建 S-01 但 contract_id=null（提示需关联）
+      var contract = SC.store.list('C-02').filter(function (c) {
+        return c.state === '已签' || c.state === '执行中';
+      })[0];
+      SC.store.create('S-01', {
+        request_no: SC.store.nextNo('PR'),
+        task_id: task.id,
+        plan_id: task.plan_id,
+        material_id: task.material_id,
+        amount: task.amount,
+        contract_id: contract ? contract.id : null,
+        state: '草稿',
+        purchase_route: '合同采购',
+      });
+      console.log('[linkage] P-05:' + task.id + ' 已分解 (合同采购) → 创建 S-01 关联 C-02 #' + (contract ? contract.id : 'null'));
     }
 
     // V0.4a：检查所属 P-02 全部 P-05 是否都已脱离草稿态；满足则触发 P-02 自动转已分解
@@ -115,6 +181,36 @@
         } catch (e) { console.warn('[linkage] auto-transition failed', e.message); }
       }
     }
+  });
+
+  /* S-01 采购申请审批通过 → 自动创建 S-02 订单（v0.16 补 P1-3）
+   * 衔接直采 / 合同采购 路径直达订单 */
+  SC.linkage.on('S-01:已审', function (req) {
+    SC.store.create('S-02', {
+      order_no: SC.store.nextNo('CG'),
+      request_id: req.id,
+      contract_id: req.contract_id || null,
+      task_id: req.task_id,
+      material_id: req.material_id,
+      amount: req.amount,
+      order_state: '草稿',
+      purchase_route: req.purchase_route || '直采',
+    });
+    console.log('[linkage] S-01:' + req.id + ' 已审 → 创建 S-02 订单（' + (req.purchase_route || '直采') + '）');
+  });
+
+  /* C-01 会签通过 → 自动创建 C-02 已签（v0.16 补 P2-1）
+   * 修复同事评审 P2-1：C-01 会签通过原是手工按钮，没走统一引擎 */
+  SC.linkage.on('C-01:已批准', function (approval) {
+    var contract = SC.store.create('C-02', {
+      contract_no: SC.store.nextNo('HT'),
+      approval_id: approval.id,
+      supplier_id: approval.supplier_id,
+      amount: approval.contract_amount,
+      payment_terms: '30% 预付 + 60% 验收 + 10% 质保（一期 payment_terms 文本，二期 A4 落 C-04 实体）',
+      state: '已签',
+    });
+    console.log('[linkage] C-01:' + approval.id + ' 已批准 → 自动创建 C-02 #' + contract.id);
   });
 
   /* T-05 中标结果验证通过 → 自动创建 C-01 合同会签 */

@@ -258,6 +258,32 @@
     guards: {},
   });
 
+  // C-01 合同会签（v0.16 补 P2-1：原 C-01 没状态机，contract-detail 用手工按钮）
+  SC.sm.define('C-01', {
+    stateField: 'approval_state',
+    initial: '会签中',
+    states: {
+      '会签中': { on: { '会签通过': '已批准', '会签驳回': '已驳回' } },
+      '已批准': {},
+      '已驳回': { on: { '修改后重提': '会签中' } },
+    },
+    guards: {},
+  });
+
+  // S-01 采购申请（v0.16 补 P1-3：直采 / 合同采购 路径达到订单）
+  SC.sm.define('S-01', {
+    stateField: 'state',
+    initial: '草稿',
+    states: {
+      '草稿': { on: { '提交审批': '待审', '作废': '已作废' } },
+      '待审': { on: { '审批通过': '已审', '审批驳回': '已驳回' } },
+      '已审': {},
+      '已驳回': { on: { '修改后重提': '待审' } },
+      '已作废': {},
+    },
+    guards: {},
+  });
+
   // S-05 采购入库（详设 06，最关键的演示点：S-05:已审 触发库存原子事务 + NC mock）
   SC.sm.define('S-05', {
     stateField: 'state',
@@ -272,5 +298,5 @@
     guards: {},
   });
 
-  console.log('[sm] ready · 9 machines:', Object.keys(machines).join(', '));
+  console.log('[sm] ready · ' + Object.keys(machines).length + ' machines:', Object.keys(machines).join(', '));
 })();

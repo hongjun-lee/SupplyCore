@@ -156,14 +156,15 @@
     /* ---------- 引擎面板 E1 审批中心 ---------- */
     var currentTab = 'todo';
 
-    /* 跨实体待办聚合规则 */
+    /* 跨实体待办聚合规则（v0.16 修复同事评审 P2-1：C-02 改为 C-01 与文案一致；加 S-01） */
     var TODO_RULES = [
-      { entity: 'P-01', stateField: 'state', states: ['待审'],          label: '需求', amountField: 'amount', codeField: 'request_no',     descField: 'purpose' },
-      { entity: 'P-02', stateField: 'state', states: ['待审'],          label: '采购计划', amountField: 'amount', codeField: 'plan_no',    descField: 'period' },
-      { entity: 'C-02', stateField: 'state', states: ['会签中'],        label: '合同',     amountField: 'amount', codeField: 'contract_no', descField: 'state' },
-      { entity: 'T-01', stateField: 'state', states: ['待审'],          label: '招标申请', amountField: 'amount', codeField: 'application_no', descField: 'state' },
-      { entity: 'S-02', stateField: 'order_state', states: ['草稿'],   label: '采购订单', amountField: 'amount', codeField: 'order_no',    descField: 'state' },
-      { entity: 'S-05', stateField: 'state', states: ['待审'],          label: '采购入库', amountField: null,    codeField: 'receipt_no',  descField: 'state' },
+      { entity: 'P-01', stateField: 'state', states: ['待审'],                  label: '需求',     amountField: 'amount', codeField: 'request_no',     descField: 'purpose' },
+      { entity: 'P-02', stateField: 'state', states: ['待审'],                  label: '采购计划', amountField: 'amount', codeField: 'plan_no',        descField: 'period' },
+      { entity: 'C-01', stateField: 'approval_state', states: ['会签中'],       label: '合同会签', amountField: 'contract_amount', codeField: 'approval_no', descField: 'approval_state' },
+      { entity: 'T-01', stateField: 'state', states: ['待审'],                  label: '招标申请', amountField: 'amount', codeField: 'application_no', descField: 'state' },
+      { entity: 'S-01', stateField: 'state', states: ['待审'],                  label: '采购申请', amountField: 'amount', codeField: 'request_no',     descField: 'purchase_route' },
+      { entity: 'S-02', stateField: 'order_state', states: ['草稿'],            label: '采购订单', amountField: 'amount', codeField: 'order_no',       descField: 'order_state' },
+      { entity: 'S-05', stateField: 'state', states: ['待审'],                  label: '采购入库', amountField: null,     codeField: 'receipt_no',     descField: 'state' },
     ];
 
     function engineGetAllTodos() {
@@ -268,8 +269,8 @@
       }
     }
 
-    /* 订阅所有相关实体 */
-    ['P-01', 'P-02', 'P-05', 'C-01', 'C-02', 'T-01', 'T-03', 'T-05', 'S-02', 'S-05'].forEach(function (e) {
+    /* 订阅所有相关实体（含 S-01 v0.16） */
+    ['P-01', 'P-02', 'P-05', 'C-01', 'C-02', 'T-01', 'T-03', 'T-05', 'S-01', 'S-02', 'S-05'].forEach(function (e) {
       SC.store.subscribe(e, engineRenderApproval);
     });
     engineRenderApproval();

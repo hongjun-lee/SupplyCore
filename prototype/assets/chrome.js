@@ -97,7 +97,7 @@ SC.renderHeader = function () {
     <button class="menu-toggle" id="menu-toggle" aria-label="菜单">☰</button>
     <div class="logo">
       <div class="mark">辽</div>
-      <div>辽宁能源 · 阜矿物资供应管理系统 <span class="sub">原型 v0.15</span></div>
+      <div>辽宁能源 · 阜矿物资供应管理系统 <span class="sub">原型 v0.16</span></div>
     </div>
     <span class="spacer"></span>
     <div class="h-item">二级集团：<strong style="color:var(--text);font-weight:500;margin-left:4px;">${sg.name}</strong></div>
@@ -154,7 +154,7 @@ SC.renderFooter = function () {
   if (document.querySelector('.app-footer')) return;
   const f = document.createElement('div');
   f.className = 'app-footer';
-  f.innerHTML = `SupplyCore 原型 v0.15 · 演示数据，不作为开发或验收依据 · ${SC.docVer}`;
+  f.innerHTML = `SupplyCore 原型 v0.16 · 演示数据，不作为开发或验收依据 · ${SC.docVer}`;
   document.body.appendChild(f);
 };
 
