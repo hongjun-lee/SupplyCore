@@ -580,7 +580,7 @@ SC.fmtMoney = function (n) {
 };
 SC.fmtNum = function (n) { return Number(n).toLocaleString('zh-CN'); };
 
-/* ─── 档 A 二期 · B1 时间穿越 widget（右下角浮动） ─── */
+/* ─── 档 A 二阶段 · B1 时间穿越 widget（右下角浮动） ─── */
 SC.renderTimeWidget = function () {
   if (!SC.time) return; // time.js 未加载则不渲染
   if (document.getElementById('sc-time-widget')) return;

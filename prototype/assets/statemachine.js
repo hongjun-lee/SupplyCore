@@ -1,5 +1,5 @@
 /* ============================================================
- * 档 A 一期 · Day 2 · 状态机引擎
+ * 档 A 一阶段 · Day 2 · 状态机引擎
  * SC.sm — define / canTransition / getAllowedEvents / transition
  *
  * 状态机配置结构：
@@ -284,7 +284,7 @@
     guards: {},
   });
 
-  // S-07 采购入库暂估（详设 06 §4.7 + 02 V0.4 二期 A8）
+  // S-07 采购入库暂估（详设 06 §4.7 + 02 V0.4 二阶段 A8）
   SC.sm.define('S-07', {
     stateField: 'estimate_state',
     initial: '暂估中',
@@ -297,7 +297,7 @@
     guards: {},
   });
 
-  // S-08 领料申请（详设 06 + 02 V0.4 二期 A2 出库主线）
+  // S-08 领料申请（详设 06 + 02 V0.4 二阶段 A2 出库主线）
   SC.sm.define('S-08', {
     stateField: 'state',
     initial: '草稿',
@@ -312,7 +312,7 @@
     guards: {},
   });
 
-  // S-09 出库执行（详设 06 + 二期 A2，对应 BIZ-005 自用消耗）
+  // S-09 出库执行（详设 06 + 二阶段 A2，对应 BIZ-005 自用消耗）
   SC.sm.define('S-09', {
     stateField: 'state',
     initial: '草稿',
@@ -325,7 +325,7 @@
     guards: {},
   });
 
-  // C-08 付款申请（详设 05 §7 + 二期 A4b）
+  // C-08 付款申请（详设 05 §7 + 二阶段 A4b）
   SC.sm.define('C-08', {
     stateField: 'state',
     initial: '草稿',
@@ -340,7 +340,7 @@
     guards: {},
   });
 
-  // C-10 付款执行（详设 05 §7 + 二期 A4b，对应 BIZ-013 NC 实付回写）
+  // C-10 付款执行（详设 05 §7 + 二阶段 A4b，对应 BIZ-013 NC 实付回写）
   SC.sm.define('C-10', {
     stateField: 'state',
     initial: '待执行',
@@ -354,7 +354,7 @@
     guards: {},
   });
 
-  // C-04 合同付款节点（详设 05 §4.4 + 二期 A4a — 4 状态机）
+  // C-04 合同付款节点（详设 05 §4.4 + 二阶段 A4a — 4 状态机）
   SC.sm.define('C-04', {
     stateField: 'node_state',
     initial: '待满足',
@@ -367,7 +367,7 @@
     guards: {},
   });
 
-  // C-07 付款计划（详设 05 §4.6 + 二期 A4a — 4 状态机，由 C-04 自动驱动）
+  // C-07 付款计划（详设 05 §4.6 + 二阶段 A4a — 4 状态机，由 C-04 自动驱动）
   SC.sm.define('C-07', {
     stateField: 'plan_state',
     initial: '待满足',
@@ -380,7 +380,7 @@
     guards: {},
   });
 
-  // S-11 调拨申请（详设 06 + 二期 A3 调拨主线）
+  // S-11 调拨申请（详设 06 + 二阶段 A3 调拨主线）
   SC.sm.define('S-11', {
     stateField: 'state',
     initial: '草稿',
@@ -395,7 +395,7 @@
     guards: {},
   });
 
-  // S-12 调拨执行（详设 06 + 二期 A3，对应 BIZ-007 内部往来）
+  // S-12 调拨执行（详设 06 + 二阶段 A3，对应 BIZ-007 内部往来）
   SC.sm.define('S-12', {
     stateField: 'state',
     initial: '草稿',
@@ -407,7 +407,7 @@
     guards: {},
   });
 
-  // S-15 盘点单（详设 06 + 二期 A5 盘点主线）
+  // S-15 盘点单（详设 06 + 二阶段 A5 盘点主线）
   SC.sm.define('S-15', {
     stateField: 'state',
     initial: '草稿',
@@ -423,7 +423,7 @@
     guards: {},
   });
 
-  // S-17 盘盈盘亏调整（详设 06 + 二期 A5，对应 BIZ-008 盘盈 / BIZ-009 盘亏）
+  // S-17 盘盈盘亏调整（详设 06 + 二阶段 A5，对应 BIZ-008 盘盈 / BIZ-009 盘亏）
   SC.sm.define('S-17', {
     stateField: 'state',
     initial: '草稿',
@@ -437,7 +437,7 @@
     guards: {},
   });
 
-  // M-13 供应商后评价（详设 04 §4.1.4 + 二期 A12，差评累计触发重评估）
+  // M-13 供应商后评价（详设 04 §4.1.4 + 二阶段 A12，差评累计触发重评估）
   SC.sm.define('M-13', {
     stateField: 'state',
     initial: '草稿',
@@ -451,7 +451,7 @@
     guards: {},
   });
 
-  // M-09 供应商状态（详设 04 + 二期 B3，maintained by 主数据 + 后评价 linkage）
+  // M-09 供应商状态（详设 04 + 二阶段 B3，maintained by 主数据 + 后评价 linkage）
   SC.sm.define('M-09', {
     stateField: 'state',
     initial: '合格',
@@ -463,7 +463,7 @@
     guards: {},
   });
 
-  // S-19 废旧处置申请（详设 06 §10 + 二期 A6）
+  // S-19 废旧处置申请（详设 06 §10 + 二阶段 A6）
   SC.sm.define('S-19', {
     stateField: 'state',
     initial: '草稿',
@@ -478,7 +478,7 @@
     guards: {},
   });
 
-  // S-23 直达使用单位单据（二期 A11，不进库存）
+  // S-23 直达使用单位单据（二阶段 A11，不进库存）
   SC.sm.define('S-23', {
     stateField: 'state',
     initial: '草稿',
@@ -490,7 +490,7 @@
     guards: {},
   });
 
-  // E-08 租赁登记（详设 07 + 二期 A7，单状态机管理租赁全生命周期）
+  // E-08 租赁登记（详设 07 + 二阶段 A7，单状态机管理租赁全生命周期）
   SC.sm.define('E-08', {
     stateField: 'state',
     initial: '草稿',
@@ -506,7 +506,7 @@
     guards: {},
   });
 
-  // E-04 外委检修（详设 07 §5.4 + 二期 A10）
+  // E-04 外委检修（详设 07 §5.4 + 二阶段 A10）
   SC.sm.define('E-04', {
     stateField: 'state',
     initial: '草稿',
@@ -522,7 +522,7 @@
     guards: {},
   });
 
-  // OP-01 委托加工（详设 06 §委托加工 + 二期 A9）
+  // OP-01 委托加工（详设 06 §委托加工 + 二阶段 A9）
   SC.sm.define('OP-01', {
     stateField: 'state',
     initial: '草稿',

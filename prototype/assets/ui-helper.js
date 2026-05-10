@@ -1,5 +1,5 @@
 /* ============================================================
- * 档 A 一期 · Day 5 · UI 通用组件
+ * 档 A 一阶段 · Day 5 · UI 通用组件
  * SC.ui — confirm / alert / toast / loading / prompt
  *
  * 简单 Modal 与 Toast 实现，统一 alert/confirm 体验，避免散乱的 window.alert。

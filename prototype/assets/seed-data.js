@@ -1,5 +1,5 @@
 /* ============================================================
- * 档 A 一期 · Day 3 · 主数据预填
+ * 档 A 一阶段 · Day 3 · 主数据预填
  * SC.seedData — 静态主数据，store.seed 时灌入 LocalStorage
  *
  * 包含：
@@ -65,22 +65,22 @@
       { id: 4, code: 'CC-WLK-01', name: '五龙矿·运输二队',     org_id: 5 },
     ],
 
-    /* F-13 NC 接口开关（v0.19 二期 P1：再加 BIZ-007 调拨 / BIZ-008 盘盈 / BIZ-009 盘亏） */
+    /* F-13 NC 接口开关（v0.19 二阶段 P1：再加 BIZ-007 调拨 / BIZ-008 盘盈 / BIZ-009 盘亏） */
     'F-13': [
       { id: 1, switch_code: 'BIZ-001-switch', interface_name: '采购入库（正式）',         switch_status: '开' },
-      { id: 2, switch_code: 'BIZ-002-switch', interface_name: '采购入库（暂估）',         switch_status: '开', remark: '二期 A8 暂估闭环 — BIZ-002 暂估 + BIZ-003 红字冲销' },
-      { id: 3, switch_code: 'BIZ-005-switch', interface_name: '出库（自用消耗）',         switch_status: '开', remark: '二期 A2 出库主线' },
-      { id: 4, switch_code: 'BIZ-007-switch', interface_name: '调拨（内部往来对冲）',     switch_status: '开', remark: '二期 P1 A3 调拨主线' },
-      { id: 5, switch_code: 'BIZ-008-switch', interface_name: '盘盈（增加库存）',         switch_status: '开', remark: '二期 P1 A5 盘点 — 盘盈调整凭证' },
-      { id: 6, switch_code: 'BIZ-009-switch', interface_name: '盘亏（减少库存）',         switch_status: '开', remark: '二期 P1 A5 盘点 — 盘亏调整凭证' },
-      { id: 7, switch_code: 'BIZ-010-switch', interface_name: '废旧报废',                 switch_status: '开', remark: '二期 P2 A6 废旧处置 — 报废凭证' },
-      { id: 8, switch_code: 'BIZ-011-switch', interface_name: '废旧变卖',                 switch_status: '开', remark: '二期 P2 A6 废旧处置 — 变卖收入凭证' },
-      { id: 9, switch_code: 'BIZ-012-switch', interface_name: '废旧回收',                 switch_status: '开', remark: '二期 P2 A6 废旧处置 — 回收凭证' },
-      { id: 10, switch_code: 'BIZ-013-switch', interface_name: '付款执行',                 switch_status: '开', remark: '二期 A4b 付款链路 — NC 实付回写' },
-      { id: 11, switch_code: 'BIZ-019-switch', interface_name: '租赁费用 / 加工费',        switch_status: '开', remark: '二期 P2 A7 设备租赁 + A9 委托加工 — 月度费用结算' },
-      { id: 12, switch_code: 'BIZ-014-switch', interface_name: '预付款转应付',             switch_status: '开', remark: '二期 P0 A4b — 预付节点（payment_node_no=1）走 BIZ-014，到货后转 BIZ-015' },
-      { id: 13, switch_code: 'BIZ-015-switch', interface_name: '应付暂估转正式',           switch_status: '开', remark: '二期 P0 A4b — S-07 暂估冲销后正式发票入账，与 BIZ-001 普通采购入库区分' },
-      { id: 14, switch_code: 'BIZ-020-switch', interface_name: '月度应付消减',             switch_status: '开', remark: '二期 P0 A4b — 月末批量消减已付应付，与 BIZ-013 实付逐笔消减并行' },
+      { id: 2, switch_code: 'BIZ-002-switch', interface_name: '采购入库（暂估）',         switch_status: '开', remark: '二阶段 A8 暂估闭环 — BIZ-002 暂估 + BIZ-003 红字冲销' },
+      { id: 3, switch_code: 'BIZ-005-switch', interface_name: '出库（自用消耗）',         switch_status: '开', remark: '二阶段 A2 出库主线' },
+      { id: 4, switch_code: 'BIZ-007-switch', interface_name: '调拨（内部往来对冲）',     switch_status: '开', remark: '二阶段 P1 A3 调拨主线' },
+      { id: 5, switch_code: 'BIZ-008-switch', interface_name: '盘盈（增加库存）',         switch_status: '开', remark: '二阶段 P1 A5 盘点 — 盘盈调整凭证' },
+      { id: 6, switch_code: 'BIZ-009-switch', interface_name: '盘亏（减少库存）',         switch_status: '开', remark: '二阶段 P1 A5 盘点 — 盘亏调整凭证' },
+      { id: 7, switch_code: 'BIZ-010-switch', interface_name: '废旧报废',                 switch_status: '开', remark: '二阶段 P2 A6 废旧处置 — 报废凭证' },
+      { id: 8, switch_code: 'BIZ-011-switch', interface_name: '废旧变卖',                 switch_status: '开', remark: '二阶段 P2 A6 废旧处置 — 变卖收入凭证' },
+      { id: 9, switch_code: 'BIZ-012-switch', interface_name: '废旧回收',                 switch_status: '开', remark: '二阶段 P2 A6 废旧处置 — 回收凭证' },
+      { id: 10, switch_code: 'BIZ-013-switch', interface_name: '付款执行',                 switch_status: '开', remark: '二阶段 A4b 付款链路 — NC 实付回写' },
+      { id: 11, switch_code: 'BIZ-019-switch', interface_name: '租赁费用 / 加工费',        switch_status: '开', remark: '二阶段 P2 A7 设备租赁 + A9 委托加工 — 月度费用结算' },
+      { id: 12, switch_code: 'BIZ-014-switch', interface_name: '预付款转应付',             switch_status: '开', remark: '二阶段 P0 A4b — 预付节点（payment_node_no=1）走 BIZ-014，到货后转 BIZ-015' },
+      { id: 13, switch_code: 'BIZ-015-switch', interface_name: '应付暂估转正式',           switch_status: '开', remark: '二阶段 P0 A4b — S-07 暂估冲销后正式发票入账，与 BIZ-001 普通采购入库区分' },
+      { id: 14, switch_code: 'BIZ-020-switch', interface_name: '月度应付消减',             switch_status: '开', remark: '二阶段 P0 A4b — 月末批量消减已付应付，与 BIZ-013 实付逐笔消减并行' },
     ],
 
     /* P-01 示例需求（演示用，v0.16 改为草稿态 — 让用户从最起点演示
@@ -103,12 +103,12 @@
     /* v0.18 二期演示种子：1 个已签合同 + 1 个执行中合同（演示付款链路起点）*/
     'C-02': [
       { id: 1, contract_no: 'HT-2026-0042', supplier_id: 1, amount: 4280000,
-        payment_terms: '30% 预付 + 60% 验收 + 10% 质保（一期 payment_terms 文本，二期 A4 落 C-04 实体）',
+        payment_terms: '30% 预付 + 60% 验收 + 10% 质保（一期 payment_terms 文本，二阶段 A4 落 C-04 实体）',
         executed_amount: 412800, paid_amount: 1284000,
         state: '执行中', signed_date: '2026-03-12' },
     ],
 
-    /* v0.19 二期 P1 A12 后评价种子：3 笔已确认差评（演示供应商累计触发重评估）*/
+    /* v0.19 二阶段 P1 A12 后评价种子：3 笔已确认差评（演示供应商累计触发重评估）*/
     'M-13': [
       { id: 1, supplier_id: 3, score: 2, evaluator: '王志国', evaluated_at: '2026-04-12',
         category: '交付质量', remark: '到货 5 套传感器中 2 套不合格，需要返修', state: '已确认' },

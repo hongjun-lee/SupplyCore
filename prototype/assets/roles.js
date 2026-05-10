@@ -1,5 +1,5 @@
 /* ============================================================
- * 档 A 一期 · Day 5 · 6 角色定义与能力
+ * 档 A 一阶段 · Day 5 · 6 角色定义与能力
  * SC.roles — current / set / capabilities / canSee / dataFilter
  *
  * 注意：SC.data.roles（chrome.js 用的角色列表）继续作为角色基础数据；
