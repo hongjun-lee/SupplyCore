@@ -12,6 +12,34 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · S-04 三类验收串行短路（详设 06 §4.3.1）</div>
+            <div class="actions">
+              <a class="btn btn-sm" href="goods-receipt.html">← S-03 到货</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>质检号</th>
+                  <th>来源 S-03</th>
+                  <th class="num">数量</th>
+                  <th>当前阶段</th>
+                  <th>可执行 events</th>
+                  <th>S-05 入库</th>
+                </tr>
+              </thead>
+              <tbody id="engine-s04-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">串行短路</span>
+              品种 → 数量 → 质量 三阶段串行；任一阶段不合格直接转「已检验」短路（不再走后续阶段，物资入待验区）；全合格 → 自动生成 S-05 草稿。
+            </div>
+          </div>
+        </div>
+
         <!-- 流转条 -->
         <div class="card">
           <div class="flow-strip">
@@ -142,6 +170,83 @@
   </div>
 
   <script src="assets/data.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* ---------- 引擎面板 S-04 串行短路 ---------- */
+    function engineRenderS04() {
+      var qcs = SC.store.list('S-04');
+      var s05 = SC.store.list('S-05');
+      var s03 = SC.store.list('S-03');
+      var s03Map = {}; s03.forEach(function (r) { s03Map[r.id] = r.receipt_no; });
+
+      document.getElementById('engine-s04-tbody').innerHTML = qcs.length === 0
+        ? '<tr><td colspan="6" class="muted" style="text-align:center;padding:18px;">无 S-04 质检 · 先到「到货验收」勾选"需要 S-04"并验收</td></tr>'
+        : qcs.map(function (q) {
+            var events = SC.sm.getAllowedEvents('S-04', q);
+            var stateColor = q.state === '已检验' ? (q.qc_passed ? 'green' : 'red') : 'amber';
+            var stateText = q.state === '已检验'
+              ? (q.qc_passed ? '已检验·合格' : '已检验·不合格(待验区)')
+              : q.state;
+            var s05rec = s05.find(function (e) { return e.qc_id === q.id; });
+            return '<tr>' +
+              '<td class="code">' + (q.qc_no || '#' + q.id) + '</td>' +
+              '<td class="muted">' + (s03Map[q.receipt_id] || '—') + '</td>' +
+              '<td class="num">' + (q.quantity || 0) + '</td>' +
+              '<td>' + SC.badge(stateText, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' +
+                events.map(function (e) {
+                  return '<a href="javascript:void(0)" onclick="engineS04(' + q.id + ', \'' + e + '\')">' + e + '</a>';
+                }).join(' · ') +
+              '</td>' +
+              '<td class="muted" style="font-size:11px;">' +
+                (s05rec ? '<span class="code">S-05 #' + s05rec.id + ' [' + s05rec.state + ']</span>' : '<span class="muted">—</span>') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineS04(id, event) {
+      var q = SC.store.get('S-04', id);
+      try {
+        SC.sm.transition('S-04', id, event);
+        // 检查是否到达「已检验」终态
+        var updated = SC.store.get('S-04', id);
+        if (updated.state === '已检验') {
+          var failed = event.indexOf('不合格') >= 0;
+          SC.store.update('S-04', id, { qc_passed: !failed });
+          if (!failed) {
+            // 三类全合格 → 生成 S-05 草稿
+            var receipt = SC.store.create('S-05', {
+              receipt_no: SC.store.nextNo('RK'),
+              source_receipt_id: q.receipt_id,
+              order_id: q.order_id,
+              qc_id: id,
+              warehouse_id: 2,
+              org_id: 3,
+              quantity: q.quantity,
+              state: '草稿',
+            });
+            SC.ui.toast('S-04 #' + id + ' 三类全合格 → 自动生成 S-05 #' + receipt.id, 'success');
+          } else {
+            SC.ui.toast('S-04 #' + id + ' 短路（' + event + '），物资入待验区，不进库存', 'warning');
+          }
+        } else {
+          SC.ui.toast('S-04 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    SC.store.subscribe('S-04', engineRenderS04);
+    SC.store.subscribe('S-05', engineRenderS04);
+    SC.store.subscribe('S-03', engineRenderS04);
+    engineRenderS04();
+  </script>
   <script src="assets/chrome.js"></script>
   <script>
     SC.layout({

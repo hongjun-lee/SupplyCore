@@ -12,6 +12,36 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · S-02 采购订单（关联 C-02 + 下达触发 NC mock）</div>
+            <div class="actions">
+              <a class="btn btn-sm" href="contract-detail.html">← C-02 合同</a>
+              <a class="btn btn-sm" href="goods-receipt.html">→ S-03 到货</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>订单号</th>
+                  <th>关联 C-02</th>
+                  <th class="num">金额</th>
+                  <th>状态</th>
+                  <th>NC 接口</th>
+                  <th>可执行 events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-s02-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动演示</span>
+              S-02 下达 → 触发 NC mock 订单同步（演示用，非 BIZ-001 入库）；状态机 5 态：草稿 / 已下达 / 部分到货 / 全部到货 / 已关闭。
+            </div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="filter-bar">
             <div class="form-field"><label>订单号</label><input placeholder="CG-2026-…"></div>
@@ -91,6 +121,78 @@
   </div>
 
   <script src="assets/data.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* ---------- 引擎面板 S-02 ---------- */
+    function engineRenderS02() {
+      var orders = SC.store.list('S-02');
+      var c02 = SC.store.list('C-02');
+      var c02Map = {}; c02.forEach(function (c) { c02Map[c.id] = c.contract_no; });
+
+      document.getElementById('engine-s02-tbody').innerHTML = orders.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">无 S-02 订单 · 先到 C-02 合同点"+ 新建订单"或下面按钮</td></tr>'
+        : orders.map(function (o) {
+            var events = SC.sm.getAllowedEvents('S-02', o);
+            var stateColor = o.order_state === '已关闭' ? 'green' : o.order_state === '全部到货' ? 'blue' : o.order_state === '部分到货' ? 'amber' : o.order_state === '已下达' ? 'amber' : 'gray';
+            return '<tr>' +
+              '<td class="code">' + (o.order_no || '#' + o.id) + '</td>' +
+              '<td class="muted">' + (c02Map[o.contract_id] || '—') + '</td>' +
+              '<td class="num">' + SC.fmtMoney(o.amount || 0) + '</td>' +
+              '<td>' + SC.badge(o.order_state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (o.nc_synced ? '<span class="badge green dot">已同步</span>' : '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineS02(' + o.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    window.engineCreateS02 = function () {
+      var contracts = SC.store.list('C-02').filter(function (c) { return c.state === '已签' || c.state === '执行中'; });
+      if (contracts.length === 0) { SC.ui.toast('没有可用 C-02 合同（已签/执行中）。先去合同详情触发会签', 'warning'); return; }
+      var c = contracts[contracts.length - 1];
+      var order = SC.store.create('S-02', {
+        order_no: SC.store.nextNo('CG'),
+        contract_id: c.id,
+        amount: c.amount * 0.5,
+        order_state: '草稿',
+      });
+      SC.ui.toast('S-02 #' + order.id + ' 草稿已创建（关联 C-02 #' + c.id + '）', 'success');
+    };
+
+    function engineS02(id, event) {
+      try {
+        SC.sm.transition('S-02', id, event);
+        if (event === '下达') {
+          SC.store.update('S-02', id, { nc_synced: true, nc_sync_time: new Date().toISOString() });
+          SC.ui.toast('S-02 #' + id + ' 已下达 → NC mock 订单同步成功', 'success');
+        } else {
+          SC.ui.toast('S-02 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    SC.store.subscribe('S-02', engineRenderS02);
+    SC.store.subscribe('C-02', engineRenderS02);
+    engineRenderS02();
+
+    // 在引擎面板上方加"+ 创建订单"按钮（如果没有）
+    var actionDiv = document.querySelector('#page-area > .card:first-child .actions');
+    if (actionDiv && !actionDiv.querySelector('.engine-create-btn')) {
+      var btn = document.createElement('button');
+      btn.className = 'btn btn-sm btn-primary engine-create-btn';
+      btn.textContent = '+ 创建 S-02 订单';
+      btn.onclick = window.engineCreateS02;
+      actionDiv.insertBefore(btn, actionDiv.firstChild);
+    }
+  </script>
   <script src="assets/chrome.js"></script>
   <script>
     SC.layout({

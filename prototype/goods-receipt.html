@@ -12,6 +12,37 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · S-03 到货 + D3 质检开关</div>
+            <div class="actions">
+              <button class="btn btn-sm" onclick="engineCreateS03()">+ 创建 S-03 到货</button>
+              <a class="btn btn-sm" href="purchase-orders.html">← S-02 订单</a>
+              <a class="btn btn-sm" href="quality-check.html">→ S-04 质检</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>到货号</th>
+                  <th>来源 S-02</th>
+                  <th class="num">数量</th>
+                  <th>需要质检 (D3)</th>
+                  <th>状态</th>
+                  <th>下游 S-04 / S-05</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-s03-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">D3 质检开关</span>
+              到货验收通过后：勾选「需要质检」→ 创建 S-04 进入串行短路；不勾 → 直接生成 S-05 草稿。质检不合格物资进待验区，不进库存（详设 06 §4.3.1）。
+            </div>
+          </div>
+        </div>
+
         <!-- 流转条 -->
         <div class="card">
           <div class="flow-strip">
@@ -193,6 +224,107 @@
   </div>
 
   <script src="assets/data.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* ---------- 引擎面板 S-03 + D3 ---------- */
+    function engineRenderS03() {
+      var receipts = SC.store.list('S-03');
+      var orders = SC.store.list('S-02');
+      var s04 = SC.store.list('S-04');
+      var s05 = SC.store.list('S-05');
+      var orderMap = {}; orders.forEach(function (o) { orderMap[o.id] = o.order_no; });
+
+      document.getElementById('engine-s03-tbody').innerHTML = receipts.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">无 S-03 到货 · 先有 S-02 订单</td></tr>'
+        : receipts.map(function (r) {
+            var events = SC.sm.getAllowedEvents('S-03', r);
+            var stateColor = r.state === '已验收' ? 'green' : r.state === '已拒收' ? 'red' : 'amber';
+            var s04rec = s04.find(function (q) { return q.receipt_id === r.id; });
+            var s05rec = s05.find(function (e) { return e.receipt_id === r.id; });
+            var downstream = s04rec ? '<a class="code" href="quality-check.html">S-04 #' + s04rec.id + ' [' + s04rec.state + ']</a>' :
+                             s05rec ? '<span class="code muted">S-05 #' + s05rec.id + ' [' + s05rec.state + ']</span>' : '<span class="muted">—</span>';
+            return '<tr>' +
+              '<td class="code">' + (r.receipt_no || '#' + r.id) + '</td>' +
+              '<td class="muted">' + (orderMap[r.order_id] || '—') + '</td>' +
+              '<td class="num">' + (r.quantity || 0) + '</td>' +
+              '<td>' + (r.state === '待验收'
+                ? '<input type="checkbox"' + (r.need_qc ? ' checked' : '') + ' onchange="engineToggleQC(' + r.id + ', this.checked)"> 需要 S-04'
+                : (r.need_qc ? '<span class="badge amber dot">需要</span>' : '<span class="badge gray dot">跳过</span>')) +
+              '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + downstream + '</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineS03(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineCreateS03() {
+      var orders = SC.store.list('S-02').filter(function (o) { return o.order_state === '已下达' || o.order_state === '部分到货'; });
+      if (orders.length === 0) { SC.ui.toast('没有可到货的 S-02 订单（已下达/部分到货）', 'warning'); return; }
+      var o = orders[orders.length - 1];
+      var receipt = SC.store.create('S-03', {
+        receipt_no: SC.store.nextNo('DH'),
+        order_id: o.id,
+        quantity: 100,
+        warehouse_id: 2,
+        org_id: 3,
+        state: '待验收',
+        need_qc: true,
+      });
+      SC.ui.toast('S-03 #' + receipt.id + ' 到货已创建（关联 S-02 #' + o.id + '）', 'success');
+    }
+
+    function engineToggleQC(id, val) {
+      SC.store.update('S-03', id, { need_qc: val });
+    }
+
+    function engineS03(id, event) {
+      try {
+        SC.sm.transition('S-03', id, event);
+        var r = SC.store.get('S-03', id);
+        if (event === '验收' && r.state === '已验收') {
+          if (r.need_qc) {
+            // D3 开关：需要质检 → 创建 S-04
+            var qc = SC.store.create('S-04', {
+              qc_no: SC.store.nextNo('QC'),
+              receipt_id: id,
+              order_id: r.order_id,
+              quantity: r.quantity,
+              state: '待检',
+            });
+            SC.ui.toast('S-03 #' + id + ' 已验收 → 创建 S-04 #' + qc.id + ' 进入质检', 'success');
+          } else {
+            // D3：不需质检 → 直接生成 S-05 草稿
+            var receipt = SC.store.create('S-05', {
+              receipt_no: SC.store.nextNo('RK'),
+              source_receipt_id: id,
+              order_id: r.order_id,
+              warehouse_id: r.warehouse_id,
+              org_id: r.org_id,
+              quantity: r.quantity,
+              state: '草稿',
+            });
+            SC.ui.toast('S-03 #' + id + ' 已验收（跳过 D3 质检）→ 直接生成 S-05 #' + receipt.id, 'success');
+          }
+        } else {
+          SC.ui.toast('S-03 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    SC.store.subscribe('S-03', engineRenderS03);
+    SC.store.subscribe('S-04', engineRenderS03);
+    SC.store.subscribe('S-05', engineRenderS03);
+    engineRenderS03();
+  </script>
   <script src="assets/chrome.js"></script>
   <script>
     SC.layout({
