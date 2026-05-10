@@ -1,7 +1,31 @@
-# SupplyCore 原型 v0.16
+# SupplyCore 原型 v0.22
 
 > **用途仅限演示与沟通** — 与管理层、业务部门、招标参与方对齐功能与流程。
 > **非真实数据，亦非开发或验收依据。** 权威口径请以 `docs/详细设计/*` 为准。
+
+> **命名说明**：本仓库内部使用"档 A 一阶段 / 二阶段"标识开发分批节奏（**不是招标分期**）。档 A 整体为本次招标承诺范围；二阶段是档 A 内部的迭代分批，与"招标二期"无关。
+
+## 当前版本范围分层
+
+| 分层 | 内容 | 状态 |
+|---|---|---|
+| **档 A 一阶段** | 框架层（store/sm/linkage/seed/nc/roles/ui，~1100 行）+ 11 页引擎接入 + 9 状态机 + 主数据 + S-05 入库主线（核心联动 + NC mock）| ✅ 完成 |
+| **档 A 二阶段 P0**（5 项）| A4a 月度集体决议 + C-04/C-07/C-08/C-10 四层付款 + A4b BIZ-013/014/015/020 + A2 出库 + A8 暂估闭环 + B1 时间穿越 + A14 化整为零 | ✅ 完成 |
+| **档 A 二阶段 P1**（4 项）| A3 调拨 + A5 盘点 + A12 后评价 + B3 主数据维护 | ✅ 完成 |
+| **档 A 二阶段 P2**（10 项）| A6 废旧 / A7 设备租赁 / A9 委托加工 / A10 外委检修 / A11 直达使用 / A13 应急采购 / B2 数据导入导出 / B4 三对一致对账 / B5 AI Tool / B6 演示快照 | ✅ 完成 |
+| **范围外** | IoT 设备实时数据接入 / Nova 完整 sub_group_id 数据范围过滤 / 信创栈联调（招标响应阶段后启动） | ⚪ 不在档 A |
+
+**功能完整度自检表**（演示前可逐项核对）：
+- 档 A 一阶段引擎层 7 个 asset：`assets/{store,statemachine,linkage,seed-data,mock-nc,roles,ui-helper}.js`
+- 档 A 二阶段补丁：18 项业务页 + 状态机扩展 14 个（C-04/C-07/E-04/E-08/OP-01/M-09/M-13/S-07/S-08/S-09/S-11/S-12/S-15/S-17/S-19/S-23 等）
+- F-13 NC 接口开关：14 项 BIZ（演示口径默认全开；正式实施时按合同范围用 F-13 紧急熔断）
+- 角色：6 类（buyer/planner/storage_mgr/finance/it/group_committee）—— 顶部下拉切换 + 数据范围演示
+
+**已知演示限制**（非缺陷，需在介绍时主动说明）：
+- 数据范围按 sub_group_id 完整过滤为产品实施阶段事项，原型仅展示界面与口径
+- 信创栈兼容性仅展示矩阵，实际联调由本系统供应商联合 NC 厂商在试运行期完成
+- LocalStorage 持久化无 schema 版本迁移（计划补 schemaVersion + 一键重置）
+
 
 ## 一、如何打开
 
@@ -23,7 +47,7 @@
 - 引擎烟雾测试：`prototype/_engine-test.html`（含 reset 数据按钮）
 - 兼容 Chrome / Edge / Safari 现代版本
 
-## 二、本版覆盖范围（v0.16 = v0.15 + 档 A 一阶段同事评审 5 项 P1/P2 修复）
+## 二、本版覆盖范围（52 页）
 
 ### 业务流转 — 14 页
 
@@ -316,8 +340,8 @@ C-01 合同会签
 - M-05 物料（10 个覆盖支护 / 电缆 / 火工品 / 设备 / 通风等）
 - M-09 供应商（5 家含 role_tags）
 - M-12 成本中心（4 个）
-- F-13 NC 开关（4 个，BIZ-001 默认开，002/005/013 关 — 移二阶段）
-- 业务种子：P-01 需求 2 条 + P-02 计划 1 条 + P-03 计划行 2 条（用于演示 P-02 审批 → linkage 自动生成 P-05）
+- F-13 NC 开关（14 个 BIZ：001/002/003/005/005A/007/008/009/010/011/012/013/014/015/019/020 演示口径全开，正式实施按合同用 F-13 紧急熔断）
+- 业务种子：P-01 草稿 3 条（让用户从最起点演示 → linkage 自动聚合 P-02/P-03 + 拆解 P-05）+ C-02 已签合同 1 条（演示付款链路起点）+ M-13 后评价 3 条（演示供应商重评估）
 
 #### 5. `assets/mock-nc.js` — NC 推送 mock（Day 4）
 - `SC.nc.push(taskId)`：1-2 秒延迟 + 5% 失败率（可配）
@@ -563,6 +587,12 @@ prototype/
 
 ## 六、变更日志
 
+- **v0.22 (2026-05-11)** — **同事评审 P0 修复 + 命名规范化**：(1) 修 system-admin SC.setRole bug（实际 API 是 SC.roles.set）+ ROLE_DESC 中文 8 key 改为对齐 roles.js 的 6 个 id key（buyer/planner/storage_mgr/finance/it/group_committee）；(2) 修 contract-list / funding-plan 实体编号错口径 — C-05 是合同变更不是付款计划，正确链路 C-04 → C-07 → C-08 → C-10；(3) 全局改名"一期/二期 → 一阶段/二阶段"避免与"招标二期"混淆，21 文件 124 处替换 + 文件 git mv（03-档A二期扩展规划-V0.2.md → 03-档A二阶段扩展规划-V0.2.md）；(4) README 升级到 v0.22 + 加范围分层表 + 修 F-13 NC 开关描述。
+- **v0.21 (2026-05-11)** — **二阶段 A4a 补丁 + 21 页页面说明卡统一 + audit 措辞清理**：(1) audit 发现 A4a 的 C-04 合同付款节点 + C-07 付款计划漏做引擎接入 — 补 statemachine.js 加 C-04 / C-07 状态机；linkage.js 加 5 个 handler（C-02 已签自动建 3 节点 + 3 计划 / C-04 ↔ C-07 双向联动 / C-08 已审累加 cumulative_amount / C-10 已记账推动 C-04 已付款）；(2) BIZ-014/015/020 mock NC 推送 — payment-execution 加月度消减按钮；(3) 28 页业务依据卡顶→底统一为"页面说明 · 业务依据 + 实现要点"；(4) inventory.html batch_state 字段口径明示 M-15 关联（S-13/S-14 不另设状态字段）；(5) 全站 audit 修订 5 处过时措辞。
+- **v0.20 (2026-05-11)** — **静态页完善三波 P0 + P1 + 第三波 + 业务侧文案清理**：(1) P0 7 项核心页改造（tender-archive 重写 / inventory-flow / contract-list / funding-plan / payment-request / base-archive / material-master）；(2) P1 9 项页加业务依据卡 + 引擎接入卡（three-way-match / nc-interface-detail / alert-rules / equipment-lifecycle / equipment-oee / system-admin / requirement-detail / ai-write-flow / mobile-stocktake）；(3) 21 页底部加 / 升级"页面说明"卡；(4) sidebar 补 8 项二阶段新增页 + 顺序整理（质检 ↔ 入库审核 业务正序）；(5) 业务侧文案去除 "二期 / ★" 内部分批标识。
+- **v0.19 (2026-05-10)** — **二阶段 P2 第二批 5 项**：A7 设备租赁（E-08 在租/月结/已结算 + BIZ-019）/ A9 委托加工（OP-01 投料→产出→入库 + 受托虚拟仓 + 标准损耗率 + 三方联合验收）/ A10 外委检修（E-04 审批 + 40% 原值上限演示 + ALR-CON-OVERLIMIT-001 + WF 加签）/ B4 三对一致对账（手工触发 S-13 vs S-21 + 月度调度日历 + 历史归档）/ B5 AI Tool（5 类查询接 SC.store + 自然语言响应 + 角色权限标识）。
+- **v0.18 (2026-05-10)** — **二阶段 P2 第一批 4 项 + P1 4 项**：(1) P2 第一批：A6 废旧处置（4 类处置路径 + BIZ-010/011/012）/ A11 直达使用（S-23 不进 S-13 + BIZ-005A）/ A13 应急采购（is_emergency 紧急通道 + 3 工作日补办）/ B2/B6 数据快照（保存/还原/导入导出）；(2) P1：A3 调拨主线（S-11/S-12 + BIZ-007）/ A5 盘点（S-15/S-17 + BIZ-008/009）/ A12 后评价（M-13 + WF-SUP-REASSESS）/ B3 主数据维护（M-04/M-05/M-09 增删改）。
+- **v0.17 (2026-05-10)** — **二阶段 P0 5 项重写 + 付款链路 3 页业务工作台细做**：(1) P0 5 项推倒重写按一阶段引擎接入风格 + 详设文档（material-issuance / council-meeting / payment-execution / split-detection / tentative-estimate）；(2) 付款链路 3 页业务工作台细做 — 决议日历 / 出纳工作台 / 银行账户 / 历史归档；(3) 步骤条改演示场景切换器（19 个场景）；(4) 引擎面板移到底部 dock。
 - **v0.16 (2026-05-10)** — **同事评审 5 项 P1/P2 修复**：(P1-1) 加 linkage on('P-01:已审') → 按月+org 自动归集到 P-02 草稿 + 创建 P-03 行（按 source_request_no 幂等）；(P1-2) linkage on('P-02:已审') 加 plan_line_id 查重避免重复创建 P-05 草稿 + seed 移除 P-02/P-03 已审项（P-01 改草稿态让用户从起点演示）+ _engine-test approveP02 去重复 emit；(P1-3) 加 S-01 状态机（草稿/待审/已审/已驳回/已作废）+ linkage on('S-01:已审') → 自动 create S-02；P-05:草稿→已分解 加合同采购分支（关联已签 C-02）；(P2-1) TODO_RULES C-02 改 C-01（stateField=approval_state）+ 加 C-01 状态机 + linkage on('C-01:已批准') → 自动 create C-02 已签 + contract-detail engineApproveC01 改用 SC.sm.transition；(P2-2) contract-detail "付款节点（C-04）" 改 "付款条件（payment_terms 文本）"，标注 C-04 移二阶段 A4。架构原则：状态机只迁移、副作用全 linkage、所有 create 幂等查重。
 - **v0.15 (2026-05-10)** — **档 A 一阶段 Week 6 收口（一期 100% 完成）**：(1) `reports.html` 加 E3 核心报表 5 张（tab 切换实时聚合）— RPT-INV-001 库存余额（含 unit_cost 移动平均）/ RPT-INV-002 收发存（S-21 按物料聚合）/ RPT-FIN-001 接口推送状态（按状态 + 接口）/ RPT-PUR-001 采购入库汇总（S-05 已审 × S-25 按物料）/ RPT-WF-001 审批超时统计（待审 + ALR-WF-001）；订阅 12 个相关实体任何变化实时重渲染。(2) 新增 `docs/原型设计/05-档A演示脚本-V0.1.md`（294 行，3 主场景 + 1 辅助 + Q&A）。(3) chrome.js 升 v0.15。**档 A 一阶段 6 周全部完成**：交付 7 个引擎 asset（约 1100 行）+ 11 页引擎接入 + 9 状态机 + 6 linkage + 4 自动预警 + 5 核心报表 + 演示脚本。下一阶段：档 A 二阶段（按 03 V0.2，等业务方反馈触发，不主动推进）。
 - **v0.14 (2026-05-10)** — **档 A 一阶段 Week 5 治理能力（E1 审批中心 + E2 预警中心）**：(1) `approval-center.html` 加 E1 三段视图（待办 / 已审过 / 我发起占位）+ 跨实体聚合（P-01/P-02/C-02/T-01/S-02/S-05 自动收集待审）+ 一键通过/驳回 → SC.sm.transition 触发对应 linkage。(2) `alert-rules.html` 扩为 alert-center + 三段视图（未读 / 已确认 / 已处理）+ 4 类自动预警 mock 触发按钮。(3) **`linkage.js` 扩展 3 个自动预警**：T-03:流标 → ALR-PUR-002 / F-01:推送失败 → ALR-INT-001 / S-13 异常 → ALR-INV-001（quantity < 50 低储 / > 1500 超储）+ mockTriggerWFTimeout 替代时间穿越。(4) **`chrome.js` v0.14 动态徽标**：SC.updateBadges 在 sidebar 渲染后调用 SC.roles.badgeCounts 自动更新审批中心和预警规则的红点徽标（引擎未加载时静默）。Week 6（核心报表 E3 + 整体验收）pending。
