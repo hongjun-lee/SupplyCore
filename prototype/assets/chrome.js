@@ -18,6 +18,7 @@ SC.nav = [
     { id: 'requirement-list',  href: 'requirement-list.html',   label: '需求计划', icon: '✎' },
     { id: 'purchase-orders',   href: 'purchase-orders.html',    label: '采购订单', icon: '⇄' },
     { id: 'goods-receipt',     href: 'goods-receipt.html',      label: '到货验收', icon: '⇩' },
+    { id: 'purchase-receipt',  href: 'purchase-receipt.html',   label: '采购入库审核 ★', icon: '☷' },
     { id: 'quality-check',     href: 'quality-check.html',      label: '质检', icon: '✓' },
     { id: 'inventory',         href: 'inventory.html',          label: '库存查询', icon: '▦' },
     { id: 'inventory-flow',    href: 'inventory-flow.html',     label: '库存流转', icon: '↔' },
@@ -92,7 +93,7 @@ SC.renderHeader = function () {
     <button class="menu-toggle" id="menu-toggle" aria-label="菜单">☰</button>
     <div class="logo">
       <div class="mark">辽</div>
-      <div>辽宁能源 · 阜矿物资供应管理系统 <span class="sub">原型 v0.12</span></div>
+      <div>辽宁能源 · 阜矿物资供应管理系统 <span class="sub">原型 v0.13</span></div>
     </div>
     <span class="spacer"></span>
     <div class="h-item">二级集团：<strong style="color:var(--text);font-weight:500;margin-left:4px;">${sg.name}</strong></div>
@@ -149,7 +150,7 @@ SC.renderFooter = function () {
   if (document.querySelector('.app-footer')) return;
   const f = document.createElement('div');
   f.className = 'app-footer';
-  f.innerHTML = `SupplyCore 原型 v0.12 · 演示数据，不作为开发或验收依据 · ${SC.docVer}`;
+  f.innerHTML = `SupplyCore 原型 v0.13 · 演示数据，不作为开发或验收依据 · ${SC.docVer}`;
   document.body.appendChild(f);
 };
 

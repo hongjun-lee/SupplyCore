@@ -12,6 +12,44 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · S-13 余额 + S-14 批次 + S-21 流水（一致性穿透）</div>
+            <div class="actions">
+              <a class="btn btn-sm" href="purchase-receipt.html">← S-05 入库（流水来源）</a>
+              <button class="btn btn-sm" onclick="engineRefreshInv()">刷新</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border);">
+              <div style="padding:10px 16px;border-right:1px solid var(--border);">
+                <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px;">S-13 库存余额（移动平均成本）</div>
+                <table class="data" style="font-size:12px;">
+                  <thead><tr><th>物料</th><th>仓库</th><th class="num">数量</th><th class="num">总额</th><th class="num">unit_cost</th></tr></thead>
+                  <tbody id="engine-s13-tbody"></tbody>
+                </table>
+              </div>
+              <div style="padding:10px 16px;">
+                <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px;">S-14 批次（按物料 / 批次）</div>
+                <table class="data" style="font-size:12px;">
+                  <thead><tr><th>物料</th><th>批次号</th><th>仓库</th><th class="num">数量</th></tr></thead>
+                  <tbody id="engine-s14-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div style="padding:10px 16px;">
+              <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px;display:flex;justify-content:space-between;">
+                <span>S-21 库存事务流水（穿透：来源单据 + 数量Δ + 金额Δ）</span>
+                <span class="muted" style="font-weight:normal;font-size:11px;">一致性校验：S-13.quantity = S-21 累计 quantity_delta · <span id="consistency-check"></span></span>
+              </div>
+              <table class="data" style="font-size:11px;">
+                <thead><tr><th>流水号</th><th>类型</th><th>物料</th><th>仓库</th><th class="num">数量Δ</th><th class="num">金额Δ</th><th>来源单据</th><th>时间</th></tr></thead>
+                <tbody id="engine-s21-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <div class="kpi-grid">
           <div class="kpi"><div class="label">在库物料种类</div><div class="value">8 类示例</div><div class="trend">演示 8 行 / 全口径 ~12,400 SKU</div></div>
           <div class="kpi"><div class="label">在库总价值</div><div class="value">¥ 86 万</div><div class="trend">演示口径</div></div>
@@ -105,6 +143,86 @@
   </div>
 
   <script src="assets/data.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* ---------- 引擎面板 S-13/S-14/S-21 ---------- */
+    var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m.name; });
+    var whMap = {}; SC.store.list('M-02').forEach(function (w) { whMap[w.id] = w.name; });
+
+    function engineRenderInv() {
+      var s13 = SC.store.list('S-13');
+      var s14 = SC.store.list('S-14');
+      var s21 = SC.store.list('S-21');
+
+      // S-13
+      document.getElementById('engine-s13-tbody').innerHTML = s13.length === 0
+        ? '<tr><td colspan="5" class="muted" style="text-align:center;padding:8px;">无库存余额 · 先去 S-05 入库审核</td></tr>'
+        : s13.map(function (i) {
+            return '<tr>' +
+              '<td>' + (matMap[i.material_id] || '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (whMap[i.warehouse_id] || '—') + '</td>' +
+              '<td class="num">' + (i.quantity || 0) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(i.total_amount || 0) + '</td>' +
+              '<td class="num" style="color:var(--brand);font-weight:600;">' + SC.fmtMoney(i.unit_cost || 0) + '</td>' +
+            '</tr>';
+          }).join('');
+
+      // S-14
+      document.getElementById('engine-s14-tbody').innerHTML = s14.length === 0
+        ? '<tr><td colspan="4" class="muted" style="text-align:center;padding:8px;">无批次</td></tr>'
+        : s14.map(function (b) {
+            return '<tr>' +
+              '<td>' + (matMap[b.material_id] || '—') + '</td>' +
+              '<td class="code">' + (b.batch_id || '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (whMap[b.warehouse_id] || '—') + '</td>' +
+              '<td class="num">' + (b.quantity || 0) + '</td>' +
+            '</tr>';
+          }).join('');
+
+      // S-21
+      document.getElementById('engine-s21-tbody').innerHTML = s21.length === 0
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:8px;">无流水</td></tr>'
+        : s21.slice().reverse().slice(0, 15).map(function (t) {
+            var deltaColor = (t.quantity_delta || 0) > 0 ? 'var(--green)' : 'var(--red)';
+            return '<tr>' +
+              '<td class="code">' + (t.transaction_no || '#' + t.id) + '</td>' +
+              '<td><span class="badge ' + (t.transaction_type === '入库' ? 'green' : 'gray') + '">' + t.transaction_type + '</span></td>' +
+              '<td>' + (matMap[t.material_id] || '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (whMap[t.warehouse_id] || '—') + '</td>' +
+              '<td class="num" style="color:' + deltaColor + ';font-weight:600;">' + ((t.quantity_delta || 0) > 0 ? '+' : '') + (t.quantity_delta || 0) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(t.amount_delta || 0) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (t.source_bill_type || '') + ' #' + (t.source_bill_id || '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (t.created_at || '').slice(11, 19) + '</td>' +
+            '</tr>';
+          }).join('');
+
+      // 一致性校验：每个 S-13 行的 quantity 应等于其 (material_id, warehouse_id) 的 S-21 累计
+      var inconsistent = 0;
+      s13.forEach(function (i) {
+        var related = s21.filter(function (t) { return t.material_id === i.material_id && t.warehouse_id === i.warehouse_id; });
+        var sum = related.reduce(function (a, t) { return a + (t.quantity_delta || 0); }, 0);
+        if (sum !== i.quantity) inconsistent++;
+      });
+      document.getElementById('consistency-check').innerHTML = s13.length === 0
+        ? '<span class="muted">N/A</span>'
+        : (inconsistent === 0
+          ? '<span style="color:var(--green);font-weight:600;">✓ 一致 (' + s13.length + ' 行)</span>'
+          : '<span style="color:var(--red);font-weight:600;">✗ ' + inconsistent + ' 行不一致</span>');
+    }
+
+    function engineRefreshInv() { engineRenderInv(); SC.ui.toast('刷新完成', 'info'); }
+
+    SC.store.subscribe('S-13', engineRenderInv);
+    SC.store.subscribe('S-14', engineRenderInv);
+    SC.store.subscribe('S-21', engineRenderInv);
+    engineRenderInv();
+  </script>
   <script src="assets/chrome.js"></script>
   <script>
     SC.layout({

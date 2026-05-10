@@ -53,6 +53,35 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--red);background:#fff5f5;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · F-08 异常台账（重推 ≥3 次仍失败的 F-01）</div>
+            <div class="actions">
+              <a class="btn btn-sm" href="nc-interface.html">← F-01 接口监控</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>异常号</th>
+                  <th>来源 F-01</th>
+                  <th>接口</th>
+                  <th>来源单据</th>
+                  <th>错误信息</th>
+                  <th>状态</th>
+                  <th>处置</th>
+                </tr>
+              </thead>
+              <tbody id="engine-f08-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge red dot">高敏感</span>
+              F-01 重推超 3 次失败自动升 F-08；处置选项：编辑映射 / 触发主数据下推 / 忽略 / 关闭 / 重推（高敏感审批）；详见详设 09 §六 ALR-INT-FAIL-001。
+            </div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-body">
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
@@ -312,6 +341,49 @@
   </div>
 
   <script src="assets/data.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* ---------- 引擎面板 F-08 异常台账 ---------- */
+    function engineRenderF08() {
+      var f08 = SC.store.list('F-08');
+      document.getElementById('engine-f08-tbody').innerHTML = f08.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">无 F-08 异常 · 触发条件：F-01 重推 ≥ 3 次失败（mock-nc.config.failureRate 调高可加速演示）</td></tr>'
+        : f08.map(function (e) {
+            return '<tr>' +
+              '<td class="code">#' + e.id + '</td>' +
+              '<td class="code muted">F-01 #' + e.task_id + '</td>' +
+              '<td class="muted">' + (e.interface_id || '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (e.source_bill_no || '—') + '</td>' +
+              '<td style="color:var(--red);font-size:11px;">' + (e.error_message || '—') + '</td>' +
+              '<td>' + SC.badge(e.state, e.state === '已处置' ? 'green' : 'red', true) + '</td>' +
+              '<td class="actions">' +
+                (e.state === '待处置'
+                  ? '<a href="javascript:void(0)" onclick="engineDispatch(' + e.id + ', \'编辑映射\')">编辑映射</a>' +
+                    '<a href="javascript:void(0)" onclick="engineDispatch(' + e.id + ', \'重推\')">重推</a>' +
+                    '<a href="javascript:void(0)" onclick="engineDispatch(' + e.id + ', \'关闭\')" style="color:var(--text-3);">关闭</a>'
+                  : '<span class="muted">已处置</span>') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineDispatch(id, action) {
+      SC.ui.confirm('确认执行【' + action + '】？高敏感操作需审批留痕。').then(function (ok) {
+        if (!ok) return;
+        SC.store.update('F-08', id, { state: '已处置', dispatch_action: action, dispatch_time: new Date().toISOString() });
+        SC.ui.toast('F-08 #' + id + ' 已' + action, 'success');
+      });
+    }
+
+    SC.store.subscribe('F-08', engineRenderF08);
+    engineRenderF08();
+  </script>
   <script src="assets/chrome.js"></script>
   <script>
     SC.layout({

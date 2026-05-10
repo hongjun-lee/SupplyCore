@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>采购入库审核 — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .atomic-banner {
+      background: linear-gradient(90deg,#0a2540 0%,#1f3b66 100%);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+    .atomic-banner h2 { margin: 0; font-size: 15px; }
+    .atomic-banner .meta { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+    .pill { display: inline-block; padding: 2px 6px; background: rgba(255,255,255,0.15); border-radius: 3px; font-size: 11px; font-family: ui-monospace, Menlo, monospace; margin: 2px; }
+    .effect-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 1100px) { .effect-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="atomic-banner">
+          <h2>📡 档 A 一期 · Week 4 · S-05 入库审核（核心演示）</h2>
+          <div class="meta">
+            <span class="pill">linkage S-05:已审</span>
+            <span class="pill">SC.store.transaction</span>
+            <span class="pill">S-21 流水</span>
+            <span class="pill">S-13 移动平均</span>
+            <span class="pill">F-01 NC 任务</span>
+            <span class="pill">mock-nc 1-2s</span>
+            点"审核通过" → 同事务内 4 件事原子完成：写库存事务流水 + 更新库存余额（移动平均）+ 创建 F-01 接口任务 + mock NC 推送
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">S-05 采购入库</div>
+            <div class="actions">
+              <a class="btn btn-sm" href="goods-receipt.html">← S-03 到货</a>
+              <a class="btn btn-sm" href="quality-check.html">← S-04 质检</a>
+              <a class="btn btn-sm" href="inventory.html">→ S-13 库存</a>
+              <a class="btn btn-sm" href="nc-interface.html">→ F-01 NC</a>
+              <button class="btn btn-sm btn-primary" onclick="engineCreateS05()">+ 创建 S-05 草稿（带 mock 行）</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>入库号</th>
+                  <th>来源</th>
+                  <th class="num">入库数量</th>
+                  <th class="num">入库金额</th>
+                  <th>状态</th>
+                  <th>可执行 events</th>
+                  <th>原子事务效应</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-s05-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">S-25 入库行（SC.store.list('S-25')）</div></div>
+              <table class="data" style="font-size:12px;">
+                <thead>
+                  <tr><th>入库行</th><th>S-05</th><th>物料</th><th class="num">数量</th><th class="num">金额</th></tr>
+                </thead>
+                <tbody id="engine-s25-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">linkage S-05:已审 副作用预览</div>
+              </div>
+              <div class="card-body">
+                <div class="timeline">
+                  <div class="step done">
+                    <div class="title">同事务包裹（snapshot/rollback）</div>
+                    <div class="comment">SC.store.transaction(['S-21', 'S-13', 'S-14', 'F-01'], fn)</div>
+                  </div>
+                  <div class="step done">
+                    <div class="title">每行 → 写 S-21 库存事务流水</div>
+                    <div class="comment">transaction_type=入库, quantity_delta, amount_delta, source=S-05</div>
+                  </div>
+                  <div class="step done">
+                    <div class="title">每行 → 更新 S-13 库存余额（移动平均）</div>
+                    <div class="comment">unit_cost = (旧总额 + 入库金额) / (旧数量 + 入库数量)</div>
+                  </div>
+                  <div class="step done">
+                    <div class="title">如有批次 → 更新 S-14</div>
+                    <div class="comment">upsert by (material, batch, warehouse)</div>
+                  </div>
+                  <div class="step done">
+                    <div class="title">F-13 BIZ-001 开关 ON → 创建 F-01</div>
+                    <div class="comment">interface_id=BIZ-001, source=S-05；setTimeout(SC.nc.push, 0)</div>
+                  </div>
+                  <div class="step current">
+                    <div class="title">mock-nc 1-2 秒延迟 + 5% 失败率</div>
+                    <div class="comment">成功 → F-03 凭证回执；失败 → emit F-01:推送失败 触发自动重推</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="title">原子事务效应观察（实时）</div></div>
+          <div class="card-body">
+            <div class="effect-grid">
+              <div>
+                <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px;">S-21 库存事务流水（最近 5 条）</div>
+                <table class="data" style="font-size:11px;">
+                  <thead><tr><th>流水号</th><th>类型</th><th>物料</th><th class="num">数量Δ</th><th class="num">金额Δ</th></tr></thead>
+                  <tbody id="engine-s21-tbody"></tbody>
+                </table>
+              </div>
+              <div>
+                <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px;">S-13 库存余额（含 unit_cost 移动平均）</div>
+                <table class="data" style="font-size:11px;">
+                  <thead><tr><th>物料</th><th>仓库</th><th class="num">数量</th><th class="num">总额</th><th class="num">单位成本</th></tr></thead>
+                  <tbody id="engine-s13-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="effect-grid" style="margin-top:12px;">
+              <div>
+                <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px;">F-01 NC 接口任务（最近 5 条）</div>
+                <table class="data" style="font-size:11px;">
+                  <thead><tr><th>任务号</th><th>接口</th><th>来源单据</th><th>状态</th><th>凭证号</th></tr></thead>
+                  <tbody id="engine-f01-tbody"></tbody>
+                </table>
+              </div>
+              <div>
+                <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px;">F-03 凭证回执</div>
+                <table class="data" style="font-size:11px;">
+                  <thead><tr><th>凭证号</th><th>来源</th><th>状态</th><th>回执时间</th></tr></thead>
+                  <tbody id="engine-f03-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    SC.layout({
+      page: 'purchase-receipt',
+      crumbs: ['业务流转', '采购入库审核'],
+      title: '采购入库审核（S-05）',
+      desc: '档 A 一期 Week 4 核心演示页 — S-05:已审 触发库存原子事务 + NC mock 推送（详设 06 §7 + 02 V0.4 §6.3）',
+    });
+
+    var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m; });
+    var whMap = {}; SC.store.list('M-02').forEach(function (w) { whMap[w.id] = w.name; });
+
+    function engineRenderS05() {
+      var receipts = SC.store.list('S-05');
+      var lines = SC.store.list('S-25');
+      var s21 = SC.store.list('S-21');
+      var f01 = SC.store.list('F-01');
+
+      // S-05 主表
+      document.getElementById('engine-s05-tbody').innerHTML = receipts.length === 0
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px;">无 S-05 草稿 · 点上方"+ 创建 S-05 草稿"或来自 S-03/S-04 自动生成</td></tr>'
+        : receipts.map(function (r) {
+            var rLines = lines.filter(function (l) { return l.receipt_id === r.id; });
+            var totalQty = rLines.reduce(function (a, l) { return a + (l.quantity || 0); }, 0);
+            var totalAmt = rLines.reduce(function (a, l) { return a + (l.line_amount || 0); }, 0);
+            var events = SC.sm.getAllowedEvents('S-05', r);
+            var stateColor = r.state === '已审' ? 'green' : r.state === '待审' ? 'amber' : 'gray';
+
+            var s21Effect = '—', f01Effect = '—';
+            if (r.state === '已审') {
+              var rs21 = s21.filter(function (t) { return t.source_bill_type === 'S-05' && t.source_bill_id === r.id; });
+              var rf01 = f01.filter(function (t) { return t.source_bill_id === r.id; });
+              s21Effect = rs21.length > 0 ? '<span class="badge green dot">S-21 ×' + rs21.length + '</span>' : '<span class="muted">—</span>';
+              f01Effect = rf01.length > 0 ? '<span class="badge ' + (rf01[0].task_state === '推送成功' ? 'green' : rf01[0].task_state === '推送失败' ? 'red' : 'amber') + ' dot">F-01 ' + rf01[0].task_state + '</span>' : '<span class="muted">—</span>';
+            }
+
+            return '<tr>' +
+              '<td class="code">' + (r.receipt_no || '#' + r.id) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (r.source_receipt_id ? 'S-03 #' + r.source_receipt_id : '—') + (r.qc_id ? ' / S-04 #' + r.qc_id : '') + '</td>' +
+              '<td class="num">' + totalQty + '</td>' +
+              '<td class="num">' + SC.fmtMoney(totalAmt) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td>' + s21Effect + ' ' + f01Effect + '</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineS05(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+
+      // S-25 行
+      document.getElementById('engine-s25-tbody').innerHTML = lines.length === 0
+        ? '<tr><td colspan="5" class="muted" style="text-align:center;padding:8px;">无 S-25 行</td></tr>'
+        : lines.slice(-10).map(function (l) {
+            return '<tr>' +
+              '<td class="code">#' + l.id + '</td>' +
+              '<td class="code muted">S-05 #' + l.receipt_id + '</td>' +
+              '<td>' + ((matMap[l.material_id] || {}).name || '—') + '</td>' +
+              '<td class="num">' + (l.quantity || 0) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(l.line_amount || 0) + '</td>' +
+            '</tr>';
+          }).join('');
+
+      // S-21 流水
+      document.getElementById('engine-s21-tbody').innerHTML = s21.length === 0
+        ? '<tr><td colspan="5" class="muted" style="text-align:center;padding:6px;">无流水</td></tr>'
+        : s21.slice(-5).reverse().map(function (t) {
+            var deltaColor = (t.quantity_delta || 0) > 0 ? 'var(--green)' : 'var(--red)';
+            return '<tr>' +
+              '<td class="code">' + (t.transaction_no || '#' + t.id) + '</td>' +
+              '<td><span class="badge ' + (t.transaction_type === '入库' ? 'green' : 'gray') + '">' + t.transaction_type + '</span></td>' +
+              '<td>' + ((matMap[t.material_id] || {}).name || '—') + '</td>' +
+              '<td class="num" style="color:' + deltaColor + ';font-weight:600;">' + ((t.quantity_delta || 0) > 0 ? '+' : '') + (t.quantity_delta || 0) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(t.amount_delta || 0) + '</td>' +
+            '</tr>';
+          }).join('');
+
+      // S-13 余额
+      var s13 = SC.store.list('S-13');
+      document.getElementById('engine-s13-tbody').innerHTML = s13.length === 0
+        ? '<tr><td colspan="5" class="muted" style="text-align:center;padding:6px;">无库存</td></tr>'
+        : s13.map(function (i) {
+            return '<tr>' +
+              '<td>' + ((matMap[i.material_id] || {}).name || '—') + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (whMap[i.warehouse_id] || '—') + '</td>' +
+              '<td class="num">' + (i.quantity || 0) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(i.total_amount || 0) + '</td>' +
+              '<td class="num" style="color:var(--brand);font-weight:600;">' + SC.fmtMoney(i.unit_cost || 0) + '</td>' +
+            '</tr>';
+          }).join('');
+
+      // F-01
+      document.getElementById('engine-f01-tbody').innerHTML = f01.length === 0
+        ? '<tr><td colspan="5" class="muted" style="text-align:center;padding:6px;">无 NC 任务</td></tr>'
+        : f01.slice(-5).reverse().map(function (t) {
+            var stateColor = t.task_state === '推送成功' ? 'green' : t.task_state === '推送失败' ? 'red' : t.task_state === '推送中' ? 'amber' : 'gray';
+            return '<tr>' +
+              '<td class="code">' + (t.task_no || '#' + t.id) + '</td>' +
+              '<td class="muted">' + t.interface_id + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + t.source_bill_no + '</td>' +
+              '<td>' + SC.badge(t.task_state, stateColor, true) + '</td>' +
+              '<td class="code muted" style="font-size:11px;">' + (t.push_voucher_no || '—') + '</td>' +
+            '</tr>';
+          }).join('');
+
+      // F-03
+      var f03 = SC.store.list('F-03');
+      document.getElementById('engine-f03-tbody').innerHTML = f03.length === 0
+        ? '<tr><td colspan="4" class="muted" style="text-align:center;padding:6px;">无凭证回执</td></tr>'
+        : f03.slice(-5).reverse().map(function (r) {
+            return '<tr>' +
+              '<td class="code">' + r.nc_voucher_no + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (r.source_bill_no || '—') + '</td>' +
+              '<td><span class="badge green dot">' + r.receipt_status + '</span></td>' +
+              '<td class="muted" style="font-size:11px;">' + (r.receipt_time || '').slice(11, 19) + '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function engineCreateS05() {
+      // 创建 S-05 草稿（演示用：3 行不同物料，含批次 / 不含批次）
+      var receipt = SC.store.create('S-05', {
+        receipt_no: SC.store.nextNo('RK'),
+        warehouse_id: 2, // 艾友矿主仓
+        org_id: 3,
+        state: '草稿',
+      });
+      // 3 行 mock S-25
+      var lines = [
+        { material_id: 8, quantity: 200, line_amount: 95620, batch_id: null }, // 锚杆 无批次
+        { material_id: 5, quantity: 1000, line_amount: 32000, batch_id: 'B202605-101' }, // 雷管 有批次
+        { material_id: 7, quantity: 80, line_amount: 18400, batch_id: null }, // 截齿
+      ];
+      lines.forEach(function (l) {
+        SC.store.create('S-25', Object.assign({ receipt_id: receipt.id }, l));
+      });
+      SC.ui.toast('S-05 #' + receipt.id + ' 草稿 + 3 行 S-25 已创建', 'success');
+    }
+
+    function engineS05(id, event) {
+      try {
+        SC.sm.transition('S-05', id, event);
+        if (event === '审核通过') {
+          SC.ui.toast('S-05 #' + id + ' 已审 → linkage 触发原子事务 + NC mock', 'success');
+          // 1.5 秒后再刷新看 NC 推送结果
+          setTimeout(engineRenderS05, 1500);
+          setTimeout(engineRenderS05, 3000);
+        } else {
+          SC.ui.toast('S-05 #' + id + ' → ' + event, 'success');
+        }
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+
+    SC.store.subscribe('S-05', engineRenderS05);
+    SC.store.subscribe('S-25', engineRenderS05);
+    SC.store.subscribe('S-21', engineRenderS05);
+    SC.store.subscribe('S-13', engineRenderS05);
+    SC.store.subscribe('S-14', engineRenderS05);
+    SC.store.subscribe('F-01', engineRenderS05);
+    SC.store.subscribe('F-03', engineRenderS05);
+    engineRenderS05();
+  </script>
+</body>
+</html>

@@ -12,6 +12,38 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · F-01 NC 接口任务（mock-nc 1-2 秒延迟 + 5% 失败率）</div>
+            <div class="actions">
+              <a class="btn btn-sm" href="purchase-receipt.html">← S-05 入库（触发源）</a>
+              <a class="btn btn-sm" href="nc-interface-detail.html">F-08 异常台账 →</a>
+              <button class="btn btn-sm" onclick="engineToggleSwitch()">切换 BIZ-001 开关</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>任务号</th>
+                  <th>接口</th>
+                  <th>来源单据</th>
+                  <th>推送状态</th>
+                  <th>财务状态</th>
+                  <th>重推次数</th>
+                  <th>凭证号 / 错误</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-f01-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">状态分层</span>
+              业务执行状态（S-05 已审）独立于推送状态（F-01 推送中/成功/失败）；F-01 失败 → linkage 30 秒自动重推（≤3 次）→ 超 3 次升 F-08 异常台账。F-13 BIZ-001 开关：<span id="biz-switch-state" class="code"></span>
+            </div>
+          </div>
+        </div>
+
         <div class="kpi-grid">
           <div class="kpi"><div class="label">今日推送任务</div><div class="value">341</div><div class="trend">主数据 98 · 业务 239 · 对账 4</div></div>
           <div class="kpi"><div class="label">成功 / 失败</div><div class="value">335 / 6</div><div class="trend up">成功率 98.2%</div></div>
@@ -121,6 +153,83 @@
   </div>
 
   <script src="assets/data.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* ---------- 引擎面板 F-01 ---------- */
+    function engineRenderF01() {
+      var f01 = SC.store.list('F-01');
+      document.getElementById('engine-f01-tbody').innerHTML = f01.length === 0
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px;">无 F-01 任务 · 先到「采购入库审核」点 S-05:已审 触发</td></tr>'
+        : f01.slice().reverse().map(function (t) {
+            var stateColor = t.task_state === '推送成功' ? 'green' : t.task_state === '推送失败' ? 'red' : t.task_state === '推送中' ? 'amber' : 'gray';
+            var canRetry = t.task_state === '推送失败';
+            var canForceTest = t.task_state === '待推送';
+            return '<tr>' +
+              '<td class="code">' + (t.task_no || '#' + t.id) + '</td>' +
+              '<td class="muted">' + t.interface_id + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + t.source_bill_no + '</td>' +
+              '<td>' + SC.badge(t.task_state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (t.finance_state || '—') + '</td>' +
+              '<td class="num">' + (t.retry_count || 0) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' +
+                (t.push_voucher_no
+                  ? '<span class="code" style="color:var(--green);">' + t.push_voucher_no + '</span>'
+                  : t.push_error_message
+                    ? '<span style="color:var(--red);">' + t.push_error_code + ' ' + t.push_error_message + '</span>'
+                    : '—') +
+              '</td>' +
+              '<td class="actions">' +
+                (canRetry ? '<a href="javascript:void(0)" onclick="engineRetry(' + t.id + ')">立即重推</a>' : '') +
+                (canForceTest ? '<a href="javascript:void(0)" onclick="engineForceSuccess(' + t.id + ')">强制成功</a>' +
+                                '<a href="javascript:void(0)" onclick="engineForceFail(' + t.id + ')" style="color:var(--red);">强制失败</a>' : '') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+
+      var sw = SC.store.list('F-13', { switch_code: 'BIZ-001-switch' })[0];
+      document.getElementById('biz-switch-state').innerHTML = sw
+        ? '<span class="badge ' + (sw.switch_status === '开' ? 'green' : 'red') + ' dot">' + sw.switch_status + '</span>'
+        : '<span class="muted">未知</span>';
+    }
+
+    function engineRetry(id) {
+      SC.nc.push(id).then(function () {
+        SC.ui.toast('F-01 #' + id + ' 已立即重推', 'info');
+      });
+    }
+
+    function engineForceSuccess(id) {
+      SC.nc.simulateSuccess(id).then(function () {
+        SC.ui.toast('F-01 #' + id + ' 强制成功', 'success');
+      });
+    }
+
+    function engineForceFail(id) {
+      SC.nc.simulateFailure(id).then(function () {
+        SC.ui.toast('F-01 #' + id + ' 强制失败 → linkage 触发 30 秒后自动重推', 'warning');
+      });
+    }
+
+    function engineToggleSwitch() {
+      var sw = SC.store.list('F-13', { switch_code: 'BIZ-001-switch' })[0];
+      if (!sw) return;
+      var next = sw.switch_status === '开' ? '关' : '开';
+      SC.store.update('F-13', sw.id, { switch_status: next });
+      SC.ui.toast('BIZ-001 接口开关已切换为' + next + (next === '关' ? '（S-05 已审不再创建 F-01）' : ''), 'info');
+      engineRenderF01();
+    }
+
+    SC.store.subscribe('F-01', engineRenderF01);
+    SC.store.subscribe('F-03', engineRenderF01);
+    SC.store.subscribe('F-13', engineRenderF01);
+    engineRenderF01();
+  </script>
   <script src="assets/chrome.js"></script>
   <script>
     SC.layout({
