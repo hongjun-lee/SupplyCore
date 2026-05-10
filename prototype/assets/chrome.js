@@ -45,6 +45,7 @@ SC.nav = [
     { id: 'three-way-match',   href: 'three-way-match.html',    label: '三单匹配', icon: '☰' },
     { id: 'tentative-estimate', href: 'tentative-estimate.html', label: '暂估闭环', icon: '◌' },
     { id: 'council-meeting',   href: 'council-meeting.html',    label: '月度集体决议 ★二期', icon: '⊕' },
+    { id: 'payment-execution', href: 'payment-execution.html',  label: '付款执行台账 ★二期', icon: '✓' },
   ]},
   { title: '基础数据', items: [
     { id: 'material-master',   href: 'material-master.html',    label: '物料主数据', icon: '◫' },
