@@ -195,6 +195,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 04 V1.1a §4.10 招投标 + 一期边界（开评标在能源集团电子商务/招采平台完成，本系统不参与开标 / 投标 / 评标过程）+ 详设 05 §合同生成。<br>
+            <strong>链路：</strong>T-01 招标申请 → 物资公司审批 → T-03 标包拆分 → 平台开评标（外部）→ T-05 中标结果 → 平台资料归档（tender-archive）→ linkage 创建 C-01 会签 → C-02 合同。<br>
+            <strong>流标分支：</strong>T-03:流标 → emit ALR-PUR-002 → 重新发标须重走集体决策（详设 04 §4.10.5）。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

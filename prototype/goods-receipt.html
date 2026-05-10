@@ -219,6 +219,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 06 V1.1a §6.4 收货登记 + 详设 04 §到货验收 + 详设 11 §13 操作日志。<br>
+            <strong>链路：</strong>采购订单（P-05 / S-02）→ 供应商发货 → 仓管员收货登记 → 自动建质检任务（quality-check）→ 质检合格 → 入库审核（purchase-receipt）→ S-13 入账。<br>
+            <strong>实现说明：</strong>到货登记时自动按订单数量比对（多到 / 少到 → 异常）；火工品 / 危险化学品收货须双人复核 + 拍照留痕。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

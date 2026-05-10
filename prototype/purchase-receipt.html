@@ -157,6 +157,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 06 V1.1a §6.5 采购入库审核 + 详设 08 BIZ-001 / BIZ-002 / BIZ-003 三单匹配联动。<br>
+            <strong>链路：</strong>收货 + 质检合格 → S-05 入库审核草稿 → 财务复核 → 已审 → linkage 原子写 S-13 + S-14 + S-21 → 触发 F-01 NC 任务（BIZ-001 正式 / BIZ-002 暂估）。<br>
+            <strong>暂估闭环：</strong>入库时无发票 → BIZ-002 暂估入账 → 发票到 → BIZ-003 红字冲销 + BIZ-001 正式入账（详设 06 §6.5）。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

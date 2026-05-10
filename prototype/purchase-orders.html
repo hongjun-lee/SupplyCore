@@ -116,6 +116,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 04 V1.1a §采购订单 + 详设 06 V1.1a §采购入库 + 详设 08 BIZ-001 入库正式凭证。<br>
+            <strong>链路：</strong>P-05 已分解（合同采购）/ S-01 已审（直采）→ 采购订单 P-05 / S-02 → 供应商发货 → 收货登记（goods-receipt）→ 质检（quality-check）→ 入库审核（purchase-receipt）→ S-13 入账 + BIZ-001。<br>
+            <strong>直达分支：</strong>is_direct_eligible=true 物料 + WF-DIR-001 例外审批 → 不进 S-13 → 三方验收（direct-delivery）+ BIZ-005A。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

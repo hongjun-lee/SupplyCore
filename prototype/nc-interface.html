@@ -148,6 +148,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 08 V1.0 F-01 推送任务 + F-03 任务调度 + F-07 重推审批 + F-13 接口开关 + 详设 09 §六 ALR-INT-FAIL-001。<br>
+            <strong>链路：</strong>业务事件触发 F-01 任务（BIZ-001~020 / NC-MD-001~008）→ 队列 → NC 推送 → 成功 / 失败重试（≤ 3 次）→ 仍失败升级 F-08 异常台账 → 接口管理员处置。<br>
+            <strong>接口开关 F-13：</strong>支持按业务码精细化禁用（演示期 BIZ-001/005/007/008/009/010/011/012/013/019 全开）；下推主数据 NC-MD 不受 F-13 限制。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

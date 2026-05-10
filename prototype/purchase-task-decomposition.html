@@ -323,6 +323,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 04 V1.1a §采购任务分解 P-05 + §三类采购方式（招采 / 直采 / 合同采购）+ §应急通道。<br>
+            <strong>链路：</strong>P-02 已审 → 系统建议拆包（金额 / 物料类别 / 历史中标供应商）→ 计划员调整 → 设置 tender_type → 已分解 → 自动建 T-01 招标 / S-01 采购申请 / 直接 P-05 合同采购订单。<br>
+            <strong>实现说明：</strong>tender_type 在 P-05 任务分解阶段确定；招采类自动创建 T-01 招标申请 → T-03 标包；直采类直接进 S-01 采购申请审批；合同采购按现有合同 C-02 执行。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

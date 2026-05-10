@@ -165,6 +165,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 06 V1.1a §6.4 质检 + §让步接收规则 + 详设 04 §供应商后评价联动 + 详设 09 ALR-QC-FAIL 不合格预警。<br>
+            <strong>链路：</strong>收货登记 → 质检任务自动建 → 抽检 / 全检 → 合格 → 入库审核 / 不合格 → 退货 / 让步接收（特批）→ 后评价 M-13 自动反馈供应商。<br>
+            <strong>实现说明：</strong>不合格率累计触发 WF-SUP-REASSESS-001 重评估；防爆 / 煤安证异常自动停用对应批次；让步接收需主管副总特批 + 留痕。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

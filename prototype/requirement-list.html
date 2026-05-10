@@ -113,6 +113,16 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 04 V1.1a §需求计划 P-01 主页（草稿 / 待审 / 已审 / 已驳回 4 状态机）+ §应急通道 + §跨矿合并规则。<br>
+            <strong>链路：</strong>使用单位（队组 / 矿）发起 P-01 → 矿主管审批 → 物资公司复核 → linkage 自动按物料合并聚合到 P-02 计划 → 拆解 P-03/P-05 → 招标 / 直采 / 合同采购分支。<br>
+            <strong>紧急通道：</strong>is_emergency=true → 一键审批通过 + 3 工作日内补办 P-02 + 100% 准确率审计抽查。<br>
+            <strong>实现说明：</strong>批量审批选中需求 → 自动按 草稿 → 待审 → 已审 流转；linkage 在 P-01:已审 时自动判断同期间 / 同 org / 同 material 三层幂等，相同维度的合并到同一 P-03 计划行（详见《04-需求计划与采购协同详细设计 V1.1》）。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

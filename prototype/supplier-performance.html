@@ -84,7 +84,15 @@
     </div>
   </div>
 
-  <div class="card"><div class="card-body" style="font-size:12px;color:var(--text-2);"><span class="badge blue dot">边界</span><span style="margin-left:8px;">供应商基础信息可在基础档案维护；准入、评价、暂停、黑名单和履约画像作为供应商管理业务能力独立展示，并与招投标、合同、采购订单、质检后评价自动联动。差评累计或防爆 / 煤安异常触发 WF-SUP-REASSESS-001。</span></div></div>
+  <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+  <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+  <div class="card-body" style="font-size:13px;line-height:1.7;">
+    <strong>业务依据：</strong>详设 04 V1.1a §供应商准入 + 详设 09 V1.2 §供应商后评价 + 详设 10 V1.2a §黑名单与重评估 + WF-SUP-REASSESS-001。<br>
+    <strong>链路：</strong>供应商准入（基础档案）→ 投标 / 中标 / 合作 → 后评价 M-13（交付准时 / 验收合格 / 配合度）→ 累计差评触发 WF-SUP-REASSESS-001 重评估 → 暂停 / 黑名单。<br>
+    <strong>边界：</strong>供应商基础信息可在基础档案维护；准入、评价、暂停、黑名单和履约画像作为供应商管理业务能力独立展示，并与招投标、合同、采购订单、质检后评价自动联动。<br>
+    <strong>实现说明：</strong>差评累计或防爆 / 煤安异常触发 WF-SUP-REASSESS-001 重评估；黑名单状态拒绝任何新订单创建（C-02 创建前置校验）。
+  </div>
+</div>
 </div></div></div>
 <script src="assets/time.js"></script>
   <script src="assets/time.js"></script>

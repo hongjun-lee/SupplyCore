@@ -264,6 +264,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 05 V1.1 §合同详情 + C-02 8 状态机 + payment_terms 文本字段（一期 A 范围）+ 详设 11 §13 SENS-CON-003/004 高敏感留痕。<br>
+            <strong>链路：</strong>C-01 会签 → C-02 草稿 → 会签中 → 已签 → 执行中 → (已完成 / 已变更 / 已终止)；C-03 条款 + payment_terms 文本字段记录付款条件（C-04 节点为后续扩展项）。<br>
+            <strong>实现说明：</strong>变更已审后服务层自动同步 C-02 字段、C-03 条款（旧条款 is_superseded=true）；金额变更超过 SY-02 配置阈值升级至项目领导小组；付款节点编辑与付款申请链路为后续扩展项。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

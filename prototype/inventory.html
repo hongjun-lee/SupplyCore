@@ -126,15 +126,16 @@
           </div>
         </div>
 
-        <!-- 提示 -->
-        <div class="card">
-          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
-            <span class="badge blue dot">说明</span>
-            <div class="text-2">
-              <div><strong>库存唯一事实源原则：</strong>所有库存数量与价值以 <span class="font-mono">S-13 库存台账</span> 为准；批次维度信息见 <span class="font-mono">S-14 批次账</span>；任意一笔出入库须在同事务原子写入 <span class="font-mono">S-21 库存事务流水</span>。</div>
-              <div style="margin-top:6px;"><strong>低储 / 超储口径：</strong>低库存按物料档案 <span class="font-mono">safety_stock</span>；超储按储备资金预算 110% + 安全周转周期双维度，不再使用单一最高库存字段。</div>
-              <div style="margin-top:6px;"><strong>火工品 / 化工品强制批次：</strong>分类前缀 <span class="font-mono">HG/HX</span> 必须按批次维度记账，并支持双人双锁专管库。</div>
-            </div>
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 06 V1.1a §库存查询主页 + S-13 库存台账（实时数量/金额）+ S-14 批次账（FIFO/批次追溯）+ S-21 库存事务流水（不可修改）。<br>
+            <strong>链路：</strong>所有出入库 / 调拨 / 盘点 / 废旧 → 同事务原子写 S-13 + S-14 + S-21 → 触发 F-01 NC 任务 → 库存查询页实时聚合显示；穿透到 S-21 流水可看每一笔变动来源。<br>
+            <strong>高敏感：</strong>火工品 / 危险化学品库存仅授权角色可见；月末结账后冻结期内库存不允许修改（详设 06 §6.4）。<br>
+            <strong>实现说明：</strong>
+            <span style="display:block;margin-top:4px;">· <strong>库存唯一事实源原则</strong>：所有库存数量与价值以 <span class="font-mono">S-13 库存台账</span> 为准；批次维度信息见 <span class="font-mono">S-14 批次账</span>；任意一笔出入库须在同事务原子写入 <span class="font-mono">S-21 库存事务流水</span>。</span>
+            <span style="display:block;">· <strong>低储 / 超储口径</strong>：低库存按物料档案 <span class="font-mono">safety_stock</span>；超储按储备资金预算 110% + 安全周转周期双维度，不再使用单一最高库存字段。</span>
+            <span style="display:block;">· <strong>火工品 / 化工品强制批次</strong>：分类前缀 <span class="font-mono">HG/HX</span> 必须按批次维度记账，并支持双人双锁专管库。</span>
           </div>
         </div>
 

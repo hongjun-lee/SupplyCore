@@ -227,6 +227,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 07 V1.0a §维修工单 E-04 外委检修 + WF-CON-OVERLIMIT-001 加签 + 40% 原值上限 + SENS-CON-004 高敏感留痕（详设 11 §13）。<br>
+            <strong>链路：</strong>设备故障 → 报修单 E-04（草稿 → 待审 → 已审 → 已结算）→ linkage 已审时检查 amount &gt; 40% × 设备原值 → 超阈值 emit ALR-CON-OVERLIMIT-001 紧急 + WF-CON-OVERLIMIT-001 自动加签财务总监 + 总经理。<br>
+            <strong>实现说明：</strong>40% 原值阈值在 SY-02 配置；外委检修与自有维修的边界由 maintenance_type 字段区分；超阈值审计抽查为季度内审重点。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

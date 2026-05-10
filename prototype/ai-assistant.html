@@ -111,6 +111,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 09 V1.2 §五 AI 助理 10 类 Tool + 集团统筹层「统一 AI 入口」+ 详设 10 V1.2a 角色权限隔离。<br>
+            <strong>链路：</strong>用户提问 → 路由器识别意图 → 调用对应 Tool（按当前角色权限）→ 查询 SC.store 实时数据 → 返回自然语言响应 + 引用单据穿透链接。<br>
+            <strong>实现说明：</strong>查询 100% 按当前角色权限过滤；写操作必须用户主动确认（详见 ai-write-flow）；导出统一进 R-10 审计表（含水印）。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

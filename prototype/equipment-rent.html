@@ -294,6 +294,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 07 V1.0a §设备租赁 + 详设 05 §8.10 + 详设 08 BIZ-019 月度租赁费 + 三笔保证金独立核算。<br>
+            <strong>链路：</strong>E-08 租赁单（起 / 在 / 续 / 停 / 退 5 状态）→ 月度自动结算 → linkage F-01 BIZ-019 → 三笔保证金（押金 / 履约 / 设备）独立账户单独核算。<br>
+            <strong>实现说明：</strong>一次性 vs 月度模式：mode=ONE_TIME 一次性付清；mode=MONTHLY 按月生成应付；过期未续约自动转停租 + 通知归还。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

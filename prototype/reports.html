@@ -110,6 +110,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 09 V1.2 §报表中心 R-INV / R-PUR / R-CON / RPT-EQ-OEE / RPT-INV-RECON + 详设 11 §13 R-10 导出审计（带水印）+ AI 助理入口。<br>
+            <strong>链路：</strong>报表订阅（日 / 周 / 月）→ 调度任务自动生成 → 推送至接收人 + 站内通知；报表穿透到底层数据（库存 / 流水 / 单据）；导出统一进 R-10 审计表（操作人 + 时间 + 范围 + 水印）。<br>
+            <strong>AI 助理：</strong>10 类 Tool（库存 / 计划 / 合同 / 预警 / 设备 / 财务 / 供应商 / 暂估 / 外委 / OEE）按当前角色权限隔离查询。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

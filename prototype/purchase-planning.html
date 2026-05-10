@@ -238,6 +238,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 04 V1.1a §采购计划 P-02（草稿 / 待审 / 已审 / 已驳回 4 状态机）+ §跨矿合并规则 + §同期间同物料三层幂等。<br>
+            <strong>链路：</strong>P-01 已审 → linkage 自动按物料 / 期间合并到 P-02 → 计划员复核 → 已审 → 拆解为 P-03（计划行）+ P-05（采购任务）→ 进入招标 / 直采 / 合同采购分支。<br>
+            <strong>实现说明：</strong>同期间 + 同 org + 同 material 三层幂等防重；P-02 月度计划周期口径在 SY-02 配置；月度集体决议（A4a）按已签合同批量决议。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

@@ -102,6 +102,15 @@
           </div>
         </div>
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 09 V1.2 §报表穿透 + R-INV-001 库存日报 + 详设 11 §13 R-10 导出审计（带水印）。<br>
+            <strong>链路：</strong>报表中心 → 选定报表 → 查询条件 → 生成报表 → 穿透到底层数据（物料 / 库存 / 流水）→ 导出 → R-10 审计表（操作人 + 时间 + 范围 + 水印）。<br>
+            <strong>实现说明：</strong>所有导出统一加水印（含操作人姓名 + 时间）；按当前角色权限隔离数据范围；穿透到 S-21 流水可看每一笔变动来源。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

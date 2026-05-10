@@ -129,12 +129,13 @@
           </table>
         </div>
 
-        <div class="card">
-          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
-            <span class="badge blue dot">说明</span>
-            <div class="text-2">
-              本页面对应统一审批中心，所有业务单据的审批均落入 <span class="font-mono">A-20 approval_instance</span> 表，按 <span class="font-mono">FIXED_USER / FIXED_ROLE / ORG_ROLE</span> 三种规则解析审批人；本版已补 <span class="font-mono">WF-DIR-001 / WF-RPR-001 / WF-CON-OVERLIMIT-001 / WF-SUP-REASSESS-001</span>。详见 <span class="font-mono">10-权限审批流详细设计 V1.2</span>。
-            </div>
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;">
+            <strong>业务依据：</strong>详设 04 V1.1a §审批中心 + 详设 10 V1.2a §权限矩阵 + WF-XXX 工作流定义 + 详设 11 §13 操作日志。<br>
+            <strong>链路：</strong>各业务页发起审批（P-01 / P-02 / P-05 / C-01 / C-08 / S-11 / S-19 等）→ 按 ORG_ROLE 路由到对应审批人 → 审批中心统一处理（通过 / 驳回 / 加签）→ linkage 推动状态机迁移 → 业务页同步刷新。<br>
+            <strong>高敏感加签：</strong>SENS-CON-003 / SENS-CON-004 / WF-CON-OVERLIMIT-001 自动加签财务总监 + 总经理；超时（按金额分档）自动 emit ALR-WF-001。<br>
+            <strong>实现说明：</strong>所有业务单据的审批均落入 <span class="font-mono">A-20 approval_instance</span> 表，按 <span class="font-mono">FIXED_USER / FIXED_ROLE / ORG_ROLE</span> 三种规则解析审批人；本版已补 <span class="font-mono">WF-DIR-001 / WF-RPR-001 / WF-CON-OVERLIMIT-001 / WF-SUP-REASSESS-001</span>。详见《10-权限审批流详细设计 V1.2》。
           </div>
         </div>
 
