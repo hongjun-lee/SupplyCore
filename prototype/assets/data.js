@@ -13,16 +13,14 @@ SC.data = {
     ],
   },
 
+  /* v0.22 收口：与 roles.js capabilities 完全一致的 6 个角色 id（同事评审 R2-2 修复）*/
   roles: [
-    { id: 'requester', label: '业务申请人（区队）' },
-    { id: 'planner',   label: '计划员' },
-    { id: 'buyer',     label: '采购员' },
-    { id: 'keeper',    label: '仓管员' },
-    { id: 'qc',        label: '质检员' },
-    { id: 'approver',  label: '审批人' },
-    { id: 'finance',   label: '财务' },
-    { id: 'leader',    label: '集团管理层' },
-    { id: 'admin',     label: '系统管理员' },
+    { id: 'buyer',           label: '采购员' },
+    { id: 'planner',         label: '计划员' },
+    { id: 'storage_mgr',     label: '物资主管' },
+    { id: 'finance',         label: '财务' },
+    { id: 'it',              label: 'IT' },
+    { id: 'group_committee', label: '集团委员会' },
   ],
 
   /* 需求计划（对齐 04） */

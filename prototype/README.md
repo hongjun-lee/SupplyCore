@@ -3,7 +3,7 @@
 > **用途仅限演示与沟通** — 与管理层、业务部门、招标参与方对齐功能与流程。
 > **非真实数据，亦非开发或验收依据。** 权威口径请以 `docs/详细设计/*` 为准。
 
-> **命名说明**：本仓库内部使用"档 A 一阶段 / 二阶段"标识开发分批节奏（**不是招标分期**）。档 A 整体为本次招标承诺范围；二阶段是档 A 内部的迭代分批，与"招标二期"无关。
+> **命名说明**：本仓库内部使用"档 A 一阶段 / 二阶段"标识开发分批节奏（**不是招标分期**）。本原型仅展示档 A 范围内的功能与口径，**正式招标承诺范围以招标技术要求 / 功能响应清单为准**；"一阶段 / 二阶段"是档 A 内部的迭代分批节奏，与"招标二期"无关。
 
 ## 当前版本范围分层
 
@@ -537,43 +537,65 @@ C-01 合同会签
 - **委托加工台账 / 直达使用单位流程**：受 P0 Q-07 / Q-08 影响
 - **真实后端 / 升 C 档**：平移到 `../SupplyCores/modules/nova.supplycores/frontend` 的 Vite/React 工程
 
-## 四、文件结构（39 个 HTML + 3 个资产）
+## 四、文件结构（52 个 HTML + 1 个 CSS + 9 个 JS asset）
 
 ```
 prototype/
 ├── README.md
-├── index.html                     工作台
-├── approval-center.html           审批中心
+├── index.html                          工作台
+├── approval-center.html                审批中心
+├── _engine-test.html                   引擎层烟雾测试（开发面向，9 卡）
 │
-├── requirement-list.html / requirement-detail.html
-├── purchase-orders.html / goods-receipt.html / quality-check.html
-├── inventory.html / inventory-flow.html / stocktake.html / mobile-stocktake.html
-├── scrap-disposal.html
-├── equipment-rent.html / equipment-lifecycle.html
-├── maintenance-order.html / equipment-oee.html ★v0.7
+├── 业务流转
+│   ├── requirement-list.html / requirement-detail.html
+│   ├── purchase-orders.html / goods-receipt.html / quality-check.html / purchase-receipt.html
+│   ├── inventory.html / inventory-flow.html / stocktake.html / mobile-stocktake.html
+│   ├── inventory-transfer.html       (二阶段 A3 调拨)
+│   ├── material-issuance.html        (二阶段 A2 出库主线)
+│   ├── outsourced-processing.html    (二阶段 A9 委托加工)
+│   ├── scrap-disposal.html / equipment-rent.html / equipment-lifecycle.html
+│   └── maintenance-order.html / equipment-oee.html
 │
-├── purchase-planning.html          ★ v0.8
-├── purchase-task-decomposition.html ★ v0.8
-├── tender.html / tender-archive.html
+├── 采购协同
+│   ├── purchase-planning.html / purchase-task-decomposition.html
+│   ├── tender.html / tender-archive.html
+│   ├── direct-delivery.html          (二阶段 A11 直达使用)
+│   └── emergency-purchase.html       (二阶段 A13 应急采购)
 │
-├── contract-list.html / contract-detail.html
-├── payment-request.html / funding-plan.html
-├── three-way-match.html           ★ v0.7
-├── tentative-estimate.html        ★ v0.8
+├── 合同与资金
+│   ├── contract-list.html / contract-detail.html
+│   ├── payment-request.html / funding-plan.html / three-way-match.html / tentative-estimate.html
+│   ├── council-meeting.html          (二阶段 A4a 月度集体决议)
+│   └── payment-execution.html        (二阶段 A4b 付款执行 + BIZ-013/014/015/020)
 │
-├── material-master.html / base-archive.html / supplier-performance.html
+├── 基础数据
+│   ├── material-master.html / base-archive.html / supplier-performance.html
+│   └── master-data-admin.html        (二阶段 B3 主数据维护)
 │
-├── reports.html / report-detail.html / alert-rules.html
-├── ai-assistant.html / ai-write-flow.html
-├── dashboard-bigscreen.html
+├── 决策 / AI
+│   ├── reports.html / report-detail.html / alert-rules.html
+│   ├── ai-assistant.html / ai-write-flow.html
+│   ├── split-detection.html          (二阶段 A14 化整为零反规避)
+│   ├── demo-snapshot.html            (二阶段 B2/B6 数据快照)
+│   └── dashboard-bigscreen.html
 │
-├── nc-interface.html / nc-interface-detail.html ★v0.7 / system-admin.html
-├── xinchuang-matrix.html
+├── 运维 / 集成
+│   ├── nc-interface.html / nc-interface-detail.html / system-admin.html
+│   ├── reconciliation.html           (二阶段 B4 三对一致对账)
+│   └── xinchuang-matrix.html
 │
 └── assets/
-    ├── styles.css                 含响应式 + 大屏暗色 + 手机外框 + 扫码动画 + 信创矩阵 + AI 草稿面板
-    ├── chrome.js                  头/侧栏/角色切换/移动端 drawer
-    └── data.js                    Mock 数据
+    ├── styles.css                    含响应式 + 大屏暗色 + 手机外框 + 扫码动画 + 信创矩阵 + AI 草稿面板
+    ├── chrome.js                     头/侧栏/角色切换/移动端 drawer/演示场景切换器/底部 dock/schemaVersion banner
+    ├── data.js                       Mock 数据（roles 6 角色对齐 roles.js）
+    ├── store.js                      LocalStorage CRUD + BroadcastChannel + snapshot/rollback + schemaVersion
+    ├── statemachine.js               14+ 状态机（P-01/P-02/P-05/T-01/T-03/C-01/C-02/C-04/C-07/C-08/C-10/S-01~S-23/E-04/E-08/OP-01/M-09/M-13）
+    ├── linkage.js                    联动总线（30+ handler 含 A4a 自动建 C-04/C-07）
+    ├── seed-data.js                  M-01/02/05/09/12 + F-13 NC 开关 14 项 + P-01 草稿 3 条
+    ├── mock-nc.js                    NC 推送 mock（1-2 秒延迟 + 5% 失败率 + 自动重推）
+    ├── roles.js                      6 角色 capabilities（菜单可见性 + 数据范围 + badgeCounts）
+    ├── ui-helper.js                  toast/alert/confirm/prompt/loading（Promise 化）
+    └── time.js                       B1 时间穿越 mock 系统时间
 ```
 
 ## 五、设计与口径约定

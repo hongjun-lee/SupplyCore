@@ -64,19 +64,28 @@
     SCHEMA_VERSION: CURRENT_SCHEMA_VERSION,
 
     /* ---------- Schema 版本检查 ---------- */
-    /* 启动时调用：如本地 schemaVersion 与代码不一致，提示用户重置（避免老数据 + 新代码的状态错乱）*/
+    /* 启动时调用：如本地 schemaVersion 与代码不一致 / 残留无版本号的旧数据 → 提示用户重置 */
     checkSchemaVersion: function () {
       var stored = localStorage.getItem(SCHEMA_VERSION_KEY);
-      if (!stored) {
-        // 首次访问 / 全新浏览器 → 直接写入当前版本
-        localStorage.setItem(SCHEMA_VERSION_KEY, CURRENT_SCHEMA_VERSION);
-        return { match: true, stored: null, current: CURRENT_SCHEMA_VERSION };
-      }
       if (stored === CURRENT_SCHEMA_VERSION) {
         return { match: true, stored: stored, current: CURRENT_SCHEMA_VERSION };
       }
-      // 版本不一致 — 不自动重置（避免误清用户数据），返回信息让 UI 层决定
-      return { match: false, stored: stored, current: CURRENT_SCHEMA_VERSION };
+      // 检查是否有任何 sc:* 业务数据（排除版本号 key 本身）
+      var hasOldData = false;
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf(KEY_PREFIX) === 0 && k !== SCHEMA_VERSION_KEY) {
+          hasOldData = true;
+          break;
+        }
+      }
+      if (!stored && !hasOldData) {
+        // 全新浏览器 / 已重置过 → 直接写入当前版本，无须提示
+        localStorage.setItem(SCHEMA_VERSION_KEY, CURRENT_SCHEMA_VERSION);
+        return { match: true, stored: null, current: CURRENT_SCHEMA_VERSION };
+      }
+      // 不匹配（含两种场景）：① 版本号不一致 ② 无版本号但有旧业务数据 → 提示重置
+      return { match: false, stored: stored || '(无版本号 + 有旧数据)', current: CURRENT_SCHEMA_VERSION };
     },
 
     /* 用户确认后的重置 + 升级版本号 */
