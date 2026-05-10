@@ -2,6 +2,15 @@
 <html lang="zh-CN">
 <head><meta charset="utf-8"><title>预警规则配置 — 阜矿物资供应管理系统（原型）</title><link rel="stylesheet" href="assets/styles.css"></head>
 <body><div id="header"></div><div class="app-layout"><div id="sidebar"></div><div class="app-main"><div id="page-area">
+
+  <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+    <div class="card-body" style="font-size:13px;line-height:1.6;">
+      <strong>📋 业务依据：</strong>详设 09 V1.2 §六 R-05 预警规则中心 + 详设 11 §13 高敏感留痕。<br>
+      <strong>🛤 链路：</strong>规则配置（库存 / 合同 / 接口 / 供应商 / 流程）→ 业务事件触发 → linkage 自动 create R-05 → 三段视图（未读 / 已确认 / 已处理）→ 接收人通知 + 处理留痕 → 报表订阅。<br>
+      <strong>🔔 4 类自动预警：</strong>ALR-INV-001 库存低储 / ALR-INT-001 NC 推送失败 / ALR-PUR-002 招标流标 / ALR-WF-001 审批超时；高敏感（SENS-CON-003/004）单独走人工二次确认。
+    </div>
+  </div>
+
   <div class="card" style="border-left:4px solid var(--amber);background:#fffbf3;">
     <div class="card-header">
       <div class="title">📡 档 A 引擎接入 · E2 预警通知中心（三段视图 + 4 类自动预警）</div>

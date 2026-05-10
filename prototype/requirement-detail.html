@@ -12,6 +12,36 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 04 V1.1a §需求计划 P-01 详情 + 详设 09 V1.2 R-05 紧急通道 + 详设 11 §13 操作日志。<br>
+            <strong>🛤 链路：</strong>P-01 草稿 → 矿物资审核（队长 / 矿主管）→ 物资公司复核（计划员 / 物资主管）→ 已审 → linkage 自动聚合 P-02 → 后续 P-03/P-05/T-01 全链路。<br>
+            <strong>🚨 紧急通道：</strong>is_emergency=true → 一键审批通过（应急）+ 3 工作日内补办 P-02 正式手续 + 100% 准确率审计抽查（详设 04 §应急采购）。
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · P-01 实时清单（接 SC.store）</div>
+            <div class="actions">
+              <a href="requirement-list.html" class="btn btn-sm">→ P-01 全量列表</a>
+              <a href="emergency-purchase.html" class="btn btn-sm">→ 应急采购</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr><th>申请号</th><th>组织</th><th>物料</th><th class="num">数量</th><th>状态</th><th>events</th><th>操作</th></tr>
+              </thead>
+              <tbody id="engine-p01-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动</span>
+              P-01:已审 → linkage 自动聚合 P-02 计划（按物料合并 + 三层幂等查重）→ P-02:已审 → 拆解 P-03/P-05 → ...（详设 04 §需求 → 计划 → 任务）。下方为单条记录详情演示样例。
+            </div>
+          </div>
+        </div>
+
         <!-- 流转条 -->
         <div class="card">
           <div class="flow-strip">
@@ -142,6 +172,47 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* 引擎接入：P-01 实时清单 */
+    var matMapRD = {}; SC.store.list('M-05').forEach(function (m) { matMapRD[m.id] = m.name; });
+    var orgMapRD = {}; SC.store.list('M-01').forEach(function (o) { orgMapRD[o.id] = o.name; });
+    function renderRDList() {
+      var rows = SC.store.list('P-01').slice().reverse();
+      document.getElementById('engine-p01-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:14px;">暂无 P-01</td></tr>'
+        : rows.map(function (r) {
+            var events = SC.sm.getAllowedEvents('P-01', r);
+            var stateColor = r.state === '已审' ? 'green' : r.state === '待审' ? 'amber' : r.state === '已驳回' ? 'red' : 'gray';
+            return '<tr>' +
+              '<td class="code">' + (r.request_no || '#' + r.id) + (r.urgency === '紧急' ? ' <span class="badge red" style="font-size:9px;">急</span>' : '') + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (orgMapRD[r.org_id] || '—') + '</td>' +
+              '<td>' + (matMapRD[r.material_id] || '#' + r.material_id) + '</td>' +
+              '<td class="num">' + (r.quantity || 0) + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+              '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+              '<td class="actions">' +
+                events.map(function (e) { return '<a href="javascript:void(0)" onclick="engineRD(' + r.id + ', \'' + e + '\')">' + e + '</a>'; }).join('') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+    }
+    function engineRD(id, event) {
+      try {
+        SC.sm.transition('P-01', id, event);
+        if (event === '审批通过') SC.ui.toast('P-01 #' + id + ' 已审 → linkage 聚合 P-02', 'success');
+        else SC.ui.toast('P-01 #' + id + ' → ' + event, 'success');
+      } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
+    }
+    SC.store.subscribe('P-01', renderRDList);
+    setTimeout(renderRDList, 100);
+  </script>
   <script>
     var d = SC.data.requirementDetail;
     SC.layout({

@@ -67,6 +67,36 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 09 V1.2 §六 RPT-EQ-OEE 设备综合效率报表 + 详设 07 V1.0a §设备运行 + 一期 → 二期 P3 OEE 体系。<br>
+            <strong>📐 OEE 公式：</strong>OEE = <strong>可用率 × 性能率 × 良品率</strong>；可用率 = (计划 - 故障停机 - 计划停机) / 计划；性能率 = 实际产量 / (理论速度 × 实际工时)；良品率 = 合格 / 总产量。<br>
+            <strong>🛤 链路：</strong>E-01 设备状态变化 → 累计停机时长 → linkage 自动重算 OEE → R-05 预警（OEE &lt; 阈值 / 故障停机 &gt; 24h）→ 月度报表 RPT-EQ-OEE。
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · E-01 状态聚合 → OEE 输入数据</div>
+            <div class="actions">
+              <a href="equipment-lifecycle.html" class="btn btn-sm">→ 设备生命周期</a>
+              <a href="maintenance-order.html" class="btn btn-sm">→ 检修工单</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr><th>状态</th><th class="num">设备数</th><th class="num">本月累计时长（小时）</th><th>OEE 影响</th></tr>
+              </thead>
+              <tbody id="engine-oee-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">演示</span>
+              一期：基础态聚合 + 月度报表；二期 P3：实时 SCADA 接入 + IoT 故障数据流 + AI 趋势预测（详设 07 §设备运行 V1.0a）。
+            </div>
+          </div>
+        </div>
+
         <div class="kpi-grid">
           <div class="kpi accent">
             <div class="label">本月集团综合 OEE</div>
@@ -238,6 +268,32 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* 引擎接入：E-01 状态聚合 → OEE */
+    function renderOEEAgg() {
+      var e01 = SC.store.list('E-01');
+      var groups = {};
+      e01.forEach(function (r) { var s = r.state || '在用'; groups[s] = (groups[s] || 0) + 1; });
+      var rows = [
+        { state: '在用', count: groups['在用'] || 0, hours: 480, impact: '<span class="badge green dot">高</span>' },
+        { state: '维修中', count: groups['维修中'] || 0, hours: 32, impact: '<span class="badge amber dot">影响可用率</span>' },
+        { state: '故障', count: groups['故障'] || 0, hours: 18, impact: '<span class="badge red dot">影响可用率 + 良品率</span>' },
+        { state: '停用 / 已注销', count: (groups['停用'] || 0) + (groups['已注销'] || 0), hours: 0, impact: '<span class="muted">不计入</span>' },
+      ];
+      document.getElementById('engine-oee-tbody').innerHTML = rows.map(function (r) {
+        return '<tr><td><strong>' + r.state + '</strong></td><td class="num">' + r.count + '</td><td class="num">' + r.hours + '</td><td>' + r.impact + '</td></tr>';
+      }).join('');
+    }
+    SC.store.subscribe('E-01', renderOEEAgg);
+    setTimeout(renderOEEAgg, 100);
+  </script>
   <script>
     SC.layout({
       page: 'equipment-oee',

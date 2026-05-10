@@ -58,6 +58,38 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 08 V1.1 F-09 三单匹配 + 详设 06 V1.1a §6.5 暂估闭环 + 详设 05 V1.1 §合同账期联动。<br>
+            <strong>🛤 链路：</strong>P-05 采购订单 ←→ S-02 入库单 ←→ F-08 发票 → 容差自动判定（数量 / 单价 / 金额 / 税率）→ 全匹配 / 差异挂账 / 拒付。<br>
+            <strong>⚖ 容差：</strong>金额 ±0.5%（含税）/ 数量 ±0.5%（按计量单位）/ 单价 ±1% / 税率必须一致；超容差 → 进人工复核 → 例外审批留痕。<br>
+            <strong>🛡 暂估闭环：</strong>S-02 入库无发票 → BIZ-002 暂估 → 发票到 → BIZ-003 红字冲销 + BIZ-001 正式入账（详设 06 §6.5）。
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · 三单数据源实时计数 + 暂估闭环演示</div>
+            <div class="actions">
+              <a href="purchase-orders.html" class="btn btn-sm">→ P-05 订单</a>
+              <a href="goods-receipt.html" class="btn btn-sm">→ S-02 入库</a>
+              <a href="tentative-estimate.html" class="btn btn-sm">→ 暂估闭环</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr><th>三单要素</th><th>实体</th><th class="num">总数</th><th class="num">已匹配</th><th class="num">待匹配</th><th>NC 推送</th></tr>
+              </thead>
+              <tbody id="engine-twm-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动</span>
+              S-02:已入库 → linkage 自动检查发票（F-08）→ 三单全匹配 → P-05 关闭 + F-01 BIZ-001/003 NC 推送；超容差 → 拒付 + 财务复核。
+            </div>
+          </div>
+        </div>
+
         <div class="kpi-grid">
           <div class="kpi"><div class="label">本月待匹配</div><div class="value">42</div><div class="trend">已匹配 38 · 待人工 4</div></div>
           <div class="kpi"><div class="label">自动通过率</div><div class="value">90.5%</div><div class="trend up">环比 ↑ 3.1pp</div></div>
@@ -366,6 +398,38 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* 引擎接入：三单数据源实时计数 */
+    function renderTwm() {
+      var orders = SC.store.list('P-05');
+      var receipts = SC.store.list('S-02');
+      var f01 = SC.store.list('F-01');
+      var rows = [
+        { name: '采购订单 P-05', entity: 'P-05', total: orders.length, matched: orders.filter(function (r) { return r.state === '已关闭'; }).length, pending: orders.filter(function (r) { return r.state !== '已关闭' && r.state !== '已作废'; }).length, nc: '—' },
+        { name: '入库单 S-02', entity: 'S-02', total: receipts.length, matched: receipts.filter(function (r) { return r.state === '已入库'; }).length, pending: receipts.filter(function (r) { return r.state === '草稿' || r.state === '待审' || r.state === '已审'; }).length, nc: f01.filter(function (f) { return f.biz_code === 'BIZ-001' || f.biz_code === 'BIZ-002'; }).length + ' 笔' },
+        { name: '发票 F-08（待二期 P3）', entity: 'F-08', total: '—', matched: '—', pending: '—', nc: '—' },
+      ];
+      document.getElementById('engine-twm-tbody').innerHTML = rows.map(function (r) {
+        return '<tr>' +
+          '<td><strong>' + r.name + '</strong></td>' +
+          '<td class="code">' + r.entity + '</td>' +
+          '<td class="num">' + r.total + '</td>' +
+          '<td class="num" style="color:var(--green);">' + r.matched + '</td>' +
+          '<td class="num" style="color:var(--amber);">' + r.pending + '</td>' +
+          '<td class="muted">' + r.nc + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+    ['P-05', 'S-02', 'F-01'].forEach(function (e) { SC.store.subscribe(e, renderTwm); });
+    setTimeout(renderTwm, 100);
+  </script>
   <script>
     SC.layout({
       page: 'three-way-match',

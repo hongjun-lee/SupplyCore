@@ -53,6 +53,14 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 08 V1.0 F-03 推送任务 + F-07 重推审批 + F-08 异常台账 + F-13 接口开关 + 详设 09 §六 ALR-INT-FAIL-001。<br>
+            <strong>🛤 链路：</strong>F-01 推送失败（NC 返回错误）→ 自动重试 3 次（间隔指数退避）→ 仍失败 → 升级 F-08 异常台账（高敏感）→ 接口管理员处置（编辑映射 / 重推审批 / 触发主数据下推 / 忽略 / 关闭）。<br>
+            <strong>🛡 高敏感重推：</strong>F-08 重推须二次审批（接口管理员 + 财务总监）+ 副本归档 + 月度审计抽查。
+          </div>
+        </div>
+
         <div class="card" style="border-left:4px solid var(--red);background:#fff5f5;">
           <div class="card-header">
             <div class="title">📡 档 A 引擎接入 · F-08 异常台账（重推 ≥3 次仍失败的 F-01）</div>

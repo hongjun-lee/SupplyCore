@@ -12,6 +12,33 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 09 V1.2 §五 AI Tool 写操作约束 + 集团统筹层「统一 AI 入口」第 3 条权限要求 + 详设 11 §13 操作日志。<br>
+            <strong>🛤 链路：</strong>AI 对话式收集字段 → AI 生成草稿（不写库）→ 用户审阅 → 用户主动确认 → SC.store 写入 → 进入正常审批流（同人工提报无差别）。<br>
+            <strong>🛡 边界：</strong>AI 不可绕过审批流；不可越权（按当前角色权限）；写操作 100% 留痕（操作人 = 当前用户，非 AI）；高敏感操作（如黑名单 / SENS-CON-003）禁 AI 触发，必须人工通道。
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · AI 写操作演示（生成 P-01 草稿 → 用户确认 → SC.store 写入）</div>
+            <div class="actions">
+              <button class="btn btn-sm btn-primary" onclick="engineAIWrite()">▶ 模拟 AI 提报需求</button>
+              <a href="ai-assistant.html" class="btn btn-sm">→ AI 助理（查询）</a>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="engine-aw-output" style="font-size:13px;line-height:1.7;background:#fafbfd;padding:12px;border-radius:6px;min-height:80px;">
+              <span class="muted">点上方按钮 → 模拟 AI 收集字段 → 生成草稿 → 用户确认 → SC.store 写入 P-01。</span>
+            </div>
+            <div style="margin-top:8px;font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动</span>
+              点确认后 SC.store 创建 P-01（state=草稿，operator=当前角色，trigger_source='AI'）→ 跳转 requirement-detail 提交审批。
+            </div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-body" style="display:flex;gap:12px;align-items:start;">
             <span class="badge red dot">关键边界</span>
@@ -132,6 +159,69 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* 引擎接入：AI 写操作演示 */
+    var aiAwState = 0;
+    function engineAIWrite() {
+      var out = document.getElementById('engine-aw-output');
+      if (aiAwState === 0) {
+        out.innerHTML = '<div style="color:var(--brand);font-weight:600;margin-bottom:8px;">🤖 AI: 我帮您起草需求，请提供：物料名称、数量、用途、紧急程度</div>' +
+          '<div style="color:var(--text-2);">用户: 锚杆 Φ20×2400, 200 根, 1308 工作面支护, 普通</div>' +
+          '<div style="color:var(--brand);font-weight:600;margin-top:8px;">🤖 AI: 草稿已生成 ✏️ — 请审阅:</div>' +
+          '<div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:10px;margin-top:6px;">' +
+            '<div style="font-size:12px;line-height:1.6;">' +
+              '<strong>申请单位</strong>：艾友矿（按当前角色自动）<br>' +
+              '<strong>物料</strong>：MAT-BJ-0801 锚杆 Φ20×2400<br>' +
+              '<strong>数量</strong>：200 根<br>' +
+              '<strong>用途</strong>：1308 工作面回风顺槽支护<br>' +
+              '<strong>紧急程度</strong>：普通<br>' +
+              '<strong>预算</strong>：约 ¥95,620（系统按近 30 天均价估）' +
+            '</div>' +
+            '<div style="margin-top:8px;display:flex;gap:8px;">' +
+              '<button class="btn btn-sm btn-primary" onclick="engineAIConfirm()">✓ 确认提交</button>' +
+              '<button class="btn btn-sm" onclick="engineAICancel()">取消</button>' +
+              '<button class="btn btn-sm">编辑后提交</button>' +
+            '</div>' +
+          '</div>' +
+          '<div style="margin-top:8px;font-size:11px;color:var(--red);">⚠ 用户主动确认才写库；点击"取消"AI 草稿不留痕迹</div>';
+        aiAwState = 1;
+      }
+    }
+    function engineAIConfirm() {
+      var mat = SC.store.list('M-05').find(function (m) { return m.code === 'MAT-BJ-0801'; }) || SC.store.list('M-05')[7];
+      var p01 = SC.store.create('P-01', {
+        request_no: SC.store.nextNo('XQ'),
+        org_id: 3,
+        material_id: mat.id,
+        quantity: 200,
+        amount: 95620,
+        purpose: '1308 工作面回风顺槽支护（AI 协助提报）',
+        urgency: '普通',
+        applicant: SC.getRole().label,
+        submit_date: new Date().toISOString().slice(0, 10),
+        trigger_source: 'AI',
+        state: '草稿',
+      });
+      var out = document.getElementById('engine-aw-output');
+      out.innerHTML = '<div style="color:var(--green);font-weight:600;">✓ P-01 #' + p01.id + ' 已写入（' + p01.request_no + '）</div>' +
+        '<div style="margin-top:6px;font-size:12px;">操作人：<strong>' + SC.getRole().label + '</strong>（非 AI）· 触发源：trigger_source=\'AI\' · 当前状态：草稿</div>' +
+        '<div style="margin-top:6px;"><a href="requirement-detail.html" class="btn btn-sm btn-primary">→ 跳转 P-01 详情提交审批</a></div>' +
+        '<div style="margin-top:8px;font-size:11px;color:var(--text-2);">详设 11 §13：本次写操作完整留痕（用户 + AI辅助标记 + 时间戳 + 草稿内容快照）</div>';
+      SC.ui.toast('P-01 已创建（用户主动确认）', 'success');
+      aiAwState = 0;
+    }
+    function engineAICancel() {
+      document.getElementById('engine-aw-output').innerHTML = '<div style="color:var(--text-2);">已取消 — AI 草稿不写库，零留痕。</div>';
+      aiAwState = 0;
+    }
+  </script>
   <script>
     SC.layout({
       page: 'ai-write-flow',

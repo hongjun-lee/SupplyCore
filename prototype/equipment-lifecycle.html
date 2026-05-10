@@ -12,6 +12,37 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 07 V1.0a §3 设备全生命周期 E-01 状态机 + E-02 维修工单 + E-04 外委检修 + E-08 设备租赁。<br>
+            <strong>🛤 链路：</strong>采购入库 (S-02) → 建档 (E-01 草稿) → 启用 → 在用 → (检修 E-02 / 外委 E-04 / 租赁 E-08 / 调拨) → 报废 (S-19) → 已注销。<br>
+            <strong>🛡 OEE 联动：</strong>设备状态变化（停机 / 故障 / 维修中）→ 影响 OEE 综合指标 → 报表 RPT-EQ-OEE。
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · E-01 设备实时清单（接 SC.store）</div>
+            <div class="actions">
+              <a href="equipment-rent.html" class="btn btn-sm">→ 设备租赁</a>
+              <a href="maintenance-order.html" class="btn btn-sm">→ 检修工单</a>
+              <a href="equipment-oee.html" class="btn btn-sm">→ OEE 报表</a>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr><th>实体</th><th>用途</th><th class="num">数量</th><th>状态分布</th></tr>
+              </thead>
+              <tbody id="engine-eq-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动</span>
+              E-01 状态变化触发 R-05 预警（停机 &gt; 24h / OEE &lt; 阈值）+ E-04 / E-08 子单据状态联动；下方为单台设备详情演示样例。
+            </div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-body">
             <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
@@ -133,6 +164,36 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* 引擎接入：设备实时计数 */
+    function renderEqAgg() {
+      var e01 = SC.store.list('E-01');
+      var e04 = SC.store.list('E-04');
+      var e08 = SC.store.list('E-08');
+      function dist(rows) {
+        var map = {};
+        rows.forEach(function (r) { var s = r.state || '未知'; map[s] = (map[s] || 0) + 1; });
+        return Object.keys(map).map(function (k) { return k + ' ' + map[k]; }).join(' / ') || '—';
+      }
+      var rows = [
+        { name: 'E-01 设备主档', use: '全生命周期 / 责任人 / 位置', count: e01.length, dist: dist(e01) },
+        { name: 'E-04 外委检修', use: '审批 + 40% 原值校验', count: e04.length, dist: dist(e04) },
+        { name: 'E-08 设备租赁', use: '在租 / 月结 / 已结算', count: e08.length, dist: dist(e08) },
+      ];
+      document.getElementById('engine-eq-tbody').innerHTML = rows.map(function (r) {
+        return '<tr><td><strong>' + r.name + '</strong></td><td class="muted">' + r.use + '</td><td class="num">' + r.count + '</td><td class="muted" style="font-size:11px;">' + r.dist + '</td></tr>';
+      }).join('');
+    }
+    ['E-01', 'E-04', 'E-08'].forEach(function (e) { SC.store.subscribe(e, renderEqAgg); });
+    setTimeout(renderEqAgg, 100);
+  </script>
   <script>
     var d = SC.data.equipmentLifecycle;
     SC.layout({

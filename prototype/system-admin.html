@@ -12,6 +12,31 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
+          <div class="card-body" style="font-size:13px;line-height:1.6;">
+            <strong>📋 业务依据：</strong>详设 10 V1.2a §权限矩阵 + 详设 11 V1.0 §1 信创 + §13 操作审计 + Nova Platform SSO + 集团统筹层统一权限。<br>
+            <strong>🛤 链路：</strong>Nova SSO 用户 → 本系统业务角色映射（SC.roles）→ 8 类角色（采购员 / 计划员 / 仓管员 / 财务接口管理员 / 出纳 / 物资管理 / 合规官 / 审计员）→ 数据范围 + 操作权限矩阵 → 操作日志（5 年留存）。<br>
+            <strong>🛡 高敏感操作：</strong>SENS-CON-003/004 + 黑名单 + 火工品双人审批 → 二次确认 + 副本归档 + 审计抽查。
+          </div>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · SC.roles 角色切换器（演示权限矩阵）</div>
+            <div class="actions">
+              <select id="engine-role-select" class="btn btn-sm" style="padding:4px 8px;"></select>
+              <button class="btn btn-sm" onclick="engineRoleApply()">应用切换</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="engine-role-info" style="font-size:13px;line-height:1.7;background:#fafbfd;padding:12px;border-radius:4px;">点上方下拉切换角色 → 查看该角色的数据范围 / 操作权限 / 高敏感约束。</div>
+            <div style="margin-top:8px;font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">联动</span>
+              切换角色后，全站页面（库存 / 合同 / 审批 / 报表 / AI 助理）的数据可见范围与按钮可用性会同步变化（详设 10 V1.2a 权限矩阵）。
+            </div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="tabs" id="tabs">
             <div class="tab active" data-tab="user">用户与 SSO</div>
@@ -186,6 +211,55 @@
   <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
+  <script>
+    /* 引擎接入：角色切换器 */
+    var ROLE_DESC = {
+      '采购员': { scope: '本部门 P-01/P-02 + 关联 P-05', ops: '需求提报 / 计划编辑 / 任务分解', sens: '禁直接付款 + 禁主数据维护' },
+      '计划员': { scope: '物资公司全口径 P-01~P-05', ops: '聚合 / 拆包 / 任务分配', sens: '禁付款 + 禁敏感主数据' },
+      '仓管员': { scope: '本仓 S-13/S-14/S-21 + 入出库', ops: '入库验收 / 出库执行 / 盘点', sens: '火工品需双人 + 禁财务凭证查询' },
+      '财务接口管理员': { scope: 'F-01/F-08 + NC-MD-001~005', ops: '接口监控 / 重推 / 主数据下推', sens: 'F-08 重推须二次审批' },
+      '出纳': { scope: 'C-08/C-10 + 银行账户', ops: '付款执行 / 银行回单录入', sens: '不可超付 + 不可抢付 + 双人复核' },
+      '物资管理（领导）': { scope: '物资公司全口径', ops: '审批 / 集体决议 / 督办', sens: '高敏感操作签字 + 月报抽查' },
+      '合规官': { scope: '所有高敏感场景', ops: 'SENS-CON-003/004 + 黑名单审批', sens: '双签 + 副本归档' },
+      '审计员（只读）': { scope: '全口径只读 + 5 年历史', ops: '查询 / 导出（带水印）', sens: '禁任何写操作' },
+    };
+    function renderRoleSelect() {
+      var sel = document.getElementById('engine-role-select');
+      if (!sel) return;
+      sel.innerHTML = Object.keys(ROLE_DESC).map(function (r) {
+        return '<option value="' + r + '">' + r + '</option>';
+      }).join('');
+      var current = SC.getRole().label;
+      if (Object.prototype.hasOwnProperty.call(ROLE_DESC, current)) sel.value = current;
+      renderRoleInfo(sel.value);
+    }
+    function renderRoleInfo(role) {
+      var d = ROLE_DESC[role];
+      if (!d) return;
+      document.getElementById('engine-role-info').innerHTML =
+        '<div><strong style="color:var(--brand);">当前角色：' + role + '</strong></div>' +
+        '<div style="margin-top:6px;"><strong>📊 数据范围：</strong>' + d.scope + '</div>' +
+        '<div><strong>🛠 可执行操作：</strong>' + d.ops + '</div>' +
+        '<div><strong>🛡 高敏感约束：</strong>' + d.sens + '</div>';
+    }
+    function engineRoleApply() {
+      var role = document.getElementById('engine-role-select').value;
+      try { SC.setRole(role); SC.ui.toast('已切换至 ' + role, 'success'); renderRoleInfo(role); }
+      catch (e) { SC.ui.toast('切换失败：' + e.message, 'error'); }
+    }
+    document.addEventListener('DOMContentLoaded', renderRoleSelect);
+    setTimeout(renderRoleSelect, 100);
+    document.addEventListener('change', function (e) {
+      if (e.target && e.target.id === 'engine-role-select') renderRoleInfo(e.target.value);
+    });
+  </script>
   <script>
     SC.layout({
       page: 'system-admin',
