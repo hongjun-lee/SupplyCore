@@ -28,7 +28,14 @@
       <span class="pill">statemachine.js</span>
       <span class="pill">linkage.js</span>
       <span class="pill">seed-data.js</span>
-      验证：CRUD + 持久化 + 状态机迁移 + 联动级联 + BroadcastChannel 跨页广播
+      <span class="pill">mock-nc.js</span>
+      <span class="pill">roles.js</span>
+      <span class="pill">ui-helper.js</span>
+      验证：CRUD + 持久化 + 状态机 + 联动 + NC mock + 6 角色 + UI 组件 + BroadcastChannel
+    </div>
+    <div style="margin-top:8px;font-size:12px;">
+      当前角色：<strong id="role-banner" style="background:rgba(255,255,255,0.15);padding:3px 10px;border-radius:3px;">—</strong>
+      <button class="btn btn-sm" style="margin-left:8px;background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);" onclick="cycleRole()">切换角色 ↻</button>
     </div>
   </div>
 
@@ -79,12 +86,48 @@
       <div class="stat">在另一个标签页打开本页 → 在任一页操作 → 这里实时收到</div>
       <pre id="bus-out" style="max-height:200px;">等待跨页消息…</pre>
     </div>
+
+    <div class="test-card">
+      <h3>⑦ NC 接口 mock（核心库存原子事务）</h3>
+      <div class="stat">演示 S-05:已审 → linkage 触发库存原子事务 + F-01 NC 推送 → 1-2 秒后回执</div>
+      <div class="actions">
+        <button class="btn btn-sm btn-primary" onclick="testS05Approve()">S-05:已审 (随机 5% 失败率)</button>
+        <button class="btn btn-sm" onclick="testNCSuccess()">强制成功</button>
+        <button class="btn btn-sm btn-danger" onclick="testNCFailure()">强制失败 (触发重推)</button>
+      </div>
+      <pre id="nc-out">—</pre>
+    </div>
+
+    <div class="test-card">
+      <h3>⑧ 6 角色 + 能力</h3>
+      <div class="stat">SC.roles.canSee(menu) + dataFilter + badgeCounts</div>
+      <div class="actions" id="role-buttons"></div>
+      <pre id="role-out">—</pre>
+    </div>
+
+    <div class="test-card">
+      <h3>⑨ UI 组件（SC.ui）</h3>
+      <div class="stat">toast / alert / confirm / prompt / loading 演示</div>
+      <div class="actions">
+        <button class="btn btn-sm" onclick="SC.ui.toast('信息提示', 'info')">Toast Info</button>
+        <button class="btn btn-sm" onclick="SC.ui.toast('成功啦', 'success')">Toast Success</button>
+        <button class="btn btn-sm" onclick="SC.ui.toast('注意警告', 'warning')">Toast Warning</button>
+        <button class="btn btn-sm" onclick="SC.ui.toast('出错了！', 'error')">Toast Error</button>
+        <button class="btn btn-sm" onclick="testConfirm()">Confirm</button>
+        <button class="btn btn-sm" onclick="testPrompt()">Prompt</button>
+        <button class="btn btn-sm" onclick="testLoading()">Loading 1.5s</button>
+      </div>
+      <pre id="ui-out" style="max-height:120px;">点按钮看效果…</pre>
+    </div>
   </div>
 
   <script src="assets/store.js"></script>
   <script src="assets/statemachine.js"></script>
   <script src="assets/linkage.js"></script>
   <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
     /* 帮助函数 */
     function fmt(v) { return JSON.stringify(v, null, 2); }
@@ -229,16 +272,162 @@
       });
     });
 
+    /* ⑦ NC mock */
+    function refreshNc() {
+      var f01 = SC.store.list('F-01');
+      var f03 = SC.store.list('F-03');
+      var lines = ['F-01 NC 接口任务: ' + f01.length];
+      f01.slice(-5).forEach(function (t) {
+        lines.push('  #' + t.id + ' [' + t.task_state + '] ' + t.task_no + ' (' + t.interface_id + ')' +
+          (t.push_voucher_no ? ' → ' + t.push_voucher_no : '') +
+          (t.push_error_message ? ' ✗ ' + t.push_error_message : '') +
+          (t.retry_count ? ' retry=' + t.retry_count : ''));
+      });
+      lines.push('');
+      lines.push('F-03 凭证回执: ' + f03.length);
+      f03.slice(-3).forEach(function (r) {
+        lines.push('  #' + r.id + ' ' + r.nc_voucher_no + ' (' + r.receipt_status + ')');
+      });
+      document.getElementById('nc-out').textContent = lines.join('\n');
+    }
+
+    function testS05Approve() {
+      // 创建一个 mock S-05 + lines，触发 linkage S-05:已审
+      var receipt = SC.store.create('S-05', {
+        receipt_no: SC.store.nextNo('RK'),
+        org_id: 3,
+        warehouse_id: 2,
+        state: '草稿',
+      });
+      // mock 入库行
+      SC.store.create('S-25', {
+        receipt_id: receipt.id,
+        material_id: 8,
+        quantity: 100,
+        line_amount: 50000,
+      });
+      // 提交 → 已审
+      try {
+        SC.sm.transition('S-05', receipt.id, '提交审核');
+        SC.sm.transition('S-05', receipt.id, '审核通过');
+        SC.ui.toast('S-05 #' + receipt.id + ' 已审 → 触发库存事务 + NC 推送', 'success');
+      } catch (e) { SC.ui.toast('迁移失败：' + e.message, 'error'); }
+      refreshNc();
+      // 1-2 秒后再刷新（推送结果）
+      setTimeout(refreshNc, 2200);
+      setTimeout(refreshNc, 4000);
+    }
+
+    function testNCSuccess() {
+      var pending = SC.store.list('F-01', { task_state: '待推送' });
+      var failed = SC.store.list('F-01', { task_state: '推送失败' });
+      var task = pending[0] || failed[0];
+      if (!task) { SC.ui.toast('没有可推送的 F-01 任务，先点 S-05:已审', 'warning'); return; }
+      SC.nc.simulateSuccess(task.id).then(function () { refreshNc(); });
+    }
+
+    function testNCFailure() {
+      var pending = SC.store.list('F-01', { task_state: '待推送' });
+      var task = pending[0];
+      if (!task) {
+        // 创建一个测试任务
+        task = SC.store.create('F-01', {
+          task_no: SC.store.nextNo('FT'),
+          interface_id: 'BIZ-001',
+          source_bill_no: 'TEST-' + Date.now(),
+          task_state: '待推送',
+          retry_count: 0,
+        });
+      }
+      SC.nc.simulateFailure(task.id).then(function () {
+        refreshNc();
+        SC.ui.toast('NC 推送失败（演示）→ 30 秒后自动重推（≤3 次）', 'warning');
+      });
+    }
+
+    /* ⑧ 角色 */
+    function refreshRoles() {
+      var info = SC.roles.currentInfo();
+      var counts = SC.roles.badgeCounts();
+      document.getElementById('role-banner').textContent = info.label + ' (' + info.id + ')';
+      var lines = [
+        'current: ' + info.id + ' · ' + info.label,
+        'description: ' + info.description,
+        'data scope: ' + info.dataScope,
+        'default landing: ' + info.defaultLanding,
+        '',
+        '可见菜单 (' + info.menus.length + '): ' + info.menus.slice(0, 8).join(' / ') + (info.menus.length > 8 ? '…' : ''),
+        '',
+        '徽标计数:',
+        '  待办: ' + counts.todo,
+        '  预警: ' + counts.alert,
+      ];
+      document.getElementById('role-out').textContent = lines.join('\n');
+    }
+
+    function cycleRole() {
+      var roles = SC.roles.list();
+      var current = SC.roles.current();
+      var idx = roles.findIndex(function (r) { return r.id === current; });
+      var next = roles[(idx + 1) % roles.length];
+      SC.roles.set(next.id);
+      SC.ui.toast('已切换为 ' + next.label, 'info');
+      refreshRoles();
+      refreshAll();
+    }
+
+    function setupRoleButtons() {
+      var roles = SC.roles.list();
+      document.getElementById('role-buttons').innerHTML = roles.map(function (r) {
+        return '<button class="btn btn-sm" onclick="SC.roles.set(\'' + r.id + '\'); refreshRoles(); refreshAll();">' + r.label + '</button>';
+      }).join('');
+    }
+
+    /* ⑨ UI helpers */
+    function testConfirm() {
+      SC.ui.confirm('确认要执行测试操作吗？', { title: '确认操作' }).then(function (ok) {
+        document.getElementById('ui-out').textContent = '[confirm] 用户选择: ' + (ok ? '确认' : '取消');
+      });
+    }
+    function testPrompt() {
+      SC.ui.prompt('请输入测试值：', { default: 'hello', placeholder: '随便填' }).then(function (val) {
+        document.getElementById('ui-out').textContent = '[prompt] 用户输入: ' + (val === null ? '<取消>' : val);
+      });
+    }
+    function testLoading() {
+      SC.ui.loading(true, '正在加载…');
+      setTimeout(function () {
+        SC.ui.loading(false);
+        SC.ui.toast('加载完成', 'success');
+        document.getElementById('ui-out').textContent = '[loading] 完成';
+      }, 1500);
+    }
+
+    /* 整合刷新 */
     function refreshAll() {
       refreshSeedStat();
       refreshP01();
       refreshP02();
       refreshSm();
       refreshLinkage();
+      refreshNc();
+      refreshRoles();
     }
 
+    setupRoleButtons();
     refreshAll();
-    console.log('[engine-test] ready · 在另一个标签页打开本页验证 BroadcastChannel');
+
+    // 跨页角色切换通知
+    if (SC.store && SC.store._bus) {
+      SC.store._bus.addEventListener('message', function (ev) {
+        if (ev.data && ev.data.type === 'role-change') {
+          refreshRoles();
+          refreshAll();
+        }
+      });
+    }
+
+    console.log('[engine-test] ready · 7 模块全部加载 · 在另一个标签页打开本页验证 BroadcastChannel');
   </script>
 </body>
 </html>
