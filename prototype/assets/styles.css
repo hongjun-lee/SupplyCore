@@ -196,7 +196,8 @@ a:hover { text-decoration: underline; }
 }
 
 /* 单行 sticky 浮动主流程导航条（v0.16 演示用 chrome）
- * top 贴 .app-header（自身已 sticky top:0，高 var(--header-h)）下方 */
+ * top 贴 .app-header（自身已 sticky top:0，高 var(--header-h)）下方
+ * v0.17 兼容修：去掉 backdrop-filter（Edge 部分版本渲染异常）+ 去负 margin（Edge sticky 计算坑） */
 .demo-flow-nav {
   position: sticky;
   top: var(--header-h);
@@ -204,15 +205,13 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: -8px -4px 12px;
+  margin: 0 0 12px;
   padding: 6px 10px;
-  background: rgba(255,255,255,0.96);
-  backdrop-filter: saturate(140%) blur(6px);
-  -webkit-backdrop-filter: saturate(140%) blur(6px);
+  background: #fff;
   border: 1px solid var(--border);
   border-left: 4px solid var(--brand);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
 }
 .demo-flow-badge {
   flex-shrink: 0;
