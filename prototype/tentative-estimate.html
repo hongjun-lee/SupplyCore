@@ -13,6 +13,8 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div id="block-banner" class="card" style="display:none;background:#fff1f0;border-color:#ffccc7;padding:10px 14px;color:#a8071a;font-size:13px;margin-bottom:12px"></div>
+
         <div class="kpi-grid" id="estimate-kpis"></div>
 
         <div class="cols-2">
@@ -100,6 +102,7 @@
     </div>
   </div>
 
+  <script src="assets/time.js"></script>
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
   <script>
@@ -112,28 +115,99 @@
       actions: [{ label: '导出预警台账' }, { label: '发起财务对账', primary: true }],
     });
 
-    document.getElementById('estimate-kpis').innerHTML = d.kpis.map(function (k, idx) {
-      var color = idx === 2 || idx === 3 ? ' style="color:var(--red)"' : idx === 1 ? ' style="color:var(--amber)"' : '';
-      return '<div class="kpi">' +
-        '<div class="label">' + k.label + '</div>' +
-        '<div class="value"' + color + '>' + k.value + '</div>' +
-        '<div class="trend">' + k.trend + '</div>' +
-      '</div>';
-    }).join('');
+    /* B1 时间穿越联动 — 基于 SC.time 动态计算 daysLeft / stage / color；KPI 由 renderRows 重算 */
+    function computeStage(row) {
+      var due = new Date(row.dueDate);
+      var daysLeft = SC.time.daysBetween(SC.time.now(), due);
+      var stage, color, level;
+      if (row.cleared) {
+        stage = '已冲减'; color = 'green'; level = 'cleared';
+      } else if (daysLeft >= 90) {
+        stage = '正常跟踪'; color = 'green'; level = 'normal';
+      } else if (daysLeft > 30) {
+        stage = 'D-90 预警 (一般级)'; color = 'amber'; level = 'd90';
+      } else if (daysLeft > 0) {
+        stage = 'D-30 升级 (重要级)'; color = 'red'; level = 'd30';
+      } else if (daysLeft >= -30) {
+        stage = 'D-0 阻断 (紧急级)'; color = 'red'; level = 'd0';
+      } else {
+        stage = 'D+30 月度专项对账'; color = 'red'; level = 'dplus30';
+      }
+      return { daysLeft: daysLeft, stage: stage, color: color, level: level };
+    }
 
-    document.getElementById('estimate-tbody').innerHTML = d.rows.map(function (r) {
-      return '<tr>' +
-        '<td class="code">' + r.code + '</td>' +
-        '<td class="code muted">' + r.receipt + '</td>' +
-        '<td>' + r.supplier + '</td>' +
-        '<td class="num">' + SC.fmtMoney(r.amount) + '</td>' +
-        '<td class="muted">' + r.entryDate + '</td>' +
-        '<td class="muted">' + r.dueDate + '</td>' +
-        '<td class="num" style="' + (r.daysLeft <= 30 ? 'color:var(--red);font-weight:600;' : r.daysLeft <= 90 ? 'color:var(--amber);font-weight:600;' : '') + '">' + r.daysLeft + '</td>' +
-        '<td>' + SC.badge(r.stage, r.color, true) + '</td>' +
-        '<td class="muted">' + r.ncState + '</td>' +
-      '</tr>';
-    }).join('');
+    function renderRows() {
+      var rows = d.rows;
+      // 阻断订单的供应商集合（供顶部 banner 用）
+      var blockedSuppliers = {};
+      var html = rows.map(function (r) {
+        var s = computeStage(r);
+        if (s.level === 'd0' || s.level === 'dplus30') blockedSuppliers[r.supplier] = true;
+        var dlColor = s.daysLeft <= 0 ? 'color:var(--red);font-weight:700;' :
+                      s.daysLeft <= 30 ? 'color:var(--red);font-weight:600;' :
+                      s.daysLeft <= 90 ? 'color:var(--amber);font-weight:600;' : '';
+        var clearBtn = r.cleared ? '<span class="muted" style="font-size:11px">已冲销</span>' :
+          '<button class="btn" onclick="clearEstimate(\'' + r.code + '\')" style="padding:2px 8px;font-size:11px">模拟冲减</button>';
+        return '<tr>' +
+          '<td class="code">' + r.code + '</td>' +
+          '<td class="code muted">' + r.receipt + '</td>' +
+          '<td>' + r.supplier + (blockedSuppliers[r.supplier] && !r.cleared ? ' <span class="badge red dot" style="font-size:10px">已阻断</span>' : '') + '</td>' +
+          '<td class="num">' + SC.fmtMoney(r.amount) + '</td>' +
+          '<td class="muted">' + r.entryDate + '</td>' +
+          '<td class="muted">' + r.dueDate + '</td>' +
+          '<td class="num" style="' + dlColor + '">' + s.daysLeft + '</td>' +
+          '<td>' + SC.badge(s.stage, s.color, true) + '</td>' +
+          '<td class="muted">' + (r.cleared ? 'BIZ-003 已冲销' : r.ncState) + ' ' + clearBtn + '</td>' +
+        '</tr>';
+      }).join('');
+      document.getElementById('estimate-tbody').innerHTML = html;
+
+      // 顶部 banner — 阻断供应商
+      var banner = document.getElementById('block-banner');
+      var blockList = Object.keys(blockedSuppliers);
+      if (blockList.length > 0) {
+        banner.style.display = '';
+        banner.innerHTML = '<span class="badge red dot">⚠ 已阻断</span> 以下供应商因暂估超期，新采购订单审批已被阻断：<b>' + blockList.join(' / ') + '</b>（对账完成后解除）';
+      } else {
+        banner.style.display = 'none';
+      }
+
+      // 重算 KPI
+      var counts = { total: 0, d90: 0, d30: 0, d0: 0, dplus30: 0, cleared: 0, balance: 0 };
+      rows.forEach(function (r) {
+        var s = computeStage(r);
+        if (r.cleared) { counts.cleared++; return; }
+        counts.total++;
+        counts.balance += r.amount;
+        if (s.level === 'd90') counts.d90++;
+        else if (s.level === 'd30') counts.d30++;
+        else if (s.level === 'd0') counts.d0++;
+        else if (s.level === 'dplus30') counts.dplus30++;
+      });
+      var kpiHtml = [
+        '<div class="kpi"><div class="label">暂估余额</div><div class="value">' + SC.fmtMoney(counts.balance) + '</div><div class="trend">' + counts.total + ' 笔未冲减</div></div>',
+        '<div class="kpi"><div class="label">D-90 预警</div><div class="value" style="color:var(--amber)">' + counts.d90 + '</div><div class="trend">一般级 · 催票窗口</div></div>',
+        '<div class="kpi"><div class="label">D-30 升级</div><div class="value" style="color:var(--red)">' + counts.d30 + '</div><div class="trend">重要级 · 财务+采购联合</div></div>',
+        '<div class="kpi"><div class="label">D-0 阻断 / D+30 转报</div><div class="value" style="color:var(--red)">' + counts.d0 + ' / ' + counts.dplus30 + '</div><div class="trend">紧急级 · 阻断新采购</div></div>'
+      ].join('');
+      document.getElementById('estimate-kpis').innerHTML = kpiHtml;
+    }
+
+    window.clearEstimate = function (code) {
+      var row = d.rows.find(function (r) { return r.code === code; });
+      if (row) {
+        row.cleared = true;
+        row.clearedAt = SC.time.iso();
+        renderRows();
+      }
+    };
+
+    renderRows();
+
+    // mock 时间变化时刷新
+    if (SC.time && SC.time.subscribe) {
+      SC.time.subscribe(function () { renderRows(); });
+    }
 
     document.getElementById('estimate-flow').innerHTML = d.timeline.map(function (t) {
       var cls = t.state === 'done' ? 'done' : t.state === 'current' ? 'current' : '';

@@ -52,6 +52,7 @@ SC.nav = [
   { title: '决策 / AI', items: [
     { id: 'reports',           href: 'reports.html',            label: '报表 / AI 助理', icon: '☆' },
     { id: 'alert-rules',       href: 'alert-rules.html',        label: '预警规则配置', icon: '!' },
+    { id: 'split-detection',   href: 'split-detection.html',    label: '化整为零检测 ★二期', icon: '⚯' },
     { id: 'ai-assistant',      href: 'ai-assistant.html',       label: 'AI 助理（独立演示）', icon: '✺' },
     { id: 'ai-write-flow',     href: 'ai-write-flow.html',      label: 'AI 写操作（演示）', icon: '✎' },
     { id: 'dashboard-bigscreen', href: 'dashboard-bigscreen.html', label: '大屏看板（投屏）', icon: '⬜' },
@@ -230,3 +231,93 @@ SC.fmtMoney = function (n) {
   return '¥ ' + Number(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 SC.fmtNum = function (n) { return Number(n).toLocaleString('zh-CN'); };
+
+/* ─── 档 A 二期 · B1 时间穿越 widget（右下角浮动） ─── */
+SC.renderTimeWidget = function () {
+  if (!SC.time) return; // time.js 未加载则不渲染
+  if (document.getElementById('sc-time-widget')) return;
+
+  const w = document.createElement('div');
+  w.id = 'sc-time-widget';
+  w.style.cssText = [
+    'position:fixed', 'bottom:16px', 'right:16px', 'z-index:9999',
+    'background:#fff', 'border:1px solid #d9d9d9', 'border-radius:8px',
+    'box-shadow:0 4px 12px rgba(0,0,0,0.12)',
+    'font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif',
+    'font-size:12px', 'min-width:200px', 'overflow:hidden'
+  ].join(';');
+
+  function render() {
+    const mocked = SC.time.isMocked();
+    const headerBg = mocked ? '#fff7e6' : '#f5f5f5';
+    const headerColor = mocked ? '#d48806' : '#666';
+    const expanded = w.dataset.expanded === '1';
+    w.innerHTML = `
+      <div id="sc-tw-header" style="padding:8px 10px;background:${headerBg};color:${headerColor};cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:${expanded?'1px solid #f0f0f0':'none'}">
+        <span><b>${SC.time.label()}</b></span>
+        <span style="font-size:10px;opacity:0.6">${expanded ? '▼' : '▲'}</span>
+      </div>
+      ${expanded ? `
+      <div style="padding:10px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:4px;align-items:center">
+          <input id="sc-tw-date" type="datetime-local" style="flex:1;padding:4px;border:1px solid #d9d9d9;border-radius:4px;font-size:11px">
+          <button id="sc-tw-set" style="padding:4px 8px;border:1px solid #1677ff;background:#1677ff;color:#fff;border-radius:4px;cursor:pointer;font-size:11px">设</button>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="sc-tw-adv" data-d="1" style="flex:1;padding:4px;border:1px solid #d9d9d9;background:#fff;border-radius:4px;cursor:pointer;font-size:11px">+1天</button>
+          <button class="sc-tw-adv" data-d="7" style="flex:1;padding:4px;border:1px solid #d9d9d9;background:#fff;border-radius:4px;cursor:pointer;font-size:11px">+7天</button>
+          <button class="sc-tw-adv" data-d="30" style="flex:1;padding:4px;border:1px solid #d9d9d9;background:#fff;border-radius:4px;cursor:pointer;font-size:11px">+30天</button>
+          <button class="sc-tw-adv" data-d="90" style="flex:1;padding:4px;border:1px solid #d9d9d9;background:#fff;border-radius:4px;cursor:pointer;font-size:11px">+90天</button>
+        </div>
+        <button id="sc-tw-reset" style="padding:5px;border:1px solid #ff7875;background:#fff;color:#cf1322;border-radius:4px;cursor:pointer;font-size:11px">重置（回真实时间）</button>
+        <div style="font-size:10px;color:#999;line-height:1.4">提示：mock 时间用于演示"暂估超期 / 合同到期 / 应急补办"等多日才出现的场景；切换后页面需刷新查看效果</div>
+      </div>` : ''}
+    `;
+
+    // 绑定事件
+    document.getElementById('sc-tw-header').onclick = function () {
+      w.dataset.expanded = expanded ? '0' : '1';
+      render();
+    };
+    if (expanded) {
+      const inp = document.getElementById('sc-tw-date');
+      const cur = SC.time.now();
+      inp.value = cur.getFullYear() + '-' +
+        String(cur.getMonth() + 1).padStart(2, '0') + '-' +
+        String(cur.getDate()).padStart(2, '0') + 'T' +
+        String(cur.getHours()).padStart(2, '0') + ':' +
+        String(cur.getMinutes()).padStart(2, '0');
+      document.getElementById('sc-tw-set').onclick = function () {
+        if (inp.value) {
+          SC.time.setMock(new Date(inp.value));
+          render();
+        }
+      };
+      Array.from(document.getElementsByClassName('sc-tw-adv')).forEach(function (b) {
+        b.onclick = function () {
+          SC.time.advance(parseInt(b.dataset.d, 10));
+          render();
+        };
+      });
+      document.getElementById('sc-tw-reset').onclick = function () {
+        if (confirm('确认回到真实时间？mock 时间会被清除。')) {
+          SC.time.clearMock();
+          render();
+        }
+      };
+    }
+  }
+
+  render();
+  document.body.appendChild(w);
+
+  // 跨页同步
+  SC.time.subscribe(render);
+};
+
+// 自动注入(DOMContentLoaded 后)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function () { SC.renderTimeWidget(); });
+} else {
+  SC.renderTimeWidget();
+}
