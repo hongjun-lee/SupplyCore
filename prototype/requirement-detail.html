@@ -41,6 +41,8 @@
               <div class="k">提报人</div><div class="v" id="kv-requester"></div>
               <div class="k">提交时间</div><div class="v" id="kv-submit"></div>
               <div class="k">期望到货</div><div class="v" id="kv-expect"></div>
+              <div class="k">业务流向</div><div class="v" id="kv-fulfillment"></div>
+              <div class="k">直达目录</div><div class="v" id="kv-direct"></div>
               <div class="k">需求事由</div><div class="v" id="kv-reason"></div>
             </div>
           </div>
@@ -119,6 +121,17 @@
                 </table>
               </div>
             </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">直达例外控制</div></div>
+              <div class="card-body" style="font-size:12px;color:var(--text-2);">
+                <div class="kv">
+                  <div class="k">审批流</div><div class="v code" id="kv-direct-wf"></div>
+                  <div class="k">审批规则</div><div class="v" id="kv-direct-rule"></div>
+                  <div class="k">落表字段</div><div class="v"><span class="font-mono">fulfillment_type</span> + <span class="font-mono">direct_exception_workflow_id</span></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -134,7 +147,7 @@
       page: 'requirement-list',
       crumbs: ['采购协同', '需求计划', d.code],
       title: d.title,
-      desc: '对齐《04-需求计划与采购协同详细设计 V1.0》P-01 / S-01 + 《10-权限审批流详细设计 V1.0》A-20 approval_instance',
+      desc: '对齐《04-需求计划与采购协同详细设计 V1.1》S-01 业务流向 + 《10 V1.2》WF-DIR-001',
     });
 
     document.getElementById('title-code').textContent = d.code;
@@ -143,7 +156,11 @@
     document.getElementById('kv-requester').innerHTML = d.requester + ' <span class="muted">' + d.requesterPhone + '</span>';
     document.getElementById('kv-submit').textContent = d.submitDate;
     document.getElementById('kv-expect').textContent = d.expectDate;
+    document.getElementById('kv-fulfillment').innerHTML = '<span class="badge blue">' + d.fulfillmentType + '</span>';
+    document.getElementById('kv-direct').innerHTML = '<span class="badge red">' + d.directCatalogState + '</span>';
     document.getElementById('kv-reason').textContent = d.reason;
+    document.getElementById('kv-direct-wf').textContent = d.directExceptionWorkflow;
+    document.getElementById('kv-direct-rule').textContent = d.directApprovalRule;
     document.getElementById('state-badge').innerHTML = SC.badge(d.state, d.stateColor, true);
 
     var total = 0;

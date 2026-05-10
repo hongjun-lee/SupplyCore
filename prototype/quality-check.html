@@ -132,7 +132,7 @@
           <div class="card-body" style="display:flex;gap:12px;align-items:start;">
             <span class="badge blue dot">规则</span>
             <div class="text-2">
-              <strong>送检 / 抽检 / 全检 / 免检 由物料分类决定：</strong>火工品、化工品、安全监测设备类目默认送检；通用物资按抽检比例；劳保等小额免检。检验记录与到货单 / 入库单串联，不合格件不得进入库存台账 (S-13)。详见《06》第 2 章。
+              <strong>送检 / 抽检 / 全检 / 免检 由物料分类决定：</strong>火工品、化工品、安全监测设备类目默认送检；通用物资按抽检比例；劳保等小额免检。检验记录与到货单 / 入库单串联，不合格件不得进入库存台账 (S-13)。防爆 / 煤安证照异常、重复不合格和差评累计自动反馈至供应商后评价，必要时触发 WF-SUP-REASSESS-001。
             </div>
           </div>
         </div>
@@ -148,7 +148,7 @@
       page: 'quality-check',
       crumbs: ['库存实物流转', '质检'],
       title: '质检',
-      desc: '对齐《06-库存实物流转详细设计 V1.0》— S-04 质检任务 + 检验项目 + 判定与处置',
+      desc: '对齐《06 V1.1》S-04 质检 + 《04/09/10》后评价自动反馈与供应商重评估',
       actions: [{ label: '检验标准库' }, { label: '+ 登记送检', primary: true }],
     });
 

@@ -17,8 +17,8 @@
         <div class="kpi-grid">
           <div class="kpi accent">
             <div class="label">待我处理</div>
-            <div class="value">4</div>
-            <div class="trend">需求 1 · 订单 1 · 设备租赁 1 · 废旧 1</div>
+            <div class="value">8</div>
+            <div class="trend">直达例外 1 · 外委检修 2 · 供应商重评估 1</div>
           </div>
           <div class="kpi">
             <div class="label">本月需求计划</div>
@@ -106,7 +106,19 @@
                     </tr>
                     <tr>
                       <td><span class="badge amber dot">低于安全</span></td>
-                      <td>艾友矿主仓 <strong>矿用电缆 MYP3*50</strong> 库存 1240 米 / 安全线 1500 米</td>
+                      <td>艾友矿主仓 <strong>矿用电缆 MYP3*50</strong> 现存 1240 米 / safety_stock 1500 米</td>
+                    </tr>
+                    <tr>
+                      <td><span class="badge amber dot">超储</span></td>
+                      <td>艾友矿设备库 <strong>矿用变频器 KBSGZY</strong> 储备资金 118% / 周转 128 天</td>
+                    </tr>
+                    <tr>
+                      <td><span class="badge red dot">暂估 D-30</span></td>
+                      <td>暂估单 <strong>ZG-202511-0032</strong> 距 6 个月截止 8 天，需催票 / 对账</td>
+                    </tr>
+                    <tr>
+                      <td><span class="badge red dot">外委超限</span></td>
+                      <td>外委检修合同 <strong>HT-WX-2026-0018</strong> 金额 / 原值 46.2%，触发 SENS-CON-004</td>
                     </tr>
                     <tr>
                       <td><span class="badge red dot">合同到期</span></td>
@@ -155,7 +167,7 @@
       page: 'dashboard',
       crumbs: ['首页', '工作台'],
       title: '工作台',
-      desc: '当前角色：' + SC.getRole().label + ' · 二级集团：' + SC.data.subGroup.name,
+      desc: '当前角色：' + SC.getRole().label + ' · 二级集团：' + SC.data.subGroup.name + ' · 已同步 2026-05-10 详设口径',
       actions: [
         { label: '⬜ 投屏大屏' },
         { label: '✺ AI 助理' },

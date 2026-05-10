@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>暂估闭环 — 阜矿物资供应管理系统（原型）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="app-layout">
+    <div id="sidebar"></div>
+    <div class="app-main">
+      <div id="page-area">
+
+        <div class="kpi-grid" id="estimate-kpis"></div>
+
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">暂估闭环台账</div>
+                <div class="actions">
+                  <button class="btn">催票记录</button>
+                  <button class="btn btn-primary">批量发起对账</button>
+                </div>
+              </div>
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>暂估单号</th>
+                    <th>入库单</th>
+                    <th>供应商</th>
+                    <th class="num">暂估金额</th>
+                    <th>入库日期</th>
+                    <th>6 个月截止</th>
+                    <th class="num">剩余天数</th>
+                    <th>阶段</th>
+                    <th>NC 状态</th>
+                  </tr>
+                </thead>
+                <tbody id="estimate-tbody"></tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">暂估与三单匹配联动</div></div>
+              <div class="card-body" style="font-size:12px;color:var(--text-2);">
+                <div class="mb-8">
+                  <strong>发票未到：</strong>月末按采购订单价或配置规则生成 BIZ-002 暂估凭证，库存入账与财务暂估余额保持可追踪。
+                </div>
+                <div class="mb-8">
+                  <strong>发票到达：</strong>进入三单匹配；匹配通过后生成 BIZ-003 红字冲销暂估，再按正式发票入账。
+                </div>
+                <div class="mb-8">
+                  <strong>D-0 控制：</strong>超过 6 个月仍未冲减的，升级 ALR-INV-007 紧急级，对账完成前阻断该供应商新采购订单审批。
+                </div>
+                <div>
+                  <strong>D+30 控制：</strong>超期 30 天后仍未冲减的，自动转入详设 09 §六"暂估超期物资"月度报表，提交财务月度核对，必要时启动专项对账。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="title">D-90 / D-30 / D-0 / D+30 四阶段控制</div></div>
+              <div class="card-body">
+                <div class="timeline" id="estimate-flow"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">配置口径</div></div>
+              <div class="card-body">
+                <div class="kv">
+                  <div class="k">暂估窗口</div><div class="v" id="cfg-window"></div>
+                  <div class="k">一级预警</div><div class="v" id="cfg-warn90"></div>
+                  <div class="k">升级预警</div><div class="v" id="cfg-warn30"></div>
+                  <div class="k">阻断控制</div><div class="v" id="cfg-block"></div>
+                  <div class="k">月度转报</div><div class="v" id="cfg-monthly"></div>
+                  <div class="k">关联报表</div><div class="v">R-INV-006 暂估超期预警台账 / 09 §六 暂估超期物资月报</div>
+                  <div class="k">关联接口</div><div class="v">BIZ-002 暂估 / BIZ-003 冲销 / 三单匹配</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+                <span class="badge blue dot">边界</span>
+                <div class="text-2">
+                  本页只表达暂估业务闭环、预警和审批阻断，不写死 NC 科目。科目、凭证模板仍以财务 / NC 厂商确认后回写 08 为准。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/chrome.js"></script>
+  <script>
+    var d = SC.data.tentativeEstimates;
+    SC.layout({
+      page: 'tentative-estimate',
+      crumbs: ['合同与资金', '暂估闭环'],
+      title: '暂估闭环',
+      desc: '对齐详设 06 V1.1a / 08 / 09 / 11 — 6 个月窗口、D-90 / D-30 二段预警 + D-0 阻断 + D+30 月度专项对账',
+      actions: [{ label: '导出预警台账' }, { label: '发起财务对账', primary: true }],
+    });
+
+    document.getElementById('estimate-kpis').innerHTML = d.kpis.map(function (k, idx) {
+      var color = idx === 2 || idx === 3 ? ' style="color:var(--red)"' : idx === 1 ? ' style="color:var(--amber)"' : '';
+      return '<div class="kpi">' +
+        '<div class="label">' + k.label + '</div>' +
+        '<div class="value"' + color + '>' + k.value + '</div>' +
+        '<div class="trend">' + k.trend + '</div>' +
+      '</div>';
+    }).join('');
+
+    document.getElementById('estimate-tbody').innerHTML = d.rows.map(function (r) {
+      return '<tr>' +
+        '<td class="code">' + r.code + '</td>' +
+        '<td class="code muted">' + r.receipt + '</td>' +
+        '<td>' + r.supplier + '</td>' +
+        '<td class="num">' + SC.fmtMoney(r.amount) + '</td>' +
+        '<td class="muted">' + r.entryDate + '</td>' +
+        '<td class="muted">' + r.dueDate + '</td>' +
+        '<td class="num" style="' + (r.daysLeft <= 30 ? 'color:var(--red);font-weight:600;' : r.daysLeft <= 90 ? 'color:var(--amber);font-weight:600;' : '') + '">' + r.daysLeft + '</td>' +
+        '<td>' + SC.badge(r.stage, r.color, true) + '</td>' +
+        '<td class="muted">' + r.ncState + '</td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('estimate-flow').innerHTML = d.timeline.map(function (t) {
+      var cls = t.state === 'done' ? 'done' : t.state === 'current' ? 'current' : '';
+      return '<div class="step ' + cls + '">' +
+        '<div class="title">' + t.title + '</div>' +
+        '<div class="comment">' + t.detail + '</div>' +
+      '</div>';
+    }).join('');
+
+    document.getElementById('cfg-window').textContent = d.windowMonths + ' 个月';
+    document.getElementById('cfg-warn90').textContent = d.warn90 + ' 触发采购催票';
+    document.getElementById('cfg-warn30').textContent = d.warn30 + ' 升级财务 / 采购联合处理';
+    document.getElementById('cfg-block').textContent = d.blockDay;
+    document.getElementById('cfg-monthly').textContent = d.monthlyReport;
+  </script>
+</body>
+</html>

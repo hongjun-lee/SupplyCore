@@ -108,6 +108,20 @@
               </div>
             </div>
 
+            <div class="card">
+              <div class="card-header"><div class="title">履约保证金控制</div></div>
+              <div class="card-body" style="font-size:12px;color:var(--text-2);">
+                <div class="kv">
+                  <div class="k">触发条件</div><div class="v" id="bond-trigger"></div>
+                  <div class="k">收取比例</div><div class="v" id="bond-ratio"></div>
+                  <div class="k">保证金金额</div><div class="v" id="bond-amount"></div>
+                  <div class="k">当前状态</div><div class="v" id="bond-state"></div>
+                  <div class="k">退还 SLA</div><div class="v" id="bond-sla"></div>
+                  <div class="k">没收控制</div><div class="v" id="bond-confiscation"></div>
+                </div>
+              </div>
+            </div>
+
             <!-- NC 推送 -->
             <div class="card">
               <div class="card-header"><div class="title">NC 推送（合同主数据）</div></div>
@@ -136,7 +150,7 @@
       page: 'contract-list',
       crumbs: ['合同与资金', '合同管理', d.code],
       title: d.name,
-      desc: '对齐 05 — C-01 合同 + C-04 付款节点 + C-05 付款计划 + C-08 三单匹配',
+      desc: '对齐 05 V1.1 — 合同 + 付款节点 + 三单匹配 + 履约保证金 SENS-CON-003',
     });
 
     document.getElementById('title-code').textContent = d.code;
@@ -149,6 +163,12 @@
     document.getElementById('kv-expire').textContent = d.expire;
     document.getElementById('kv-summary').textContent = d.summary;
     document.getElementById('state-badge').innerHTML = SC.badge(d.state, d.color, true);
+    document.getElementById('bond-trigger').textContent = d.performanceBond.trigger;
+    document.getElementById('bond-ratio').textContent = d.performanceBond.ratio;
+    document.getElementById('bond-amount').textContent = SC.fmtMoney(d.performanceBond.amount);
+    document.getElementById('bond-state').innerHTML = SC.badge(d.performanceBond.state, 'green', true);
+    document.getElementById('bond-sla').textContent = d.performanceBond.refundSla;
+    document.getElementById('bond-confiscation').textContent = d.performanceBond.confiscationControl;
 
     document.getElementById('nodes-tbody').innerHTML = d.payNodes.map(function (n) {
       return '<tr>' +

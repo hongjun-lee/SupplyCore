@@ -53,6 +53,7 @@
                 <th>订单号</th>
                 <th>供应商</th>
                 <th>来源需求</th>
+                <th>业务流向</th>
                 <th class="num">行数</th>
                 <th class="num">订单金额</th>
                 <th>下单日期</th>
@@ -80,7 +81,7 @@
             <span class="badge amber dot">提示</span>
             <div class="text-2">
               订单状态与 NC 推送状态分层显示：<strong>订单状态</strong> 反映业务执行阶段；<strong>NC 推送状态</strong> 反映与 NC 系统的接口同步进度。两者解耦，不互相替代。
-              详见 <span class="font-mono">04-需求计划与采购协同详细设计 V1.0</span> 与 <span class="font-mono">08-财务与NC接口详细设计 V1.0</span>。
+              详设 04 V1.1 已补 <span class="font-mono">fulfillment_type</span>：外购入库、直达材料、直达设备、外购代储、外委检修、委托加工。同一物料可按不同业务流向执行，非目录直达需先走 WF-DIR-001。
             </div>
           </div>
         </div>
@@ -96,7 +97,7 @@
       page: 'purchase-orders',
       crumbs: ['采购协同', '采购订单'],
       title: '采购订单',
-      desc: '对齐 04 (S-23 order) + 08 (interface_push_state) — 订单状态与 NC 推送状态分层',
+      desc: '对齐 04 V1.1 (S-23 order) + 08 (interface_push_state) — 业务流向与 NC 状态分层',
       actions: [{ label: '导出 Excel' }, { label: '+ 新建订单', primary: true }],
     });
 
@@ -107,6 +108,7 @@
         '<td class="code"><a>' + o.code + '</a></td>' +
         '<td>' + o.supplier + '</td>' +
         '<td class="code muted">' + o.src + '</td>' +
+        '<td><span class="badge gray">' + o.fulfillment + '</span></td>' +
         '<td class="num">' + o.lines + '</td>' +
         '<td class="num">' + SC.fmtMoney(o.amount) + '</td>' +
         '<td class="muted">' + o.date + '</td>' +

@@ -16,7 +16,7 @@
           <div class="kpi"><div class="label">在库物料种类</div><div class="value">8 类示例</div><div class="trend">演示 8 行 / 全口径 ~12,400 SKU</div></div>
           <div class="kpi"><div class="label">在库总价值</div><div class="value">¥ 86 万</div><div class="trend">演示口径</div></div>
           <div class="kpi"><div class="label">临期 / 过期批次</div><div class="value" style="color:var(--amber)">2</div><div class="trend down">需关注：乳化油、乳化炸药</div></div>
-          <div class="kpi"><div class="label">火工品库存</div><div class="value">2 类</div><div class="trend">专管库 · 双人双锁</div></div>
+          <div class="kpi"><div class="label">低储 / 超储</div><div class="value" style="color:var(--amber)">3</div><div class="trend">安全库存 2 · 双维超储 1</div></div>
         </div>
 
         <div class="card">
@@ -69,6 +69,8 @@
                 <th class="num">现存量</th>
                 <th>批次 / 保质期</th>
                 <th>批次状态</th>
+                <th class="num">安全库存</th>
+                <th>储备控制</th>
                 <th class="num">平均成本</th>
                 <th class="num">价值</th>
               </tr>
@@ -92,6 +94,7 @@
             <span class="badge blue dot">说明</span>
             <div class="text-2">
               <div><strong>库存唯一事实源原则：</strong>所有库存数量与价值以 <span class="font-mono">S-13 库存台账</span> 为准；批次维度信息见 <span class="font-mono">S-14 批次账</span>；任意一笔出入库须在同事务原子写入 <span class="font-mono">S-21 库存事务流水</span>。</div>
+              <div style="margin-top:6px;"><strong>低储 / 超储口径：</strong>低库存按物料档案 <span class="font-mono">safety_stock</span>；超储按储备资金预算 110% + 安全周转周期双维度，不再使用单一最高库存字段。</div>
               <div style="margin-top:6px;"><strong>火工品 / 化工品强制批次：</strong>分类前缀 <span class="font-mono">HG/HX</span> 必须按批次维度记账，并支持双人双锁专管库。</div>
             </div>
           </div>
@@ -108,7 +111,7 @@
       page: 'inventory',
       crumbs: ['库存实物流转', '库存查询'],
       title: '库存查询',
-      desc: '对齐《06-库存实物流转详细设计 V1.0》S-13 / S-14 / S-21',
+      desc: '对齐《06-库存实物流转详细设计 V1.1》S-13 / S-14 / S-21 + 低储 / 超储新口径',
       actions: [{ label: '导出 Excel' }, { label: '+ 调拨申请' }, { label: '+ 领料申请', primary: true }],
     });
 
@@ -126,6 +129,9 @@
         '<td class="num">' + SC.fmtNum(i.qty) + '</td>' +
         '<td>' + i.batch + '<div class="muted" style="font-size:11px;">' + i.life + '</div></td>' +
         '<td>' + stateBadge + '</td>' +
+        '<td class="num">' + (i.safetyStock != null ? SC.fmtNum(i.safetyStock) : '<span class="muted">—</span>') + '</td>' +
+        '<td>' + SC.badge(i.stockControl, i.stockControl === '超储' || i.stockControl === '低储' ? 'amber' : i.stockControl === '过期处置' ? 'red' : 'gray', true) +
+          '<div class="muted" style="font-size:11px;">资金 ' + i.reserveBudgetPct + '% · 周转 ' + i.turnoverDays + ' 天</div></td>' +
         '<td class="num">' + SC.fmtMoney(i.avgCost) + '</td>' +
         '<td class="num">' + SC.fmtMoney(i.value) + '</td>' +
       '</tr>';

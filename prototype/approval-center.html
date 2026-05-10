@@ -15,8 +15,8 @@
         <div class="kpi-grid">
           <div class="kpi accent">
             <div class="label">待我处理</div>
-            <div class="value">4</div>
-            <div class="trend">SLA 临近 1 单 · 加急 1 单</div>
+            <div class="value">8</div>
+            <div class="trend">SLA 临近 3 单 · 高敏感 1 单</div>
           </div>
           <div class="kpi"><div class="label">本月已办</div><div class="value">38</div><div class="trend up">较上月 ↑ 12%</div></div>
           <div class="kpi"><div class="label">平均审批耗时</div><div class="value">3.2h</div><div class="trend down">较上月 ↓ 0.8h</div></div>
@@ -27,7 +27,7 @@
         <div class="card">
           <div class="card-header" style="border-bottom:none;padding-bottom:0;">
             <div style="display:flex;gap:0;">
-              <div class="btn btn-primary" style="border-radius:4px 0 0 0;">待办 (4)</div>
+              <div class="btn btn-primary" style="border-radius:4px 0 0 0;">待办 (8)</div>
               <div class="btn" style="border-radius:0;border-left:none;">已办 (38)</div>
               <div class="btn" style="border-radius:0 0 0 0;border-left:none;">我发起 (12)</div>
               <div class="btn" style="border-radius:0 4px 0 0;border-left:none;">抄送给我 (7)</div>
@@ -41,6 +41,7 @@
                 <option>需求计划</option><option>采购订单</option><option>合同会签</option>
                 <option>付款申请</option><option>设备租赁</option><option>废旧处置</option>
                 <option>调拨</option><option>盘点差异</option><option>反结申请</option>
+                <option>直达例外</option><option>外委检修</option><option>合同超限</option><option>供应商重评估</option>
               </select>
             </div>
             <div class="form-field"><label>提交人</label><input placeholder="姓名"></div>
@@ -100,7 +101,7 @@
           <div class="card-body" style="display:flex;gap:12px;align-items:start;">
             <span class="badge blue dot">说明</span>
             <div class="text-2">
-              本页面对应统一审批中心，所有业务单据的审批均落入 <span class="font-mono">A-20 approval_instance</span> 表，按 <span class="font-mono">FIXED_USER / FIXED_ROLE / ORG_ROLE</span> 三种规则解析审批人，由 Nova Platform 统一提供组织角色递进解析能力。详见 <span class="font-mono">10-权限审批流详细设计 V1.0</span>。
+              本页面对应统一审批中心，所有业务单据的审批均落入 <span class="font-mono">A-20 approval_instance</span> 表，按 <span class="font-mono">FIXED_USER / FIXED_ROLE / ORG_ROLE</span> 三种规则解析审批人；本版已补 <span class="font-mono">WF-DIR-001 / WF-RPR-001 / WF-CON-OVERLIMIT-001 / WF-SUP-REASSESS-001</span>。详见 <span class="font-mono">10-权限审批流详细设计 V1.2</span>。
             </div>
           </div>
         </div>
@@ -116,7 +117,7 @@
       page: 'approval-center',
       crumbs: ['工作', '审批中心'],
       title: '审批中心',
-      desc: '对齐《10-权限审批流详细设计 V1.0》A-20 approval_instance + Nova ORG_ROLE 解析',
+      desc: '对齐《10-权限审批流详细设计 V1.2》A-20 approval_instance + Nova ORG_ROLE + 新增审批模板',
       actions: [{ label: '审批规则配置' }],
     });
 

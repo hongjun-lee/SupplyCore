@@ -17,7 +17,7 @@
           <div>
             <div class="card">
               <div class="card-header">
-                <div class="title">报表中心（21 张基础报表 · 节选 9 张）</div>
+                <div class="title">报表中心（新增详设同步报表 · 节选展示）</div>
                 <div class="actions">
                   <button class="btn">报表配置</button>
                   <button class="btn">导出审计</button>
@@ -31,7 +31,7 @@
 
             <div class="card">
               <div class="card-header">
-                <div class="title">预警规则（12 类）· 今日触发</div>
+                <div class="title">预警规则（18 类）· 今日触发</div>
                 <div class="actions">
                   <button class="btn">规则配置</button>
                   <button class="btn">订阅与通知</button>
@@ -61,7 +61,7 @@
                 <div class="ai-mark">AI</div>
                 <div>
                   <div style="font-weight:600;font-size:13px;">物资 AI 助理</div>
-                  <div style="font-size:11px;color:var(--text-2);">已接入 8 类业务 Tool · 同业务权限隔离 · 集团统一 AI 入口</div>
+                  <div style="font-size:11px;color:var(--text-2);">已接入 10 类业务 Tool · 同业务权限隔离 · 集团统一 AI 入口</div>
                 </div>
                 <span class="spacer" style="flex:1;"></span>
                 <a class="btn btn-sm">能力清单</a>
@@ -74,7 +74,7 @@
             </div>
 
             <div class="card">
-              <div class="card-header"><div class="title">AI Tool 能力清单（节选 8 类）</div></div>
+              <div class="card-header"><div class="title">AI Tool 能力清单（节选 10 类）</div></div>
               <table class="data">
                 <thead>
                   <tr><th>编码</th><th>能力名称</th><th>说明</th><th>权限</th></tr>
@@ -107,11 +107,11 @@
       page: 'reports',
       crumbs: ['决策 / AI', '报表 / AI 助理'],
       title: '报表 / AI 助理',
-      desc: '对齐《09-报表预警与AI能力详细设计 V1.0》— 21 张报表 + 12 类预警 + 8 类 AI Tool',
+      desc: '对齐《09-报表预警与AI能力详细设计 V1.2》— 暂估、外委检修、后评价、超储预警已同步',
       actions: [{ label: '导出审计' }, { label: '+ 新建预警规则', primary: true }],
     });
 
-    var ico = { '库存': '▦', '采购': '⇄', '合同': '◇', '设备': '⚙', '财务': '¥', '管理': '★' };
+    var ico = { '库存': '▦', '采购': '⇄', '合同': '◇', '设备': '⚙', '财务': '¥', '管理': '★', '供应商': '◎' };
     document.getElementById('reports-grid').innerHTML = SC.data.reports.map(function (r) {
       var href = r.code === 'R-INV-001' ? 'report-detail.html' : '#';
       return '<a class="report-thumb" href="' + href + '" style="text-decoration:none;color:inherit;">' +

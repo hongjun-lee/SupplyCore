@@ -16,7 +16,7 @@
           <div class="kpi"><div class="label">在执行合同</div><div class="value">3</div><div class="trend">含 1 框架协议</div></div>
           <div class="kpi"><div class="label">本月合同金额</div><div class="value">¥ 414 万</div><div class="trend up">较上月 ↑ 8.2%</div></div>
           <div class="kpi"><div class="label">付款节点临期</div><div class="value" style="color:var(--amber)">5</div><div class="trend">7 日内需付款</div></div>
-          <div class="kpi"><div class="label">已支付占比</div><div class="value">29.9%</div><div class="trend">¥ 145 万 / ¥ 485 万</div></div>
+          <div class="kpi"><div class="label">外委超限</div><div class="value" style="color:var(--red)">1</div><div class="trend">触发 SENS-CON-004</div></div>
         </div>
 
         <div class="card">
@@ -27,7 +27,7 @@
             <div class="form-field"><label>合同类型</label>
               <select>
                 <option>全部</option><option>物资订单</option><option>物资框架</option>
-                <option>设备租赁</option><option>服务合同</option>
+                <option>设备租赁</option><option>服务合同</option><option>外委检修</option>
               </select>
             </div>
             <div class="form-field"><label>状态</label>
@@ -62,6 +62,7 @@
                 <th class="num">合同金额</th>
                 <th class="num">已付 / 待付</th>
                 <th>签订 ~ 到期</th>
+                <th>控制点</th>
                 <th>状态</th>
                 <th>操作</th>
               </tr>
@@ -74,7 +75,7 @@
           <div class="card-body" style="display:flex;gap:12px;align-items:start;">
             <span class="badge blue dot">说明</span>
             <div class="text-2">
-              <strong>四层付款控制链路：</strong>合同付款节点 (C-04) → 付款计划 (C-05) → 付款申请 (C-06) → 付款执行 (C-07)。每一环均可查 NC 推送任务（NC-BIZ-013 付款单推送）。详见《05-合同与资金详细设计 V1.0》。
+              <strong>四层付款控制链路：</strong>合同付款节点 (C-04) → 付款计划 (C-05) → 付款申请 (C-06) → 付款执行 (C-07)。外委检修合同额原则上不超过设备原值 40%，超限触发 WF-CON-OVERLIMIT-001 + SENS-CON-004；履约保证金没收纳入 SENS-CON-003。详见《05-合同与资金详细设计 V1.1》。
             </div>
           </div>
         </div>
@@ -90,7 +91,7 @@
       page: 'contract-list',
       crumbs: ['合同与资金', '合同管理'],
       title: '合同管理',
-      desc: '对齐《05-合同与资金详细设计 V1.0》— C-01~C-11、合同 8 状态机 + 四层付款控制',
+      desc: '对齐《05-合同与资金详细设计 V1.1》— 合同 8 状态机、付款控制、履约保证金与外委检修上限',
       actions: [{ label: '导出 Excel' }, { label: '+ 新建合同', primary: true }],
     });
 
@@ -105,6 +106,7 @@
         '<td class="num">' + SC.fmtMoney(c.amount) + '</td>' +
         '<td class="num">' + SC.fmtMoney(c.paid) + '<div class="muted" style="font-size:11px;">待付 ' + SC.fmtMoney(c.pendingPay) + '</div></td>' +
         '<td class="muted">' + c.signed + '<br>' + c.expire + '</td>' +
+        '<td class="muted" style="max-width:220px;">' + (c.control || '—') + '</td>' +
         '<td>' + SC.badge(c.state, c.color, true) + '</td>' +
         '<td class="actions"><a href="contract-detail.html">查看</a>' +
           (c.state === '执行中' ? '<a>付款申请</a>' : '') +

@@ -19,8 +19,8 @@
             <div class="node done"><span class="step-num">2</span> 供应商发货</div>
             <div class="node current"><span class="step-num">3</span> 到货验收 (S-03)</div>
             <div class="node"><span class="step-num">4</span> 质检 (S-04)</div>
-            <div class="node"><span class="step-num">5</span> 入库 (S-05)</div>
-            <div class="node"><span class="step-num">6</span> NC 推送 (NC-BIZ-007)</div>
+            <div class="node"><span class="step-num">5</span> 入库 / 暂估</div>
+            <div class="node"><span class="step-num">6</span> NC / 冲减闭环</div>
           </div>
         </div>
 
@@ -165,16 +165,25 @@
               </div>
               <div class="form-field">
                 <label>暂估入库</label>
-                <div class="static">否（已有合同价）</div>
+                <div class="static">是（发票未到，进入 6 个月窗口）</div>
               </div>
               <div class="form-field">
                 <label>NC 推送策略</label>
-                <div class="static">入库提交后自动触发 NC-BIZ-007</div>
+                <div class="static">入库触发 NC-BIZ-007；月末触发 BIZ-002 暂估</div>
               </div>
             </div>
             <div class="form-field">
               <label>验收备注</label>
               <textarea rows="2" placeholder="如部分退回、临时放置等情况说明">隔爆开关到货 6 台，外观检查发现 1 台外壳变形，已暂留并退还供应商。已通知采购员重新配货。</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="display:flex;gap:12px;align-items:start;">
+            <span class="badge amber dot">暂估口径</span>
+            <div class="text-2">
+              发票未到的合格入库进入 <strong>6 个月暂估窗口</strong>，按 <strong>D-90 / D-30</strong> 两段预警跟踪；D 日仍未冲减时阻断同供应商 / 同合同新采购审批或转特批。<a href="tentative-estimate.html">查看暂估闭环页</a>
             </div>
           </div>
         </div>
@@ -190,7 +199,7 @@
       page: 'goods-receipt',
       crumbs: ['库存实物流转', '到货验收'],
       title: '到货验收',
-      desc: '对齐《06-库存实物流转详细设计 V1.0》— 实体 S-03 (goods_receipt_state) → S-04 质检 → S-05 (purchase_receipt_state)',
+      desc: '对齐《06-库存实物流转详细设计 V1.1》— S-03 → S-04 → S-05，发票未到进入暂估闭环',
       actions: [{ label: '扫码到货' }, { label: '+ 登记到货', primary: true }],
     });
 

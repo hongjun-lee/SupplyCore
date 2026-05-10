@@ -106,6 +106,14 @@
                 </table>
               </div>
             </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">保证金 / 高敏感提醒</div></div>
+              <div class="card-body" style="font-size:12px;color:var(--text-2);">
+                <div class="mb-8"><strong>履约保证金：</strong>验收合格后 5 个工作日内退还；没收操作纳入 SENS-CON-003，高敏感 + 二次确认。</div>
+                <div><strong>质保金边界：</strong>质保金属于合同质量保证安排，与履约保证金分开展示、分开审批。</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -121,7 +129,7 @@
       page: 'payment-request',
       crumbs: ['合同与资金', '付款申请', d.code],
       title: '付款申请 ' + d.code,
-      desc: '对齐《05》— C-06 付款申请 + C-07 付款执行 + C-08 三单匹配 + NC-BIZ-013',
+      desc: '对齐《05 V1.1》— 付款申请 + 三单匹配 + 履约保证金退还 SLA + NC-BIZ-013',
     });
 
     document.getElementById('title-code').textContent = d.code;

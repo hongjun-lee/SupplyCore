@@ -87,6 +87,15 @@
             <div class="card-body" style="border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
               数据范围由 <strong>Nova data_scope_grants</strong> + 本系统业务角色叠加计算；审批人通过 <strong>FIXED_USER / FIXED_ROLE / ORG_ROLE</strong> 三种规则解析。
             </div>
+            <table class="data">
+              <thead><tr><th>新增审批模板</th><th>业务触发</th><th>关键节点</th><th>敏感控制</th></tr></thead>
+              <tbody>
+                <tr><td class="code">WF-DIR-001</td><td>非直达目录物资走直达</td><td>业务主管 / 总经理分档</td><td>写入 direct_exception_workflow_id</td></tr>
+                <tr><td class="code">WF-RPR-001</td><td>外委检修申请</td><td>设备主管 → 总经理</td><td>需内部无法承接回函</td></tr>
+                <tr><td class="code">WF-CON-OVERLIMIT-001</td><td>外委检修合同超 40% 原值</td><td>合同会签 → 总经理</td><td>SENS-CON-004</td></tr>
+                <tr><td class="code">WF-SUP-REASSESS-001</td><td>后评价差评累计 / 证照异常</td><td>供应商管理员 → 业务主管</td><td>影响供应商分类</td></tr>
+              </tbody>
+            </table>
           </div>
 
           <!-- 审计 -->
@@ -132,7 +141,8 @@
                     · 全部走 SSO，本系统不存密码<br>
                     · 审计 365 天 · 高敏感永久留存<br>
                     · 导出含水印 + 下载明细<br>
-                    · 反结 / 月结需双人复核
+                    · 反结 / 月结需双人复核<br>
+                    · SENS-CON-003/004 二次确认
                   </div>
                 </div>
                 <div>
@@ -145,6 +155,19 @@
                   </div>
                 </div>
               </div>
+
+              <hr class="sep">
+
+              <div class="text-2 mb-8" style="font-weight:500;color:var(--text);">关键业务配置</div>
+              <table class="data">
+                <thead><tr><th>配置项</th><th>默认值</th><th>影响页面</th><th>说明</th></tr></thead>
+                <tbody>
+                  <tr><td class="code">TENTATIVE_WINDOW_MONTHS</td><td>6 个月</td><td>暂估闭环 / 报表预警</td><td>D-90 / D-30 两段预警，D 日阻断</td></tr>
+                  <tr><td class="code">OUTSOURCED_REPAIR_PRICE_CAP_RATIO</td><td>40%</td><td>维修工单 / 合同</td><td>外委检修合同超限触发高敏感审批</td></tr>
+                  <tr><td class="code">PERFORMANCE_BOND_REFUND_SLA</td><td>5 个工作日</td><td>合同详情 / 付款</td><td>验收合格后退还履约保证金</td></tr>
+                  <tr><td class="code">OVERSTOCK_BUDGET_RATIO</td><td>110%</td><td>库存查询 / 报表</td><td>与周转天数组成超储双维度</td></tr>
+                </tbody>
+              </table>
 
               <hr class="sep">
 
@@ -167,7 +190,7 @@
       page: 'system-admin',
       crumbs: ['运维 / 集成', '系统管理'],
       title: '系统管理',
-      desc: '对齐《10-权限审批流详细设计 V1.0》+ 《11-非功能详细设计 V1.0》',
+      desc: '对齐《10 V1.2》审批模板 + 《11 V1.0》关键配置项',
     });
 
     /* tabs */

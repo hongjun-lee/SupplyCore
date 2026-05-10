@@ -7,7 +7,7 @@
  */
 window.SC = window.SC || {};
 
-SC.docVer = '对齐文档 V1.0（详设 01–11）';
+SC.docVer = '对齐详设 V1.2 基线（2026-05-10 同步）';
 
 SC.nav = [
   { title: '工作', items: [
@@ -39,6 +39,7 @@ SC.nav = [
     { id: 'payment-request',   href: 'payment-request.html',    label: '付款申请（演示）', icon: '¥' },
     { id: 'funding-plan',      href: 'funding-plan.html',       label: '资金计划（月度）', icon: '☷' },
     { id: 'three-way-match',   href: 'three-way-match.html',    label: '三单匹配', icon: '☰' },
+    { id: 'tentative-estimate', href: 'tentative-estimate.html', label: '暂估闭环', icon: '◌' },
   ]},
   { title: '基础数据', items: [
     { id: 'material-master',   href: 'material-master.html',    label: '物料主数据', icon: '◫' },
@@ -89,7 +90,7 @@ SC.renderHeader = function () {
     <button class="menu-toggle" id="menu-toggle" aria-label="菜单">☰</button>
     <div class="logo">
       <div class="mark">辽</div>
-      <div>辽宁能源 · 阜矿物资供应管理系统 <span class="sub">原型 v0.7</span></div>
+      <div>辽宁能源 · 阜矿物资供应管理系统 <span class="sub">原型 v0.8</span></div>
     </div>
     <span class="spacer"></span>
     <div class="h-item">二级集团：<strong style="color:var(--text);font-weight:500;margin-left:4px;">${sg.name}</strong></div>
@@ -146,7 +147,7 @@ SC.renderFooter = function () {
   if (document.querySelector('.app-footer')) return;
   const f = document.createElement('div');
   f.className = 'app-footer';
-  f.innerHTML = `SupplyCore 原型 v0.7 · 演示数据，不作为开发或验收依据 · ${SC.docVer}`;
+  f.innerHTML = `SupplyCore 原型 v0.8 · 演示数据，不作为开发或验收依据 · ${SC.docVer}`;
   document.body.appendChild(f);
 };
 

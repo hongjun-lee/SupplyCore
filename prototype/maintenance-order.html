@@ -14,9 +14,9 @@
 
         <div class="kpi-grid">
           <div class="kpi"><div class="label">本月工单</div><div class="value">5</div><div class="trend">3 已关单 · 1 检修中 · 1 待派工</div></div>
-          <div class="kpi"><div class="label">本月费用合计</div><div class="value">¥ 28,600</div><div class="trend">仅含已关单工单</div></div>
+          <div class="kpi"><div class="label">本月费用合计</div><div class="value">¥ 14.86 万</div><div class="trend">含外委检修申请</div></div>
           <div class="kpi"><div class="label">平均响应时长</div><div class="value">28 min</div><div class="trend up">报修→派工 ↓ 12%</div></div>
-          <div class="kpi"><div class="label">备件领用</div><div class="value">¥ 13,835</div><div class="trend">3 项备件出库</div></div>
+          <div class="kpi"><div class="label">外委超限</div><div class="value" style="color:var(--red)">1</div><div class="trend">46.2% 原值 · 待总经理</div></div>
         </div>
 
         <!-- 列表 -->
@@ -27,7 +27,7 @@
             <div class="form-field"><label>类型</label>
               <select>
                 <option>全部</option><option>故障报修</option><option>故障维修</option>
-                <option>一级保养</option><option>二级保养</option><option>检修</option>
+                <option>一级保养</option><option>二级保养</option><option>检修</option><option>外委检修</option>
               </select>
             </div>
             <div class="form-field"><label>状态</label>
@@ -73,11 +73,11 @@
         <div class="card">
           <div class="flow-strip">
             <div class="node done"><span class="step-num">1</span> 故障报修</div>
-            <div class="node done"><span class="step-num">2</span> 调度派工</div>
-            <div class="node done"><span class="step-num">3</span> 到达现场</div>
-            <div class="node current"><span class="step-num">4</span> 检修执行</div>
-            <div class="node"><span class="step-num">5</span> 试运行验证</div>
-            <div class="node"><span class="step-num">6</span> 验收 + 关单</div>
+            <div class="node done"><span class="step-num">2</span> 内部能力判断</div>
+            <div class="node current"><span class="step-num">3</span> WF-RPR-001</div>
+            <div class="node"><span class="step-num">4</span> 外委合同</div>
+            <div class="node"><span class="step-num">5</span> 检修 / 回收</div>
+            <div class="node"><span class="step-num">6</span> 验收 + 结算</div>
           </div>
 
           <div class="card-body">
@@ -117,7 +117,7 @@
           <div>
             <div class="card">
               <div class="card-header">
-                <div class="title">备件领用（联动库存 S-22 领料申请）</div>
+                <div class="title">外委费用 / 配件明细</div>
                 <div class="actions">
                   <button class="btn btn-sm">+ 申领备件</button>
                 </div>
@@ -141,6 +141,25 @@
                   </tr>
                 </tfoot>
               </table>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="title">外委检修审批控制</div></div>
+              <div class="card-body" style="font-size:12px;color:var(--text-2);">
+                <div class="kv">
+                  <div class="k">审批流</div><div class="v code" id="out-wf"></div>
+                  <div class="k">合同超限</div><div class="v code" id="out-over"></div>
+                  <div class="k">审批分档</div><div class="v" id="out-tiers"></div>
+                  <div class="k">外委合同</div><div class="v code" id="out-contract"></div>
+                  <div class="k">检修单位</div><div class="v" id="out-supplier"></div>
+                  <div class="k">原值 / 金额</div><div class="v" id="out-amount"></div>
+                  <div class="k">控制状态</div><div class="v" id="out-control"></div>
+                  <div class="k">内部回函</div><div class="v" id="out-reply"></div>
+                  <div class="k">附件要求</div><div class="v" id="out-attachments"></div>
+                  <div class="k">月度上报</div><div class="v" id="out-monthly"></div>
+                  <div class="k">NC 口径</div><div class="v" id="out-nc"></div>
+                </div>
+              </div>
             </div>
 
             <!-- 附件 -->
@@ -171,6 +190,7 @@
                   <li>备件领用单 (S-22) 关闭并产生库存事务流水 (S-21)</li>
                   <li>故障如属于厂家保修期内：触发 NC-MD-005 回传保修索赔</li>
                   <li>停机时长写入设备 OEE 指标，供 09 报表统计</li>
+                  <li>外委检修合同超 40% 原值时保留 SENS-CON-004 高敏感审计</li>
                 </ul>
               </div>
             </div>
@@ -188,7 +208,7 @@
       page: 'maintenance-order',
       crumbs: ['设备', '设备维修工单'],
       title: '设备维修工单',
-      desc: '对齐《07-设备与设备租赁详细设计 V1.0》— E-04 维修保养 + S-22 备件领用 + NC-MD-005',
+      desc: '对齐《07-设备与设备租赁详细设计 V1.0a》— E-05 外委检修 + WF-RPR-001 + 40% 原值上限',
       actions: [{ label: '+ 新建报修', primary: true }],
     });
 
@@ -224,6 +244,17 @@
     document.getElementById('d-arrive').textContent = d.arriveAt;
     document.getElementById('d-fault').textContent = d.fault;
     document.getElementById('d-diag').textContent = d.diagnose;
+    document.getElementById('out-wf').textContent = d.outsourcedRepair.workflow;
+    document.getElementById('out-over').textContent = d.outsourcedRepair.overLimitWorkflow;
+    document.getElementById('out-tiers').textContent = d.outsourcedRepair.approvalTiers;
+    document.getElementById('out-contract').textContent = d.outsourcedRepair.contract;
+    document.getElementById('out-supplier').textContent = d.outsourcedRepair.supplier;
+    document.getElementById('out-amount').textContent = SC.fmtMoney(d.outsourcedRepair.repairAmount) + ' / 原值 ' + SC.fmtMoney(d.outsourcedRepair.originalValue) + ' = ' + d.outsourcedRepair.actualRatio;
+    document.getElementById('out-control').innerHTML = '<span class="badge red dot">' + d.outsourcedRepair.controlState + '</span>';
+    document.getElementById('out-reply').textContent = d.outsourcedRepair.internalReply;
+    document.getElementById('out-attachments').textContent = d.outsourcedRepair.attachments;
+    document.getElementById('out-monthly').textContent = d.outsourcedRepair.monthlyReportDay;
+    document.getElementById('out-nc').textContent = d.outsourcedRepair.ncState;
 
     var partsTotal = 0;
     document.getElementById('parts-tbody').innerHTML = d.parts.map(function (p) {

@@ -350,7 +350,7 @@
                 <strong>不替代财务做账：</strong>三单匹配是付款前的"业务校验"环节，匹配通过后生成应付凭证草稿，由财务在 NC 中正式做账。
               </div>
               <div class="mb-8">
-                <strong>暂估闭环联动：</strong>已暂估入库的物资，发票到达后在此匹配；冲减暂估后回写库存计价（详设 06）。
+                <strong>暂估闭环联动：</strong>已暂估入库的物资，发票到达后在此匹配；冲减暂估后回写库存计价。超过 6 个月窗口按 D-90 / D-30 预警和 D 日阻断处理。<a href="tentative-estimate.html">查看暂估闭环</a>
               </div>
               <div>
                 <strong>不影响业务执行状态：</strong>采购订单的 <span class="font-mono">order_state</span> 与 <span class="font-mono">three_way_match_state</span> 解耦，匹配未通过不阻塞订单履约。
@@ -370,7 +370,7 @@
       page: 'three-way-match',
       crumbs: ['合同与资金', '三单匹配'],
       title: '三单匹配（采购订单 / 入库 / 发票）',
-      desc: '对齐《08-财务与NC接口详细设计 V1.0》F-09 三单匹配 + 《06》暂估闭环 + 《05》合同账期联动',
+      desc: '对齐《08 V1.1》F-09 三单匹配 + 《06 V1.1》暂估闭环 + 《05 V1.1》合同账期联动',
       actions: [{ label: '三单容差配置' }, { label: '批量匹配', primary: true }],
     });
 

@@ -3,8 +3,8 @@
 <head><meta charset="utf-8"><title>预警规则配置 — 阜矿物资供应管理系统（原型）</title><link rel="stylesheet" href="assets/styles.css"></head>
 <body><div id="header"></div><div class="app-layout"><div id="sidebar"></div><div class="app-main"><div id="page-area">
   <div class="kpi-grid">
-    <div class="kpi"><div class="label">启用预警规则</div><div class="value">12</div><div class="trend">库存 4 / 合同 3 / 接口 3 / 供应商 2</div></div>
-    <div class="kpi"><div class="label">今日触发</div><div class="value" style="color:var(--amber)">18</div><div class="trend down">其中高风险 2 条</div></div>
+    <div class="kpi"><div class="label">启用预警规则</div><div class="value">18</div><div class="trend">库存 7 / 合同 5 / 接口 3 / 供应商 3</div></div>
+    <div class="kpi"><div class="label">今日触发</div><div class="value" style="color:var(--amber)">27</div><div class="trend down">其中高风险 5 条</div></div>
     <div class="kpi"><div class="label">已处理</div><div class="value">13</div><div class="trend">平均处理 2.4 小时</div></div>
     <div class="kpi"><div class="label">报表订阅</div><div class="value">6</div><div class="trend">日报 3 / 周报 3</div></div>
   </div>
@@ -14,7 +14,12 @@
     <table class="data">
       <thead><tr><th>规则编码</th><th>预警对象</th><th>触发条件</th><th>风险等级</th><th>接收对象</th><th>状态</th><th>审计要求</th></tr></thead>
       <tbody>
-        <tr><td class="code">AL-ST-001</td><td>安全库存</td><td>现存量 &lt; 安全库存 × 1.1</td><td><span class="badge amber">中</span></td><td>仓管员 / 计划员</td><td><span class="badge green dot">启用</span></td><td>处理意见留痕</td></tr>
+        <tr><td class="code">AL-ST-001</td><td>安全库存</td><td>现存量 &lt; safety_stock</td><td><span class="badge amber">中</span></td><td>仓管员 / 计划员</td><td><span class="badge green dot">启用</span></td><td>处理意见留痕</td></tr>
+        <tr><td class="code">AL-ST-020</td><td>超储双维度</td><td>储备资金 &gt; 预算 110% 且周转天数超阈值</td><td><span class="badge amber">中</span></td><td>计划员 / 物资管理</td><td><span class="badge green dot">启用</span></td><td>纳入库存分析</td></tr>
+        <tr><td class="code">AL-ZG-006</td><td>暂估 D-90 / D-30</td><td>暂估 6 个月窗口剩余 ≤90 / ≤30 日</td><td><span class="badge red">高</span></td><td>采购 / 财务</td><td><span class="badge green dot">启用</span></td><td>D 日阻断记录</td></tr>
+        <tr><td class="code">AL-WX-009</td><td>外委检修超限</td><td>合同金额 / 设备原值 &gt; 40%</td><td><span class="badge red">高</span></td><td>设备 / 合同 / 总经理</td><td><span class="badge green dot">启用</span></td><td>SENS-CON-004</td></tr>
+        <tr><td class="code">AL-BD-003</td><td>履约保证金没收</td><td>履约保证金状态 = 已没收</td><td><span class="badge red">高</span></td><td>合同 / 财务</td><td><span class="badge green dot">启用</span></td><td>SENS-CON-003</td></tr>
+        <tr><td class="code">AL-CMP-002</td><td>后评价差评累计</td><td>差评次数达到供应商重评估阈值</td><td><span class="badge amber">中</span></td><td>供应商管理员</td><td><span class="badge green dot">启用</span></td><td>触发 WF-SUP-REASSESS</td></tr>
         <tr><td class="code">AL-HT-002</td><td>合同履约</td><td>到货节点逾期 ≥ 3 天</td><td><span class="badge red">高</span></td><td>采购负责人 / 合同管理员</td><td><span class="badge green dot">启用</span></td><td>需闭环处理</td></tr>
         <tr><td class="code">AL-NC-003</td><td>NC 接口</td><td>接口失败连续 3 次</td><td><span class="badge red">高</span></td><td>财务接口管理员 / 运维</td><td><span class="badge green dot">启用</span></td><td>重推需审批</td></tr>
         <tr><td class="code">AL-SP-004</td><td>供应商资质</td><td>证照有效期 &lt; 30 天</td><td><span class="badge amber">中</span></td><td>供应商管理员</td><td><span class="badge green dot">启用</span></td><td>到期自动暂停</td></tr>
@@ -31,6 +36,8 @@
         <tbody>
           <tr><td>08:41</td><td>NC-IF-7782</td><td>采购入库接口失败 3 次</td><td><span class="badge red dot">待处理</span></td></tr>
           <tr><td>09:12</td><td>HT-2026-031</td><td>合同到货节点逾期 5 天</td><td><span class="badge amber dot">处理中</span></td></tr>
+          <tr><td>09:45</td><td>ZG-202511-0032</td><td>暂估 D-30 升级，距 6 个月截止 8 天</td><td><span class="badge red dot">待财务复核</span></td></tr>
+          <tr><td>10:18</td><td>HT-WX-2026-0018</td><td>外委检修合同金额超过设备原值 40%</td><td><span class="badge red dot">审批中</span></td></tr>
           <tr><td>10:05</td><td>M-HG-2026-0032</td><td>火工品批次临期</td><td><span class="badge green dot">已确认</span></td></tr>
         </tbody>
       </table>
@@ -50,5 +57,5 @@
 
   <div class="card"><div class="card-body" style="font-size:12px;color:var(--text-2);"><span class="badge blue dot">AI 边界</span><span style="margin-left:8px;">AI 可以解释预警原因、检索关联单据、生成处理建议；不能自动关闭预警、不能绕过审批重推接口、不能替用户提交业务单据。</span></div></div>
 </div></div></div>
-<script src="assets/data.js"></script><script src="assets/chrome.js"></script><script>SC.layout({page:'alert-rules',crumbs:['报表预警与AI','预警规则配置'],title:'预警规则配置',desc:'补齐预警对象、触发条件、接收对象、报表订阅和审计闭环',actions:[{label:'预警记录'},{label:'+ 新建规则',primary:true}]});</script>
+<script src="assets/data.js"></script><script src="assets/chrome.js"></script><script>SC.layout({page:'alert-rules',crumbs:['报表预警与AI','预警规则配置'],title:'预警规则配置',desc:'对齐详设 09 V1.2：暂估、超储、外委检修、履约保证金和后评价预警',actions:[{label:'预警记录'},{label:'+ 新建规则',primary:true}]});</script>
 </body></html>

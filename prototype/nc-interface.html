@@ -16,7 +16,7 @@
           <div class="kpi"><div class="label">今日推送任务</div><div class="value">341</div><div class="trend">主数据 98 · 业务 239 · 对账 4</div></div>
           <div class="kpi"><div class="label">成功 / 失败</div><div class="value">335 / 6</div><div class="trend up">成功率 98.2%</div></div>
           <div class="kpi"><div class="label">待重推</div><div class="value" style="color:var(--amber)">3</div><div class="trend">采购订单推送 (NC-BIZ-005)</div></div>
-          <div class="kpi"><div class="label">已停用接口</div><div class="value">1</div><div class="trend">NC-BIZ-018 盘盈盘亏 (待 NC 落地)</div></div>
+          <div class="kpi"><div class="label">待确认接口</div><div class="value">2</div><div class="trend">盘盈盘亏 / 外委检修凭证</div></div>
         </div>
 
         <div class="cols-2">
@@ -24,7 +24,7 @@
           <div>
             <div class="card">
               <div class="card-header">
-                <div class="title">接口清单（节选 8 / 共 29 项）</div>
+                <div class="title">接口清单（节选 9 / 共 29+ 项）</div>
                 <div class="actions">
                   <button class="btn">查看 NC 映射告警</button>
                   <button class="btn">接口开关 (F-13)</button>
@@ -110,7 +110,7 @@
                 <div class="mb-8">阶段一：<strong>本地落地，不推送</strong> — 状态 = 已关闭，接口任务不入队</div>
                 <div class="mb-8">阶段二：<strong>本地落地 + 模拟推送</strong> — 状态 = 推送成功（mock），用于联调演练</div>
                 <div>阶段三：<strong>正式推送</strong> — NC 上线后切换为真实推送</div>
-                <div class="mt-12 muted">详见 08 第 7 章 / 14-NC 映射与科目配置模板。</div>
+                <div class="mt-12 muted">外委检修费用凭证、租赁设备一次性收费仍待财务 / NC 厂商确认；详见 08 第 7 章 / 14-NC 映射与科目配置模板。</div>
               </div>
             </div>
           </div>
@@ -127,7 +127,7 @@
       page: 'nc-interface',
       crumbs: ['运维 / 集成', 'NC 接口监控'],
       title: 'NC 接口监控',
-      desc: '对齐《08-财务与NC接口详细设计 V1.0》F-01 ~ F-14',
+      desc: '对齐《08-财务与NC接口详细设计 V1.1》F-01 ~ F-14；外委检修凭证保留待确认占位',
       actions: [{ label: '接口开关 (F-13)' }, { label: '科目规则 (F-12)' }, { label: '触发对账', primary: true }],
     });
 
