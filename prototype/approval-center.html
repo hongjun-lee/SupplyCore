@@ -12,6 +12,38 @@
     <div class="app-main">
       <div id="page-area">
 
+        <div class="card" style="border-left:4px solid var(--brand);background:#f0f7ff;">
+          <div class="card-header">
+            <div class="title">📡 档 A 引擎接入 · E1 审批管理中心（三段视图 + 一键审批跨实体聚合）</div>
+            <div class="actions">
+              <span style="font-size:12px;color:var(--text-2);">当前角色：<strong id="engine-role-banner" class="code"></strong></span>
+              <button class="btn btn-sm" onclick="engineSwitchTab('todo')" id="tab-todo">待办</button>
+              <button class="btn btn-sm" onclick="engineSwitchTab('done')" id="tab-done">已审过</button>
+              <button class="btn btn-sm" onclick="engineSwitchTab('issued')" id="tab-issued">我发起</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>实体</th>
+                  <th>编号</th>
+                  <th>金额 / 描述</th>
+                  <th>状态</th>
+                  <th>提交</th>
+                  <th>可执行 events</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="engine-todo-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+              <span class="badge blue dot">跨实体聚合</span>
+              统一展示 P-01 / P-02 / C-01（会签中）/ S-05（待审）/ T-01 等多类业务单据；一键审批通过 → 触发对应 SC.sm.transition + linkage 级联效果（如 P-02 通过 → 自动生成 P-05）。
+            </div>
+          </div>
+        </div>
+
         <div class="kpi-grid">
           <div class="kpi accent">
             <div class="label">待我处理</div>
@@ -112,7 +144,135 @@
 
   <script src="assets/data.js"></script>
   <script src="assets/chrome.js"></script>
+  <script src="assets/store.js"></script>
+  <script src="assets/statemachine.js"></script>
+  <script src="assets/linkage.js"></script>
+  <script src="assets/seed-data.js"></script>
+  <script src="assets/mock-nc.js"></script>
+  <script src="assets/roles.js"></script>
+  <script src="assets/ui-helper.js"></script>
   <script>
+    /* ---------- 引擎面板 E1 审批中心 ---------- */
+    var currentTab = 'todo';
+
+    /* 跨实体待办聚合规则 */
+    var TODO_RULES = [
+      { entity: 'P-01', stateField: 'state', states: ['待审'],          label: '需求', amountField: 'amount', codeField: 'request_no',     descField: 'purpose' },
+      { entity: 'P-02', stateField: 'state', states: ['待审'],          label: '采购计划', amountField: 'amount', codeField: 'plan_no',    descField: 'period' },
+      { entity: 'C-02', stateField: 'state', states: ['会签中'],        label: '合同',     amountField: 'amount', codeField: 'contract_no', descField: 'state' },
+      { entity: 'T-01', stateField: 'state', states: ['待审'],          label: '招标申请', amountField: 'amount', codeField: 'application_no', descField: 'state' },
+      { entity: 'S-02', stateField: 'order_state', states: ['草稿'],   label: '采购订单', amountField: 'amount', codeField: 'order_no',    descField: 'state' },
+      { entity: 'S-05', stateField: 'state', states: ['待审'],          label: '采购入库', amountField: null,    codeField: 'receipt_no',  descField: 'state' },
+    ];
+
+    function engineGetAllTodos() {
+      var list = [];
+      TODO_RULES.forEach(function (r) {
+        var items = SC.store.list(r.entity);
+        items.forEach(function (it) {
+          if (r.states.indexOf(it[r.stateField]) >= 0) {
+            list.push({
+              entity: r.entity, label: r.label, item: it,
+              code: it[r.codeField] || ('#' + it.id),
+              amount: r.amountField ? it[r.amountField] : 0,
+              desc: it[r.descField] || '',
+              state: it[r.stateField],
+              stateField: r.stateField,
+            });
+          }
+        });
+      });
+      return list;
+    }
+
+    function engineGetAllDone() {
+      var done = [];
+      TODO_RULES.forEach(function (r) {
+        var items = SC.store.list(r.entity);
+        items.forEach(function (it) {
+          var s = it[r.stateField];
+          if (['已审', '已签', '执行中', '已分解', '已结案', '已批准', '已下达'].indexOf(s) >= 0) {
+            done.push({
+              entity: r.entity, label: r.label, item: it,
+              code: it[r.codeField] || ('#' + it.id),
+              amount: r.amountField ? it[r.amountField] : 0,
+              desc: it[r.descField] || '',
+              state: s, stateField: r.stateField,
+            });
+          }
+        });
+      });
+      return done.slice(-15).reverse();
+    }
+
+    function engineRenderApproval() {
+      var role = SC.roles.currentInfo();
+      document.getElementById('engine-role-banner').textContent = role.label + ' (' + role.id + ')';
+      ['todo', 'done', 'issued'].forEach(function (k) {
+        var el = document.getElementById('tab-' + k);
+        if (el) {
+          el.className = 'btn btn-sm' + (currentTab === k ? ' btn-primary' : '');
+        }
+      });
+
+      var rows = currentTab === 'todo' ? engineGetAllTodos()
+              : currentTab === 'done' ? engineGetAllDone()
+              : []; // 'issued' 占位
+
+      var tbody = document.getElementById('engine-todo-tbody');
+      if (rows.length === 0) {
+        var hint = currentTab === 'todo'
+          ? '当前无待办（先到各业务页提交单据 → 这里聚合显示）'
+          : currentTab === 'done'
+          ? '暂无已审过单据'
+          : '我发起视图（占位）— 需要 created_by 字段，下版补'
+        tbody.innerHTML = '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">' + hint + '</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = rows.map(function (r) {
+        var events = SC.sm.has(r.entity) ? SC.sm.getAllowedEvents(r.entity, r.item) : [];
+        var stateColor = r.state === '已审' || r.state === '已签' || r.state === '执行中' ? 'green' : r.state === '待审' || r.state === '会签中' ? 'amber' : 'gray';
+        return '<tr>' +
+          '<td><span class="badge gray">' + r.label + '</span><div class="muted code" style="font-size:11px;margin-top:2px;">' + r.entity + '</div></td>' +
+          '<td class="code">' + r.code + '</td>' +
+          '<td class="muted" style="font-size:11px;">' + (r.amount ? SC.fmtMoney(r.amount) : '—') + ' / ' + r.desc + '</td>' +
+          '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+          '<td class="muted" style="font-size:11px;">' + (r.item.created_at || '').slice(0, 10) + '</td>' +
+          '<td class="muted" style="font-size:11px;">[' + events.join(', ') + ']</td>' +
+          '<td class="actions">' +
+            (currentTab === 'todo'
+              ? events.filter(function (e) { return /通过|审批|批准/.test(e); }).map(function (e) {
+                  return '<a href="javascript:void(0)" onclick="engineApproveTodo(\'' + r.entity + '\', ' + r.item.id + ', \'' + e + '\')" style="color:var(--green);">' + e + '</a>';
+                }).concat(events.filter(function (e) { return /驳回/.test(e); }).map(function (e) {
+                  return '<a href="javascript:void(0)" onclick="engineApproveTodo(\'' + r.entity + '\', ' + r.item.id + ', \'' + e + '\')" style="color:var(--red);">' + e + '</a>';
+                })).join('')
+              : '<span class="muted">—</span>') +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function engineSwitchTab(tab) {
+      currentTab = tab;
+      engineRenderApproval();
+    }
+
+    function engineApproveTodo(entity, id, event) {
+      try {
+        SC.sm.transition(entity, id, event);
+        SC.ui.toast(entity + ' #' + id + ' → ' + event + ' 成功（一键审批）', 'success');
+      } catch (e) {
+        SC.ui.toast('迁移失败：' + e.message, 'error');
+      }
+    }
+
+    /* 订阅所有相关实体 */
+    ['P-01', 'P-02', 'P-05', 'C-01', 'C-02', 'T-01', 'T-03', 'T-05', 'S-02', 'S-05'].forEach(function (e) {
+      SC.store.subscribe(e, engineRenderApproval);
+    });
+    engineRenderApproval();
+
     SC.layout({
       page: 'approval-center',
       crumbs: ['工作', '审批中心'],

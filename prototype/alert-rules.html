@@ -2,6 +2,36 @@
 <html lang="zh-CN">
 <head><meta charset="utf-8"><title>预警规则配置 — 阜矿物资供应管理系统（原型）</title><link rel="stylesheet" href="assets/styles.css"></head>
 <body><div id="header"></div><div class="app-layout"><div id="sidebar"></div><div class="app-main"><div id="page-area">
+  <div class="card" style="border-left:4px solid var(--amber);background:#fffbf3;">
+    <div class="card-header">
+      <div class="title">📡 档 A 引擎接入 · E2 预警通知中心（三段视图 + 4 类自动预警）</div>
+      <div class="actions">
+        <button class="btn btn-sm" onclick="alertSwitchTab('unread')" id="alert-tab-unread">未读 <span id="alert-unread-cnt"></span></button>
+        <button class="btn btn-sm" onclick="alertSwitchTab('confirmed')" id="alert-tab-confirmed">已确认 <span id="alert-confirmed-cnt"></span></button>
+        <button class="btn btn-sm" onclick="alertSwitchTab('handled')" id="alert-tab-handled">已处理 <span id="alert-handled-cnt"></span></button>
+      </div>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <div style="padding:8px 16px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-2);background:#fafbfd;">
+        <strong>4 类自动预警（演示触发）</strong>：
+        <button class="btn btn-sm" onclick="mockTriggerInv()">📦 库存低储 ALR-INV-001</button>
+        <button class="btn btn-sm" onclick="mockTriggerNCFail()">⚠ NC 推送失败 ALR-INT-001</button>
+        <button class="btn btn-sm" onclick="mockTriggerLiubiao()">🏷 招标流标 ALR-PUR-002</button>
+        <button class="btn btn-sm" onclick="mockTriggerWFTimeout()">⏱ 审批超时 ALR-WF-001</button>
+      </div>
+      <table class="data">
+        <thead>
+          <tr><th>预警代码</th><th>级别</th><th>来源</th><th>说明</th><th>触发时间</th><th>状态</th><th>操作</th></tr>
+        </thead>
+        <tbody id="engine-r05-tbody"></tbody>
+      </table>
+      <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);">
+        <span class="badge blue dot">联动说明</span>
+        T-03:流标 / F-01:推送失败 / S-13 异常变化 → linkage 自动 create R-05；可"标记已处理"穿透到来源单据。审批超时（mock 触发）= ALR-WF-001。
+      </div>
+    </div>
+  </div>
+
   <div class="kpi-grid">
     <div class="kpi"><div class="label">启用预警规则</div><div class="value">18</div><div class="trend">库存 7 / 合同 5 / 接口 3 / 供应商 3</div></div>
     <div class="kpi"><div class="label">今日触发</div><div class="value" style="color:var(--amber)">27</div><div class="trend down">其中高风险 5 条</div></div>
@@ -57,5 +87,107 @@
 
   <div class="card"><div class="card-body" style="font-size:12px;color:var(--text-2);"><span class="badge blue dot">AI 边界</span><span style="margin-left:8px;">AI 可以解释预警原因、检索关联单据、生成处理建议；不能自动关闭预警、不能绕过审批重推接口、不能替用户提交业务单据。</span></div></div>
 </div></div></div>
-<script src="assets/data.js"></script><script src="assets/chrome.js"></script><script>SC.layout({page:'alert-rules',crumbs:['报表预警与AI','预警规则配置'],title:'预警规则配置',desc:'对齐详设 09 V1.2：暂估、超储、外委检修、履约保证金和后评价预警',actions:[{label:'预警记录'},{label:'+ 新建规则',primary:true}]});</script>
+<script src="assets/data.js"></script><script src="assets/chrome.js"></script>
+<script src="assets/store.js"></script>
+<script src="assets/statemachine.js"></script>
+<script src="assets/linkage.js"></script>
+<script src="assets/seed-data.js"></script>
+<script src="assets/mock-nc.js"></script>
+<script src="assets/roles.js"></script>
+<script src="assets/ui-helper.js"></script>
+<script>
+SC.layout({page:'alert-rules',crumbs:['报表预警与AI','预警规则配置 / 预警中心'],title:'预警规则配置 + 预警通知中心',desc:'对齐详设 09 V1.2 + 02 V0.4 E2 — 静态规则配置 + 引擎自动预警三段视图',actions:[{label:'预警记录'},{label:'+ 新建规则',primary:true}]});
+
+/* ---------- E2 预警中心 ---------- */
+var alertTab = 'unread';
+var TAB_TO_STATE = { unread: '未读', confirmed: '已确认', handled: '已处理' };
+
+function alertRender() {
+  var all = SC.store.list('R-05');
+  var counts = { unread: 0, confirmed: 0, handled: 0 };
+  all.forEach(function (a) {
+    if (a.read_state === '未读') counts.unread++;
+    else if (a.read_state === '已确认') counts.confirmed++;
+    else if (a.read_state === '已处理') counts.handled++;
+  });
+  document.getElementById('alert-unread-cnt').textContent = counts.unread > 0 ? '(' + counts.unread + ')' : '';
+  document.getElementById('alert-confirmed-cnt').textContent = counts.confirmed > 0 ? '(' + counts.confirmed + ')' : '';
+  document.getElementById('alert-handled-cnt').textContent = counts.handled > 0 ? '(' + counts.handled + ')' : '';
+
+  ['unread', 'confirmed', 'handled'].forEach(function (k) {
+    var el = document.getElementById('alert-tab-' + k);
+    el.className = 'btn btn-sm' + (alertTab === k ? ' btn-primary' : '');
+  });
+
+  var rows = all.filter(function (a) { return a.read_state === TAB_TO_STATE[alertTab]; }).reverse();
+  var tbody = document.getElementById('engine-r05-tbody');
+  if (rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="muted" style="text-align:center;padding:18px;">无' + TAB_TO_STATE[alertTab] + '预警 · 点上方按钮触发 mock 预警，或去业务页（流标 / NC 推送失败 / S-05 入库）触发自动预警</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(function (a) {
+    var levelColor = a.level === '紧急' ? 'red' : a.level === '重要' ? 'amber' : 'gray';
+    var stateColor = a.read_state === '未读' ? 'red' : a.read_state === '已确认' ? 'amber' : 'green';
+    return '<tr>' +
+      '<td class="code">' + a.alert_code + '</td>' +
+      '<td>' + SC.badge(a.level, levelColor, true) + '</td>' +
+      '<td class="muted code" style="font-size:11px;">' + (a.source_entity || '—') + ' #' + (a.source_id || '—') + '</td>' +
+      '<td><strong>' + (a.title || '') + '</strong><div class="muted" style="font-size:11px;">' + (a.message || '') + '</div></td>' +
+      '<td class="muted" style="font-size:11px;">' + (a.occur_time || '').slice(11, 19) + '</td>' +
+      '<td>' + SC.badge(a.read_state, stateColor, true) + '</td>' +
+      '<td class="actions">' +
+        (a.read_state === '未读' ? '<a href="javascript:void(0)" onclick="alertConfirm(' + a.id + ')">标记已确认</a>' : '') +
+        (a.read_state === '已确认' ? '<a href="javascript:void(0)" onclick="alertHandle(' + a.id + ')">标记已处理</a>' : '') +
+        (a.read_state === '未读' ? '<a href="javascript:void(0)" onclick="alertHandle(' + a.id + ')">直接处理</a>' : '') +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function alertSwitchTab(tab) { alertTab = tab; alertRender(); }
+function alertConfirm(id) { SC.store.update('R-05', id, { read_state: '已确认', confirm_time: new Date().toISOString() }); SC.ui.toast('已确认', 'info'); }
+function alertHandle(id) { SC.store.update('R-05', id, { read_state: '已处理', handle_time: new Date().toISOString() }); SC.ui.toast('已处理', 'success'); }
+
+/* mock 触发 */
+function mockTriggerInv() {
+  // 创建一个低数量的 S-13 触发 ALR-INV-001
+  var existing = SC.store.list('S-13', { material_id: 5, warehouse_id: 6 })[0];
+  if (existing) SC.store.update('S-13', existing.id, { quantity: 30, total_amount: 960 });
+  else SC.store.create('S-13', { material_id: 5, warehouse_id: 6, org_id: 5, quantity: 30, total_amount: 960, unit_cost: 32 });
+  SC.ui.toast('已触发库存低储（数量 30 < 50）', 'info');
+}
+function mockTriggerNCFail() {
+  // 创建一个 F-01 失败任务
+  var task = SC.store.create('F-01', {
+    task_no: SC.store.nextNo('FT'),
+    interface_id: 'BIZ-001',
+    source_bill_no: 'MOCK-' + Date.now(),
+    source_bill_type: 'S-05',
+    task_state: '推送失败',
+    push_error_code: 'NC-MOCK-001',
+    push_error_message: '模拟接口超时（mock 触发）',
+    retry_count: 0,
+  });
+  SC.linkage.emit('F-01:推送失败', task);
+  SC.ui.toast('已触发 NC 推送失败预警', 'warning');
+}
+function mockTriggerLiubiao() {
+  // 创建一个 T-03 流标
+  var pkg = SC.store.create('T-03', {
+    package_no: SC.store.nextNo('TB'),
+    state: '流标',
+    amount: 500000,
+  });
+  SC.linkage.emit('T-03:流标', pkg);
+  SC.ui.toast('已触发招标流标预警', 'warning');
+}
+function mockTriggerWFTimeout() {
+  var n = SC.linkage.mockTriggerWFTimeout();
+  if (n === 0) SC.ui.toast('当前无待审单据 → 先去 P-01/P-02 提交后再试', 'warning');
+  else SC.ui.toast('已为 ' + n + ' 个待审单据触发审批超时预警', 'warning');
+}
+
+SC.store.subscribe('R-05', alertRender);
+alertRender();
+</script>
 </body></html>

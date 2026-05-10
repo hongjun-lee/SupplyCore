@@ -226,5 +226,88 @@
     console.log('[linkage] F-01:' + task.id + ' 推送失败 → 30 秒后自动重推（第 ' + ((task.retry_count || 0) + 1) + ' 次）');
   });
 
-  console.log('[linkage] ready · ' + Object.keys(listeners).length + ' event(s) wired');
+  /* ====================================================
+   * E2 自动预警（v0.14 加：流标 / NC 失败 / 库存异常）
+   * 写入 R-05 alert_record，alert-rules 页 alert-center 三段视图聚合
+   * ==================================================== */
+
+  function emitAlert(payload) {
+    SC.store.create('R-05', Object.assign({
+      read_state: '未读',
+      occur_time: new Date().toISOString(),
+    }, payload));
+  }
+
+  /* T-03:流标 → ALR-PUR-002 */
+  SC.linkage.on('T-03:流标', function (pkg) {
+    emitAlert({
+      alert_code: 'ALR-PUR-002',
+      level: '重要',
+      source_entity: 'T-03',
+      source_id: pkg.id,
+      title: '招标流标',
+      message: 'T-03 #' + pkg.id + (pkg.package_no ? ' (' + pkg.package_no + ')' : '') + ' 流标，重新发标须重走集体决策（详设 04 §4.10.5）',
+    });
+    console.log('[linkage] auto-alert ALR-PUR-002 created for T-03:' + pkg.id);
+  });
+
+  /* F-01:推送失败 → ALR-INT-001（独立于已有的重推处理）*/
+  SC.linkage.on('F-01:推送失败', function (task) {
+    emitAlert({
+      alert_code: 'ALR-INT-001',
+      level: (task.retry_count || 0) >= 2 ? '紧急' : '一般',
+      source_entity: 'F-01',
+      source_id: task.id,
+      title: 'NC 接口推送失败',
+      message: 'F-01 #' + task.id + ' (' + (task.task_no || '') + ') 推送失败：' + (task.push_error_message || '') + '，retry=' + (task.retry_count || 0),
+    });
+  });
+
+  /* S-13 update → 库存低储 / 超储 检查 ALR-INV-001
+   * 简单 mock：quantity < 50 视为低储；> 1500 视为超储
+   */
+  SC.store.subscribe('S-13', function (msg) {
+    if (msg.event !== 'update' && msg.event !== 'create') return;
+    var i = msg.item;
+    if (!i || !i.quantity) return;
+    if (i.quantity < 50) {
+      emitAlert({
+        alert_code: 'ALR-INV-001',
+        level: '一般',
+        source_entity: 'S-13',
+        source_id: i.id,
+        title: '库存低储',
+        message: '物料 #' + i.material_id + ' 仓库 #' + i.warehouse_id + ' 数量 ' + i.quantity + ' < 50（mock 阈值）',
+      });
+    } else if (i.quantity > 1500) {
+      emitAlert({
+        alert_code: 'ALR-INV-002',
+        level: '一般',
+        source_entity: 'S-13',
+        source_id: i.id,
+        title: '库存超储',
+        message: '物料 #' + i.material_id + ' 仓库 #' + i.warehouse_id + ' 数量 ' + i.quantity + ' > 1500（mock 阈值）',
+      });
+    }
+  });
+
+  /* 暴露给页面调用：mock 触发审批超时（无时间穿越的替代）*/
+  SC.linkage.mockTriggerWFTimeout = function () {
+    var pending = []
+      .concat(SC.store.list('P-01', { state: '待审' }))
+      .concat(SC.store.list('P-02', { state: '待审' }));
+    pending.slice(0, 3).forEach(function (p) {
+      emitAlert({
+        alert_code: 'ALR-WF-001',
+        level: '一般',
+        source_entity: p.request_no ? 'P-01' : 'P-02',
+        source_id: p.id,
+        title: '审批超时',
+        message: (p.request_no || p.plan_no || '#' + p.id) + ' 提交超过 4h 未处理（mock 触发）',
+      });
+    });
+    return pending.slice(0, 3).length;
+  };
+
+  console.log('[linkage] ready · ' + Object.keys(listeners).length + ' event(s) wired + 3 auto-alert handlers');
 })();

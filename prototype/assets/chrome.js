@@ -93,7 +93,7 @@ SC.renderHeader = function () {
     <button class="menu-toggle" id="menu-toggle" aria-label="菜单">☰</button>
     <div class="logo">
       <div class="mark">辽</div>
-      <div>辽宁能源 · 阜矿物资供应管理系统 <span class="sub">原型 v0.13</span></div>
+      <div>辽宁能源 · 阜矿物资供应管理系统 <span class="sub">原型 v0.14</span></div>
     </div>
     <span class="spacer"></span>
     <div class="h-item">二级集团：<strong style="color:var(--text);font-weight:500;margin-left:4px;">${sg.name}</strong></div>
@@ -150,7 +150,7 @@ SC.renderFooter = function () {
   if (document.querySelector('.app-footer')) return;
   const f = document.createElement('div');
   f.className = 'app-footer';
-  f.innerHTML = `SupplyCore 原型 v0.13 · 演示数据，不作为开发或验收依据 · ${SC.docVer}`;
+  f.innerHTML = `SupplyCore 原型 v0.14 · 演示数据，不作为开发或验收依据 · ${SC.docVer}`;
   document.body.appendChild(f);
 };
 
@@ -166,6 +166,8 @@ SC.bindRoleSwitch = function () {
       location.reload();
     });
   }
+  // 引擎层若已加载 → 用 SC.roles.badgeCounts 动态更新 sidebar 徽标（v0.14）
+  setTimeout(SC.updateBadges, 200);
   const tgl = document.getElementById('menu-toggle');
   if (tgl) {
     tgl.addEventListener('click', () => {
@@ -179,6 +181,45 @@ SC.bindRoleSwitch = function () {
       }
     });
   }
+};
+
+/* ─── 动态徽标更新（v0.14：引擎层加载后调用） ─── */
+SC.updateBadges = function () {
+  if (!window.SC || !SC.roles || !SC.store) return; // 引擎未加载，保持静态
+  try {
+    const counts = SC.roles.badgeCounts();
+    // 审批中心徽标 → counts.todo
+    const approvalLink = document.querySelector('.nav-item[href="approval-center.html"]');
+    if (approvalLink) {
+      let badge = approvalLink.querySelector('.badge');
+      if (counts.todo > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'badge';
+          approvalLink.appendChild(badge);
+        }
+        badge.textContent = counts.todo;
+      } else if (badge) {
+        badge.remove();
+      }
+    }
+    // 预警规则徽标 → counts.alert
+    const alertLink = document.querySelector('.nav-item[href="alert-rules.html"]');
+    if (alertLink) {
+      let badge = alertLink.querySelector('.badge');
+      if (counts.alert > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'badge';
+          badge.style.background = 'var(--red)';
+          alertLink.appendChild(badge);
+        }
+        badge.textContent = counts.alert;
+      } else if (badge) {
+        badge.remove();
+      }
+    }
+  } catch (e) { console.warn('[chrome] updateBadges error', e); }
 };
 
 /* ─── 工具：渲染状态徽章 ─── */
