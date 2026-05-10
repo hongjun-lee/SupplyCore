@@ -268,7 +268,7 @@
       approval_id: approval.id,
       supplier_id: approval.supplier_id,
       amount: approval.contract_amount,
-      payment_terms: '30% 预付 + 60% 验收 + 10% 质保（一期 payment_terms 文本，二期 A4 落 C-04 实体）',
+      payment_terms: '30% 预付 + 60% 验收 + 10% 质保（payment_terms 文本字段；linkage 同步建 C-04 节点 + C-07 计划）',
       state: '已签',
     });
     SC.linkage.emit('C-02:已签', contract);

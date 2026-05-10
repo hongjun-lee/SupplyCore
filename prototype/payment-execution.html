@@ -183,7 +183,7 @@
         <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
           <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
           <div class="card-body" style="font-size:13px;line-height:1.7;">
-            <strong>📋 业务依据：</strong>详设 05 §8.2 四层付款控制链路（C-04 → C-07 → C-08 → C-10，一期 C-10 即可演示）+ 详设 08 BIZ-013 付款执行 NC 实付回写。<br>
+            <strong>📋 业务依据：</strong>详设 05 §8.2 四层付款控制链路（C-04 节点 → C-07 计划 → C-08 申请 → C-10 执行，全部已引擎接入）+ 详设 08 BIZ-013 / BIZ-014 / BIZ-015 / BIZ-020 凭证类型。<br>
             <strong>🛤 链路：</strong>C-08 付款申请已审 → linkage 自动 create C-10 待执行 → 出纳触发"执行" → mock-nc 推送 BIZ-013 → NC 实付回写 → C-10 已记账 → 应付消减（C-02 paid_amount 累加）。
           </div>
         </div>

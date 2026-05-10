@@ -313,7 +313,7 @@ SC.data = {
     paymentMode: 'MONTHLY',
     paymentModeText: '月度结算（默认 SY-02 RENTAL_PAYMENT_MODE_DEFAULT=MONTHLY）',
     billingCycle: '月',
-    feeRule: '月租金 × 计费天数 / 当月自然天数 + 调整金额（一期基础口径，复杂阶梯计价 / 台班计价 二期）',
+    feeRule: '月租金 × 计费天数 / 当月自然天数 + 调整金额（基础口径；阶梯计价 / 台班计价等高级模式后续扩展）',
     initialReading: '运行 0 小时',
     currentReading: '运行 920 小时',
     /* 押金（一般预收，租期结束退还） */
@@ -522,7 +522,7 @@ SC.data = {
       { state: 'done', title: '主管副总审批', who: '张国强', time: '2026-03-11 17:40', comment: '同意。' },
       { state: 'done', title: '签订入库', who: '李宁', time: '2026-03-12 14:20', comment: '电子签章已完成。' },
     ],
-    /* 履约节点（一期 A 静态履约视角；按计划 vs 实际履约对比，不建 C-04 实体） */
+    /* 履约节点（实物交付维度静态展示：到货 / 验收 / 质保；与 C-04 付款节点资金维度不同，本数据仅 mock 展示不建独立实体） */
     milestones: [
       { no: 1, name: '合同生效 + 预付款 30%', planDate: '2026-03-12', actDate: '2026-03-12', state: '已完成', color: 'green', compliance: '准时', detail: '已签订并完成预付 ¥1,284,000' },
       { no: 2, name: '首批到货 50%（30 日账期）', planDate: '2026-05-10', actDate: '2026-05-08', state: '到货 → 验收中', color: 'amber', compliance: '提前 2 日', detail: '到货 DH-2026-0508 部分到货 412,800；待质检入库' },
