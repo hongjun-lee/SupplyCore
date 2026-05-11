@@ -82,6 +82,72 @@
           </div>
         </div>
 
+        <!-- 业务工作台 -->
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">📒 投料台账（OP-01 → 受托虚拟仓）</div>
+                <div class="actions">
+                  <span class="muted" style="font-size:11px;">实时聚合：S-21 流水 + OP-01 状态</span>
+                </div>
+              </div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>加工号</th><th>受托方</th><th>原料</th><th class="num">投料数量</th><th class="num">投料金额</th><th>时间</th><th>状态</th></tr></thead>
+                <tbody id="op-feed-tbody"></tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+                投料后原料挂在受托方虚拟仓（不在物资公司主库）；S-21 流水可穿透看每笔原料出库来源。
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">🔬 产成品质检报告（受托方提交）</div>
+                <div class="actions">
+                  <button class="btn btn-sm">+ 录入质检报告</button>
+                </div>
+              </div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>加工号</th><th>批次号</th><th class="num">产成品</th><th>合格率</th><th>检验项</th><th>结论</th></tr></thead>
+                <tbody id="op-qc-tbody"></tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+                金属类：硬度 / 尺寸 / 表面探伤；化工类：纯度 / 含水率 / 杂质；不合格批次禁止入库 → 受托方返工或核减加工费。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="title">⚠ 损耗率超阈值审批工作台（受托方书面说明 + 物资公司核定）</div>
+            <div class="actions">
+              <span id="op-overlimit-count" class="badge amber">—</span>
+            </div>
+          </div>
+          <table class="data" style="font-size:12px;">
+            <thead>
+              <tr>
+                <th>加工号</th>
+                <th>受托方</th>
+                <th>物料类别</th>
+                <th class="num">实际损耗率</th>
+                <th class="num">报警阈值</th>
+                <th>受托方说明</th>
+                <th>处置建议</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="op-overlimit-tbody"></tbody>
+          </table>
+          <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+            超阈值审批：受托方上传书面说明（含原料质量 / 设备工况 / 操作工艺等原因）→ 物资公司组织技术评审 → 决议补缺料（核减加工费）/ 全额接受 / 索赔；评审结果留痕进 R-10 审计表。
+          </div>
+        </div>
+
         <div class="card" style="border-left:4px solid var(--blue);background:#eff6ff;">
           <div class="card-header"><div class="title">📋 页面说明 · 业务依据 + 实现要点</div></div>
           <div class="card-body" style="font-size:13px;line-height:1.7;">
@@ -194,7 +260,87 @@
       } catch (e) { SC.ui.toast('失败：' + e.message, 'error'); }
     }
 
-    function refresh() { renderKpis(); renderOP(); }
+    /* 投料台账 — 从 OP-01 + S-21 实时聚合 */
+    function renderFeed() {
+      var rows = SC.store.list('OP-01').filter(function (r) {
+        return r.state === '已投料' || r.state === '已产出' || r.state === '已入库';
+      });
+      document.getElementById('op-feed-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="7" class="muted" style="text-align:center;padding:14px;">暂无投料 — 在上方引擎接入卡 → 创建 OP-01 → 原料投料</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var stateColor = r.state === '已入库' ? 'green' : r.state === '已产出' ? 'blue' : 'amber';
+            return '<tr>' +
+              '<td class="code">' + r.op_no + '</td>' +
+              '<td>' + (supMap[r.supplier_id] || '—') + '</td>' +
+              '<td class="muted">' + ((matMap[r.raw_material_id] || {}).name || '—') + '</td>' +
+              '<td class="num">' + (r.raw_quantity || 0) + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.raw_amount || 0) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (r.updated_at || r.created_at || '').slice(5, 16).replace('T', ' ') + '</td>' +
+              '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    /* 产成品质检报告 — 按 OP-01 已产出/已入库批次 mock */
+    function renderQC() {
+      var rows = SC.store.list('OP-01').filter(function (r) {
+        return r.state === '已产出' || r.state === '已入库';
+      });
+      document.getElementById('op-qc-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="6" class="muted" style="text-align:center;padding:14px;">暂无产成品 — 待 OP-01 状态进入"已产出"</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var lossPct = r.product_quantity && r.raw_quantity ? (1 - r.product_quantity / r.raw_quantity) : 0;
+            var passRate = lossPct > 0.07 ? '92.5%' : lossPct > 0.05 ? '96.8%' : '99.2%';
+            var passColor = lossPct > 0.07 ? 'amber' : 'green';
+            var conclusion = lossPct > 0.07 ? '部分批次返工' : '合格';
+            var prodName = (matMap[r.product_material_id] || {}).name || '产成品';
+            return '<tr>' +
+              '<td class="code">' + r.op_no + '</td>' +
+              '<td class="code muted" style="font-size:11px;">B' + r.id.toString().padStart(6, '0') + '</td>' +
+              '<td class="num">' + (r.product_quantity || 0) + '</td>' +
+              '<td><span class="badge ' + passColor + ' dot">' + passRate + '</span></td>' +
+              '<td class="muted" style="font-size:11px;">硬度 / 尺寸 / 表面探伤</td>' +
+              '<td>' + (conclusion === '合格' ? '<span class="badge green dot">合格</span>' : '<span class="badge amber dot">' + conclusion + '</span>') + '</td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    /* 损耗率超阈值审批 — 算实际损耗率，超 5% 列出 */
+    function renderOverlimit() {
+      var STD_LOSS = 0.05;  // 默认标准损耗率（金属切削）
+      var ALARM_LOSS = 0.07; // 报警阈值
+      var rows = SC.store.list('OP-01').filter(function (r) {
+        if (!r.product_quantity || !r.raw_quantity) return false;
+        return (1 - r.product_quantity / r.raw_quantity) > STD_LOSS;
+      });
+      document.getElementById('op-overlimit-count').textContent = rows.length === 0 ? '✓ 全部在阈值内' : rows.length + ' 单待复核';
+      document.getElementById('op-overlimit-count').className = rows.length === 0 ? 'badge green dot' : 'badge amber dot';
+      document.getElementById('op-overlimit-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:14px;">✓ 当前无超阈值加工单</td></tr>'
+        : rows.slice().reverse().map(function (r) {
+            var actualLoss = (1 - r.product_quantity / r.raw_quantity);
+            var actualPct = (actualLoss * 100).toFixed(1) + '%';
+            var alarmTriggered = actualLoss > ALARM_LOSS;
+            var note = alarmTriggered
+              ? '原料含杂质过高（化验报告 #' + r.id + '-Q）'
+              : '设备工况波动 + 工艺调整';
+            var advice = alarmTriggered
+              ? '<span style="color:var(--red);">补缺料 + 索赔受托方</span>'
+              : '<span style="color:var(--text-2);">核减加工费</span>';
+            return '<tr>' +
+              '<td class="code">' + r.op_no + '</td>' +
+              '<td>' + (supMap[r.supplier_id] || '—') + '</td>' +
+              '<td class="muted">金属切削</td>' +
+              '<td class="num"><span class="badge ' + (alarmTriggered ? 'red' : 'amber') + ' dot">' + actualPct + '</span></td>' +
+              '<td class="num muted">' + (STD_LOSS * 100) + '% / ' + (ALARM_LOSS * 100) + '%</td>' +
+              '<td class="muted" style="font-size:11px;">' + note + '</td>' +
+              '<td style="font-size:11px;">' + advice + '</td>' +
+              '<td class="actions"><a href="javascript:void(0)">复核</a><a href="javascript:void(0)">技术评审</a></td>' +
+            '</tr>';
+          }).join('');
+    }
+
+    function refresh() { renderKpis(); renderOP(); renderFeed(); renderQC(); renderOverlimit(); }
     ['OP-01', 'S-13', 'S-21', 'F-01'].forEach(function (e) { SC.store.subscribe(e, refresh); });
     refresh();
   </script>

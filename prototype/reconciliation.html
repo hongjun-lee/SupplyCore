@@ -76,6 +76,86 @@
           </div>
         </div>
 
+        <!-- 业务工作台 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="title">📊 三方对账数据来源（点 tab 切换查看）</div>
+            <div class="actions" id="rec-source-tabs">
+              <button class="btn btn-sm btn-primary" data-src="finance">NC 财务账</button>
+              <button class="btn btn-sm" data-src="system">系统 S-13 账</button>
+              <button class="btn btn-sm" data-src="keeper">保管卡片账</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="data" style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>来源</th>
+                  <th>物料</th>
+                  <th>仓库</th>
+                  <th class="num">数量</th>
+                  <th class="num">金额</th>
+                  <th>更新时间</th>
+                </tr>
+              </thead>
+              <tbody id="rec-source-tbody"></tbody>
+            </table>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--text-2);" id="rec-source-hint"></div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">🔍 差异复核工作台</div>
+                <div class="actions">
+                  <span id="rec-review-count" class="badge gray">尚未对账</span>
+                </div>
+              </div>
+              <table class="data" style="font-size:12px;">
+                <thead>
+                  <tr>
+                    <th>物料</th>
+                    <th>仓库</th>
+                    <th class="num">差异</th>
+                    <th>建议来源</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="rec-review-tbody"></tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+                差异分级：≤ 千分之 5 自动忽略；千分之 5-1% 物资管理员复核；&gt; 1% 升级集团审计 + 月度报表标红。
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">📞 督办任务分派</div>
+                <div class="actions">
+                  <span class="muted" style="font-size:11px;">差异 → 责任人 → SLA</span>
+                </div>
+              </div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>任务号</th><th>对账周期</th><th>责任人</th><th>SLA</th><th>状态</th></tr></thead>
+                <tbody>
+                  <tr><td class="code">REC-D-2026-0507</td><td>2026-04 月对账</td><td>陈雪（物资）+ 张伟（财务）</td><td><span class="badge green">已完成</span></td><td><span class="badge green dot">已对齐 2 行</span></td></tr>
+                  <tr><td class="code">REC-D-2026-0411</td><td>2026-03 月对账</td><td>—</td><td><span class="badge gray">无差异</span></td><td><span class="badge green dot">完全一致</span></td></tr>
+                  <tr><td class="code">REC-D-2026-0312</td><td>2026-02 月对账</td><td>李宁（物资）</td><td><span class="badge amber">2 日</span></td><td><span class="badge green dot">已对齐 1 行</span></td></tr>
+                  <tr><td class="code muted" id="rec-current-task">—</td><td>本次手工对账（演示）</td><td id="rec-current-owner">—</td><td><span class="badge gray">演示</span></td><td id="rec-current-state"><span class="badge gray">未触发</span></td></tr>
+                </tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+                督办分派：物资管理员（差异定位）+ 财务接口管理员（NC 数据复核）+ 仓管员（保管卡片核对）；SLA 默认 5 工作日。
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-header"><div class="title">⚖ 三对一致对账规则（详设 11 §11.1）</div></div>
           <div class="card-body" style="font-size:12px;line-height:1.7;">
@@ -169,7 +249,121 @@
       renderResults();
     }
 
-    function refresh() { renderKpis(); renderResults(); }
+    /* 三方对账数据来源 — tab 切换 */
+    var currentSource = 'finance';
+    function renderSource() {
+      var rows = [];
+      var hint = '';
+      if (currentSource === 'system') {
+        var s13 = SC.store.list('S-13').filter(function (r) { return r.qty_onhand > 0; });
+        rows = s13.slice(0, 8).map(function (r) {
+          return {
+            source: '系统 S-13',
+            material: matMap[r.material_id] || '#' + r.material_id,
+            warehouse: whMap[r.warehouse_id] || '#' + r.warehouse_id,
+            qty: r.qty_onhand,
+            amount: (r.qty_onhand || 0) * (r.unit_cost || 0),
+            time: (r.updated_at || '').slice(5, 16).replace('T', ' ') || '实时聚合',
+          };
+        });
+        hint = '<span class="badge blue dot">实时</span> 来自 SC.store S-13；金额 = 数量 × unit_cost（移动平均）；任何出入库 / 调拨 / 盘点都会同步更新。';
+      } else if (currentSource === 'keeper') {
+        // mock 保管卡片（基于 S-13 + 小幅扰动）
+        var s13k = SC.store.list('S-13').filter(function (r) { return r.qty_onhand > 0; }).slice(0, 8);
+        rows = s13k.map(function (r, i) {
+          var drift = i % 5 === 0 ? -2 : 0;  // 第 5 个 mock 实物少 2
+          return {
+            source: '保管卡片',
+            material: matMap[r.material_id] || '#' + r.material_id,
+            warehouse: whMap[r.warehouse_id] || '#' + r.warehouse_id,
+            qty: r.qty_onhand + drift,
+            amount: (r.qty_onhand + drift) * (r.unit_cost || 0),
+            time: '2026-04-30 月度盘点（S-15）',
+          };
+        });
+        hint = '<span class="badge amber dot">月度</span> 来自仓库实物盘点（S-15 月度盘点导入 → 保管员手工核对）；与 S-13 偏差由月度对账任务比对。';
+      } else {
+        // mock 财务账（基于 S-13 + 月初快照偏差）
+        var s13f = SC.store.list('S-13').filter(function (r) { return r.qty_onhand > 0; }).slice(0, 8);
+        rows = s13f.map(function (r, i) {
+          return {
+            source: 'NC 财务账',
+            material: matMap[r.material_id] || '#' + r.material_id,
+            warehouse: whMap[r.warehouse_id] || '#' + r.warehouse_id,
+            qty: '—',
+            amount: (r.qty_onhand || 0) * (r.unit_cost || 0) * (1 + (i % 7 === 0 ? 0.012 : 0)),  // 第 7 个 +1.2% 偏差
+            time: '2026-04-30 月末快照',
+          };
+        });
+        hint = '<span class="badge green dot">月度</span> 来自 NC 财务账（NC-MD-008 月末科目余额，1403 原材料按月汇总，仅金额维度）；月末 22:00 调度任务自动比对。';
+      }
+      document.getElementById('rec-source-tbody').innerHTML = rows.length === 0
+        ? '<tr><td colspan="6" class="muted" style="text-align:center;padding:14px;">无数据</td></tr>'
+        : rows.map(function (r) {
+            return '<tr>' +
+              '<td><span class="badge gray">' + r.source + '</span></td>' +
+              '<td>' + r.material + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + r.warehouse + '</td>' +
+              '<td class="num">' + r.qty + '</td>' +
+              '<td class="num">' + SC.fmtMoney(r.amount) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + r.time + '</td>' +
+            '</tr>';
+          }).join('');
+      document.getElementById('rec-source-hint').innerHTML = hint;
+    }
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('#rec-source-tabs button');
+      if (!btn) return;
+      currentSource = btn.dataset.src;
+      Array.prototype.forEach.call(document.querySelectorAll('#rec-source-tabs button'), function (b) {
+        b.className = 'btn btn-sm' + (b.dataset.src === currentSource ? ' btn-primary' : '');
+      });
+      renderSource();
+    });
+
+    /* 差异复核工作台 — 接 lastResults 不一致行 */
+    function renderReview() {
+      var inconsistent = lastResults.filter(function (r) { return !r.consistent; });
+      var badge = document.getElementById('rec-review-count');
+      if (lastResults.length === 0) {
+        badge.textContent = '尚未对账';
+        badge.className = 'badge gray';
+      } else if (inconsistent.length === 0) {
+        badge.textContent = '✓ 全部一致';
+        badge.className = 'badge green dot';
+      } else {
+        badge.textContent = inconsistent.length + ' 行待复核';
+        badge.className = 'badge amber dot';
+      }
+      document.getElementById('rec-review-tbody').innerHTML = lastResults.length === 0
+        ? '<tr><td colspan="6" class="muted" style="text-align:center;padding:14px;">点上方"▶ 立即执行对账"产生差异行</td></tr>'
+        : inconsistent.length === 0
+        ? '<tr><td colspan="6" class="muted" style="text-align:center;padding:14px;">✓ 本次扫描全部一致，无需复核</td></tr>'
+        : inconsistent.map(function (r) {
+            var pct = Math.abs(r.diff) / Math.max(r.s13_qty, 1);
+            var level = pct > 0.01 ? '升集团审计' : pct > 0.005 ? '物资复核' : '自动忽略';
+            var levelColor = pct > 0.01 ? 'red' : pct > 0.005 ? 'amber' : 'gray';
+            return '<tr>' +
+              '<td>' + (matMap[r.material_id] || '#' + r.material_id) + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (whMap[r.warehouse_id] || '#' + r.warehouse_id) + '</td>' +
+              '<td class="num" style="color:var(--red);font-weight:600;">' + (r.diff > 0 ? '+' : '') + r.diff + '</td>' +
+              '<td><span class="badge ' + levelColor + ' dot">' + level + '</span></td>' +
+              '<td><span class="badge amber">待复核</span></td>' +
+              '<td class="actions"><a href="javascript:void(0)">分派</a><a href="javascript:void(0)">穿透 S-21</a><a href="javascript:void(0)" style="color:var(--green);">已对齐</a></td>' +
+            '</tr>';
+          }).join('');
+
+      // 同步更新底部督办任务 - 当前手工对账行
+      if (lastResults.length > 0) {
+        document.getElementById('rec-current-task').textContent = 'REC-D-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-LIVE';
+        document.getElementById('rec-current-owner').textContent = inconsistent.length > 0 ? '陈雪（物资）+ 张伟（财务）' : '—';
+        document.getElementById('rec-current-state').innerHTML = inconsistent.length === 0
+          ? '<span class="badge green dot">完全一致</span>'
+          : '<span class="badge amber dot">' + inconsistent.length + ' 行待复核</span>';
+      }
+    }
+
+    function refresh() { renderKpis(); renderResults(); renderSource(); renderReview(); }
     ['S-13', 'S-21', 'R-05'].forEach(function (e) { SC.store.subscribe(e, refresh); });
     refresh();
   </script>

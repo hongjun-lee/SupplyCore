@@ -89,6 +89,75 @@
           </div>
         </div>
 
+        <!-- 业务工作台 -->
+        <div class="cols-2">
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">📤 NC-MD 主数据下推队列</div>
+                <div class="actions">
+                  <button class="btn btn-sm" onclick="engineSimulateNCMD()">▶ 模拟一次下推</button>
+                </div>
+              </div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>接口</th><th>实体</th><th>来源</th><th>状态</th><th>NC 凭证 / 时间</th></tr></thead>
+                <tbody id="md-nc-tbody"></tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+                NC-MD-001 物料 / NC-MD-002 供应商 / NC-MD-003 组织+仓库；新增/变更触发；推送失败 ≥ 3 次升 F-08 异常台账（同 BIZ 接口）。
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="title">✅ 主数据变更审批流</div>
+                <div class="actions">
+                  <span class="muted" style="font-size:11px;">A-20 approval_instance</span>
+                </div>
+              </div>
+              <table class="data" style="font-size:12px;">
+                <thead><tr><th>申请号</th><th>类型</th><th>变更摘要</th><th>提交人</th><th>状态</th></tr></thead>
+                <tbody id="md-approval-tbody">
+                  <tr><td class="code">MD-A-2026-0521</td><td>供应商新增</td><td class="muted" style="font-size:11px;">新供应商"沈阳辉煌"准入申请</td><td>李宁（采购科）</td><td><span class="badge amber dot">财务复核中</span></td></tr>
+                  <tr><td class="code">MD-A-2026-0518</td><td>物料变更</td><td class="muted" style="font-size:11px;">MAT-DL-0220 规格修订（电压等级）</td><td>陈雪（物资管理）</td><td><span class="badge green dot">已批准</span></td></tr>
+                  <tr><td class="code">MD-A-2026-0515</td><td>仓库新增</td><td class="muted" style="font-size:11px;">艾友矿新增二号备件库</td><td>王志国（物资）</td><td><span class="badge green dot">已批准</span></td></tr>
+                  <tr><td class="code">MD-A-2026-0510</td><td>供应商暂停</td><td class="muted" style="font-size:11px;">SUP-003 因连续差评暂停（WF-SUP-REASSESS-001）</td><td>系统自动</td><td><span class="badge gray dot">已生效</span></td></tr>
+                </tbody>
+              </table>
+              <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+                供应商准入 / 仓库新增 / 物料分类变更须走 A-20 审批；技术参数修订（如规格 / 单位）二级审批；停用 / 黑名单走高敏感双签。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="title">📜 变更审计历史（详设 11 §13 操作日志，5 年留存）</div>
+            <div class="actions">
+              <button class="btn btn-sm">导出 R-10 审计</button>
+              <span class="muted" style="font-size:11px;margin-left:6px;">本表 mock 演示，实际由 SC.store update hook 自动写入</span>
+            </div>
+          </div>
+          <table class="data" style="font-size:12px;">
+            <thead>
+              <tr><th>时间</th><th>操作人</th><th>实体</th><th>动作</th><th>变更内容（before → after）</th><th>关联审批</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="muted" style="font-size:11px;">2026-05-11 09:23</td><td>陈雪（物资）</td><td class="code">M-05 #3</td><td>update</td><td class="muted" style="font-size:11px;">spec: "MYJV22 6/10kV" → "MYJV22 8.7/15kV"</td><td><a href="javascript:void(0)">MD-A-2026-0518</a></td></tr>
+              <tr><td class="muted" style="font-size:11px;">2026-05-10 18:42</td><td>系统</td><td class="code">M-09 #3</td><td>state</td><td class="muted" style="font-size:11px;">合格 → 暂停（WF-SUP-REASSESS-001 触发）</td><td><a href="javascript:void(0)">MD-A-2026-0510</a></td></tr>
+              <tr><td class="muted" style="font-size:11px;">2026-05-09 14:08</td><td>王志国（物资）</td><td class="code">M-02 #7</td><td>create</td><td class="muted" style="font-size:11px;">新增"艾友矿二号备件库" + 触发 NC-MD-003 下推</td><td><a href="javascript:void(0)">MD-A-2026-0515</a></td></tr>
+              <tr><td class="muted" style="font-size:11px;">2026-05-08 10:15</td><td>李宁（采购）</td><td class="code">M-09 new</td><td>create</td><td class="muted" style="font-size:11px;">新供应商"沈阳辉煌"准入提交（含税务/营业执照/煤安证）</td><td><a href="javascript:void(0)">MD-A-2026-0521</a></td></tr>
+              <tr><td class="muted" style="font-size:11px;">2026-05-06 16:33</td><td>陈雪（物资）</td><td class="code">M-05 #5</td><td>attr</td><td class="muted" style="font-size:11px;">is_safety_special: false → true（火工品强制批次）</td><td><a href="javascript:void(0)">MD-A-2026-0501</a></td></tr>
+            </tbody>
+          </table>
+          <div class="card-body" style="border-top:1px solid var(--border);font-size:11px;color:var(--text-2);">
+            审计字段口径：actor / entity / action（create/update/state/attr/disable）/ before / after / 时间戳 / 关联 A-20 审批。导出统一进 R-10 审计表（含水印 + 操作人 + 时间）。
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-header"><div class="title">⚖ 主数据维护规则</div></div>
           <div class="card-body" style="font-size:12px;line-height:1.7;">
@@ -259,8 +328,57 @@
       });
     }
 
-    function refresh() { renderKpis(); renderSupplier(); renderMaterial(); renderWarehouse(); }
-    ['M-01', 'M-02', 'M-05', 'M-09', 'S-13'].forEach(function (e) { SC.store.subscribe(e, refresh); });
+    /* NC-MD 下推队列 — 接 F-01 中 interface_id 以 NC-MD- 开头的任务 */
+    function renderNCMD() {
+      var rows = SC.store.list('F-01').filter(function (t) {
+        return (t.interface_id || '').indexOf('NC-MD-') === 0;
+      }).slice(-8).reverse();
+      var staticRows = [
+        { iface: 'NC-MD-001', entity: '物料 (M-05)', source: '系统初始化批量同步', state: '推送成功', voucher: 'NC20260501-MD-001', time: '2026-05-01 08:00' },
+        { iface: 'NC-MD-002', entity: '供应商 (M-09)', source: '系统初始化批量同步', state: '推送成功', voucher: 'NC20260501-MD-002', time: '2026-05-01 08:01' },
+        { iface: 'NC-MD-003', entity: '组织 + 仓库 (M-01/M-02)', source: 'Nova 同步触发', state: '推送成功', voucher: 'NC20260501-MD-003', time: '2026-05-01 08:02' },
+      ];
+      var dynamicRows = rows.map(function (t) {
+        return {
+          iface: t.interface_id,
+          entity: t.source_bill_type || '—',
+          source: '本会话变更触发',
+          state: t.task_state,
+          voucher: t.push_voucher_no || '—',
+          time: (t.last_pushed_at || t.created_at || '').slice(5, 16).replace('T', ' '),
+        };
+      });
+      var all = dynamicRows.concat(staticRows);
+      document.getElementById('md-nc-tbody').innerHTML = all.map(function (r) {
+        var stateColor = r.state === '推送成功' ? 'green' : r.state === '推送失败' ? 'red' : r.state === '推送中' ? 'amber' : 'gray';
+        return '<tr>' +
+          '<td class="code muted" style="font-size:11px;">' + r.iface + '</td>' +
+          '<td>' + r.entity + '</td>' +
+          '<td class="muted" style="font-size:11px;">' + r.source + '</td>' +
+          '<td><span class="badge ' + stateColor + ' dot">' + r.state + '</span></td>' +
+          '<td class="muted" style="font-size:11px;">' + (r.voucher !== '—' ? '<span class="code" style="color:var(--green);">' + r.voucher + '</span> · ' : '') + r.time + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function engineSimulateNCMD() {
+      var ifaces = ['NC-MD-001', 'NC-MD-002', 'NC-MD-003'];
+      var iface = ifaces[Math.floor(Math.random() * 3)];
+      var task = SC.store.create('F-01', {
+        task_no: SC.store.nextNo('FT'),
+        interface_id: iface,
+        source_bill_no: 'MD-' + Date.now().toString().slice(-6),
+        source_bill_type: iface === 'NC-MD-001' ? 'M-05' : iface === 'NC-MD-002' ? 'M-09' : 'M-02',
+        source_bill_id: null,
+        task_state: '待推送',
+        retry_count: 0,
+      });
+      if (SC.nc) setTimeout(function () { SC.nc.push(task.id); }, 0);
+      SC.ui.toast(iface + ' 推送任务已创建 → mock NC（1-2 秒后回写凭证）', 'success');
+    }
+
+    function refresh() { renderKpis(); renderSupplier(); renderMaterial(); renderWarehouse(); renderNCMD(); }
+    ['M-01', 'M-02', 'M-05', 'M-09', 'S-13', 'F-01'].forEach(function (e) { SC.store.subscribe(e, refresh); });
     refresh();
   </script>
 </body>
