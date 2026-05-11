@@ -72,10 +72,13 @@
 
 #### D1-5 详细 — 抽象基类（半天）
 
-详设 01 §4.2 / §4.3 要求的两个 ABP 没有的字段：
+详设 01 §4.2 / §4.3 要求的两个 ABP 没有的字段。
+
+> **路径修正**：`FullAuditedAggregateRoot<TKey>` 在 `Volo.Abp.Ddd.Domain` 包（不在 `.Shared`）。基类放 `Domain` 项目，**不是** `Domain.Shared`：
 
 ```csharp
-// Nova.SupplyCores.Domain.Shared/Entities/Auditing/SupplyCoresFullAuditedAggregateRoot.cs
+// modules/nova.supplycores/src/Nova.SupplyCores.Domain/Entities/Auditing/
+//   SupplyCoresFullAuditedAggregateRoot.cs
 
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -117,9 +120,25 @@ public abstract class SupplyCoresFullAuditedAggregateRoot<TKey>
 - **审计 8 个实体（OperationLog 等）**：本来就用 `CreationAuditedAggregateRoot<long>`（append-only），不动
 
 **验收**：
-- 基类编译通过
+- 基类编译通过 ✓（dotnet build 0 错误，2026-05-11）
 - Wave7 M-09/10/11 实体继承本基类（D7 时验证）
-- 单测覆盖 `MarkAsDeleted(reason)` 行为
+- 单测覆盖 `MarkAsDeleted(reason)` 行为（推迟到 D1-6 测试项目建好后做）
+
+### D1-6 新加 — 测试项目搭建（Sprint 0 必需，0.5 天）
+
+工程当前没有任何测试项目，所有后续单测 / 集成测试都需要先搭骨架。建议按 ABP 模板标准建：
+
+```
+test/
+  ├── Nova.SupplyCores.Domain.Tests/                    Domain 单元测试（无 DI）
+  ├── Nova.SupplyCores.Application.Tests/               Application 集成测试（含 DI + ABP TestBase）
+  └── Nova.SupplyCores.EntityFrameworkCore.Tests/      （可选）EF Core 测试
+```
+
+**验收**：
+- 3 个 test .csproj 加入 SupplyCores.slnx
+- 各自含 1 个 smoke test（如 `Material_Should_Compile()`）
+- `dotnet test` 通过
 
 ---
 
