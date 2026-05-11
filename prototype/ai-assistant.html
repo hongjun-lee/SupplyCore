@@ -143,12 +143,12 @@
 
       if (question.indexOf('库存') >= 0) {
         var s13 = SC.store.list('S-13');
-        var total = s13.reduce(function (a, r) { return a + (r.qty_onhand || 0) * (r.unit_cost || 0); }, 0);
+        var total = s13.reduce(function (a, r) { return a + (r.quantity || 0) * (r.unit_cost || 0); }, 0);
         html += '<div style="background:#fff;padding:10px;border-radius:4px;border:1px solid var(--border);">' +
           '<div style="color:var(--brand);font-weight:600;margin-bottom:6px;">🤖 AI Tool: query_inventory_balance()</div>' +
           '<div>当前库存共 <strong>' + s13.length + '</strong> 个物料-仓库组合，账面金额合计 <strong style="color:var(--brand);">' + SC.fmtMoney(total) + '</strong>。</div>' +
           (s13.length ? '<div style="margin-top:6px;font-size:11px;color:var(--text-2);">最近 3 个：' + s13.slice(0, 3).map(function (r) {
-            return (matMap[r.material_id] || '#' + r.material_id) + ' × ' + (r.qty_onhand || 0);
+            return (matMap[r.material_id] || '#' + r.material_id) + ' × ' + (r.quantity || 0);
           }).join('；') + '</div>' : '') +
         '</div>';
       } else if (question.indexOf('P-02') >= 0 || question.indexOf('计划') >= 0) {

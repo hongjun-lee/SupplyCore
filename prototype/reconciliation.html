@@ -255,43 +255,43 @@
       var rows = [];
       var hint = '';
       if (currentSource === 'system') {
-        var s13 = SC.store.list('S-13').filter(function (r) { return r.qty_onhand > 0; });
+        var s13 = SC.store.list('S-13').filter(function (r) { return r.quantity > 0; });
         rows = s13.slice(0, 8).map(function (r) {
           return {
             source: '系统 S-13',
             material: matMap[r.material_id] || '#' + r.material_id,
             warehouse: whMap[r.warehouse_id] || '#' + r.warehouse_id,
-            qty: r.qty_onhand,
-            amount: (r.qty_onhand || 0) * (r.unit_cost || 0),
+            qty: r.quantity,
+            amount: (r.quantity || 0) * (r.unit_cost || 0),
             time: (r.updated_at || '').slice(5, 16).replace('T', ' ') || '实时聚合',
           };
         });
         hint = '<span class="badge blue dot">实时</span> 来自 SC.store S-13；金额 = 数量 × unit_cost（移动平均）；任何出入库 / 调拨 / 盘点都会同步更新。';
       } else if (currentSource === 'keeper') {
         // mock 保管卡片（基于 S-13 + 小幅扰动）
-        var s13k = SC.store.list('S-13').filter(function (r) { return r.qty_onhand > 0; }).slice(0, 8);
+        var s13k = SC.store.list('S-13').filter(function (r) { return r.quantity > 0; }).slice(0, 8);
         rows = s13k.map(function (r, i) {
           var drift = i % 5 === 0 ? -2 : 0;  // 第 5 个 mock 实物少 2
           return {
             source: '保管卡片',
             material: matMap[r.material_id] || '#' + r.material_id,
             warehouse: whMap[r.warehouse_id] || '#' + r.warehouse_id,
-            qty: r.qty_onhand + drift,
-            amount: (r.qty_onhand + drift) * (r.unit_cost || 0),
+            qty: r.quantity + drift,
+            amount: (r.quantity + drift) * (r.unit_cost || 0),
             time: '2026-04-30 月度盘点（S-15）',
           };
         });
         hint = '<span class="badge amber dot">月度</span> 来自仓库实物盘点（S-15 月度盘点导入 → 保管员手工核对）；与 S-13 偏差由月度对账任务比对。';
       } else {
         // mock 财务账（基于 S-13 + 月初快照偏差）
-        var s13f = SC.store.list('S-13').filter(function (r) { return r.qty_onhand > 0; }).slice(0, 8);
+        var s13f = SC.store.list('S-13').filter(function (r) { return r.quantity > 0; }).slice(0, 8);
         rows = s13f.map(function (r, i) {
           return {
             source: 'NC 财务账',
             material: matMap[r.material_id] || '#' + r.material_id,
             warehouse: whMap[r.warehouse_id] || '#' + r.warehouse_id,
             qty: '—',
-            amount: (r.qty_onhand || 0) * (r.unit_cost || 0) * (1 + (i % 7 === 0 ? 0.012 : 0)),  // 第 7 个 +1.2% 偏差
+            amount: (r.quantity || 0) * (r.unit_cost || 0) * (1 + (i % 7 === 0 ? 0.012 : 0)),  // 第 7 个 +1.2% 偏差
             time: '2026-04-30 月末快照',
           };
         });

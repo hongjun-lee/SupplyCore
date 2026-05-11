@@ -1124,8 +1124,9 @@
     console.log('[linkage] E-04:' + req.id + ' 已结算 → NC 凭证待财务确认（详设 07 V1.0a + 详设 08 占位项）');
   });
 
-  /* A9 委托加工：OP-01:已投料 → S-21 出库流水（投料原料从主库到受托虚拟仓）+ S-13 减原料 */
+  /* A9 委托加工：OP-01:已投料 → 标记 feed_time + S-21 出库流水（投料原料从主库到受托虚拟仓）+ S-13 减原料 */
   SC.linkage.on('OP-01:已投料', function (op) {
+    if (!op.feed_time) SC.store.update('OP-01', op.id, { feed_time: new Date().toISOString() });
     SC.store.transaction(['S-21', 'S-13'], function () {
       SC.store.create('S-21', {
         transaction_no: SC.store.nextNo('IT'),

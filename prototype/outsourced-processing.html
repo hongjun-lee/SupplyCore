@@ -181,6 +181,24 @@
     var supMap = {}; SC.store.list('M-09').forEach(function (s) { supMap[s.id] = s.name; });
     var matMap = {}; SC.store.list('M-05').forEach(function (m) { matMap[m.id] = m; });
 
+    /* 损耗率阈值按物料类别配置（详设 06 §委托加工 + 02 V0.4）*/
+    var LOSS_THRESHOLDS = {
+      '化工油料': { std: 0.08, alarm: 0.12, label: '化工分馏' },
+      '火工品':   { std: 0.08, alarm: 0.12, label: '化工分馏' },
+      '电气设备': { std: 0.05, alarm: 0.07, label: '金属切削' },
+      '电缆电线': { std: 0.05, alarm: 0.07, label: '金属切削' },
+      '安全监测': { std: 0.05, alarm: 0.07, label: '金属切削' },
+      '采掘备件': { std: 0.08, alarm: 0.12, label: '金属铸造' },
+      '支护材料': { std: 0.08, alarm: 0.12, label: '金属铸造' },
+      '通风设备': { std: 0.08, alarm: 0.12, label: '金属铸造' },
+    };
+    var LOSS_DEFAULT = { std: 0.03, alarm: 0.05, label: '其他' };
+    function getThreshold(rawMatId) {
+      var m = matMap[rawMatId];
+      if (!m) return LOSS_DEFAULT;
+      return LOSS_THRESHOLDS[m.category] || LOSS_DEFAULT;
+    }
+
     function renderKpis() {
       var rows = SC.store.list('OP-01');
       var inProgress = rows.filter(function (r) { return r.state === '已投料' || r.state === '已产出'; });
@@ -205,7 +223,9 @@
             var stateColor = r.state === '已入库' ? 'green' : r.state === '已产出' ? 'blue' : r.state === '已投料' ? 'amber' : 'gray';
             var loss = r.product_quantity && r.raw_quantity ?
               ((1 - r.product_quantity / r.raw_quantity) * 100).toFixed(1) + '%' : '—';
-            var lossColor = r.product_quantity && r.raw_quantity && (1 - r.product_quantity / r.raw_quantity) > 0.05 ? 'amber' : 'gray';
+            var t = getThreshold(r.raw_material_id);
+            var actualLoss = r.product_quantity && r.raw_quantity ? (1 - r.product_quantity / r.raw_quantity) : 0;
+            var lossColor = actualLoss > t.alarm ? 'red' : actualLoss > t.std ? 'amber' : 'gray';
             return '<tr>' +
               '<td class="code">' + r.op_no + '</td>' +
               '<td>' + (supMap[r.supplier_id] || '—') + '</td>' +
@@ -275,13 +295,13 @@
               '<td class="muted">' + ((matMap[r.raw_material_id] || {}).name || '—') + '</td>' +
               '<td class="num">' + (r.raw_quantity || 0) + '</td>' +
               '<td class="num">' + SC.fmtMoney(r.raw_amount || 0) + '</td>' +
-              '<td class="muted" style="font-size:11px;">' + (r.updated_at || r.created_at || '').slice(5, 16).replace('T', ' ') + '</td>' +
+              '<td class="muted" style="font-size:11px;">' + (r.feed_time || r.updated_at || r.created_at || '').slice(5, 16).replace('T', ' ') + '</td>' +
               '<td>' + SC.badge(r.state, stateColor, true) + '</td>' +
             '</tr>';
           }).join('');
     }
 
-    /* 产成品质检报告 — 按 OP-01 已产出/已入库批次 mock */
+    /* 产成品质检报告 — 按 OP-01 已产出/已入库批次（合格率与损耗率按物料类别阈值动态判定）*/
     function renderQC() {
       var rows = SC.store.list('OP-01').filter(function (r) {
         return r.state === '已产出' || r.state === '已入库';
@@ -290,28 +310,28 @@
         ? '<tr><td colspan="6" class="muted" style="text-align:center;padding:14px;">暂无产成品 — 待 OP-01 状态进入"已产出"</td></tr>'
         : rows.slice().reverse().map(function (r) {
             var lossPct = r.product_quantity && r.raw_quantity ? (1 - r.product_quantity / r.raw_quantity) : 0;
-            var passRate = lossPct > 0.07 ? '92.5%' : lossPct > 0.05 ? '96.8%' : '99.2%';
-            var passColor = lossPct > 0.07 ? 'amber' : 'green';
-            var conclusion = lossPct > 0.07 ? '部分批次返工' : '合格';
-            var prodName = (matMap[r.product_material_id] || {}).name || '产成品';
+            var t = getThreshold(r.raw_material_id);
+            var passRate = lossPct > t.alarm ? '92.5%' : lossPct > t.std ? '96.8%' : '99.2%';
+            var passColor = lossPct > t.alarm ? 'amber' : 'green';
+            var conclusion = lossPct > t.alarm ? '部分批次返工' : '合格';
+            var checkItems = (t.label === '化工分馏') ? '纯度 / 含水率 / 杂质' : '硬度 / 尺寸 / 表面探伤';
             return '<tr>' +
               '<td class="code">' + r.op_no + '</td>' +
               '<td class="code muted" style="font-size:11px;">B' + r.id.toString().padStart(6, '0') + '</td>' +
               '<td class="num">' + (r.product_quantity || 0) + '</td>' +
               '<td><span class="badge ' + passColor + ' dot">' + passRate + '</span></td>' +
-              '<td class="muted" style="font-size:11px;">硬度 / 尺寸 / 表面探伤</td>' +
+              '<td class="muted" style="font-size:11px;">' + checkItems + '</td>' +
               '<td>' + (conclusion === '合格' ? '<span class="badge green dot">合格</span>' : '<span class="badge amber dot">' + conclusion + '</span>') + '</td>' +
             '</tr>';
           }).join('');
     }
 
-    /* 损耗率超阈值审批 — 算实际损耗率，超 5% 列出 */
+    /* 损耗率超阈值审批 — 按物料类别阈值动态判断超阈值 */
     function renderOverlimit() {
-      var STD_LOSS = 0.05;  // 默认标准损耗率（金属切削）
-      var ALARM_LOSS = 0.07; // 报警阈值
       var rows = SC.store.list('OP-01').filter(function (r) {
         if (!r.product_quantity || !r.raw_quantity) return false;
-        return (1 - r.product_quantity / r.raw_quantity) > STD_LOSS;
+        var t = getThreshold(r.raw_material_id);
+        return (1 - r.product_quantity / r.raw_quantity) > t.std;
       });
       document.getElementById('op-overlimit-count').textContent = rows.length === 0 ? '✓ 全部在阈值内' : rows.length + ' 单待复核';
       document.getElementById('op-overlimit-count').className = rows.length === 0 ? 'badge green dot' : 'badge amber dot';
@@ -320,19 +340,21 @@
         : rows.slice().reverse().map(function (r) {
             var actualLoss = (1 - r.product_quantity / r.raw_quantity);
             var actualPct = (actualLoss * 100).toFixed(1) + '%';
-            var alarmTriggered = actualLoss > ALARM_LOSS;
+            var t = getThreshold(r.raw_material_id);
+            var alarmTriggered = actualLoss > t.alarm;
+            // mock 演示用：超 alarm 阈值用"原料质量问题"理由，其他用"设备/工艺"
             var note = alarmTriggered
-              ? '原料含杂质过高（化验报告 #' + r.id + '-Q）'
-              : '设备工况波动 + 工艺调整';
+              ? '原料含杂质过高（mock 化验报告 #' + r.id + '-Q）'
+              : '设备工况波动 + 工艺调整（mock）';
             var advice = alarmTriggered
               ? '<span style="color:var(--red);">补缺料 + 索赔受托方</span>'
               : '<span style="color:var(--text-2);">核减加工费</span>';
             return '<tr>' +
               '<td class="code">' + r.op_no + '</td>' +
               '<td>' + (supMap[r.supplier_id] || '—') + '</td>' +
-              '<td class="muted">金属切削</td>' +
+              '<td class="muted">' + t.label + '</td>' +
               '<td class="num"><span class="badge ' + (alarmTriggered ? 'red' : 'amber') + ' dot">' + actualPct + '</span></td>' +
-              '<td class="num muted">' + (STD_LOSS * 100) + '% / ' + (ALARM_LOSS * 100) + '%</td>' +
+              '<td class="num muted">' + (t.std * 100) + '% / ' + (t.alarm * 100) + '%</td>' +
               '<td class="muted" style="font-size:11px;">' + note + '</td>' +
               '<td style="font-size:11px;">' + advice + '</td>' +
               '<td class="actions"><a href="javascript:void(0)">复核</a><a href="javascript:void(0)">技术评审</a></td>' +
