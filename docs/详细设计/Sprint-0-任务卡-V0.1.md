@@ -66,8 +66,60 @@
 | D1-2 | `dotnet ef database update -p src/SupplyCores.DbMigrator` 跑 Wave1-6 到本地 PostgreSQL | 21 张表（13 M 域 + 8 审计）存在 + Wave6 SensitiveOperation seed 数据有 |
 | D1-3 | `dotnet run --project src/SupplyCores.Web` + 打开 `/swagger` | 已有 6 个 Controller 全部可见，能 GET 各列表 |
 | D1-4 | Backlog 锁定（本任务卡进仓库 + issue tracker）| 任务卡 v0.1 入库 |
+| D1-5 | **补抽象基类 `SupplyCoresFullAuditedAggregateRoot<TKey>`**（加 `CreatedOrgId` + `DeleteReason` 详设独有字段）+ 加单元测试 | 见 D1-5 详细 |
 
 > 验收任一失败 → 先解决环境问题再往下。
+
+#### D1-5 详细 — 抽象基类（半天）
+
+详设 01 §4.2 / §4.3 要求的两个 ABP 没有的字段：
+
+```csharp
+// Nova.SupplyCores.Domain.Shared/Entities/Auditing/SupplyCoresFullAuditedAggregateRoot.cs
+
+using Volo.Abp.Domain.Entities.Auditing;
+
+namespace Nova.SupplyCores.Entities.Auditing;
+
+/// <summary>
+/// SupplyCores 业务实体基类（详设 01 §4.2 + §4.3）。
+/// 在 ABP FullAuditedAggregateRoot 基础上扩展两个详设独有字段：
+///   - CreatedOrgId 创建人所属组织（A-06 data_permission 数据范围过滤的关键字段）
+///   - DeleteReason 软删除原因（详设 11 §13 合规留痕要求）
+/// </summary>
+public abstract class SupplyCoresFullAuditedAggregateRoot<TKey>
+    : FullAuditedAggregateRoot<TKey>
+{
+    /// <summary>详设 01 §4.2：创建人所属组织（FK→M-01）</summary>
+    public virtual long? CreatedOrgId { get; protected set; }
+
+    /// <summary>详设 01 §4.3：软删除原因（高敏感操作必填）</summary>
+    public virtual string? DeleteReason { get; protected set; }
+
+    protected SupplyCoresFullAuditedAggregateRoot() { }
+    protected SupplyCoresFullAuditedAggregateRoot(TKey id) : base(id) { }
+
+    /// <summary>
+    /// 软删除时显式设置原因（不直接暴露 setter）。
+    /// 由 IRepository.DeleteAsync 钩子或 Domain Service 调用。
+    /// </summary>
+    public virtual void MarkAsDeleted(string reason)
+    {
+        DeleteReason = reason;
+        // IsDeleted 由 ABP 框架在 DeleteAsync 时自动设置
+    }
+}
+```
+
+**Sprint 0 范围内的实体迁移策略**：
+- **本 Sprint 新建的 M-09/10/11 供应商三件套**：**直接继承 `SupplyCoresFullAuditedAggregateRoot<long>`** ✓
+- **已有 16 个业务实体（Material / Organization / Warehouse / ...）**：**Sprint 0 不动**，留到 Sprint 0.5 风格统一时一起改（避免污染 Sprint 0 + 减少 migration 次数）
+- **审计 8 个实体（OperationLog 等）**：本来就用 `CreationAuditedAggregateRoot<long>`（append-only），不动
+
+**验收**：
+- 基类编译通过
+- Wave7 M-09/10/11 实体继承本基类（D7 时验证）
+- 单测覆盖 `MarkAsDeleted(reason)` 行为
 
 ---
 
@@ -361,8 +413,24 @@ public class MockNcInterfaceService : INcInterfaceService { ... }
 
 ---
 
-## 六、版本沿革
+## 六、衔接 Sprint 0.5（风格统一）
+
+Sprint 0 后**紧跟 Sprint 0.5（1-2 天）**做命名风格统一 — 避免 Sprint 1 业务开发期再回头改：
+
+| 任务 | 估时 |
+|---|---|
+| 加 `EFCore.NamingConventions` + 配 `UseSnakeCaseNamingConvention()` | 0.5 天 |
+| Reset DB + 重做 Wave1-7 migration（PascalCase 列名 → snake_case）| 0.5 天 |
+| 已有 16 个业务实体 → 改继承 `SupplyCoresFullAuditedAggregateRoot<TKey>`（在 D1-5 已建好基类）| 0.5 天 |
+| 详设 12 个文档全文术语对齐（`created_at` → `creation_time` 等）| 0.5 天 |
+
+完整任务卡见 [`Sprint-0.5-任务卡-V0.1.md`](./Sprint-0.5-任务卡-V0.1.md)。
+
+---
+
+## 七、版本沿革
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-11 | 首版任务卡：2 周 10 工作日；Day 1-14 拆解；M-09/10/11 供应商 + Material/Organization 应用层 + Wave6 审计接通 + NC-MD mock 四大块；衔接 Sprint 1 第 2 批 P0；估算 1.5 人月 |
+| V0.2 | 2026-05-11 | 加 D1-5 补抽象基类 `SupplyCoresFullAuditedAggregateRoot<TKey>`（含 `CreatedOrgId` + `DeleteReason`）+ Wave7 M-09/10/11 直接用新基类；衔接 Sprint 0.5 命名风格统一 |
