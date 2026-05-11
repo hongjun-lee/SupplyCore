@@ -104,6 +104,11 @@
           write(entity, JSON.parse(JSON.stringify(seedRef[entity])));
         }
       });
+      // 首次 seed（无版本号）时同步写入当前版本，避免 chrome.js 每次启动弹"版本不一致"banner
+      // 已有旧版本号时不覆盖，让 checkSchemaVersion 走"提示升级"路径
+      if (!localStorage.getItem(SCHEMA_VERSION_KEY)) {
+        localStorage.setItem(SCHEMA_VERSION_KEY, CURRENT_SCHEMA_VERSION);
+      }
       console.log('[store] seeded', Object.keys(seedRef).length, 'entities');
     },
 
