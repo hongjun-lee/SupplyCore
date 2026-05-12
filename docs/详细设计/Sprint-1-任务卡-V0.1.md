@@ -1,7 +1,7 @@
-# Sprint 1 任务卡 — Stage A 收尾 + B2 启动（V0.2）
+# Sprint 1 任务卡 — Stage A 收尾 + B2 启动（V0.3）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（联动 sub_group_id 评审留痕，待用户确认）
+**版本：** V0.3（NovaSync 实施层落地，待用户确认）
 **日期：** 2026-05-12
 **文档性质：** 开发实施层 · Sprint 任务卡
 **适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 1（10 工作日 / 约 2 周）
@@ -24,9 +24,10 @@
 **两条主线并行：**
 
 1. **Stage A 收尾**（V0.4 §5.1 阶段 A 1.5-2 个月预算的剩余 ~10%）：
-   - 17 家 Organization mock seed（满足 Sprint 0 Demo 用例 1 / 汇报 §2.2 第 1 批"全集团 17 家覆盖"试演要求）
-   - Warehouse 链（M-02 + M-03A + M-03B）6 家 mock seed
+   - **NovaOrganizationSyncContributor 第一次落地**——从 Catio 生产 `Host=fxkyjt.cn;Port=5432;Database=Nova` `platform.organizations` 同步阜新矿业（sub_group_id = `40351efe-a370-4239-96fc-1b53a57714de`）完整子树（**24 家 level 3 厂矿 + 完整 level 4-7 部门 / 班组共 995 行**），不含 mock 占位数据
+   - Warehouse 链（M-02 + M-03A + M-03B）3 家代表性单位 mock seed（Nova 端无仓库数据，仍 mock）
    - Docker compose + Dockerfile（Sprint 0 D14 ⬜ 唯一剩余项，汇报 §一·第一步 1.6 试点部署）
+   - **人员（platform.persons 11,258 人）不在本 Sprint 范围**——含 mobile / id_number 等 PII，留 Stage B1 真实联调期同步
 
 2. **Stage B2 启动**（V0.4 §5.2 业务模块并行 990 PD，本 Sprint 跑通 03 编码生成 + 04 P-01/P-02 主链）：
    - 03 物料编码生成器 + 批量导入服务（V0.4 §3.1 03 模块 5 PD "批量导入"）
@@ -48,15 +49,18 @@
 | Wave6 审计接通（自定义 SupplyCoresAuditingStore）| ✅ Sprint 0 D4-6 + 4b3a4c3 长度修复 |
 | NC-MD-001/002/003 mock service | ✅ Sprint 0 D13 |
 | 测试 63/63（Domain 56 + EFCore 2 + Application 5）| ✅ |
+| **Catio 生产 Nova DB 连通性已验证**（`fxkyjt.cn:5432/Nova`）| ✅ 2026-05-12 探查：阜矿子树 995 行 + 11,258 人员（人员本 Sprint 不取）|
 
-> **本机 DB 同步动作（V0.2 升版后须做一次）：** `dotnet ef database drop --force` → `dotnet ef database update`（应用 `20260512033645_Init`）→ `dotnet run --project src/SupplyCores.DbMigrator`。Sprint 1 D1 起手前完成。
+> **本机 DB 同步动作（V0.3 升版后须做一次）：** `dotnet ef database drop --force` → `dotnet run --project src/SupplyCores.DbMigrator`（DbMigrator 自动 apply migration + 跑 seed/sync contributors，**勿单跑 `dotnet ef database update`**——经 Sprint 0 D14 验证，design-time 写的 history runtime 看不到，会导致表重建冲突）。Sprint 1 D1 起手前完成。
 
 ### 1.3 关键缺口
 
 | 类型 | 缺什么 | 详设依据 | 优先级 |
 |------|--------|---------|--------|
-| ❌ Seed | **Organization 17 家 mock seed**（含集团 / 物资公司 / 矿/厂/子公司三层 + `sub_group_id` 全部 = 阜矿 org_id）| 02 V1.1 §4.1 + 汇报 §序言 17 家覆盖 + sub_group_id 清单 §修订 #1 | P0 |
-| ❌ Seed | **Warehouse 链 mock seed**（≥1 家代表性单位的 m.warehouse + warehouse_zone + storage_location）| 02 V1.1 §3-5 | P0 |
+| ❌ Sync | **NovaOrganizationSyncContributor**——从 Catio `platform.organizations` 同步阜矿完整子树（995 行）；含 uuid → bigint ID 映射 + nova_org_id 唯一索引保 idempotent + sub_group_id 字段值用本地 bigint 自指 | 02 V1.1 §4.1 + sub_group_id 清单 §修订 #4 (Nova 同步契约) | P0 |
+| ❌ 配置 | **`appsettings.secrets.json` 加 `NovaSync` 节** —— `ConnectionString` + `RootSubGroupId` (阜矿 uuid)；只读访问；**不进 git** | sub_group_id 清单 §修订 #4 + 信安 | P0 |
+| ❌ 类型映射 | **NovaUuidMapper**（内存 Dictionary<Guid, long> + nova_org_id 唯一索引）—— uuid PK ↔ SupplyCore bigint PK | 02 V1.1 §4.1 + nova_org_id 字段语义 | P0 |
+| ❌ Seed | **Warehouse 链 mock seed**（3 家代表性厂矿的 m.warehouse + warehouse_zone + storage_location；Nova 端无仓库数据，仍 mock）| 02 V1.1 §3-5 | P0 |
 | ❌ DevOps | **`docker-compose.yml` + `Dockerfile`**（试点单位部署包草案）| Sprint-0-Demo §4.1 + 11 V1.0 §部署框架 | P0（Sprint 0 D14 ⬜ 唯一剩余）|
 | ❌ 应用层 | **MaterialCodeGenerator + BulkImportService**（M-05 一物一码 + 16 + Excel 批量导入）| 03 V1.1 §编码生成 + 5 §SY-01 序列联动 | P1 |
 | ❌ 实体 + Migration | **P-01 demand_request + P-06 demand_request_line**（继承基类自动获得 `SubGroupId` + `CreatedOrgId` + `DeleteReason`） | 04 V1.1 §4.4 | P0（B2 主链入口）|
@@ -68,58 +72,64 @@
 
 ### 1.4 完成标准（Sprint 1 验收）
 
-- ✅ `dotnet test SupplyCores.slnx` ≥ **75 个用例通过**（当前 63 + Sprint 1 新增 ≥ 12 单测：P-01/P-02 状态机 + Material 编码生成）
-- ✅ Demo 脚本用例 1 重跑 `GET /api/supply-cores/organizations/tree` 返回 17 家三层组织树（非空）
+- ✅ `dotnet test SupplyCores.slnx` ≥ **75 个用例通过**（当前 63 + Sprint 1 新增 ≥ 12 单测：P-01/P-02 状态机 + Material 编码生成 + NovaUuidMapper + NovaOrganizationSyncContributor）
+- ✅ Demo 脚本用例 1 重跑 `GET /api/supply-cores/organizations/tree` 返回真实阜矿组织树（**24 家 level 3 厂矿 + 完整子树共 995 行**，非空且名称为 Catio 真实命名如"阜新矿业（集团）有限责任公司本部" / "阜新矿业（集团）有限责任公司恒大煤矿" 等）
 - ✅ Demo 新用例 6：批量导入 5 条 Material（CSV）→ 编码自动按 03 §3 规则生成（HG / ZH / SB / ... 前缀 + 6 位序号）
 - ✅ Demo 新用例 7：创建 P-01 需求 → 提交 → 审批 → 自动归集为 P-02 计划草稿（按 org + 月聚合）
 - ✅ Demo 新用例 8：P-02 计划审批通过 → 状态转 `已审`，linkage 待 Sprint 2 接 P-05 分解
+- ✅ Demo 新用例 9：**NovaSync 二次跑幂等**——`dotnet run --project DbMigrator` 重复执行，`m.organization` 行数不增（按 nova_org_id 唯一索引去重）
 - ✅ `docker compose up` 在本地一行启动 supplycores-web + postgres，`/swagger` 可达
 - ✅ 跑完 5+ 个 P-01 / P-02 操作，`a.operation_log` 新增 ≥ 20 行（继续 Sprint 0 验收的审计自动写入）
 - ✅ **`sub_group_id` 数据隔离边界字段覆盖**（评审留痕清单 §三 原则 1 + §6.3 修订 #2 落地验证）：
-  - 每张业务表（`m.*` + `a.*` + 新建的 `m.demand_request` / `m.purchase_plan` 等）DDL 必须含 `sub_group_id bigint NULL` 列（由 EnforceSnakeCaseColumnNames 自动转 snake_case）
-  - 17 家 Organization mock seed 中 `sub_group_id` 非空率 100%（集团根节点除外，按修订 #4 边界条件）
+  - 每张业务表（`m.*` + `a.*` + 新建的 `m.demand_request` / `m.purchase_plan` 等）DDL 必须含 `sub_group_id bigint NULL` 列（由 EnforceSnakeCaseColumnNames 自动转 snake_case）—— 已 ✅ commit `2132de1` + 验证 m schema 18 个 + sy schema 1 个共 19 张表
+  - **Nova 同步后**：`m.organization.sub_group_id` 非空率 = 994/995（阜矿本部自身 sub_group_id 自指本地 bigint id；其下 994 行 sub_group_id 全部 = 阜矿本地 bigint id）
   - 新增 EFCore.Tests 单测：扫 `ctx.Model.GetEntityTypes()`，所有有 schema 的业务实体都必须含 `SubGroupId` 属性（原则 1 CI 检测后端版）
 
 ---
 
 ## 二、按日任务拆解（10 工作日）
 
-### Day 1 — Org 17 家 mock seed + Warehouse 链 seed
+### Day 1 — NovaSync 准备（配置 + Mapper + 探查）
 
 | # | 任务 | 详设引用 | 验收 |
 |---|------|---------|------|
-| D1-1 | 新增 `OrganizationDataSeedContributor`，按集团 / 物资公司 / 17 家矿厂三层结构 seed；**根节点（辽宁能源 org_level=1）`sub_group_id=NULL`；阜矿（org_level=2，二级集团）`sub_group_id = 自身 org_id`；17 家矿厂（org_level=3）`sub_group_id = 阜矿 org_id`**（一期单二级集团口径，sub_group_id 清单 §修订 #1 + §修订 #4）| 02 V1.1 §4.1 organization 层级 + 汇报 §序言 17 家 + sub_group_id 清单 §修订 #1 | DbMigrator 跑完后 `m.organization` 行数 = 19（1 集团 + 1 物资公司 + 17 家子单位）;`sub_group_id IS NOT NULL` 的行 = 18（集团根除外）|
-| D1-2 | mock 17 家命名（可参考能源行业典型，如"X 矿 / Y 厂 / Z 公司"，business_unit_type 字段按煤矿/非煤/能源/化工分类）；命名为占位（业务方真实清单到位后替换）| 02 V1.1 §4.1.2 字段 | 调用 `GET /api/supply-cores/organizations/tree` 返回 3 层树，深度 = 3，叶子 17 个 |
-| D1-3 | 加 `OrganizationDataSeedContributor_Tests` 单测：验证 17 家 + 三层结构 + 不重复 seed（幂等）+ **sub_group_id 非空率 ≥ 18/19 + FK 自指（sub_group_id 指向的 org_id 必须存在且 org_level=2）+ 集团根 sub_group_id IS NULL** | sub_group_id 清单 §三 原则 4 | `dotnet test` 单测通过；至少 4 个 case（结构 / 幂等 / sub_group_id 覆盖 / FK 自指）|
-
-**预估工时：** 1 工作日（V0.4 §3.1 02 模块 51 PD 残余 + sub_group_id 写入逻辑 ≈ 0.5 PD）
-
----
-
-### Day 2 — Warehouse + WarehouseZone + StorageLocation seed
-
-| # | 任务 | 详设引用 | 验收 |
-|---|------|---------|------|
-| D2-1 | 新增 `WarehouseDataSeedContributor`，给 17 家中 3 家试点单位（如"大矿 + 中型矿 + 非煤"）seed 各 2 个 Warehouse | 02 V1.0 §4.2 warehouse + 汇报 §四·决策 3 试点 2-3 家 | DbMigrator 跑完后 `m.warehouse` ≥ 6 行 |
-| D2-2 | 链式 seed：每个 Warehouse 下 seed 2 个 WarehouseZone + 每个 WarehouseZone 下 seed 3 个 StorageLocation | 02 V1.0 §4.3 / §4.4 | `m.warehouse_zone` ≥ 12 + `m.storage_location` ≥ 36 |
-| D2-3 | seed 包含 1 个**火工品专管仓**（warehouse_type=`HG`，触发 03 §特殊属性的火工品场景）| 02 V1.0 §4.2.3 + 03 V1.1 §特殊属性 | `m.warehouse` 中至少 1 行 `warehouse_type = 'HG'` |
-| D2-4 | 加 `WarehouseChainDataSeedContributor_Tests` 单测（幂等 + 层级完整） | — | `dotnet test` 通过 |
+| D1-1 | `appsettings.secrets.json` 加 `NovaSync` 节：`{ "ConnectionString": "Host=fxkyjt.cn;Port=5432;Database=Nova;Username=postgres;Password=...", "RootSubGroupId": "40351efe-a370-4239-96fc-1b53a57714de", "ReadOnly": true }`；**写到 `appsettings.secrets.json` 而非 `appsettings.json`，不进 git** | sub_group_id 清单 §修订 #4 + 信安 | secrets 文件未被 git 跟踪（`.gitignore` 已含；DbMigrator + Web 两边都加）|
+| D1-2 | 新增 `Nova.SupplyCores.Domain/Integration/Nova/NovaSyncOptions` POCO + DI 绑定 | ABP options pattern | `IOptions<NovaSyncOptions>` DI 可解析 |
+| D1-3 | 新增 `Nova.SupplyCores.Domain/Integration/Nova/INovaSourceReader` + `NpgsqlNovaSourceReader` 实现（连 fxkyjt.cn 只读查询，返回 `IAsyncEnumerable<NovaOrgRow>`）| 02 V1.1 §4.1 nova_org_id 同步 | 单测 mock NpgsqlConnection，验证 SELECT 阜矿子树 SQL 语句正确（含 sub_group_id 过滤）|
+| D1-4 | 新增 `Nova.SupplyCores.Domain/Integration/Nova/NovaUuidMapper`：内存 `Dictionary<Guid, long>`（uuid → SupplyCore bigint id）+ `Resolve(Guid? novaId)` + `Register(Guid novaId, long localId)` + 持久化层用 `m.organization.nova_org_id` 唯一索引保跨进程查询 | 02 V1.1 §4.1.2 nova_org_id varchar UQ | 单测 ≥ 4：注册 / 解析 / null 处理 / 重复注册抛异常 |
+| D1-5 | 探查脚本入仓 `tools/probe-nova/`（一次性 csproj + Npgsql 读取阜矿子树结构性快照，**结果只输出到 stdout 不入仓**），用于团队成员二次验证 Nova 端 schema | — | `dotnet run --project tools/probe-nova` 输出阜矿 995 行汇总 + 各层级行数 |
 
 **预估工时：** 1 工作日
 
 ---
 
-### Day 3 — Docker compose + Dockerfile + 试点部署文档
+### Day 2 — NovaOrganizationSyncContributor 实现 + 验证
+
+| # | 任务 | 详设引用 | 验收 |
+|---|------|---------|------|
+| D2-1 | 新增 `Nova.SupplyCores.Domain/Integration/Nova/NovaOrganizationSyncContributor`（实现 `IDataSeedContributor`），按 level 升序拉取阜矿子树（包含 sub_group_id = 阜矿 uuid 的所有行 + 阜矿自身那一行）| sub_group_id 清单 §修订 #4 + 02 V1.1 §4.1 | DbMigrator 跑完后 `m.organization` 行数 = 995 |
+| D2-2 | 字段映射逻辑：`id = SupplyCore bigint 新分配` / `nova_org_id = Catio uuid 字符串` / `parent_id = NovaUuidMapper.Resolve(catio.parent_id)` / `sub_group_id = NovaUuidMapper.Resolve(catio.sub_group_id)`（阜矿自身 sub_group_id 自指本地 bigint id）| 02 V1.1 §4.1.2 字段表 | 单测验证字段映射正确（≥ 6 case 覆盖根节点 / 阜矿本部 / 各 level 子节点）|
+| D2-3 | 拓扑顺序保证：按 `level ASC, display_order ASC` 排序后单遍 insert，**parent_id 引用的 nova_org_id 必须先 register 到 mapper**；否则抛 `MissingParentException` | — | 单测：故意删除 mapper 中一条 parent 后调用应抛 |
+| D2-4 | Idempotent：第二次 SeedAsync 调用应跳过已存在的 nova_org_id 行（按唯一索引判定），不重复 insert | sub_group_id 清单 §修订 #1 + idempotent | 单测：连续两次 SeedAsync，`m.organization` 行数稳定在 995 |
+| D2-5 | 阜矿本部 sub_group_id 自指处理（详设 02 V1.1 §4.1 "二级集团自身 sub_group_id = 自身 org_id"）：sync 时阜矿那一行先 insert 拿 bigint id，再 update 自己的 sub_group_id 字段为该 bigint | 02 V1.1 §4.1 + sub_group_id 清单 §修订 #1 业务规则 | 单测：阜矿本部行 `sub_group_id = id`（自指）|
+| D2-6 | 加 `NovaOrganizationSyncContributor_Tests` 集成测试（连接 Catio 测一次，标 `[Trait("Category","Integration")]`，CI 默认跳过；本地开发跑全量）| — | 集成测试通过 + 计数正确 |
+
+**预估工时：** 1.5 工作日（V0.4 §3.1 02 模块 51 PD 残余 + uuid 映射 + 拓扑 insert + idempotent ≈ 3-4 PD）
+
+---
+
+### Day 3 — Warehouse 链 mock seed + Docker compose + Dockerfile
 
 | # | 任务 | 引用 | 验收 |
-|---|------|------|------|
-| D3-1 | 新增 `Dockerfile`（基于 `mcr.microsoft.com/dotnet/aspnet:10.0`，多阶段 build，输出 `SupplyCores.Web` 镜像）| Sprint-0-Demo §4.1 草案 | `docker build -t supplycores-web .` 成功 |
-| D3-2 | 新增 `docker-compose.yml`（postgres:16 + supplycores-web 服务，含 healthcheck + volume）| Sprint-0-Demo §4.1 草案 | `docker compose up -d` 后 30 秒内 `/swagger` 可达 |
-| D3-3 | 新增 `docker-compose.override.example.yml`（暴露试点环境变量与端口映射模板）| 11 V1.0 §部署 | 示例文件可一键复制为 override.yml |
-| D3-4 | 新增 `docs/部署/试点单位部署指南-V0.1.md`（落到 `SupplyCores` 仓库）| Sprint-0-Demo §4.1 + 11 V1.0 §九 切换 | 指南覆盖：先决条件 / 启动顺序 / 数据库初始化 / 健康检查 / 故障回滚 |
-| D3-5 | 在 GitHub Actions 加 `docker-build.yml`（仅 build 验证，不 push）| — | PR / push 时自动 build 通过 |
+|---|------|---------|------|
+| D3-1 | 新增 `WarehouseDataSeedContributor`，给阜矿 24 家 level 3 中的 **3 家代表性厂矿**（建议：阜新矿业本部 + 恒大煤矿 + 阜新矿业集团物资公司）seed 各 2 个 Warehouse，**parent_id 引用通过 NovaUuidMapper 解析的本地 bigint**；Nova 端无仓库数据，故仍 mock | 02 V1.1 §4.2 + 汇报 §四·决策 3 试点 2-3 家 | DbMigrator 跑完后 `m.warehouse` ≥ 6 行 + 关联 organization 正确 |
+| D3-2 | 链式 seed 简化：每个 Warehouse 下 1 个 WarehouseZone + 2 个 StorageLocation（不再要求 36 个 storage_location，按需扩展）| 02 V1.1 §4.3 / §4.4 | `m.warehouse_zone` ≥ 6 + `m.storage_location` ≥ 12 |
+| D3-3 | seed 包含 1 个**火工品专管仓**（warehouse_type=`HG`，触发 03 §特殊属性的火工品场景）| 02 V1.1 §4.2.3 + 03 V1.1 §特殊属性 | `m.warehouse` 中至少 1 行 `warehouse_type = 'HG'` |
+| D3-4 | 新增 `Dockerfile`（基于 `mcr.microsoft.com/dotnet/aspnet:10.0`，多阶段 build，输出 `SupplyCores.Web` 镜像）| Sprint-0-Demo §4.1 草案 | `docker build -t supplycores-web .` 成功 |
+| D3-5 | 新增 `docker-compose.yml`（postgres:16 + supplycores-web 服务，含 healthcheck + volume；**`NovaSync__ConnectionString` 通过 env 注入**） | Sprint-0-Demo §4.1 草案 | `docker compose up -d` 后 30 秒内 `/swagger` 可达；容器内能拉到 995 行阜矿组织 |
+| D3-6 | 新增 `docs/部署/试点单位部署指南-V0.1.md`（落到 `SupplyCores` 仓库）| Sprint-0-Demo §4.1 + 11 V1.0 §九 切换 | 指南覆盖：先决条件 / Nova 连接配置 / 启动顺序 / 健康检查 / 故障回滚 |
 
-**预估工时：** 1 工作日（V0.4 §3.1 11 非功能模块 99 PD 含部署基础设施部分）
+**预估工时：** 1.5 工作日（V0.4 §3.1 11 非功能模块部署基础设施 1-2 PD + Warehouse mock 0.5 PD）
 
 ---
 
@@ -240,11 +250,14 @@ Sprint 2 任务卡在 Sprint 1 D10-5 起草。
 | 项 | 估算 / 应对 |
 |----|------------|
 | **人月** | 1 个全栈 .NET 后端开发者 ≈ **0.5 人月**（10 工作日 / 21 工作日 = 0.48 人月）|
-| **关键风险 1** | 17 家 Organization mock seed 命名不符合阜矿集团实际单位名 → 用占位命名 + 文档说明 "待业务方确认替换为真实清单"，不影响功能验收 |
+| **关键风险 1** | `fxkyjt.cn:5432/Nova` 网络稳定性 / 凭据时效 → D1-3 加超时 + 失败重试 3 次；D2-1 同步失败不影响其他 contributors（catch + log + 继续）；secrets 凭据若改密码需更新 secrets.json |
 | **关键风险 2** | Docker 镜像 build 在 Apple Silicon 上跨平台 `linux/amd64` 慢 → 文档指定 `--platform linux/amd64` build 选项，CI 用 amd64 runner |
 | **关键风险 3** | linkage `DemandRequest:已审 → PurchasePlan 草稿` 幂等性测试不足 → D8-4 单测覆盖"重复 approve 不重复生成 plan" |
 | **关键风险 4** | sub_group_id 写入钩子覆盖不全（漏掉某个 AppService.CreateAsync 入口）→ 新增 EFCore.Tests "所有业务实体 SubGroupId 非空率" 守护测试（D6-6 + D8 涵盖）|
-| **依赖外部** | 无（Sprint 1 仍在 Stage A 末段，OAuth / NC 厂商 / 招采平台 / 消息平台均不涉及）；sub_group_id 真实 Catio 同步联调延后到 Stage B1 |
+| **关键风险 5** | NovaSync 拓扑断裂（parent_id 引用未注册 mapper）→ D2-3 按 level 升序遍历 + 抛 MissingParentException 兜底；单测覆盖故意断裂 case |
+| **关键风险 6** | 24 家是否就是业务方眼里的"17 家"？汇报材料 V0.2 与 Catio 现状口径不一致 → 数据库同步 24 家全部；业务方需要时由前端 / 报表加 `is_in_scope_v1 boolean` 标记圈定（本 Sprint 不实现该标记）|
+| **数据合规** | Sprint 1 只同步组织（995 行），**不同步人员**（11258 人含 mobile / id_number 等 PII）；人员同步推到 Stage B1 真实联调期，配合 Nova SSO + 数据加密 + 合规审批 |
+| **依赖外部** | `fxkyjt.cn:5432/Nova` 只读访问已确认通；OAuth / NC 厂商 / 招采平台 / 消息平台不涉及；sub_group_id 实时事件订阅推到 Stage B1 |
 
 ---
 
@@ -265,8 +278,9 @@ Sprint 2 任务卡在 Sprint 1 D10-5 起草。
 
 | Sprint 1 Day | V0.4 §3.1/§3.2 对应模块 | V0.4 工时 PD |
 |--------------|----------------------|--------------|
-| D1-2 Org + Warehouse seed | 02 基础档案残余 | ≈ 2 PD |
-| D3 Docker compose | 11 非功能（部署基础设施） | ≈ 1-2 PD |
+| D1 NovaSync 配置 + Mapper | 02 基础档案残余 + 集成配置 | ≈ 1 PD |
+| D2 NovaOrganizationSyncContributor | 02 基础档案残余 + uuid/bigint 映射层 | ≈ 1.5 PD |
+| D3 Warehouse mock + Docker compose | 02 残余 + 11 非功能（部署基础设施） | ≈ 1.5 PD |
 | D4-5 Material 编码 + 批量导入 | 03 物料（5 PD 批量 + 1-2 PD 编码） | ≈ 5-7 PD |
 | D6-7 P-01 demand_request 全链 | 04 需求计划（M-09/10/11 + P-01 全链）9 后端 PD 残余 | ≈ 5 PD |
 | D8-9 P-02 purchase_plan 全链 | 04 采购申请 12 后端 PD | ≈ 8-10 PD |
@@ -295,3 +309,4 @@ Sprint 2 任务卡在 Sprint 1 D10-5 起草。
 |------|------|------|
 | V0.1 | 2026-05-12 | 草案：基于 V0.4 §3.1 工时 + Sprint 0 收尾状态 + 汇报 §2.1 第 1 批节奏起草；待用户评审 |
 | V0.2 | 2026-05-12 | 联动 `数据隔离边界sub_group_id修订建议清单-V0.1` §四影响范围"Sprint-1 任务卡 V0.1 待联动"要求：(1) §1.2 基线加 commit `2132de1` 基类加 `SubGroupId` + migration 重生成 `20260512033645_Init`；(2) §1.3 加 Nova 同步契约对齐项（P1，真联调延后）；(3) §1.4 加 sub_group_id 字段 + 17 家非空率 + EFCore.Tests 守护测试；(4) D1-1/D1-3 OrgSeed 写明根节点 NULL / 二级集团自指 / 17 家全部 = 阜矿 + FK 自指完整性单测；(5) D6/D8 P-01/P-02 写明继承基类自动获得 SubGroupId + `sub_group_id` 索引 + linkage 复制源字段；(6) 新增 D6-6 写入钩子条目；(7) §四 加风险 4（钩子覆盖）；(8) 详设 02 引用从 V1.0 升 V1.1。 |
+| V0.3 | 2026-05-12 | 整改 D1-D2 从 mock 转 Catio 真实同步（已验证 `fxkyjt.cn:5432/Nova` 连通 + 阜矿子树 995 行 + 11258 人）：(1) §1.1 目标改"NovaOrganizationSyncContributor 第一次落地"，**人员不在范围**（PII，留 Stage B1）；(2) §1.2 加 Catio 连通验证、本机 DB 同步动作改"drop + DbMigrator"两步（移除 dotnet ef database update，Sprint 0 D14 已证 history 不通）；(3) §1.3 改 Org 缺口为 NovaSync + 配置 + UuidMapper 三条；(4) §1.4 完成标准改 24 家 + 995 行真实命名 + 二次幂等用例 9；(5) §二 D1-D3 重写：D1 NovaSync 准备 / D2 同步实现 + 验证 / D3 Warehouse mock 简化 + Docker compose；(6) §四 风险加 5/6/合规三条；(7) §六 工时对照 D1-D3 拆分。**口径校正：阜矿 = 阜新矿业（不是抚顺），level 3 = 24 家不是 17 家**；汇报材料 V0.2 的 17 家是 PDF 调研老口径，下次升版调位。 |
