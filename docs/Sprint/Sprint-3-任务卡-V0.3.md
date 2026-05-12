@@ -57,7 +57,7 @@
 - S-06 入库后续单据（Sprint 4）
 - M-13 默认成本中心规则（独立模块按业务方排期）
 - Catio Workflow 真实联调（OAuth 凭据未到）
-- NC 真实接入（08A 清单回函未到）
+- NC 真实接入（08B 外发函回函未到，08A 内部底稿待消化）
 
 ### 1.4 完成标准（Sprint 3 验收）
 
@@ -137,7 +137,7 @@
 | D7-1 | IStockInboundAppService + AppService + Controller（含 BulkAddLine endpoint） | 06 §4.2 | 单测 ≥ 5 |
 | D7-2 | **StockInboundManager 写入钩子双轨**（V0.2 决策点 5）：ContractId 不空时从 C-02 复制 SubGroupId；空时按 OrgId 反查 M-01（同 PurchasePlanManager 模式）| sub_group_id 清单 §三 原则 3 | 单测 2 路径：有 C-02 + 无 C-02 |
 | D7-3 | 入库审核通过后回写 C-02.ExecutedAmount 增量 | 05 §4.2.2 状态迁移约束（已签 → 执行中） | 单测覆盖 |
-| D8-1 | **关键 linkage：S-05 入库审核通过 → 触发 NC BIZ-001 接通点**（V0.2 决策点 3：仍用 MockNcInterfaceService，命名上去掉"真实推送"措辞改"接通点"；NC 团队 08A 回函后仅替换 INcInterfaceService 实现，外部观感不变） | 详设 08 §5.2 BIZ-001 + Sprint 2 D9-3 | E2E：审核后 contract.nc_voucher_no 写入（mock 凭证号）|
+| D8-1 | **关键 linkage：S-05 入库审核通过 → 触发 NC BIZ-001 接通点**（V0.2 决策点 3：仍用 MockNcInterfaceService，命名上去掉"真实推送"措辞改"接通点"；NC 团队 08B 外发函回函后仅替换 INcInterfaceService 实现，外部观感不变） | 详设 08 §5.2 BIZ-001 + Sprint 2 D9-3 | E2E：审核后 contract.nc_voucher_no 写入（mock 凭证号）|
 | D8-2 | 接通 C-02 状态机：**首笔 S-05 入库审核通过** → C-02.StartExecution() 触发（V0.2 决策点 4：Sprint 3 不做 S-02 订单，以 S-05 入库作驱动点；详设 05 §4.2.2 V1.2 升版时同步修订为"S-02 下达 或 S-05 入库"双驱动）| 05 §4.2.2 现行 + V1.2 拟修订 | E2E 单测；详设 V1.2 升版任务列 Sprint 3 D9 |
 
 **预估工时：** 3 PD
@@ -160,7 +160,7 @@
 | D10-2 | Sprint-1/2-Demo 用例 1-11 回归跑通；Sprint-3-Demo 新增用例 12-14（招投标 / 合同变更 / 入库 + NC 推送）| 全 200 OK |
 | D10-3 | `docker compose up` 容器内跑 D10-2 全套 | 容器内 demo 全通过 |
 | D10-4 | 写 `Sprint-3-Demo-脚本-V0.1.md` | 文档入库 |
-| D10-5 | 起 Sprint 4 任务卡草案：T-03~T-07 招投标后续 + C-04~C-06 合同收尾 + S-04/S-06+ 入库出库单据 + Catio Workflow 真实联调 + NC 真实接入（依赖 08A 回函）| `Sprint-4-任务卡-V0.1.md` 草案 |
+| D10-5 | 起 Sprint 4 任务卡草案：T-03~T-07 招投标后续 + C-04~C-06 合同收尾 + S-04/S-06+ 入库出库单据 + Catio Workflow 真实联调 + NC 真实接入（依赖 08B 外发函回函）| `Sprint-4-任务卡-V0.1.md` 草案 |
 | D10-6 | 整理 Sprint 3 commit log + PR / release notes | git log 整洁 |
 
 **预估工时：** 1 PD
@@ -177,7 +177,7 @@
 | C-04 履约 / C-05 验收 / C-06 决算 | 05 §4.4-4.6 | ≈ 8 PD |
 | S-04 质检让步 / S-06+ 其他入库出库单据起步 | 06 §4.1, §4.3+ | ≈ 5 PD |
 | Catio Workflow 真实联调（OAuth 凭据到位后切真实 chain 解析） | 10A V1.1 + NovaSync 切换方案 | ≈ 2 PD |
-| NC 真实接入（08A 回函到位后切真实 endpoint） | 08A V0.1 → V0.2 联动详设 08 升 V1.2 | ≈ 3 PD（实施侧）|
+| NC 真实接入（08B 外发函回函到位后切真实 endpoint） | 08B 外发函 V0.1 + 08A 内部底稿 V0.2，回函后联动详设 08 升 V1.2 | ≈ 3 PD（实施侧）|
 
 ### 3.2 远端衔接（不在 Sprint 4 范围）
 
@@ -192,7 +192,7 @@
 | 风险 | 概率 | 影响 | 缓解 |
 |------|------|------|------|
 | 招投标外部对接（能源集团招采平台）延期 | 高 | T-04 投标 / T-06 评标接口形态不定 | Sprint 3 不依赖招采平台，T-01/T-02/T-05 主链先落，T-04+ 留 Sprint 4 |
-| NC 团队 08A 清单回函 SLA | 中 | D8-1 真实推送切换时点未定 | Sprint 3 仍用 Sprint 2 MockNcInterfaceService；08A 回函后 D8-1 替换实现 |
+| NC 团队 08B 外发函回函 SLA | 中 | D8-1 真实推送切换时点未定 | Sprint 3 仍用 Sprint 2 MockNcInterfaceService；08B 回函后 D8-1 替换实现，08A 内部底稿用于消化字段 |
 | 详设 06 入库主链版本（V1.1 是否就绪） | 中 | S-05 字段以详设为准；如详设未升 V1.1 须先升 | Sprint 3 D1 起手前确认 |
 | sub_group_id 写入钩子新业务实体覆盖率 | 低 | D9-2 守护单测兜底 | Sprint 2 D5-4 已建守护，新加业务实体若违规立刻失败 |
 
