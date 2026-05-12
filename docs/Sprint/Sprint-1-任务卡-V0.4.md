@@ -1,7 +1,7 @@
-# Sprint 1 任务卡 — Stage A 收尾 + B2 启动（V0.3）
+# Sprint 1 任务卡 — Stage A 收尾 + B2 启动（V0.4）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.3（NovaSync 实施层落地，待用户确认）
+**版本：** V0.4（联动 NovaSync 实施层切换方案 V0.1 + D1 实跑回写）
 **日期：** 2026-05-12
 **文档性质：** 开发实施层 · Sprint 任务卡
 **适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 1（10 工作日 / 约 2 周）
@@ -12,6 +12,8 @@
 - 上游 Sprint 节奏 → [`Sprint-0-任务卡-V0.1.md`](./Sprint-0-任务卡-V0.1.md) + [`Sprint-0.5-任务卡-V0.1.md`](./Sprint-0.5-任务卡-V0.1.md)
 - 详设依据 → [`02-基础档案与组织仓库详细设计-V1.1.md`](../详细设计/02-基础档案与组织仓库详细设计-V1.1.md) / [`03-物料主数据与编码详细设计-V1.1.md`](../详细设计/03-物料主数据与编码详细设计-V1.1.md) / [`04-需求计划与采购协同详细设计-V1.1.md`](../详细设计/04-需求计划与采购协同详细设计-V1.1.md) / [`11-非功能详细设计-V1.0.md`](../详细设计/11-非功能详细设计-V1.0.md)
 - 数据隔离边界 → [`评审留痕/数据隔离边界sub_group_id修订建议清单-V0.1.md`](../详细设计/评审留痕/数据隔离边界sub_group_id修订建议清单-V0.1.md) §四 影响范围列明本任务卡为待联动项
+- NovaSync 切换 → [`NovaSync 实施层切换方案-V0.1.md`](../详细设计/NovaSync%20实施层切换方案-V0.1.md) — 开发期 Npgsql 直连 / 生产期 HttpReader 切换方案
+- API 契约清单 → [`10A-给Catio团队的字段缺口提问清单-V1.1.md`](../详细设计/10A-给Catio团队的字段缺口提问清单-V1.1.md) §十二 NovaSync API 契约（V1.1 新增）
 - Sprint 0 Demo → [`Sprint-0-Demo-脚本-V0.1.md`](./Sprint-0-Demo-脚本-V0.1.md)
 - 工程约定 → `../../../SupplyCores/AGENTS.md`
 
@@ -50,6 +52,7 @@
 | NC-MD-001/002/003 mock service | ✅ Sprint 0 D13 |
 | 测试 63/63（Domain 56 + EFCore 2 + Application 5）| ✅ |
 | **Catio 生产 Nova DB 连通性已验证**（`fxkyjt.cn:5432/Nova`）| ✅ 2026-05-12 探查：阜矿子树 995 行 + 11,258 人员（人员本 Sprint 不取）|
+| **D1 NovaSync 配置 + Reader + Mapper + probe 工具已落地**（commit `0dcbeb0`） | ✅ 2026-05-12，75/75 测试通过；INovaSourceReader 抽象 + NpgsqlNovaSourceReader 开发期实现 + NovaUuidMapper 单进程映射 + tools/probe-nova 工具 |
 
 > **本机 DB 同步动作（V0.3 升版后须做一次）：** `dotnet ef database drop --force` → `dotnet run --project src/SupplyCores.DbMigrator`（DbMigrator 自动 apply migration + 跑 seed/sync contributors，**勿单跑 `dotnet ef database update`**——经 Sprint 0 D14 验证，design-time 写的 history runtime 看不到，会导致表重建冲突）。Sprint 1 D1 起手前完成。
 
@@ -229,7 +232,9 @@
 
 ---
 
-## 三、Sprint 2 衔接
+## 三、Sprint 2 衔接 + Stage B1 衔接
+
+### 3.1 Sprint 2（下一个 Sprint）
 
 Sprint 1 完成后，Sprint 2 起接（V0.4 §3.2 04 + 05 子模块）：
 
@@ -242,6 +247,14 @@ Sprint 1 完成后，Sprint 2 起接（V0.4 §3.2 04 + 05 子模块）：
 | 5 项预并行外部协调动作回执确认 | V0.4 §5.3 | PM/BA 工作量 |
 
 Sprint 2 任务卡在 Sprint 1 D10-5 起草。
+
+### 3.2 Stage B1（远端衔接）— NovaSync 实施层切换
+
+Sprint 1 的 `NpgsqlNovaSourceReader`（直连 fxkyjt.cn）是**开发期实现**。Stage B1（OAuth 凭据到位后）需切换到 `HttpNovaSourceReader`（走 Catio 提供的 REST API）。
+
+切换方案、前置条件、checklist 详见 [`NovaSync 实施层切换方案-V0.1.md`](../详细设计/NovaSync%20实施层切换方案-V0.1.md)。
+
+切换工时预估：1.5–2 PD，依赖 Catio 团队 §十二 API 契约（见 10A 提问清单 V1.1+）。
 
 ---
 
@@ -271,6 +284,9 @@ Sprint 2 任务卡在 Sprint 1 D10-5 起草。
 | Sprint 0 `MockNcInterfaceService` | P-02 已审若联动 NC（详设未要求但保留扩展点），mock 已可直接调 |
 | Sprint 0.5 `SchemaNamingConvention_Tests` 守护测试 | 自动验证 P-01/02/03/06 新表列名分层正确 |
 | 原型 v0.16 `prototype/assets/linkage.js` `on('P-01:已审')` | D7-4 + D8-4 linkage 实现的参考样板 |
+| **D1 已建 `INovaSourceReader` 抽象接口（Domain 层）+ NovaUuidMapper** | 生产期 Stage B1 切换 `HttpNovaSourceReader` 零改动业务下游；NovaUuidMapper 可用于未来 platform.persons 等其他 Nova 表同步 |
+| **D1 已建 `tools/probe-nova/` 探查模式** | 后续接 Catio 其他模块时（如 hrx.persons / kq.department_mappings）可仿同样模式快速验证 schema + 数据量 |
+| **`NovaSync 实施层切换方案-V0.1` §五 6 步 checklist** | Stage B1 切换 HttpReader 时按 checklist 跑，预估 1.5-2 PD 收口 |
 
 ---
 
@@ -310,3 +326,4 @@ Sprint 2 任务卡在 Sprint 1 D10-5 起草。
 | V0.1 | 2026-05-12 | 草案：基于 V0.4 §3.1 工时 + Sprint 0 收尾状态 + 汇报 §2.1 第 1 批节奏起草；待用户评审 |
 | V0.2 | 2026-05-12 | 联动 `数据隔离边界sub_group_id修订建议清单-V0.1` §四影响范围"Sprint-1 任务卡 V0.1 待联动"要求：(1) §1.2 基线加 commit `2132de1` 基类加 `SubGroupId` + migration 重生成 `20260512033645_Init`；(2) §1.3 加 Nova 同步契约对齐项（P1，真联调延后）；(3) §1.4 加 sub_group_id 字段 + 17 家非空率 + EFCore.Tests 守护测试；(4) D1-1/D1-3 OrgSeed 写明根节点 NULL / 二级集团自指 / 17 家全部 = 阜矿 + FK 自指完整性单测；(5) D6/D8 P-01/P-02 写明继承基类自动获得 SubGroupId + `sub_group_id` 索引 + linkage 复制源字段；(6) 新增 D6-6 写入钩子条目；(7) §四 加风险 4（钩子覆盖）；(8) 详设 02 引用从 V1.0 升 V1.1。 |
 | V0.3 | 2026-05-12 | 整改 D1-D2 从 mock 转 Catio 真实同步（已验证 `fxkyjt.cn:5432/Nova` 连通 + 阜矿子树 995 行 + 11258 人）：(1) §1.1 目标改"NovaOrganizationSyncContributor 第一次落地"，**人员不在范围**（PII，留 Stage B1）；(2) §1.2 加 Catio 连通验证、本机 DB 同步动作改"drop + DbMigrator"两步（移除 dotnet ef database update，Sprint 0 D14 已证 history 不通）；(3) §1.3 改 Org 缺口为 NovaSync + 配置 + UuidMapper 三条；(4) §1.4 完成标准改 24 家 + 995 行真实命名 + 二次幂等用例 9；(5) §二 D1-D3 重写：D1 NovaSync 准备 / D2 同步实现 + 验证 / D3 Warehouse mock 简化 + Docker compose；(6) §四 风险加 5/6/合规三条；(7) §六 工时对照 D1-D3 拆分。**口径校正：阜矿 = 阜新矿业（不是抚顺），level 3 = 24 家不是 17 家**；汇报材料 V0.2 的 17 家是 PDF 调研老口径，下次升版调位。 |
+| V0.4 | 2026-05-12 | 联动新建 `NovaSync 实施层切换方案-V0.1`：(1) 头部 `衔接文档` 加 NovaSync 切换方案 + 10A 清单 V1.1 引用；(2) §1.2 基线加一行"D1 已落地（commit `0dcbeb0`），75/75 测试通过"；(3) §三 改名"Sprint 2 衔接 + Stage B1 衔接"，加 §3.2 NovaSync HttpReader 切换衔接（链到切换方案）；(4) §五 可复用资产加 3 条：INovaSourceReader 抽象 / tools/probe-nova 探查模式 / 切换 checklist；(5) 文件名升 V0.3 → V0.4，同 commit `git mv`。**关键设计立场：`NpgsqlNovaSourceReader` 是开发期实现，生产期必经 HttpReader 切换；INovaSourceReader 抽象就是为此预留的扩展点**。 |

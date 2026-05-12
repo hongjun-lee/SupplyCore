@@ -1,6 +1,6 @@
-# 给 Catio 团队的字段缺口提问清单 V1.0
+# 给 Catio 团队的字段缺口提问清单 V1.1
 
-**文档目的：** SupplyCores（物资管理系统）通过 `[DependsOn]` 复用 Catio 仓库的 `Nova.Platform` + `Nova.Workflow` 模块代码，在本地独立数据库建相同结构的表（不访问集团 Nova Platform 的运行库，部署边界遵循概设 01）。本清单原按详设 10《权限审批流详细设计 V1.0》发函核对字段缺口；Catio 2026-05-05 回函后，已吸收到详设 10 V1.1 与 10A V0.6。本文档保留为发函/回函闭环记录，当前实施口径以 `10-权限审批流详细设计-V1.2.md` + `10A-权限审计域整合方案-V0.6.md` 为准。
+**文档目的：** SupplyCores（物资管理系统）通过 `[DependsOn]` 复用 Catio 仓库的 `Nova.Platform` + `Nova.Workflow` 模块代码，在本地独立数据库建相同结构的表（不访问集团 Nova Platform 的运行库，部署边界遵循概设 01）。本清单原按详设 10《权限审批流详细设计 V1.0》发函核对字段缺口；Catio 2026-05-05 回函后，已吸收到详设 10 V1.1 与 10A V0.6。**V1.1 升版**加 §九 Bis NovaSync API 契约一组新缺口，对应 sub_group_id 评审留痕清单 §修订 #4 落地。本文档保留为发函/回函闭环记录，当前实施口径以 `10-权限审批流详细设计-V1.2.md` + `10A-权限审计域整合方案-V0.6.md` + `NovaSync 实施层切换方案-V0.1.md` 为准。
 
 **回复 SLA 期望：** T+5 工作日。超期 SupplyCores 将按降级方案落地（缺失字段的表从 REUSE 改为 SupplyCores 自建 ADD），后续如 Catio 扩展再回切。
 
@@ -202,6 +202,103 @@
 
 ---
 
+## 九 Bis：缺口 #6 — `Nova.Platform.Organizations` WebAPI 契约（NovaSync 同步通道，V1.1 新增）
+
+**SupplyCores 需求：** SupplyCore（物资管理系统，独立部署）需要把 Catio `platform.organizations` 阜矿子树同步到本地 `m.organization`，作为业务主数据。Sprint 1 D1 已用 Npgsql 直连 `platform.organizations` 落地了开发期实现（见 `NovaSync 实施层切换方案-V0.1.md`）；**生产期必须改走 WebAPI**（凭据 / Schema 演进 / 网络边界 / 实时事件 / 审计五条理由见切换方案 §二）。
+
+本节是基于 Sprint 1 D1 实战回写的 API 契约请求，**未来 Catio 整理对外 API 契约文档时可直接吸收**。
+
+### 12.1 现状盘点（2026-05-12 SupplyCore 团队自助核对）
+
+| 项 | 现状 | 代码事实 |
+|----|------|---------|
+| HTTP endpoint | ✅ 已有 | `GET /api/platform/organizations/tree`（见 `OrganizationsController.cs` L18-21） |
+| 认证 | ✅ `[Authorize]` | `OrganizationAppService.GetTreeAsync` 标 `[Authorize]` |
+| 数据范围过滤 | ✅ 自动 DataScope | 走 `IDataScopeQueryPlanner.GetMyQueryPlanAsync(...)`；调用方按权限拿到自己范围内组织 |
+| 返回结构 | ✅ 树形嵌套 | `List<OrganizationTreeNodeDto>` 含 `Children` 自引用 |
+| 字段完整性 | ⚠ 缺关键字段 | 见 §12.2 |
+| 增量拉取 | ❌ 无 since 参数 | 每次全量 |
+| 实时事件 | ❌ 无 webhook / SSE / SignalR | — |
+
+### 12.2 字段缺口（请求扩 `OrganizationTreeNodeDto` 或新建 `OrganizationDto`）
+
+`OrganizationTreeNodeDto` 当前字段：`Id / ParentId / ParentName / Code / Name / ShortName / Description / Level / DisplayOrder / IsActive / Children`。**缺以下 SupplyCore 业务必需字段：**
+
+**问 Catio 团队：**
+
+- [ ] **Q12.1** 能否在 `OrganizationTreeNodeDto` 加 `SubGroupId` (Guid?) ？
+  - 用途：SupplyCore A-06 数据隔离边界主用字段（详设 02 V1.1 §4.1 / sub_group_id 评审留痕清单 §修订 #1 + #4）
+  - DB 已有该列（`platform.organizations.sub_group_id uuid`），仅 DTO 没暴露
+  - ✓ 可加：版本 ________
+  - ✗ 暂无：是否考虑扩展？预计版本 ________
+- [ ] **Q12.2** 能否在 `OrganizationTreeNodeDto` 加 `NamePath` (string?) ？
+  - 用途：SupplyCore 报表 / 树展示时直接用 `能源集团.阜新矿业.恒大煤矿` 路径串，免去客户端递归拼接
+  - DB 已有该列（`platform.organizations.name_path varchar`）
+- [ ] **Q12.3** 能否在 `OrganizationTreeNodeDto` 加 `IsLeaf` (bool)？
+  - DB 已有该列；UI 渲染叶子节点用
+- [ ] **Q12.4** 能否在 `OrganizationTreeNodeDto` 加 `OrgTypeId` (int) + `EffectiveDate` + `ExpiryDate`？
+  - 用途：组织生命周期 + 类型语义，业务报表用
+- [ ] **Q12.5** 能否暴露 `ExternalId` + `SyncedAt`？
+  - 用途：SupplyCore 自建系统对接其他系统时需要"Catio 端业务 ID"和"上次 Catio 同步时间戳"溯源
+
+### 12.3 端点形态缺口
+
+**问 Catio 团队：**
+
+- [ ] **Q12.6** 能否新增**平铺列表**端点（除现有 tree 外）？
+  - 提议形态：`GET /api/platform/organizations?include_descendants=true&sub_group_id={uuid}` → 返回平铺 `OrganizationDto[]`（不嵌套）
+  - 用途：批量同步场景下，客户端流式接收 + 不需 client-side 递归展平；现有 `/tree` 嵌套 + ToListAsync 在大子树（如能源集团 4666 行）下一次性传输负担大
+  - ✓ 可加 / ✗ 暂无 / ⚠ 建议另议
+- [ ] **Q12.7** 能否在端点上加 `since` 查询参数（增量拉取）？
+  - 提议形态：`?since={iso8601 datetime}` → 只返 `LastModificationTime >= since` 的组织（含被软删的，让客户端反向处理）
+  - 用途：SupplyCore 全量同步首次跑后，后续按小时增量；省去全量比对开销
+- [ ] **Q12.8** 能否在端点上加分页 / 流式 / `page_token` 机制？
+  - 阜矿子树 995 行可一次性返回；将来如果集团报表场景同步整个能源集团 4666 行甚至更大子树，需要分页
+  - ✓ 已有 / ✗ 暂无 / ⚠ 不需要（接受单次返回）
+
+### 12.4 实时事件订阅缺口
+
+**问 Catio 团队：**
+
+- [ ] **Q12.9** 是否计划提供组织变更的**实时事件订阅**机制？
+  - 候选方案：
+    - 方案 A：Webhook（Catio → 消费方 POST `{url}/organization-changed`）+ HMAC 签名
+    - 方案 B：SignalR Hub（消费方 connect + subscribe sub_group_id）
+    - 方案 C：SSE 长连接
+    - 方案 D：RabbitMQ / Kafka topic（集团基础设施层方案）
+  - SupplyCore 期望事件粒度：单条 `OrganizationChanged{ Action: Created/Updated/Deleted, Id, SubGroupId, OccurredAt, Snapshot }`
+  - 不强制 Stage B1 落地；不则降级为每 6 小时全量 + idempotent 比对（参见 NovaSync 切换方案 §四·4.3）
+
+### 12.5 跨系统认证缺口
+
+**问 Catio 团队：**
+
+- [ ] **Q12.10** SupplyCore.Web 作为 OAuth client 接入 Catio API 时，需要哪些 scope？
+  - 提议：`platform.organizations.read`（仅读阜矿子树，按调用方 sub_group_id 自动过滤）
+  - 颁发方式：通过 `Nova.Platform.OpenIddict` 申请 client_id + client_secret？或者集团统一 OAuth server？
+  - token 过期 / 刷新机制？
+
+### 12.6 SupplyCore 自建过渡方案
+
+在 §九 Bis 缺口 Catio 全部落地前，SupplyCore Sprint 1 D1-D2 已落 `NpgsqlNovaSourceReader`（直连 5432）作为开发期实现。**关键：业务下游通过 `INovaSourceReader` 抽象解耦**，Catio 提供 API 后切换 `HttpNovaSourceReader` 零改业务侧。
+
+切换 checklist 详见 `NovaSync 实施层切换方案-V0.1.md` §五。
+
+### 12.7 §九 Bis 整体说明
+
+本节缺口产出物有两层用途：
+
+1. **对 Catio 团队**：明确 SupplyCore 在生产前期望 Catio 提供的 API 契约
+2. **对 Catio 未来 API 文档**：本节 Q12.1-Q12.10 都是基于实战的实际诉求，**Catio 整理对外 API 契约文档时可直接吸收成 endpoint 设计依据**——其他下游系统（如其他业务系统从 Catio 取组织 / 人员数据）会有同样诉求。
+
+### 12.8 衔接文档
+
+- `NovaSync 实施层切换方案-V0.1.md` —— 完整切换路径与 checklist
+- `数据隔离边界sub_group_id修订建议清单-V0.1.md` §修订 #4 Nova 同步契约
+- `Sprint-1-任务卡-V0.4.md` §三·3.2 Stage B1 衔接 NovaSync HttpReader 切换
+
+---
+
 ## 十、回复格式建议
 
 为方便 SupplyCores 一次性吸收回复，建议：
@@ -234,3 +331,15 @@
 | 10A 整合方案        | `docs/详细设计/10A-权限审计域整合方案-V0.6.md` | 实施层选择 + 适配层 + 阶段排期 + 风险登记 |
 | 10A 节 5A 字段映射详表 | 同上文档 §五A                                     | 已识别缺口的字段级 ✗/? 标注          |
 | 概设 01 部署边界      | `docs/概要设计/01-总体架构与集成边界-v0.1.md` 节 6.1                       | "物资系统独立部署、不访问 Nova 底层数据库" |
+| NovaSync 切换方案    | `docs/详细设计/NovaSync 实施层切换方案-V0.1.md`         | 开发期直连 → 生产期 WebAPI 切换方案 + checklist；§九 Bis 缺口的来源 |
+| sub_group_id 评审留痕 | `docs/详细设计/评审留痕/数据隔离边界sub_group_id修订建议清单-V0.1.md` | §修订 #4 Nova 同步契约的来源 |
+
+
+---
+
+## 版本沿革
+
+| 版本 | 日期 | 变更 |
+| --- | --- | --- |
+| V1.0 | 2026-05-05 | 首版：Q1-Q9.1 共 16 个缺口问询；Catio 2026-05-05 回函闭环，结论吸收到详设 10 V1.1 + 10A V0.6。 |
+| V1.1 | 2026-05-12 | 加 §九 Bis 缺口 #6 — `Nova.Platform.Organizations` WebAPI 契约（Q12.1-Q12.10 共 10 项）。基于 Sprint 1 D1 实战回写：(1) §12.1 现状盘点：Catio 已有 `GET /api/platform/organizations/tree` + `[Authorize]` + 自动 DataScope；(2) §12.2 字段缺口 5 项（OrganizationTreeNodeDto 缺 SubGroupId / NamePath / IsLeaf / OrgTypeId / 生效日期 / ExternalId 等）；(3) §12.3 端点缺口 3 项（平铺 / 增量 since / 分页）；(4) §12.4 实时事件订阅缺口；(5) §12.5 OAuth scope 缺口；(6) §12.6 SupplyCore 自建过渡方案。**意图**：这 10 个 Q 既是给 Catio 团队的请求，也是 Catio 未来对外 API 契约文档的需求依据（其他下游系统会有同样诉求）。 |
