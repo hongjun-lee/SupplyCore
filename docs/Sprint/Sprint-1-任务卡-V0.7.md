@@ -1,7 +1,7 @@
-# Sprint 1 任务卡 — Stage A 收尾 + B2 启动（V0.6）
+# Sprint 1 任务卡 — Stage A 收尾 + B2 启动（V0.7）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.6（org_code vs sub_group_id 双轨查询模式澄清）
+**版本：** V0.7（D6-1 fulfillment_type 笔误修正：详设 04 §4.4.1 P-01 不含此字段）
 **日期：** 2026-05-12
 **文档性质：** 开发实施层 · Sprint 任务卡
 **适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 1（10 工作日 / 约 2 周）
@@ -218,7 +218,7 @@ SELECT id, parent_id, sub_group_id, code, name, short_name,
 
 | # | 任务 | 详设引用 | 验收 |
 |---|------|---------|------|
-| D6-1 | 新增 Domain 实体 `DemandRequest`（继承 `SupplyCoresFullAuditedAggregateRoot<long>` → **自动获得 `SubGroupId` / `CreatedOrgId` / `DeleteReason`**；含 fulfillment_type 字段）| 04 V1.1 §4.4.1 P-01 全字段表 + 基类设计 | 字段对齐详设 4.4.1 全 27 字段；EF model 含 `sub_group_id` 列（基类继承）|
+| D6-1 | 新增 Domain 实体 `DemandRequest`（继承 `SupplyCoresFullAuditedAggregateRoot<long>` → **自动获得 `SubGroupId` / `CreatedOrgId` / `DeleteReason`**）| 04 V1.1 §4.4.1 P-01 全字段表 + 基类设计 | 字段对齐详设 4.4.1 全 20 业务字段 + 基类 7 字段 = 27；EF model 含 `sub_group_id` 列（基类继承）|
 | D6-2 | 新增 Domain 实体 `DemandRequestLine`（继承同上，FK→DemandRequest + Material）| 04 V1.1 §4.4.2 P-06 全字段表 | 字段对齐详设 4.4.2；EF model 含 `sub_group_id` 列 |
 | D6-3 | 新增 EF mapping（`m.demand_request` + `m.demand_request_line`，snake_case 列名由 EnforceSnakeCaseColumnNames 自动处理）；**`sub_group_id` 加索引**（A-06 一刀切过滤主用，原则 2 性能要求）| AGENTS.md §数据库规则 + sub_group_id 清单 §三 原则 2 | migration 列名全 snake_case；`sub_group_id` 索引存在（IsBusinessTable + has SubGroupId 的实体都加）|
 | D6-4 | 状态机方法 `DemandRequest.Submit() / Approve(approverUserId) / Reject(reason)`（5 状态：草稿/待审/已审/已驳回/已分解，详设 §4.4.3）| 04 V1.1 §4.4.3 | 单测 ≥ 6 用例（每个 transition + 非法迁移 400）|
@@ -393,3 +393,4 @@ Sprint 1 的 `NpgsqlNovaSourceReader`（直连 fxkyjt.cn）是**开发期实现*
 | V0.4 | 2026-05-12 | 联动新建 `NovaSync 实施层切换方案-V0.1`：(1) 头部 `衔接文档` 加 NovaSync 切换方案 + 10A 清单 V1.1 引用；(2) §1.2 基线加一行"D1 已落地（commit `0dcbeb0`），75/75 测试通过"；(3) §三 改名"Sprint 2 衔接 + Stage B1 衔接"，加 §3.2 NovaSync HttpReader 切换衔接（链到切换方案）；(4) §五 可复用资产加 3 条：INovaSourceReader 抽象 / tools/probe-nova 探查模式 / 切换 checklist；(5) 文件名升 V0.3 → V0.4，同 commit `git mv`。**关键设计立场：`NpgsqlNovaSourceReader` 是开发期实现，生产期必经 HttpReader 切换；INovaSourceReader 抽象就是为此预留的扩展点**。 |
 | V0.5 | 2026-05-12 | **NovaSync 同步祖先链整改**——D2 commit `a9c0466` 同步窗口仅覆盖阜矿子树（995 行），漏掉集团根（能源集团 level 1），阜矿本部 parent_id=NULL 链路断裂。用户指出"系统为能源集团整体设计，应将父记录也同步过来，便于集团级汇总"。V0.5 修订：(1) §1.1 加"为能源集团整体设计 / 一期数据范围为集团根 + 阜矿子树"两层姿态 + 强调集团级汇总能力；(2) §1.2 基线加 D2 状态 + V0.5 需重跑提示；(3) §1.3 缺口改"NovaOrganizationSyncContributor SQL 扩祖先链 recursive CTE"；(4) §1.4 完成标准改 996 行 + 集团根 NULL 双字段 + parent_id 链路完整 + 集团级汇总查询验证；(5) §二 D2 重写 SQL 例 + 验收数；(6) §三 加 §3.3 多二级集团扩展衔接（清能 / 铁煤 / 沈煤等 10 家未来按需扩 RootSubGroupIds 数组）；(7) §六 D2 工时 +0.2 PD；(8) §七 DoD 改"完成标准全部 ✅"去掉数字硬编码；(9) 文件名升 V0.4 → V0.5，同 commit `git mv`。**核心立场：本地 PK bigint 不变；nova_org_id 仍是跨系统对齐字段；集团根本地 id 进 m.organization 让 parent_id 链路完整到顶**。 |
 | V0.6 | 2026-05-12 | **org_code vs sub_group_id 双轨查询模式澄清**——用户指出"code 是为了汇总用"，强化两个并行字段的职责分清。新增 §1.1.1 小节"组织数据双轨查询模式"：sub_group_id（数据隔离边界，二级集团一刀切粒度）/ org_code（业务汇总，path 编码任意层级）两轨表格；典型 SQL；A-06 权限 + 各级汇总匹配；未来 Code Review 检查项三条。实施现状：D2 commit `a9c0466` 已落地 OrgCode 字段同步，code 汇总能力 in place，无需 D3+ 额外工作。文件名升 V0.5 → V0.6，同 commit `git mv`。**核心立场：两字段不冲突、各自最优解决一个问题**。 |
+| V0.7 | 2026-05-12 | **D6-1 fulfillment_type 笔误修正**——D6 落地（commit `832c8fb`）时发现 V0.6 D6-1 描述"含 fulfillment_type 字段"与详设 04 V1.1 §4.4.1 P-01 全字段表不一致：fulfillment_type 实际定义在 S-01 采购申请单（详设 §4.14.1），不属于 P-01。已按详设走，D6-1 描述更正去掉该字段提及，字段数从"全 27 字段"细化为"20 业务字段 + 基类 7 字段 = 27"。代码不需任何变更（实体已按详设落地）。文件名升 V0.6 → V0.7，同 commit `git mv`。 |
