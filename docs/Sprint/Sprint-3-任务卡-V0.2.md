@@ -1,9 +1,9 @@
-# Sprint 3 任务卡 — T-01 招投标主链 + C-03 合同变更 + S-05 入库（V0.1）
+# Sprint 3 任务卡 — T-01 招投标主链 + C-03 合同变更 + S-05 入库（V0.2）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 / 待评审）
+**版本：** V0.2（用户评审 5 决策点后定版）
 **日期：** 2026-05-12
-**文档性质：** 开发实施层 · Sprint 任务卡（待评审）
+**文档性质：** 开发实施层 · Sprint 任务卡
 **适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 3（预估 10 工作日 / 约 2 周）
 **衔接文档：**
 
@@ -97,9 +97,9 @@
 
 | # | 任务 | 详设引用 | 验收 |
 |---|------|---------|------|
-| D4-1 | IPurchaseTaskToTenderLinkage：P-05 MarkInTender 调用前先自动创建 T-01 草稿 | 04 §4.7.2 业务规则 2 路径分发 + 原型 v0.16 | 单测：P-05 触发后自动建 T-01 |
-| D4-2 | 改 PurchaseTaskAppService.MarkInTenderAsync：参数从 `tenderAppId` 改为可选 → 不传时自动建 T-01 + 回填 | — | 兼容已有 endpoint |
-| D4-3 | E2E：从 P-01 提交 → P-02 已分解 → P-05 招采路径 → T-01 草稿自动生成 | — | E2E 单测 1 个 |
+| D4-1 | IPurchaseTaskToTenderLinkage：P-05 触发 → 自动建 T-01 草稿 + 回填 tender_app_id | 04 §4.7.2 业务规则 2 路径分发 + 原型 v0.16 | 单测：P-05 触发后自动建 T-01 |
+| D4-2 | **新加** AutoCreateTenderAsync endpoint（V0.2 决策点 2）：`POST /purchase-tasks/{id}/auto-create-tender` 自动建 T-01 + 调实体 MarkInTender(generatedTenderAppId)；老 MarkInTenderAsync(tenderAppId) 保留**不改签名**（兼容 Sprint 2 D4 测试 + Demo 用例 10） | — | 无 breaking change，Sprint 2 D4 单测 + 用例 10 curl 无需改动 |
+| D4-3 | E2E：从 P-01 提交 → P-02 已分解 → P-05 招采路径调用 AutoCreateTenderAsync → T-01 草稿自动生成 | — | E2E 单测 1 个 |
 
 **预估工时：** 1.5 PD
 
@@ -117,14 +117,15 @@
 
 | # | 任务 | 详设引用 | 验收 |
 |---|------|---------|------|
-| D6-1 | S-05 StockInbound 实体（外购入库主表，~30 字段） | 06 §4.2 | 字段对齐 |
+| D6-1 | S-05 StockInbound 实体（外购入库主表，~30 字段；含 ContractId nullable —— V0.2 决策点 5：紧急采购无 C-02 时允许为空）| 06 §4.2 | 字段对齐 |
 | D6-2 | S-05.S-22 入库明细行实体 | 06 §4.2 | 字段对齐 |
 | D6-3 | 状态机 5 状态（草稿/待审/已审/已驳回/已入库）+ 7 单测 | 06 §4.2 | 单测 ≥ 5 |
 | D6-4 | EF mapping + Add_StockInbound migration | — | apply 通过 |
 | D7-1 | IStockInboundAppService + AppService + Controller（含 BulkAddLine endpoint） | 06 §4.2 | 单测 ≥ 5 |
-| D7-2 | 入库审核通过后回写 C-02.ExecutedAmount 增量 | 05 §4.2.2 状态迁移约束（已签 → 执行中） | 单测覆盖 |
-| D8-1 | **关键 linkage：S-05 入库审核通过 → 触发 NC BIZ-001 真实推送**（Sprint 2 D9-3 stub 此时被实际消费） | 详设 08 §5.2 BIZ-001 + V0.2 D9-3 | E2E：审核后 contract.nc_voucher_no 写入 |
-| D8-2 | 接通 C-02 状态机：首笔 S-05 入库审核通过 → C-02.StartExecution() 触发（详设 §4.2.2"已签 → 执行中"系统自动驱动） | 05 §4.2.2 | E2E 单测 |
+| D7-2 | **StockInboundManager 写入钩子双轨**（V0.2 决策点 5）：ContractId 不空时从 C-02 复制 SubGroupId；空时按 OrgId 反查 M-01（同 PurchasePlanManager 模式）| sub_group_id 清单 §三 原则 3 | 单测 2 路径：有 C-02 + 无 C-02 |
+| D7-3 | 入库审核通过后回写 C-02.ExecutedAmount 增量 | 05 §4.2.2 状态迁移约束（已签 → 执行中） | 单测覆盖 |
+| D8-1 | **关键 linkage：S-05 入库审核通过 → 触发 NC BIZ-001 接通点**（V0.2 决策点 3：仍用 MockNcInterfaceService，命名上去掉"真实推送"措辞改"接通点"；NC 团队 08A 回函后仅替换 INcInterfaceService 实现，外部观感不变） | 详设 08 §5.2 BIZ-001 + Sprint 2 D9-3 | E2E：审核后 contract.nc_voucher_no 写入（mock 凭证号）|
+| D8-2 | 接通 C-02 状态机：**首笔 S-05 入库审核通过** → C-02.StartExecution() 触发（V0.2 决策点 4：Sprint 3 不做 S-02 订单，以 S-05 入库作驱动点；详设 05 §4.2.2 V1.2 升版时同步修订为"S-02 下达 或 S-05 入库"双驱动）| 05 §4.2.2 现行 + V1.2 拟修订 | E2E 单测；详设 V1.2 升版任务列 Sprint 3 D9 |
 
 **预估工时：** 3 PD
 
@@ -204,3 +205,4 @@
 | 版本 | 日期 | 变更 |
 |------|------|------|
 | V0.1 | 2026-05-12 | 首版草案，Sprint 2 D10-5 起。范围：T-01 招标主链 + T-02 字典 + T-05 中标结果 + P-05→T-01 linkage + C-03 合同变更 + S-05 入库 + S-05→NC BIZ-001 真实推送。预估 10 PD。T-03~T-07 + C-04~C-06 + S-04/S-06+ 延后 Sprint 4。Catio Workflow 与 NC 真实接入依赖外部回函，留 Sprint 4。待用户评审 + 三方进度信号回函后升 V0.2 联动。 |
+| V0.2 | 2026-05-12 | 用户评审 5 决策点后定版：(1) 范围维持 V0.1 全 4 模块 10.5 PD（决策点 1）；(2) D4-2 改为新加 AutoCreateTenderAsync endpoint 不动 MarkInTender 签名（决策点 2，避免 breaking Sprint 2 D4）；(3) D8-1 "真实推送" 改 "BIZ-001 接通点"，仍用 MockNcInterfaceService（决策点 3）；(4) D8-2 触发点 = 首笔 S-05 入库审核（决策点 4，详设 05 §4.2.2 V1.2 升版同步修订）；(5) D7-2 StockInboundManager 钩子双轨：有 C-02 复制 / 无 C-02 OrgId 反查（决策点 5）。文件名 V0.1 → V0.2 git mv 同 commit。 |
