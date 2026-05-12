@@ -132,7 +132,7 @@
 | D8-3 | EF mapping + `Add_Contract` migration；sub_group_id 索引 | — | apply 通过 |
 | D9-1 | `IContractAppService` + AppService + Controller | 05 §4.2 | 单测 ≥ 5 |
 | D9-2 | **关键 linkage：** C-01 `已会签` → C-02 草稿自动生成（复制字段 + sub_group_id） | 05 §4.2.4 业务规则 1 + 清单 §修订 #2 原则 3 | E2E 单测 |
-| D9-3 | **NC 接口中等 stub**（V0.2 决策点 4）：C-02 生效 → 调 INcInterfaceService.PushAsync('BIZ-001', ...) → 复用 Sprint 0 MockNcInterfaceService 模式 → 回写 mock `nc_voucher_no` 到 contract。Demo 可演完整"合同已生效 + NC 凭证已记账"链路；NC 团队回函后替换实现，外部观感不变 | 详设 08 §5.2 BIZ-001 + 08A 给NC清单 V0.1 + Sprint 0 D2 NC-MD-001 mock 模式 | 单测：C-02 生效后 contract.nc_voucher_no 非空 + INcInterfaceService.PushAsync 被调 1 次 |
+| D9-3 | **NC 接口中等 stub**（V0.2 决策点 4）：C-02 生效 → 调 INcInterfaceService.PushAsync('BIZ-001', ...) → 复用 Sprint 0 MockNcInterfaceService 模式 → 回写 mock `nc_voucher_no` 到 contract。Demo 可演完整"合同已生效 + NC 凭证已记账"链路；NC 团队回函后替换实现，外部观感不变 | 详设 08 §5.2 BIZ-001 + 08A 给NC清单 V0.2 + Sprint 0 D2 NC-MD-001 mock 模式 | 单测：C-02 生效后 contract.nc_voucher_no 非空 + INcInterfaceService.PushAsync 被调 1 次 |
 
 **预估工时：** 2 PD
 
@@ -165,7 +165,7 @@ Sprint 2 完成后，Sprint 3 起接（V0.4 §3.3 招投标 + 合同后续）：
 
 ### 3.2 NC 接口预联调（远端衔接）
 
-Sprint 2 D9-3 已落 NC endpoint stub；正式联调需先收 NC 团队回函（[08A-给NC团队的对接需求清单-V0.1.md](../详细设计/08A-给NC团队的对接需求清单-V0.1.md)）。
+Sprint 2 D9-3 已落 NC endpoint stub；正式联调需先收 NC 团队回函（[08A-给NC团队的对接需求清单-V0.2.md](../详细设计/08A-给NC团队的对接需求清单-V0.2.md)）。
 NC 凭据 + endpoint 到位后：
 
 - BIZ-001 采购入库正式（合同入库 → NC 凭证生成 + 回写凭证号）

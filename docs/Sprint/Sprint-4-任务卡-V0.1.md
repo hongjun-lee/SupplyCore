@@ -168,7 +168,7 @@ Sprint 4 V0.1 草案先列全 5 类（A~E）总 ~30 PD；评审拍板切到 10 P
 | # | 任务 | 详设引用 | 验收 |
 |---|------|---------|------|
 | D8-1 | **依赖外部回函**：Catio 10A V1.1 §九 Bis 回函检查；如就绪，启动 NovaSync HttpReader 切换 | NovaSync 切换方案 V0.1 | 切换方案落地或登记延后 |
-| D8-2 | **依赖外部回函**：NC 团队 08A V0.1 回函检查；如就绪，启动 BIZ-001 真实接口切换（Sprint 3 mock 替换）| 08A 给NC清单 V0.1 → V0.2 | 切换方案落地或登记延后 |
+| D8-2 | **依赖外部回函**：NC 团队 08A V0.1 回函检查；如就绪，启动 BIZ-001 真实接口切换（Sprint 3 mock 替换）| 08A 给NC清单 V0.2 → V0.2 | 切换方案落地或登记延后 |
 | D9-1 | Catio Workflow 真实联调：C-01 多方会签 chain 解析（替换 Sprint 2 单签 mock） | 详设 10 V1.2 §4.6 | 单测 + E2E |
 | D9-2 | 4 新审批模板（WF-DIR / WF-RPR / WF-CON-OVERLIMIT / WF-SUP-REASSESS）配置（V0.5 §3.3 #3）| 详设 10 V1.2 | 模板配置入库 |
 
