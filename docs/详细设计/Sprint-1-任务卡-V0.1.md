@@ -1,7 +1,7 @@
-# Sprint 1 任务卡 — Stage A 收尾 + B2 启动（V0.1）
+# Sprint 1 任务卡 — Stage A 收尾 + B2 启动（V0.2）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案，待用户确认）
+**版本：** V0.2（联动 sub_group_id 评审留痕，待用户确认）
 **日期：** 2026-05-12
 **文档性质：** 开发实施层 · Sprint 任务卡
 **适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 1（10 工作日 / 约 2 周）
@@ -10,7 +10,8 @@
 - 上游业务节奏 → [`../流程调研/存货问题解决方案-领导汇报-V0.1.md`](../流程调研/存货问题解决方案-领导汇报-V0.1.md) §2.1 P0 第 1 批（4-12 周）+ 第 2 批（13-22 周）启动
 - 上游工时模型 → [`开发进度规划-V0.4.md`](./开发进度规划-V0.4.md) §3.1 模块工时 + §5.1 阶段拆分
 - 上游 Sprint 节奏 → [`Sprint-0-任务卡-V0.1.md`](./Sprint-0-任务卡-V0.1.md) + [`Sprint-0.5-任务卡-V0.1.md`](./Sprint-0.5-任务卡-V0.1.md)
-- 详设依据 → [`02-基础档案与组织仓库详细设计-V1.0.md`](./02-基础档案与组织仓库详细设计-V1.0.md) / [`03-物料主数据与编码详细设计-V1.1.md`](./03-物料主数据与编码详细设计-V1.1.md) / [`04-需求计划与采购协同详细设计-V1.1.md`](./04-需求计划与采购协同详细设计-V1.1.md) / [`11-非功能详细设计-V1.0.md`](./11-非功能详细设计-V1.0.md)
+- 详设依据 → [`02-基础档案与组织仓库详细设计-V1.1.md`](./02-基础档案与组织仓库详细设计-V1.1.md) / [`03-物料主数据与编码详细设计-V1.1.md`](./03-物料主数据与编码详细设计-V1.1.md) / [`04-需求计划与采购协同详细设计-V1.1.md`](./04-需求计划与采购协同详细设计-V1.1.md) / [`11-非功能详细设计-V1.0.md`](./11-非功能详细设计-V1.0.md)
+- 数据隔离边界 → [`评审留痕/数据隔离边界sub_group_id修订建议清单-V0.1.md`](./评审留痕/数据隔离边界sub_group_id修订建议清单-V0.1.md) §四 影响范围列明本任务卡为待联动项
 - Sprint 0 Demo → [`Sprint-0-Demo-脚本-V0.1.md`](./Sprint-0-Demo-脚本-V0.1.md)
 - 工程约定 → `../../../SupplyCores/AGENTS.md`
 
@@ -37,7 +38,8 @@
 | 已落地 | 状态 |
 |--------|------|
 | 命名分层（ABP PascalCase / 业务 snake_case，对齐 Catio） | ✅ Sprint 0.5 + d7540ae 收口 |
-| 24 张表（16 业务 schema + 8 ABP 框架）已 migration | ✅ `20260511200219_Init.cs` |
+| 24 张表（16 业务 schema + 8 ABP 框架）已 migration | ✅ `20260512033645_Init.cs`（基类加 SubGroupId 后重生成）|
+| **基类加 `SubGroupId`（数据隔离边界字段）** | ✅ commit `2132de1`；详见 sub_group_id 评审留痕清单 §6.3 |
 | DbMigrator IDbContextProvider + UoW wiring | ✅ 4b3a4c3 修复 |
 | Seed：Unit ×12 / MaterialCategory ×15 / Supplier ×5 / SensitiveOperation ×19 | ✅ DbMigrator |
 | 16 实体 Domain + 11 业务 Controller / AppService（M-01/02/03A/03B/04/05/06/07/08/09/10/11/12/13/14/15/16/17）| ✅ Sprint 0 |
@@ -47,17 +49,20 @@
 | NC-MD-001/002/003 mock service | ✅ Sprint 0 D13 |
 | 测试 63/63（Domain 56 + EFCore 2 + Application 5）| ✅ |
 
+> **本机 DB 同步动作（V0.2 升版后须做一次）：** `dotnet ef database drop --force` → `dotnet ef database update`（应用 `20260512033645_Init`）→ `dotnet run --project src/SupplyCores.DbMigrator`。Sprint 1 D1 起手前完成。
+
 ### 1.3 关键缺口
 
 | 类型 | 缺什么 | 详设依据 | 优先级 |
 |------|--------|---------|--------|
-| ❌ Seed | **Organization 17 家 mock seed**（含集团 / 物资公司 / 矿/厂/子公司三层）| 02 V1.0 §4.1 + 汇报 §序言 17 家覆盖 | P0 |
-| ❌ Seed | **Warehouse 链 mock seed**（≥1 家代表性单位的 m.warehouse + warehouse_zone + storage_location）| 02 V1.0 §3-5 | P0 |
+| ❌ Seed | **Organization 17 家 mock seed**（含集团 / 物资公司 / 矿/厂/子公司三层 + `sub_group_id` 全部 = 阜矿 org_id）| 02 V1.1 §4.1 + 汇报 §序言 17 家覆盖 + sub_group_id 清单 §修订 #1 | P0 |
+| ❌ Seed | **Warehouse 链 mock seed**（≥1 家代表性单位的 m.warehouse + warehouse_zone + storage_location）| 02 V1.1 §3-5 | P0 |
 | ❌ DevOps | **`docker-compose.yml` + `Dockerfile`**（试点单位部署包草案）| Sprint-0-Demo §4.1 + 11 V1.0 §部署框架 | P0（Sprint 0 D14 ⬜ 唯一剩余）|
 | ❌ 应用层 | **MaterialCodeGenerator + BulkImportService**（M-05 一物一码 + 16 + Excel 批量导入）| 03 V1.1 §编码生成 + 5 §SY-01 序列联动 | P1 |
-| ❌ 实体 + Migration | **P-01 demand_request + P-06 demand_request_line** | 04 V1.1 §4.4 | P0（B2 主链入口）|
-| ❌ 实体 + Migration | **P-02 purchase_plan + P-03 purchase_plan_line** | 04 V1.1 §4.5 | P0（B2 主链续接）|
+| ❌ 实体 + Migration | **P-01 demand_request + P-06 demand_request_line**（继承基类自动获得 `SubGroupId` + `CreatedOrgId` + `DeleteReason`） | 04 V1.1 §4.4 | P0（B2 主链入口）|
+| ❌ 实体 + Migration | **P-02 purchase_plan + P-03 purchase_plan_line**（同上继承）| 04 V1.1 §4.5 | P0（B2 主链续接）|
 | ❌ 应用层 | **DemandRequestAppService + PurchasePlanAppService（含状态机 endpoint）** | 04 V1.1 §4.4.3 / §4.5.3 | P0 |
+| ⚠ Nova 同步契约 | **`M-01.sub_group_id` 直接吃 Catio.platform.organizations.sub_group_id** 联调验收点（一期单二级集团，本 Sprint 只出 mock；真实联调待 Stage B1 OAuth 凭据后）| sub_group_id 清单 §修订 #4 | P1（Sprint 1 出 mock + 文档占位，真联调延后）|
 
 > P-04 plan_adjustment / P-05 purchase_task / T-01~07 招投标推后到 Sprint 2-3（详 §三 衔接）。
 
@@ -70,6 +75,10 @@
 - ✅ Demo 新用例 8：P-02 计划审批通过 → 状态转 `已审`，linkage 待 Sprint 2 接 P-05 分解
 - ✅ `docker compose up` 在本地一行启动 supplycores-web + postgres，`/swagger` 可达
 - ✅ 跑完 5+ 个 P-01 / P-02 操作，`a.operation_log` 新增 ≥ 20 行（继续 Sprint 0 验收的审计自动写入）
+- ✅ **`sub_group_id` 数据隔离边界字段覆盖**（评审留痕清单 §三 原则 1 + §6.3 修订 #2 落地验证）：
+  - 每张业务表（`m.*` + `a.*` + 新建的 `m.demand_request` / `m.purchase_plan` 等）DDL 必须含 `sub_group_id bigint NULL` 列（由 EnforceSnakeCaseColumnNames 自动转 snake_case）
+  - 17 家 Organization mock seed 中 `sub_group_id` 非空率 100%（集团根节点除外，按修订 #4 边界条件）
+  - 新增 EFCore.Tests 单测：扫 `ctx.Model.GetEntityTypes()`，所有有 schema 的业务实体都必须含 `SubGroupId` 属性（原则 1 CI 检测后端版）
 
 ---
 
@@ -79,11 +88,11 @@
 
 | # | 任务 | 详设引用 | 验收 |
 |---|------|---------|------|
-| D1-1 | 新增 `OrganizationDataSeedContributor`，按集团 / 物资公司 / 17 家矿厂三层结构 seed | 02 V1.0 §4.1 organization 层级 + 汇报 §序言 17 家 | DbMigrator 跑完后 `m.organization` 行数 = 19（1 集团 + 1 物资公司 + 17 家子单位）|
-| D1-2 | mock 17 家命名（可参考能源行业典型，如"X 矿 / Y 厂 / Z 公司"，business_unit_type 字段按煤矿/非煤/能源/化工分类）| 02 V1.0 §4.1.2 字段 | 调用 `GET /api/supply-cores/organizations/tree` 返回 3 层树，深度 = 3，叶子 17 个 |
-| D1-3 | 加 `OrganizationDataSeedContributor_Tests` 单测：验证 17 家 + 三层结构 + 不重复 seed（幂等）| — | `dotnet test` 单测通过 |
+| D1-1 | 新增 `OrganizationDataSeedContributor`，按集团 / 物资公司 / 17 家矿厂三层结构 seed；**根节点（辽宁能源 org_level=1）`sub_group_id=NULL`；阜矿（org_level=2，二级集团）`sub_group_id = 自身 org_id`；17 家矿厂（org_level=3）`sub_group_id = 阜矿 org_id`**（一期单二级集团口径，sub_group_id 清单 §修订 #1 + §修订 #4）| 02 V1.1 §4.1 organization 层级 + 汇报 §序言 17 家 + sub_group_id 清单 §修订 #1 | DbMigrator 跑完后 `m.organization` 行数 = 19（1 集团 + 1 物资公司 + 17 家子单位）;`sub_group_id IS NOT NULL` 的行 = 18（集团根除外）|
+| D1-2 | mock 17 家命名（可参考能源行业典型，如"X 矿 / Y 厂 / Z 公司"，business_unit_type 字段按煤矿/非煤/能源/化工分类）；命名为占位（业务方真实清单到位后替换）| 02 V1.1 §4.1.2 字段 | 调用 `GET /api/supply-cores/organizations/tree` 返回 3 层树，深度 = 3，叶子 17 个 |
+| D1-3 | 加 `OrganizationDataSeedContributor_Tests` 单测：验证 17 家 + 三层结构 + 不重复 seed（幂等）+ **sub_group_id 非空率 ≥ 18/19 + FK 自指（sub_group_id 指向的 org_id 必须存在且 org_level=2）+ 集团根 sub_group_id IS NULL** | sub_group_id 清单 §三 原则 4 | `dotnet test` 单测通过；至少 4 个 case（结构 / 幂等 / sub_group_id 覆盖 / FK 自指）|
 
-**预估工时：** 1 工作日（V0.4 §3.1 02 模块 51 PD 残余）
+**预估工时：** 1 工作日（V0.4 §3.1 02 模块 51 PD 残余 + sub_group_id 写入逻辑 ≈ 0.5 PD）
 
 ---
 
@@ -144,11 +153,12 @@
 
 | # | 任务 | 详设引用 | 验收 |
 |---|------|---------|------|
-| D6-1 | 新增 Domain 实体 `DemandRequest`（继承 `SupplyCoresFullAuditedAggregateRoot<long>`，含 fulfillment_type 字段）| 04 V1.1 §4.4.1 P-01 全字段表 | 字段对齐详设 4.4.1 全 27 字段 |
-| D6-2 | 新增 Domain 实体 `DemandRequestLine`（继承同上，FK→DemandRequest + Material）| 04 V1.1 §4.4.2 P-06 全字段表 | 字段对齐详设 4.4.2 |
-| D6-3 | 新增 EF mapping（`m.demand_request` + `m.demand_request_line`，snake_case 列名由 EnforceSnakeCaseColumnNames 自动处理）| AGENTS.md §数据库规则 | migration 列名全 snake_case |
+| D6-1 | 新增 Domain 实体 `DemandRequest`（继承 `SupplyCoresFullAuditedAggregateRoot<long>` → **自动获得 `SubGroupId` / `CreatedOrgId` / `DeleteReason`**；含 fulfillment_type 字段）| 04 V1.1 §4.4.1 P-01 全字段表 + 基类设计 | 字段对齐详设 4.4.1 全 27 字段；EF model 含 `sub_group_id` 列（基类继承）|
+| D6-2 | 新增 Domain 实体 `DemandRequestLine`（继承同上，FK→DemandRequest + Material）| 04 V1.1 §4.4.2 P-06 全字段表 | 字段对齐详设 4.4.2；EF model 含 `sub_group_id` 列 |
+| D6-3 | 新增 EF mapping（`m.demand_request` + `m.demand_request_line`，snake_case 列名由 EnforceSnakeCaseColumnNames 自动处理）；**`sub_group_id` 加索引**（A-06 一刀切过滤主用，原则 2 性能要求）| AGENTS.md §数据库规则 + sub_group_id 清单 §三 原则 2 | migration 列名全 snake_case；`sub_group_id` 索引存在（IsBusinessTable + has SubGroupId 的实体都加）|
 | D6-4 | 状态机方法 `DemandRequest.Submit() / Approve(approverUserId) / Reject(reason)`（5 状态：草稿/待审/已审/已驳回/已分解，详设 §4.4.3）| 04 V1.1 §4.4.3 | 单测 ≥ 6 用例（每个 transition + 非法迁移 400）|
-| D6-5 | EF migration 生成（`dotnet ef migrations add Add_DemandRequest`，名字按 commit message 风格）| — | migration 文件存在 + apply 后 2 张表 + 索引 ≥ 4 |
+| D6-5 | EF migration 生成（`dotnet ef migrations add Add_DemandRequest`，名字按 commit message 风格）| — | migration 文件存在 + apply 后 2 张表 + 索引 ≥ 4（含 `sub_group_id` 索引）|
+| D6-6 | **写入钩子（DomainService 或 AppService.CreateAsync 入口）：根据 `ICurrentUser.OrgId` 反查 M-01.sub_group_id 一次性回算后落库**（业务实体写入时 SubGroupId 不为 null，除非显式声明集团级共享，原则 3）| sub_group_id 清单 §修订 #2 + §三 原则 3 | 创建 1 条 P-01 → `m.demand_request.sub_group_id` 等于该 user 所属 org 的 sub_group_id |
 
 **预估工时：** 1 工作日（V0.4 §3.2 04 子模块"需求计划 M-09/10/11" 9 后端 PD 中 ~4 PD 用于 P-01/06 实体）
 
@@ -172,10 +182,10 @@
 
 | # | 任务 | 详设引用 | 验收 |
 |---|------|---------|------|
-| D8-1 | 新增 Domain 实体 `PurchasePlan` + `PurchasePlanLine` | 04 V1.1 §4.5.1 / §4.5.2 | 字段全对齐 |
-| D8-2 | 新增 EF mapping + migration `Add_PurchasePlan` | — | apply 后 2 张表 + 索引 |
+| D8-1 | 新增 Domain 实体 `PurchasePlan` + `PurchasePlanLine`（继承基类自动获得 SubGroupId / CreatedOrgId / DeleteReason）| 04 V1.1 §4.5.1 / §4.5.2 | 字段全对齐；EF model 含 `sub_group_id` 列 |
+| D8-2 | 新增 EF mapping + migration `Add_PurchasePlan`；`sub_group_id` 加索引 | sub_group_id 清单 §三 原则 2 | apply 后 2 张表 + 索引（含 sub_group_id）|
 | D8-3 | 状态机方法 `PurchasePlan.Submit() / Approve() / MarkDecomposed()`（4 状态：草稿/待审/已审/已分解，详设 §4.5.3）| 04 V1.1 §4.5.3 | 单测 ≥ 5 |
-| D8-4 | **承接 D7-4 linkage**：实现 `DemandRequest:已审` → `PurchasePlan` 草稿自动生成（按 org + month 幂等聚合 + 复制 line 数据），D7 末的 approve 调用应触发该 linkage | 原型 v0.16 + 04 V1.1 §4.5.4 | 单测：approve 2 个同 org 同月 demand_request → 1 个 PurchasePlan 草稿（4 行 line） |
+| D8-4 | **承接 D7-4 linkage**：实现 `DemandRequest:已审` → `PurchasePlan` 草稿自动生成（按 org + month 幂等聚合 + 复制 line 数据 + **复制 sub_group_id 字段**，确保聚合后的 PurchasePlan 与源 DemandRequest 在同一二级集团范围内），D7 末的 approve 调用应触发该 linkage | 原型 v0.16 + 04 V1.1 §4.5.4 + sub_group_id 清单 §三 原则 3 | 单测：approve 2 个同 org 同月 demand_request → 1 个 PurchasePlan 草稿（4 行 line）；`PurchasePlan.sub_group_id` 等于源 DemandRequest 的 sub_group_id |
 
 **预估工时：** 1 工作日
 
@@ -233,7 +243,8 @@ Sprint 2 任务卡在 Sprint 1 D10-5 起草。
 | **关键风险 1** | 17 家 Organization mock seed 命名不符合阜矿集团实际单位名 → 用占位命名 + 文档说明 "待业务方确认替换为真实清单"，不影响功能验收 |
 | **关键风险 2** | Docker 镜像 build 在 Apple Silicon 上跨平台 `linux/amd64` 慢 → 文档指定 `--platform linux/amd64` build 选项，CI 用 amd64 runner |
 | **关键风险 3** | linkage `DemandRequest:已审 → PurchasePlan 草稿` 幂等性测试不足 → D8-4 单测覆盖"重复 approve 不重复生成 plan" |
-| **依赖外部** | 无（Sprint 1 仍在 Stage A 末段，OAuth / NC 厂商 / 招采平台 / 消息平台均不涉及）|
+| **关键风险 4** | sub_group_id 写入钩子覆盖不全（漏掉某个 AppService.CreateAsync 入口）→ 新增 EFCore.Tests "所有业务实体 SubGroupId 非空率" 守护测试（D6-6 + D8 涵盖）|
+| **依赖外部** | 无（Sprint 1 仍在 Stage A 末段，OAuth / NC 厂商 / 招采平台 / 消息平台均不涉及）；sub_group_id 真实 Catio 同步联调延后到 Stage B1 |
 
 ---
 
@@ -283,3 +294,4 @@ Sprint 2 任务卡在 Sprint 1 D10-5 起草。
 | 版本 | 日期 | 变更 |
 |------|------|------|
 | V0.1 | 2026-05-12 | 草案：基于 V0.4 §3.1 工时 + Sprint 0 收尾状态 + 汇报 §2.1 第 1 批节奏起草；待用户评审 |
+| V0.2 | 2026-05-12 | 联动 `数据隔离边界sub_group_id修订建议清单-V0.1` §四影响范围"Sprint-1 任务卡 V0.1 待联动"要求：(1) §1.2 基线加 commit `2132de1` 基类加 `SubGroupId` + migration 重生成 `20260512033645_Init`；(2) §1.3 加 Nova 同步契约对齐项（P1，真联调延后）；(3) §1.4 加 sub_group_id 字段 + 17 家非空率 + EFCore.Tests 守护测试；(4) D1-1/D1-3 OrgSeed 写明根节点 NULL / 二级集团自指 / 17 家全部 = 阜矿 + FK 自指完整性单测；(5) D6/D8 P-01/P-02 写明继承基类自动获得 SubGroupId + `sub_group_id` 索引 + linkage 复制源字段；(6) 新增 D6-6 写入钩子条目；(7) §四 加风险 4（钩子覆盖）；(8) 详设 02 引用从 V1.0 升 V1.1。 |
