@@ -1,10 +1,10 @@
-# Sprint 3 任务卡 — T-01 招投标主链 + C-03 合同变更 + S-05 入库（V0.2）
+# Sprint 3 任务卡 — D0 schema 整改 + T-01 招投标主链 + C-03 合同变更 + S-05 入库（V0.3）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（用户评审 5 决策点后定版）
+**版本：** V0.3（D0 schema 整改加入 + 联动 V0.5 进度规划盘点）
 **日期：** 2026-05-12
 **文档性质：** 开发实施层 · Sprint 任务卡
-**适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 3（预估 10 工作日 / 约 2 周）
+**适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 3（预估 10.5 工作日 / 约 2 周）
 **衔接文档：**
 
 - 上游 Sprint 节奏 → [`Sprint-2-任务卡-V0.2.md`](./Sprint-2-任务卡-V0.2.md) §三 Sprint 3 衔接（D10-5 起源）
@@ -61,15 +61,28 @@
 
 ### 1.4 完成标准（Sprint 3 验收）
 
-- [ ] §二 D1-D10 全部任务 ✅
-- [ ] 全量测试 ≥ 220 通过（Sprint 2 基线 200 + Sprint 3 新增 ~20）
-- [ ] 新增 EF migrations ≥ 4 条（`Add_TenderApplication` / `Add_ProcurementMethod` / `Add_TenderResult` / `Add_ContractChange` / `Add_StockInbound`），全部 apply
+- [ ] §二 D0-D10 全部任务 ✅
+- [ ] 全量测试 ≥ 220 通过（Sprint 2 基线 200 + Sprint 3 新增 ~20；D0 schema 整改 0 新测试，回归 200 不掉）
+- [ ] 新增 EF migrations ≥ 5 条（`Schema_Move_P_Tables_To_PSchema` D0 + `Add_TenderApplication` / `Add_ProcurementMethod` / `Add_TenderResult` / `Add_ContractChange` / `Add_StockInbound`），全部 apply
+- [ ] AGENTS.md + CLAUDE.md schema 清单含 `t` 招采协同域（D0-1 验收）
 - [ ] Sprint-3-Demo-脚本 V0.1 入库（用例 12-14 覆盖招投标 / 合同变更 / 入库链）
 - [ ] commit log 整洁 + 5 个左右 feat commit 全 push
 
 ---
 
-## 二、按日任务拆解（10 工作日）
+## 二、按日任务拆解（10.5 工作日）
+
+### Day 0 — Schema 命名整改（V0.3 加入，0.5 PD）
+
+> 起手前发现 Sprint 1/2 P-01~P-05 共 6 张表误用 `m` schema（应属采购计划域 `p`，详设 01 §6.2），加 CLAUDE.md / AGENTS.md schema 清单漏 `t`（招采协同域）。V0.3 起手补齐两个 issue，避免 Sprint 3 T-01 沿用错误。
+
+| # | 任务 | 详设引用 | 验收 |
+|---|------|---------|------|
+| D0-1 | AGENTS.md + CLAUDE.md schema 清单从 9 改 10：`m / p / t / c / s / e / f / r / a / sy` | 详设 01 §6 | 两文件已联动更新 |
+| D0-2 | 6 张 P 表 schema 从 `m` 迁到 `p`：demand_request / demand_request_line / purchase_plan / purchase_plan_line / plan_adjustment / purchase_task；EnforceSnakeCaseColumnNames 业务 schema 白名单加 `p` | 详设 01 §6.2 P 域 | migration `Schema_Move_P_Tables_To_PSchema` 通过 + 全量 200 测试无回归 |
+| D0-3 | 任务卡 V0.2 → V0.3 升版联动 | 文件名 = 内容版本约定 | git mv + 头部 + 版本沿革 |
+
+**预估工时：** 0.5 PD
 
 ### Day 1-2 — T-02 + T-01 招标基线
 
@@ -206,3 +219,4 @@
 |------|------|------|
 | V0.1 | 2026-05-12 | 首版草案，Sprint 2 D10-5 起。范围：T-01 招标主链 + T-02 字典 + T-05 中标结果 + P-05→T-01 linkage + C-03 合同变更 + S-05 入库 + S-05→NC BIZ-001 真实推送。预估 10 PD。T-03~T-07 + C-04~C-06 + S-04/S-06+ 延后 Sprint 4。Catio Workflow 与 NC 真实接入依赖外部回函，留 Sprint 4。待用户评审 + 三方进度信号回函后升 V0.2 联动。 |
 | V0.2 | 2026-05-12 | 用户评审 5 决策点后定版：(1) 范围维持 V0.1 全 4 模块 10.5 PD（决策点 1）；(2) D4-2 改为新加 AutoCreateTenderAsync endpoint 不动 MarkInTender 签名（决策点 2，避免 breaking Sprint 2 D4）；(3) D8-1 "真实推送" 改 "BIZ-001 接通点"，仍用 MockNcInterfaceService（决策点 3）；(4) D8-2 触发点 = 首笔 S-05 入库审核（决策点 4，详设 05 §4.2.2 V1.2 升版同步修订）；(5) D7-2 StockInboundManager 钩子双轨：有 C-02 复制 / 无 C-02 OrgId 反查（决策点 5）。文件名 V0.1 → V0.2 git mv 同 commit。 |
+| V0.3 | 2026-05-12 | 联动开发进度规划 V0.4→V0.5 升版后的盘点：发现 Sprint 1/2 P-01~P-05 共 6 张表误用 `m` schema（应属采购计划域 `p`，详设 01 §6.2），CLAUDE.md / AGENTS.md schema 清单漏 `t` 招采协同域。Sprint 3 起手前 §二 加 D0 schema 整改条目（+0.5 PD）：(1) AGENTS.md + CLAUDE.md schema 清单从 9 改 10 加 `t`；(2) 6 张 P 表 ALTER SET SCHEMA p（new migration `Schema_Move_P_Tables_To_PSchema`，本地 DB 已 apply）+ 全量回归 200 测试无失败；(3) Sprint 1/2 已落地代码 / 任务卡保持不动，schema 整改作为 Sprint 3 D0 处理。V0.5 §3.3 其余 10 项政策驱动功能增量（外委检修 / 4 新审批模板 / 暂估双预警 / 超储三级 / 履约保证金 / 后评价等）属 Sprint 4+ 范围，详设 05/07/10 V1.2 升版时再吸收。文件名 V0.2 → V0.3 git mv 同 commit。 |
