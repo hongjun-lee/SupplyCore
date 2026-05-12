@@ -295,7 +295,7 @@
 
 - `NovaSync 实施层切换方案-V0.1.md` —— 完整切换路径与 checklist
 - `数据隔离边界sub_group_id修订建议清单-V0.1.md` §修订 #4 Nova 同步契约
-- `Sprint-1-任务卡-V0.5.md` §三·3.2 Stage B1 衔接 NovaSync HttpReader 切换
+- `Sprint-1-任务卡-V0.6.md` §三·3.2 Stage B1 衔接 NovaSync HttpReader 切换
 
 ---
 
