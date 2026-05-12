@@ -154,7 +154,7 @@ OAuth 凭据流程绑定到 sub_group_id 评审留痕 §修订 #4"Nova 同步契
 | `Sprint-1-任务卡 V0.4+` | §五 可复用资产里标 `INovaSourceReader` 是切换扩展点；§三 衔接里加"Stage B1 切换 HttpReader"作为后续 Sprint 范围 |
 | `10A-给Catio团队的字段缺口提问清单-V1.1` | §九 Bis 新增缺口 #6：NovaSync API 契约（组织树 endpoint / 字段 / 分页 / 增量 / 实时事件 5 项 Q） |
 | `02-基础档案与组织仓库详细设计-V1.2`（未来）| §4.1 业务规则"Nova 同步规则"补 API 端点 + OAuth scope 描述 |
-| `开发进度规划-V0.4` | §5.3 阻塞项 #1 OAuth 凭据预申请的"目标阶段 A 末到位"延伸到"NovaSync HttpReader 切换" |
+| `开发进度规划-V0.5` | §5.3 阻塞项 #1 OAuth 凭据预申请的"目标阶段 A 末到位"延伸到"NovaSync HttpReader 切换" |
 
 ## 七、版本沿革
 
