@@ -66,13 +66,13 @@
 | D1-2 | `dotnet ef database update -p src/SupplyCores.DbMigrator` 跑 Wave1-6 到本地 PostgreSQL | 21 张表（13 M 域 + 8 审计）存在 + Wave6 SensitiveOperation seed 数据有 |
 | D1-3 | `dotnet run --project src/SupplyCores.Web` + 打开 `/swagger` | 已有 6 个 Controller 全部可见，能 GET 各列表 |
 | D1-4 | Backlog 锁定（本任务卡进仓库 + issue tracker）| 任务卡 v0.1 入库 |
-| D1-5 | **补抽象基类 `SupplyCoresFullAuditedAggregateRoot<TKey>`**（加 `CreatedOrgId` + `DeleteReason` 详设独有字段）+ 加单元测试 | 见 D1-5 详细 |
+| D1-5 | **补抽象基类 `SupplyCoresFullAuditedAggregateRoot<TKey>`**（加 `CreatedOrgId` + `SubGroupId` + `DeleteReason` 详设独有字段）+ 加单元测试 | 见 D1-5 详细 |
 
 > 验收任一失败 → 先解决环境问题再往下。
 
 #### D1-5 详细 — 抽象基类（半天）
 
-详设 01 §4.2 / §4.3 要求的两个 ABP 没有的字段。
+详设 01 §4.2 / §4.3 要求的 ABP 没有的字段（**2026-05-12 V1.1 起含 `SubGroupId`**，落地 `评审留痕/数据隔离边界sub_group_id修订建议清单-V0.1.md` 修订 #2）。
 
 > **路径修正**：`FullAuditedAggregateRoot<TKey>` 在 `Volo.Abp.Ddd.Domain` 包（不在 `.Shared`）。基类放 `Domain` 项目，**不是** `Domain.Shared`：
 
@@ -85,9 +85,10 @@ using Volo.Abp.Domain.Entities.Auditing;
 namespace Nova.SupplyCores.Entities.Auditing;
 
 /// <summary>
-/// SupplyCores 业务实体基类（详设 01 §4.2 + §4.3）。
-/// 在 ABP FullAuditedAggregateRoot 基础上扩展两个详设独有字段：
-///   - CreatedOrgId 创建人所属组织（A-06 data_permission 数据范围过滤的关键字段）
+/// SupplyCores 业务实体基类（详设 01 §4.2 + §4.3 + 审计字段映射表 V0.2）。
+/// 在 ABP FullAuditedAggregateRoot 基础上扩展三个详设独有字段：
+///   - CreatedOrgId 创建人所属组织（细粒度过滤辅助）
+///   - SubGroupId   数据所属二级集团（A-06 数据范围"以二级集团为隔离边界"一刀切主用字段，V1.1 新增）
 ///   - DeleteReason 软删除原因（详设 11 §13 合规留痕要求）
 /// </summary>
 public abstract class SupplyCoresFullAuditedAggregateRoot<TKey>
@@ -95,6 +96,14 @@ public abstract class SupplyCoresFullAuditedAggregateRoot<TKey>
 {
     /// <summary>详设 01 §4.2：创建人所属组织（FK→M-01）</summary>
     public virtual long? CreatedOrgId { get; protected set; }
+
+    /// <summary>
+    /// 详设 01 §4.2（V1.1 新增）：数据所属二级集团（FK→M-01）。
+    /// 写入时由 CreatedOrgId 回溯 M-01.sub_group_id 确定；集团级共享主数据可为 NULL。
+    /// A-06 数据范围过滤主用字段；详见
+    /// 评审留痕/数据隔离边界sub_group_id修订建议清单-V0.1.md 修订 #2 + 原则 1-4。
+    /// </summary>
+    public virtual long? SubGroupId { get; protected set; }
 
     /// <summary>详设 01 §4.3：软删除原因（高敏感操作必填）</summary>
     public virtual string? DeleteReason { get; protected set; }
@@ -114,6 +123,11 @@ public abstract class SupplyCoresFullAuditedAggregateRoot<TKey>
 }
 ```
 
+**SubGroupId 写入钩子**（D2-3 接 A-06 数据范围时实现，本 Sprint 仅占位）：
+- 仓储层 `ICurrentTenant` + `ICurrentOrgContext`（项目自建）在新增/迁移时由 `CreatedOrgId` 回算 `M-01.sub_group_id` 后落库
+- 集团级共享主数据由 Domain Service 显式置 NULL，且必须配合 `is_group_shared=true` 等显式声明字段
+- 详细规约见原则 1-4
+
 **Sprint 0 范围内的实体迁移策略**：
 - **本 Sprint 新建的 M-09/10/11 供应商三件套**：**直接继承 `SupplyCoresFullAuditedAggregateRoot<long>`** ✓
 - **已有 16 个业务实体（Material / Organization / Warehouse / ...）**：**Sprint 0 不动**，留到 Sprint 0.5 风格统一时一起改（避免污染 Sprint 0 + 减少 migration 次数）
@@ -121,8 +135,10 @@ public abstract class SupplyCoresFullAuditedAggregateRoot<TKey>
 
 **验收**：
 - 基类编译通过 ✓（dotnet build 0 错误，2026-05-11）
+- 基类含 `SubGroupId` 属性（2026-05-12 V1.1 新增，含 protected setter + XML 注释链回修订清单）
 - Wave7 M-09/10/11 实体继承本基类（D7 时验证）
 - 单测覆盖 `MarkAsDeleted(reason)` 行为（推迟到 D1-6 测试项目建好后做）
+- 单测覆盖 `SubGroupId` 属性可读写（D1-6 后补）
 
 ### D1-6 新加 — 测试项目搭建（Sprint 0 必需，0.5 天）
 
@@ -453,3 +469,4 @@ Sprint 0 后**紧跟 Sprint 0.5（1-2 天）**做命名风格统一 — 避免 S
 |---|---|---|
 | V0.1 | 2026-05-11 | 首版任务卡：2 周 10 工作日；Day 1-14 拆解；M-09/10/11 供应商 + Material/Organization 应用层 + Wave6 审计接通 + NC-MD mock 四大块；衔接 Sprint 1 第 2 批 P0；估算 1.5 人月 |
 | V0.2 | 2026-05-11 | 加 D1-5 补抽象基类 `SupplyCoresFullAuditedAggregateRoot<TKey>`（含 `CreatedOrgId` + `DeleteReason`）+ Wave7 M-09/10/11 直接用新基类；衔接 Sprint 0.5 命名风格统一 |
+| V0.3 | 2026-05-12 | 落地 `评审留痕/数据隔离边界sub_group_id修订建议清单-V0.1` 修订 #2：D1-5 抽象基类追加 `SubGroupId long?` 详设独有字段（数据所属二级集团 FK→M-01，A-06 数据范围一刀切主用字段）+ 写入钩子占位说明 + 验收点 2 条。**联动：** 详设 01 V1.1 / 详设 02 V1.1 / 审计字段映射表 V0.2 同期生效；CI 检测项（业务表必须有 sub_group_id 列）在 Sprint 0.5 任务卡落地。 |
