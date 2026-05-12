@@ -1,6 +1,6 @@
 # 给 Catio 团队的字段缺口提问清单 V1.1
 
-**文档目的：** SupplyCores（物资管理系统）通过 `[DependsOn]` 复用 Catio 仓库的 `Nova.Platform` + `Nova.Workflow` 模块代码，在本地独立数据库建相同结构的表（不访问集团 Nova Platform 的运行库，部署边界遵循概设 01）。本清单原按详设 10《权限审批流详细设计 V1.0》发函核对字段缺口；Catio 2026-05-05 回函后，已吸收到详设 10 V1.1 与 10A V0.6。**V1.1 升版**加 §九 Bis NovaSync API 契约一组新缺口，对应 sub_group_id 评审留痕清单 §修订 #4 落地。本文档保留为发函/回函闭环记录，当前实施口径以 `10-权限审批流详细设计-V1.2.md` + `10A-权限审计域整合方案-V0.6.md` + `NovaSync 实施层切换方案-V0.1.md` 为准。
+**文档目的：** SupplyCores（物资管理系统）通过 `[DependsOn]` 复用 Catio 仓库的 `Nova.Platform` + `Nova.Workflow` 模块代码，在本地独立数据库建相同结构的表（不访问集团 Nova Platform 的运行库，部署边界遵循概设 01）。本清单原按详设 10《权限审批流详细设计 V1.0》发函核对字段缺口；Catio 2026-05-05 回函后，已吸收到详设 10 V1.1 与 10A V0.6。**V1.1 升版**加 §九 Bis NovaSync API 契约一组新缺口，对应 sub_group_id 评审留痕清单 §修订 #4 落地；2026-05-13 已按用户确认补充“开发期直连 / 联调期契约 / UAT 前切换”的过渡策略。本文档保留为发函/回函闭环记录，当前实施口径以 `10-权限审批流详细设计-V1.2.md` + `10A-权限审计域整合方案-V0.6.md` + `NovaSync 实施层切换方案-V0.2.md` 为准。
 
 **回复 SLA 期望：** T+5 工作日。超期 SupplyCores 将按降级方案落地（缺失字段的表从 REUSE 改为 SupplyCores 自建 ADD），后续如 Catio 扩展再回切。
 
@@ -204,7 +204,7 @@
 
 ## 九 Bis：缺口 #6 — `Nova.Platform.Organizations` WebAPI 契约（NovaSync 同步通道，V1.1 新增）
 
-**SupplyCores 需求：** SupplyCore（物资管理系统，独立部署）需要把 Catio `platform.organizations` 阜矿子树同步到本地 `m.organization`，作为业务主数据。Sprint 1 D1 已用 Npgsql 直连 `platform.organizations` 落地了开发期实现（见 `NovaSync 实施层切换方案-V0.1.md`）；**生产期必须改走 WebAPI**（凭据 / Schema 演进 / 网络边界 / 实时事件 / 审计五条理由见切换方案 §二）。
+**SupplyCores 需求：** SupplyCore（物资管理系统，独立部署）需要把 Catio `platform.organizations` 阜矿子树同步到本地 `m.organization`，作为业务主数据。Sprint 1 D1 已用 Npgsql 直连 `platform.organizations` 落地了开发期实现（见 `NovaSync 实施层切换方案-V0.2.md`）；**UAT / 生产前必须改走 WebAPI**（凭据 / Schema 演进 / 网络边界 / 实时事件 / 审计五条理由见切换方案 §三）。
 
 本节是基于 Sprint 1 D1 实战回写的 API 契约请求，**未来 Catio 整理对外 API 契约文档时可直接吸收**。
 
@@ -267,7 +267,7 @@
     - 方案 C：SSE 长连接
     - 方案 D：RabbitMQ / Kafka topic（集团基础设施层方案）
   - SupplyCore 期望事件粒度：单条 `OrganizationChanged{ Action: Created/Updated/Deleted, Id, SubGroupId, OccurredAt, Snapshot }`
-  - 不强制 Stage B1 落地；不则降级为每 6 小时全量 + idempotent 比对（参见 NovaSync 切换方案 §四·4.3）
+  - 不强制 Stage B1 落地；不则降级为每 6 小时全量 + idempotent 比对（参见 NovaSync 切换方案 §五·5.3）
 
 ### 12.5 跨系统认证缺口
 
@@ -282,7 +282,32 @@
 
 在 §九 Bis 缺口 Catio 全部落地前，SupplyCore Sprint 1 D1-D2 已落 `NpgsqlNovaSourceReader`（直连 5432）作为开发期实现。**关键：业务下游通过 `INovaSourceReader` 抽象解耦**，Catio 提供 API 后切换 `HttpNovaSourceReader` 零改业务侧。
 
-切换 checklist 详见 `NovaSync 实施层切换方案-V0.1.md` §五。
+**2026-05-13 用户确认的协同原则：** Catio 团队可以在 SupplyCore 明确真实同步 / 权限 / Workflow 需求后，再形成正式 API 契约和交付排期；SupplyCore 开发验证期允许“只读直连 + 本地 mock + 源码复用”先行，不因 Catio API 未就绪阻塞业务主线。但该过渡只适用于开发验证，**UAT / 生产前必须切换到正式 WebAPI / OAuth / Workflow 机制**。
+
+#### 12.6.1 可先直连 / 过渡的内容
+
+- `platform.organizations` 组织树：开发期可只读直连，验证阜矿子树、`sub_group_id`、`org_code`、层级路径等字段口径。
+- 组织字段探查：可先基于真实库字段反推 API DTO 需求，再提交给 Catio 固化接口契约。
+- `Nova.Platform` / `Nova.Workflow` 模块代码：可先通过 `[DependsOn]` 在 SupplyCore 本地库复用建表，不访问集团 Nova 运行库。
+- Workflow DSL / ApproverRule / 审批记录映射：可先按源码和本地样例验证，Catio 后续补正式 schema 和模板示例。
+- 人员、权限、组织事件：开发期可 mock / 脱敏 / 定时同步降级；不强制 Catio 在 Stage A 一次性交付完整能力。
+
+#### 12.6.2 不允许长期直连 / 必须正式化的内容
+
+- SSO 登录、OAuth 授权、生产用户身份认证必须走 Nova / OIDC。
+- SupplyCore 不得直写 Catio / Nova 的组织、人员、角色、平台权限等权威数据。
+- 身份证、手机号等 PII 不在开发期直接批量拉取；必须等字段权限、脱敏规则和审计要求明确。
+- UAT / 生产前不得继续依赖生产 DB 直连，必须切换 `HttpNovaSourceReader`、OAuth scope、API 审计和错误码机制。
+
+#### 12.6.3 Catio 滞后交付的截止点
+
+| 阶段 | Catio 可滞后的内容 | 必须交付的内容 |
+|------|------------------|---------------|
+| Stage A 开发验证期 | 正式 API 文档、增量同步、实时事件、人员接口、Workflow 完整示例 | 字段语义确认、源码版本 / commit、必要的只读探查支持 |
+| Stage B 联调期 | 实时事件可继续后置 | 组织 API、OAuth client / scope、测试环境、字段清单、错误码、限流 / 审计说明 |
+| UAT / 生产前 | 不再允许核心接口缺位 | 正式 API、正式凭据、切换验证、DB 直连下线或限定为诊断用途 |
+
+切换 checklist 详见 `NovaSync 实施层切换方案-V0.2.md` §六。
 
 ### 12.7 §九 Bis 整体说明
 
@@ -293,9 +318,9 @@
 
 ### 12.8 衔接文档
 
-- `NovaSync 实施层切换方案-V0.1.md` —— 完整切换路径与 checklist
+- `NovaSync 实施层切换方案-V0.2.md` —— 完整切换路径与 checklist
 - `数据隔离边界sub_group_id修订建议清单-V0.1.md` §修订 #4 Nova 同步契约
-- `Sprint-1-任务卡-V0.6.md` §三·3.2 Stage B1 衔接 NovaSync HttpReader 切换
+- `Sprint-1-任务卡-V0.7.md` §三·3.2 Stage B1 衔接 NovaSync HttpReader 切换
 
 ---
 
@@ -331,7 +356,7 @@
 | 10A 整合方案        | `docs/详细设计/10A-权限审计域整合方案-V0.6.md` | 实施层选择 + 适配层 + 阶段排期 + 风险登记 |
 | 10A 节 5A 字段映射详表 | 同上文档 §五A                                     | 已识别缺口的字段级 ✗/? 标注          |
 | 概设 01 部署边界      | `docs/概要设计/01-总体架构与集成边界-v0.1.md` 节 6.1                       | "物资系统独立部署、不访问 Nova 底层数据库" |
-| NovaSync 切换方案    | `docs/详细设计/NovaSync 实施层切换方案-V0.1.md`         | 开发期直连 → 生产期 WebAPI 切换方案 + checklist；§九 Bis 缺口的来源 |
+| NovaSync 切换方案    | `docs/详细设计/NovaSync 实施层切换方案-V0.2.md`         | 开发期直连 → 生产期 WebAPI 切换方案 + checklist；§九 Bis 缺口的来源 |
 | sub_group_id 评审留痕 | `docs/详细设计/评审留痕/数据隔离边界sub_group_id修订建议清单-V0.1.md` | §修订 #4 Nova 同步契约的来源 |
 
 
@@ -343,3 +368,4 @@
 | --- | --- | --- |
 | V1.0 | 2026-05-05 | 首版：Q1-Q9.1 共 16 个缺口问询；Catio 2026-05-05 回函闭环，结论吸收到详设 10 V1.1 + 10A V0.6。 |
 | V1.1 | 2026-05-12 | 加 §九 Bis 缺口 #6 — `Nova.Platform.Organizations` WebAPI 契约（Q12.1-Q12.10 共 10 项）。基于 Sprint 1 D1 实战回写：(1) §12.1 现状盘点：Catio 已有 `GET /api/platform/organizations/tree` + `[Authorize]` + 自动 DataScope；(2) §12.2 字段缺口 5 项（OrganizationTreeNodeDto 缺 SubGroupId / NamePath / IsLeaf / OrgTypeId / 生效日期 / ExternalId 等）；(3) §12.3 端点缺口 3 项（平铺 / 增量 since / 分页）；(4) §12.4 实时事件订阅缺口；(5) §12.5 OAuth scope 缺口；(6) §12.6 SupplyCore 自建过渡方案。**意图**：这 10 个 Q 既是给 Catio 团队的请求，也是 Catio 未来对外 API 契约文档的需求依据（其他下游系统会有同样诉求）。 |
+| V1.1a | 2026-05-13 | 按用户确认补充 §12.6 过渡策略：Catio 可在需求明确后滞后形成正式 API 契约；SupplyCore Stage A 允许只读直连 / mock / 源码复用先行；Stage B 需提供组织 API、OAuth、测试环境和字段清单；UAT / 生产前必须切换 WebAPI / OAuth，禁止长期生产 DB 直连。同步引用 `NovaSync 实施层切换方案-V0.2`。 |
