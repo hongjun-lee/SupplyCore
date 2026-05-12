@@ -7,7 +7,7 @@
 **适用范围：** Catio Nova 组织 + 人员同步的实施层（开发期直连 → 生产期 WebAPI）
 **衔接文档：**
 
-- [`Sprint-1-任务卡（V0.3+）`](../Sprint/Sprint-1-任务卡-V0.4.md) §1.1 D1-2 NovaSync 范围
+- [`Sprint-1-任务卡（V0.3+）`](../Sprint/Sprint-1-任务卡-V0.5.md) §1.1 D1-2 NovaSync 范围
 - [`02-基础档案与组织仓库详细设计-V1.1.md`](./02-基础档案与组织仓库详细设计-V1.1.md) §4.1 M-01 organization
 - [`评审留痕/数据隔离边界sub_group_id修订建议清单-V0.1.md`](./评审留痕/数据隔离边界sub_group_id修订建议清单-V0.1.md) §修订 #4 Nova 同步契约
 - [`10A-给Catio团队的字段缺口提问清单`](./10A-给Catio团队的字段缺口提问清单-V1.1.md) §九 Bis NovaSync API 契约（V1.1+ 增加）
@@ -33,7 +33,7 @@ Sprint 1 D1-D2 让 SupplyCore 落地"从 Catio 同步阜矿组织树到本地 M-
 
 ## 三、当前 D1 直连实现的边界
 
-`Sprint-1-任务卡-V0.4` D1-D5 已落地的代码：
+`Sprint-1-任务卡-V0.5` D1-D5 已落地的代码：
 
 ```
 modules/nova.supplycores/src/

@@ -1,7 +1,7 @@
-# Sprint 1 任务卡 — Stage A 收尾 + B2 启动（V0.4）
+# Sprint 1 任务卡 — Stage A 收尾 + B2 启动（V0.5）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.4（联动 NovaSync 实施层切换方案 V0.1 + D1 实跑回写）
+**版本：** V0.5（NovaSync 同步祖先链 + 集团根，对齐"为能源集团设计"姿态）
 **日期：** 2026-05-12
 **文档性质：** 开发实施层 · Sprint 任务卡
 **适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 1（10 工作日 / 约 2 周）
@@ -26,7 +26,9 @@
 **两条主线并行：**
 
 1. **Stage A 收尾**（V0.4 §5.1 阶段 A 1.5-2 个月预算的剩余 ~10%）：
-   - **NovaOrganizationSyncContributor 第一次落地**——从 Catio 生产 `Host=fxkyjt.cn;Port=5432;Database=Nova` `platform.organizations` 同步阜新矿业（sub_group_id = `40351efe-a370-4239-96fc-1b53a57714de`）完整子树（**24 家 level 3 厂矿 + 完整 level 4-7 部门 / 班组共 995 行**），不含 mock 占位数据
+   - **NovaOrganizationSyncContributor 第一次落地**——从 Catio 生产 `Host=fxkyjt.cn;Port=5432;Database=Nova` `platform.organizations` 同步**集团根（能源集团 level 1）祖先链 + 阜新矿业（sub_group_id = `40351efe-a370-4239-96fc-1b53a57714de`）完整子树共 996 行**（1 集团根 + 1 阜矿本部 + 24 厂矿 + level 4-7 部门/班组 970）
+   - **设计姿态**：系统为**辽宁能源集团整体**设计，一期数据范围为**集团根 + 阜矿子树**；其他二级集团（清能 / 铁煤 / 沈煤 / 抚顺矿业等共 10 家）按需逐步接入，框架不动只追加 RootSubGroupId
+   - **集团级汇总能力**：parent_id 链路完整到集团根 → 能源集团级跨二级集团报表自然成立；sub_group_id 一刀切过滤（评审留痕 §三 原则 2）保留作为二级集团范围内主用
    - Warehouse 链（M-02 + M-03A + M-03B）3 家代表性单位 mock seed（Nova 端无仓库数据，仍 mock）
    - Docker compose + Dockerfile（Sprint 0 D14 ⬜ 唯一剩余项，汇报 §一·第一步 1.6 试点部署）
    - **人员（platform.persons 11,258 人）不在本 Sprint 范围**——含 mobile / id_number 等 PII，留 Stage B1 真实联调期同步
@@ -53,6 +55,7 @@
 | 测试 63/63（Domain 56 + EFCore 2 + Application 5）| ✅ |
 | **Catio 生产 Nova DB 连通性已验证**（`fxkyjt.cn:5432/Nova`）| ✅ 2026-05-12 探查：阜矿子树 995 行 + 11,258 人员（人员本 Sprint 不取）|
 | **D1 NovaSync 配置 + Reader + Mapper + probe 工具已落地**（commit `0dcbeb0`） | ✅ 2026-05-12，75/75 测试通过；INovaSourceReader 抽象 + NpgsqlNovaSourceReader 开发期实现 + NovaUuidMapper 单进程映射 + tools/probe-nova 工具 |
+| **D2 NovaOrganizationSyncContributor 已落地**（commit `a9c0466`） | ✅ 2026-05-12，79/79 测试通过；DB 实测 995 行同步成功 + 阜矿本部 sub_group_id 自指 + 二次幂等。**⚠ 需 V0.5 整改：祖先链未覆盖到集团根**——D2 同步窗口仅含阜矿子树，集团根（能源集团 level 1）漏掉，阜矿本部 parent_id=NULL（应指向集团根）。V0.5 SQL 扩祖先链 → 996 行，需重跑一次 |
 
 > **本机 DB 同步动作（V0.3 升版后须做一次）：** `dotnet ef database drop --force` → `dotnet run --project src/SupplyCores.DbMigrator`（DbMigrator 自动 apply migration + 跑 seed/sync contributors，**勿单跑 `dotnet ef database update`**——经 Sprint 0 D14 验证，design-time 写的 history runtime 看不到，会导致表重建冲突）。Sprint 1 D1 起手前完成。
 
@@ -60,7 +63,7 @@
 
 | 类型 | 缺什么 | 详设依据 | 优先级 |
 |------|--------|---------|--------|
-| ❌ Sync | **NovaOrganizationSyncContributor**——从 Catio `platform.organizations` 同步阜矿完整子树（995 行）；含 uuid → bigint ID 映射 + nova_org_id 唯一索引保 idempotent + sub_group_id 字段值用本地 bigint 自指 | 02 V1.1 §4.1 + sub_group_id 清单 §修订 #4 (Nova 同步契约) | P0 |
+| ⚠ Sync 整改 | **NovaOrganizationSyncContributor SQL 扩祖先链**——D2 commit `a9c0466` 已落地 995 行同步但未覆盖集团根；V0.5 整改 SQL 加 recursive CTE 拉祖先链到 level 1，总数 996 行；阜矿本部 parent_id 指向集团根 bigint id（不再 NULL）；集团根 sub_group_id=NULL（评审留痕 §修订 #4 边界条件） | 02 V1.1 §4.1 + sub_group_id 清单 §修订 #4 (Nova 同步契约) | P0（D2 整改）|
 | ❌ 配置 | **`appsettings.secrets.json` 加 `NovaSync` 节** —— `ConnectionString` + `RootSubGroupId` (阜矿 uuid)；只读访问；**不进 git** | sub_group_id 清单 §修订 #4 + 信安 | P0 |
 | ❌ 类型映射 | **NovaUuidMapper**（内存 Dictionary<Guid, long> + nova_org_id 唯一索引）—— uuid PK ↔ SupplyCore bigint PK | 02 V1.1 §4.1 + nova_org_id 字段语义 | P0 |
 | ❌ Seed | **Warehouse 链 mock seed**（3 家代表性厂矿的 m.warehouse + warehouse_zone + storage_location；Nova 端无仓库数据，仍 mock）| 02 V1.1 §3-5 | P0 |
@@ -76,7 +79,7 @@
 ### 1.4 完成标准（Sprint 1 验收）
 
 - ✅ `dotnet test SupplyCores.slnx` ≥ **75 个用例通过**（当前 63 + Sprint 1 新增 ≥ 12 单测：P-01/P-02 状态机 + Material 编码生成 + NovaUuidMapper + NovaOrganizationSyncContributor）
-- ✅ Demo 脚本用例 1 重跑 `GET /api/supply-cores/organizations/tree` 返回真实阜矿组织树（**24 家 level 3 厂矿 + 完整子树共 995 行**，非空且名称为 Catio 真实命名如"阜新矿业（集团）有限责任公司本部" / "阜新矿业（集团）有限责任公司恒大煤矿" 等）
+- ✅ Demo 脚本用例 1 重跑 `GET /api/supply-cores/organizations/tree` 返回**能源集团 → 阜新矿业 → 24 家 level 3 厂矿 → level 4-7 子树**完整三层及以上嵌套（**总 996 行**：1 集团根 + 995 阜矿子树；非空且名称为 Catio 真实命名如"辽宁省能源产业控股集团有限责任公司"/"阜新矿业（集团）有限责任公司本部"/"阜新矿业（集团）有限责任公司恒大煤矿"等）
 - ✅ Demo 新用例 6：批量导入 5 条 Material（CSV）→ 编码自动按 03 §3 规则生成（HG / ZH / SB / ... 前缀 + 6 位序号）
 - ✅ Demo 新用例 7：创建 P-01 需求 → 提交 → 审批 → 自动归集为 P-02 计划草稿（按 org + 月聚合）
 - ✅ Demo 新用例 8：P-02 计划审批通过 → 状态转 `已审`，linkage 待 Sprint 2 接 P-05 分解
@@ -85,7 +88,9 @@
 - ✅ 跑完 5+ 个 P-01 / P-02 操作，`a.operation_log` 新增 ≥ 20 行（继续 Sprint 0 验收的审计自动写入）
 - ✅ **`sub_group_id` 数据隔离边界字段覆盖**（评审留痕清单 §三 原则 1 + §6.3 修订 #2 落地验证）：
   - 每张业务表（`m.*` + `a.*` + 新建的 `m.demand_request` / `m.purchase_plan` 等）DDL 必须含 `sub_group_id bigint NULL` 列（由 EnforceSnakeCaseColumnNames 自动转 snake_case）—— 已 ✅ commit `2132de1` + 验证 m schema 18 个 + sy schema 1 个共 19 张表
-  - **Nova 同步后**：`m.organization.sub_group_id` 非空率 = 994/995（阜矿本部自身 sub_group_id 自指本地 bigint id；其下 994 行 sub_group_id 全部 = 阜矿本地 bigint id）
+  - **Nova 同步后**：`m.organization.sub_group_id` 非空率 = 995/996（集团根 sub_group_id=NULL 符合评审留痕 §修订 #4 边界；阜矿本部 sub_group_id 自指本地 bigint id；其下 994 行 sub_group_id 全部 = 阜矿本部本地 bigint id）
+  - **Nova 同步后**：`m.organization.parent_id` 非空率 = 995/996（集团根无父；阜矿本部 parent_id 指向集团根 bigint id；其下 994 行 parent_id 链路完整）
+  - **集团级汇总查询验证**：能源集团下所有组织递归 COUNT(*) = 996（包含集团根本身）；阜矿二级集团下 sub_group_id 一刀切 COUNT(*) = 995
   - 新增 EFCore.Tests 单测：扫 `ctx.Model.GetEntityTypes()`，所有有 schema 的业务实体都必须含 `SubGroupId` 属性（原则 1 CI 检测后端版）
 
 ---
@@ -110,14 +115,34 @@
 
 | # | 任务 | 详设引用 | 验收 |
 |---|------|---------|------|
-| D2-1 | 新增 `Nova.SupplyCores.Domain/Integration/Nova/NovaOrganizationSyncContributor`（实现 `IDataSeedContributor`），按 level 升序拉取阜矿子树（包含 sub_group_id = 阜矿 uuid 的所有行 + 阜矿自身那一行）| sub_group_id 清单 §修订 #4 + 02 V1.1 §4.1 | DbMigrator 跑完后 `m.organization` 行数 = 995 |
-| D2-2 | 字段映射逻辑：`id = SupplyCore bigint 新分配` / `nova_org_id = Catio uuid 字符串` / `parent_id = NovaUuidMapper.Resolve(catio.parent_id)` / `sub_group_id = NovaUuidMapper.Resolve(catio.sub_group_id)`（阜矿自身 sub_group_id 自指本地 bigint id）| 02 V1.1 §4.1.2 字段表 | 单测验证字段映射正确（≥ 6 case 覆盖根节点 / 阜矿本部 / 各 level 子节点）|
-| D2-3 | 拓扑顺序保证：按 `level ASC, display_order ASC` 排序后单遍 insert，**parent_id 引用的 nova_org_id 必须先 register 到 mapper**；否则抛 `MissingParentException` | — | 单测：故意删除 mapper 中一条 parent 后调用应抛 |
-| D2-4 | Idempotent：第二次 SeedAsync 调用应跳过已存在的 nova_org_id 行（按唯一索引判定），不重复 insert | sub_group_id 清单 §修订 #1 + idempotent | 单测：连续两次 SeedAsync，`m.organization` 行数稳定在 995 |
-| D2-5 | 阜矿本部 sub_group_id 自指处理（详设 02 V1.1 §4.1 "二级集团自身 sub_group_id = 自身 org_id"）：sync 时阜矿那一行先 insert 拿 bigint id，再 update 自己的 sub_group_id 字段为该 bigint | 02 V1.1 §4.1 + sub_group_id 清单 §修订 #1 业务规则 | 单测：阜矿本部行 `sub_group_id = id`（自指）|
-| D2-6 | 加 `NovaOrganizationSyncContributor_Tests` 集成测试（连接 Catio 测一次，标 `[Trait("Category","Integration")]`，CI 默认跳过；本地开发跑全量）| — | 集成测试通过 + 计数正确 |
+| D2-1 | 新增 `Nova.SupplyCores.Domain/Integration/Nova/NovaOrganizationSyncContributor`（实现 `IDataSeedContributor`），SQL 含**祖先链 + 子树**：`recursive CTE 拉 root 的所有祖先（含集团根 level 1）+ sub_group_id = root::uuid 的子树`，按 level ASC, display_order ASC 排序流式返回 | sub_group_id 清单 §修订 #4 + 02 V1.1 §4.1 + V0.5 §1.1 设计姿态 | DbMigrator 跑完后 `m.organization` 行数 = 996（含集团根 1 行）|
+| D2-2 | 字段映射逻辑：`id = SupplyCore bigint 新分配` / `nova_org_id = Catio uuid 字符串` / `parent_id = NovaUuidMapper.Resolve(catio.parent_id)` / `sub_group_id = NovaUuidMapper.Resolve(catio.sub_group_id)`（阜矿自身 sub_group_id 自指本地 bigint id）| 02 V1.1 §4.1.2 字段表 | 单测验证字段映射正确（≥ 6 case 覆盖集团根 / 阜矿本部 / 各 level 子节点）|
+| D2-3 | 拓扑顺序保证：按 `level ASC, display_order ASC` 排序后单遍 insert：**集团根 level=1 第一**（parent_id=NULL, sub_group_id=NULL）→ **阜矿本部 level=2**（parent_id=集团根 bigint）→ **24 家厂矿 level=3**（parent_id=阜矿本部）→ level 4-7。parent_id 引用的 nova_org_id 必须先 register 到 mapper；否则抛 `KeyNotFoundException`（NovaUuidMapper.ResolveOrThrow 兜底）| — | 单测：故意删除 mapper 中一条 parent 后调用应抛 |
+| D2-4 | Idempotent：第二次 SeedAsync 调用应跳过已存在的 nova_org_id 行（按唯一索引判定），不重复 insert；Pass 0 预加载 DB 已有映射到 mapper | sub_group_id 清单 §修订 #1 + idempotent | 单测：连续两次 SeedAsync，`m.organization` 行数稳定在 996 |
+| D2-5 | 边界 NULL 处理（评审留痕 §修订 #4 + 原则 4）：**集团根 sub_group_id=NULL + parent_id=NULL**；**阜矿本部 sub_group_id 自指本地 bigint id**（Insert 后 SetSubGroupId 回填）| 02 V1.1 §4.1 + sub_group_id 清单 §修订 #1 / 原则 4 | 单测：集团根 NULL 双字段；阜矿本部 `sub_group_id = id`（自指）|
+| D2-6 | 加 `NovaOrganizationSyncContributor_Tests` 集成测试（连接 Catio 测一次，标 `[Trait("Category","Integration")]`，CI 默认跳过；本地开发跑全量）| — | 集成测试通过 + 计数 996 + 集团根 + 阜矿自指 + 厂矿链路 |
 
-**预估工时：** 1.5 工作日（V0.4 §3.1 02 模块 51 PD 残余 + uuid 映射 + 拓扑 insert + idempotent ≈ 3-4 PD）
+**SQL 示例**（祖先链 recursive CTE）：
+
+```sql
+WITH RECURSIVE ancestors AS (
+    SELECT id, parent_id FROM platform.organizations
+     WHERE id = @root::uuid AND is_deleted = false
+    UNION ALL
+    SELECT o.id, o.parent_id FROM platform.organizations o
+    JOIN ancestors a ON o.id = a.parent_id
+    WHERE o.is_deleted = false
+)
+SELECT id, parent_id, sub_group_id, code, name, short_name,
+       org_type_id, level, name_path, is_leaf, display_order,
+       is_active, effective_date, expiry_date, description
+  FROM platform.organizations
+ WHERE is_deleted = false
+   AND (sub_group_id = @root::uuid OR id IN (SELECT id FROM ancestors))
+ ORDER BY level, display_order, id
+```
+
+**预估工时：** 1.5 工作日（V0.4 §3.1 02 模块 51 PD 残余 + uuid 映射 + 拓扑 insert + idempotent ≈ 3-4 PD；V0.5 整改 SQL +0.2 PD：改 recursive CTE + 重跑 drop+DbMigrator 验证 996 行）
 
 ---
 
@@ -254,7 +279,19 @@ Sprint 1 的 `NpgsqlNovaSourceReader`（直连 fxkyjt.cn）是**开发期实现*
 
 切换方案、前置条件、checklist 详见 [`NovaSync 实施层切换方案-V0.1.md`](../详细设计/NovaSync%20实施层切换方案-V0.1.md)。
 
-切换工时预估：1.5–2 PD，依赖 Catio 团队 §十二 API 契约（见 10A 提问清单 V1.1+）。
+切换工时预估：1.5–2 PD，依赖 Catio 团队 §九 Bis API 契约（见 10A 提问清单 V1.1）。
+
+### 3.3 多二级集团扩展（远端衔接）
+
+一期 RootSubGroupId = 阜新矿业 uuid（单值）；未来扩 **清能 / 铁煤 / 沈煤 / 抚顺矿业 / 辽能股份 / 能源投资 / 集采中心 / 辽能本部 / 电机集团 / 辽宁南票电厂** 等 10 家二级集团时：
+
+- 改造点：`NovaSyncOptions.RootSubGroupIds` (`string[]`)，遍历同步
+- 集团根 `能源集团 (7d10b21e-...)` **仍只 1 行**（recursive CTE 自然去重）
+- 各二级集团本部 sub_group_id 自指本地 id（同阜矿模式）
+- 各自子树 sub_group_id 指向各自二级集团本地 id
+- 不冲突：集团根 + N 个二级集团子树 = N+1 个相对独立的隔离边界，A-06 数据范围按 sub_group_id 一刀切
+
+数据合规边界：扩展时需评估"是否将其他二级集团数据进 SupplyCore 实例"（合规、隔离、PII），不在 Sprint 1 范围。
 
 ---
 
@@ -295,7 +332,7 @@ Sprint 1 的 `NpgsqlNovaSourceReader`（直连 fxkyjt.cn）是**开发期实现*
 | Sprint 1 Day | V0.4 §3.1/§3.2 对应模块 | V0.4 工时 PD |
 |--------------|----------------------|--------------|
 | D1 NovaSync 配置 + Mapper | 02 基础档案残余 + 集成配置 | ≈ 1 PD |
-| D2 NovaOrganizationSyncContributor | 02 基础档案残余 + uuid/bigint 映射层 | ≈ 1.5 PD |
+| D2 NovaOrganizationSyncContributor + V0.5 祖先链整改 | 02 基础档案残余 + uuid/bigint 映射层 + recursive CTE 整改 | ≈ 1.7 PD |
 | D3 Warehouse mock + Docker compose | 02 残余 + 11 非功能（部署基础设施） | ≈ 1.5 PD |
 | D4-5 Material 编码 + 批量导入 | 03 物料（5 PD 批量 + 1-2 PD 编码） | ≈ 5-7 PD |
 | D6-7 P-01 demand_request 全链 | 04 需求计划（M-09/10/11 + P-01 全链）9 后端 PD 残余 | ≈ 5 PD |
@@ -309,7 +346,7 @@ Sprint 1 的 `NpgsqlNovaSourceReader`（直连 fxkyjt.cn）是**开发期实现*
 
 ## 七、Definition of Done（DoD）
 
-- [ ] §1.4 完成标准 7 项全部 ✅
+- [ ] §1.4 完成标准全部 ✅（含 996 行 + 集团根 NULL 双字段 + 阜矿本部 parent_id 指向集团根 + sub_group_id 自指 + 二次幂等）
 - [ ] §二 D1-D10 全部任务勾选完毕
 - [ ] `dotnet test SupplyCores.slnx` ≥ 75 通过 / 0 失败
 - [ ] Demo 脚本（Sprint 0 + Sprint 1 新增）全部 200
@@ -327,3 +364,4 @@ Sprint 1 的 `NpgsqlNovaSourceReader`（直连 fxkyjt.cn）是**开发期实现*
 | V0.2 | 2026-05-12 | 联动 `数据隔离边界sub_group_id修订建议清单-V0.1` §四影响范围"Sprint-1 任务卡 V0.1 待联动"要求：(1) §1.2 基线加 commit `2132de1` 基类加 `SubGroupId` + migration 重生成 `20260512033645_Init`；(2) §1.3 加 Nova 同步契约对齐项（P1，真联调延后）；(3) §1.4 加 sub_group_id 字段 + 17 家非空率 + EFCore.Tests 守护测试；(4) D1-1/D1-3 OrgSeed 写明根节点 NULL / 二级集团自指 / 17 家全部 = 阜矿 + FK 自指完整性单测；(5) D6/D8 P-01/P-02 写明继承基类自动获得 SubGroupId + `sub_group_id` 索引 + linkage 复制源字段；(6) 新增 D6-6 写入钩子条目；(7) §四 加风险 4（钩子覆盖）；(8) 详设 02 引用从 V1.0 升 V1.1。 |
 | V0.3 | 2026-05-12 | 整改 D1-D2 从 mock 转 Catio 真实同步（已验证 `fxkyjt.cn:5432/Nova` 连通 + 阜矿子树 995 行 + 11258 人）：(1) §1.1 目标改"NovaOrganizationSyncContributor 第一次落地"，**人员不在范围**（PII，留 Stage B1）；(2) §1.2 加 Catio 连通验证、本机 DB 同步动作改"drop + DbMigrator"两步（移除 dotnet ef database update，Sprint 0 D14 已证 history 不通）；(3) §1.3 改 Org 缺口为 NovaSync + 配置 + UuidMapper 三条；(4) §1.4 完成标准改 24 家 + 995 行真实命名 + 二次幂等用例 9；(5) §二 D1-D3 重写：D1 NovaSync 准备 / D2 同步实现 + 验证 / D3 Warehouse mock 简化 + Docker compose；(6) §四 风险加 5/6/合规三条；(7) §六 工时对照 D1-D3 拆分。**口径校正：阜矿 = 阜新矿业（不是抚顺），level 3 = 24 家不是 17 家**；汇报材料 V0.2 的 17 家是 PDF 调研老口径，下次升版调位。 |
 | V0.4 | 2026-05-12 | 联动新建 `NovaSync 实施层切换方案-V0.1`：(1) 头部 `衔接文档` 加 NovaSync 切换方案 + 10A 清单 V1.1 引用；(2) §1.2 基线加一行"D1 已落地（commit `0dcbeb0`），75/75 测试通过"；(3) §三 改名"Sprint 2 衔接 + Stage B1 衔接"，加 §3.2 NovaSync HttpReader 切换衔接（链到切换方案）；(4) §五 可复用资产加 3 条：INovaSourceReader 抽象 / tools/probe-nova 探查模式 / 切换 checklist；(5) 文件名升 V0.3 → V0.4，同 commit `git mv`。**关键设计立场：`NpgsqlNovaSourceReader` 是开发期实现，生产期必经 HttpReader 切换；INovaSourceReader 抽象就是为此预留的扩展点**。 |
+| V0.5 | 2026-05-12 | **NovaSync 同步祖先链整改**——D2 commit `a9c0466` 同步窗口仅覆盖阜矿子树（995 行），漏掉集团根（能源集团 level 1），阜矿本部 parent_id=NULL 链路断裂。用户指出"系统为能源集团整体设计，应将父记录也同步过来，便于集团级汇总"。V0.5 修订：(1) §1.1 加"为能源集团整体设计 / 一期数据范围为集团根 + 阜矿子树"两层姿态 + 强调集团级汇总能力；(2) §1.2 基线加 D2 状态 + V0.5 需重跑提示；(3) §1.3 缺口改"NovaOrganizationSyncContributor SQL 扩祖先链 recursive CTE"；(4) §1.4 完成标准改 996 行 + 集团根 NULL 双字段 + parent_id 链路完整 + 集团级汇总查询验证；(5) §二 D2 重写 SQL 例 + 验收数；(6) §三 加 §3.3 多二级集团扩展衔接（清能 / 铁煤 / 沈煤等 10 家未来按需扩 RootSubGroupIds 数组）；(7) §六 D2 工时 +0.2 PD；(8) §七 DoD 改"完成标准全部 ✅"去掉数字硬编码；(9) 文件名升 V0.4 → V0.5，同 commit `git mv`。**核心立场：本地 PK bigint 不变；nova_org_id 仍是跨系统对齐字段；集团根本地 id 进 m.organization 让 parent_id 链路完整到顶**。 |
