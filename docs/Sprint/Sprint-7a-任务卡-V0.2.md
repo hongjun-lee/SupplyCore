@@ -1,11 +1,11 @@
-# Sprint 7a 任务卡 — 库存余额 + 付款流程后续 + 报表预警起步（V0.1 草案）
+# Sprint 7a 任务卡 — 库存余额 + 付款流程后续 + 报表预警起步（V0.2）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案，待评审锁版为 V0.2）
+**版本：** V0.2（评审后锁版 / 实施基线）
 **日期：** 2026-05-13
-**文档性质：** 开发实施层 · Sprint 任务卡（草案）
+**文档性质：** 开发实施层 · Sprint 任务卡（实施基线）
 **适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 7a（预估 10 工作日 / 约 2 周）
-**并行轨道：** 与 Sprint 7b 设备运维深化 平行进行（草案另立）
+**并行轨道：** 与 Sprint 7b 设备运维深化 平行进行（详 [`Sprint-7b-任务卡-V0.2.md`](./Sprint-7b-任务卡-V0.2.md)，待 b 完成 Day 10 + 锁版）
 
 **衔接文档：**
 
@@ -17,7 +17,7 @@
 
 ## 一、目标与范围
 
-### 1.1 V0.1 候选范围（约 10 PD，待评审收口到 ~8-9）
+### 1.1 V0.2 锁版范围（10 PD 严卡）
 
 Sprint 6a 闭环 C-04 → C-07 → C-08 付款链 + S-10/S-12 库存出入库前置。Sprint 7a 把"库存余额"和"付款后续"两条主线收口，同时启动 09 报表预警。
 
@@ -47,15 +47,21 @@ Sprint 6a 闭环 C-04 → C-07 → C-08 付款链 + S-10/S-12 库存出入库前
 - Sprint-7a-Demo
 - Sprint-8a 任务卡草案
 
-### 1.2 V0.1 待评审决策点
+### 1.2 V0.2 评审决策点（已锁版）
 
-| # | 决策点 | 候选方案 | 倾向 |
+| # | 决策点 | 锁版结论 | 理由 |
 |---|--------|----------|------|
-| 1 | S-13/S-14 范围 | A. 完整双表 + 全联动 / B. S-13 only（S-14 留 Sprint 8a） | A — 单表无意义；Sprint 5-6 库存联动 TODO 累计已经多个，必须一起做闭环 |
-| 2 | C-09 PaymentBatch 范围 | A. 完整批次 + NC 推送 / B. 仅实体落，批次推送简化 | B — 批次推送复杂度高（事务一致性 + 部分失败回执），Sprint 8a 接 |
-| 3 | 招采平台 OAuth 真接 | A. 本期实装 / B. 顺延 Sprint 8a | A — 凭据已拿到，Sprint 6a Mock 不实接积压成本累计 |
-| 4 | 09 报表预警范围 | A. 完整 2 预警 + 调度 / B. 仅 R-04 PaymentDueNear / C. 顺延 Sprint 8a | B — 优先做最有业务价值的 R-04；R-05 / 调度 Sprint 8a |
-| 5 | 与 b 集成测试边界 | A. a 不依赖 b / B. a 接 b 的 E-09 LeaseContract → C-08 联动 | A — Sprint 6 双轨 5A 经验稳；E-09 → C-08 联动留 Sprint 8 详设 V1.X 升版后做 |
+| 1 | S-13/S-14 范围 | **A — 完整双表 + 全联动** | 单表无意义；Sprint 5-6 累计 6+ 处库存联动 TODO 必须一起闭环；本 Sprint 重点价值 |
+| 2 | C-09 PaymentBatch 范围 | **B — 仅实体落，批次推送 Sprint 8a** | 批次推送复杂度高（事务一致性 + 部分失败回执），优先做更有价值的 C-10 实付回执 |
+| 3 | 招采平台 OAuth 真接 | **A — 本期实装** | 凭据 Sprint 4 D9 已拿到，Mock 不实接积压成本累计；Real 实现 + DI 切换 |
+| 4 | 09 报表预警范围 | **B — 仅 R-04 PaymentDueNear** | 优先做最有业务价值的 R-04（C-07 超期预警）；R-05 / 调度 Sprint 8a 接 Hangfire |
+| 5 | 与 b 集成测试边界 | **A — a 不依赖 b** | Sprint 6 双轨 5A 经验稳；E-09 → C-08 联动留 Sprint 8 详设升版后做 |
+
+**总工时调整**（V0.1 12.5 PD → V0.2 10 PD 严卡）：
+- 决策点 2B：C-09 简化为实体 only（NC 批次推送 Sprint 8a）= **-0.5 PD**
+- 决策点 4B：仅 R-04（去 R-05 + Hangfire 调度框架）= **-1 PD**
+- 决策点 3A 完整实装框架但 D9-1 50+ batch 真接联调降级为可选 buffer（视 OAuth 凭据可用性）= **-1 PD**
+- 总计 **-2.5 PD** → V0.2 严卡 **10 PD ✓**
 
 ### 1.3 不在范围
 
@@ -64,18 +70,19 @@ Sprint 6a 闭环 C-04 → C-07 → C-08 付款链 + S-10/S-12 库存出入库前
 - AI 报表预警 / 智能建议（Sprint 8+ 大模块）
 - 09 详设 V1.0 升版（本期仅起步 R-04，详设升版留 Sprint 8a）
 
-### 1.4 基线（待 Sprint 6 收尾确认）
+### 1.4 基线
 
-- ☐ Sprint 6a D10 commit 已 push + Demo-6a V0.1 入库
-- ☐ Sprint 6b 全部任务收尾（含 Day 9 集成 E2E + Day 10 Demo）
-- ☐ EF migrations 40 条全部 apply（Sprint 6a 加 4 + Sprint 6b 加 5）
-- ☐ sub_group_id 守护单测覆盖 Sprint 6a/6b 新增 13 实体
+- ✅ Sprint 6a D10 commit `db3d8ea` + Demo-6a V0.1 入库（SupplyCore `d549b41`）
+- ☐ Sprint 6b 全部任务收尾（Day 1-8 完成，Day 9 集成 E2E + Day 10 Demo 进行中，由 b 重启 session 完成）
+- ✅ EF migrations 40 条全部 apply（Sprint 6a 加 4：Wave 31-34 + Sprint 6b 加 5：Wave 41/43-48）
+- ✅ sub_group_id 守护单测自动覆盖 Sprint 6a/6b 新增 13 实体（StockReturn / StockTransfer / PaymentPlan / PaymentRequest + Equipment 7 状态 / EquipmentCategory / Manufacturer / InstallationLocation / RepairApplication / EquipmentInspectionRecord / LeaseContract / EquipmentEntry / LeaseBilling / EquipmentExit）
+- ✅ 测试基线 **727 全过**（Domain 467 / Application 250 / EFCore 10）
 
 ### 1.5 完成标准（Sprint 7a 验收）
 
 - [ ] §二 D1-D10 全部任务 ✅
 - [ ] 全量测试 ≥ 780 通过（基线 727 + 7a 新增 ~55）
-- [ ] 新增 EF migrations 5-6 条：Add_StockBalance_S13 / Add_StockJournal_S14 / Add_PaymentBatch_C09 / Add_PaymentReceipt_C10 / Add_ReportAlert_R04（视决策点 4）
+- [ ] 新增 EF migrations 5 条（决策点 2B + 4B 锁版后）：Add_StockBalance_S13 / Add_StockJournal_S14 / Add_PaymentBatch_C09 / Add_PaymentReceipt_C10 / Add_ReportAlert_R04
 - [ ] Sprint 5a-6a 累计 6+ 处"库存联动留 Sprint 7a"备忘全部消化（S-05/S-06/S-09/S-10/S-12 → S-13/S-14）
 - [ ] Sprint7a_StockBalance_E2E + Sprint7a_PaymentReceipt_E2E 通过
 - [ ] 招采平台真接 OAuth 联调成功（Mock → Real DI 切换）
@@ -210,3 +217,4 @@ Sprint 6 完成阶段识别的 TODO（非 a 主路径但需记录）：
 | 版本 | 日期 | 变更 |
 |------|------|------|
 | V0.1 | 2026-05-13 | 首版草案，基于 Sprint-6a-V0.2 D10-4 验收物起。范围 5 类候选：A S-13/S-14 库存余额 / B C-09/C-10 付款后续 / C 招采平台真接 / D 09 报表预警起步 / E 验收，约 12.5 PD（需收口到 10 PD）。5 决策点待评审锁版。Sprint 6 决策点接收记入 §四（S-09/S-12 库存联动 + C-10 NC 实付回执 + 招采平台 Mock→Real）。|
+| V0.2 | 2026-05-13 | 评审 5 决策点一次性按"推荐版本"锁版：(1) S-13/S-14 完整双表 + 全联动；(2) **C-09 仅实体落**（批次推送 Sprint 8a）；(3) 招采平台 OAuth 本期实装；(4) **仅 R-04 PaymentDueNear**（R-05 + Hangfire 调度 Sprint 8a）；(5) a 不依赖 b（与 6a §5A 对称）。§1.1 范围标题更新到 "10 PD 严卡"；§1.2 决策点表（候选 / 倾向 → 锁版结论 / 理由）+ 总工时调整公式 -2.5 PD（2B -0.5 + 4B -1 + 3A D9 联调降级 -1）→ 10 PD ✓。§1.4 基线更新到 Sprint 6a 实际收尾 commit `db3d8ea` + SupplyCore `d549b41` Demo-6a/Sprint-7a 草案；测试基线 **727 全过**。§1.5 验收门保持 ≥ 780（基线 727 + 新增 ~55）；migration 数明确 5 条（含决策点 2B + 4B 调整后）。Sprint 7a 即刻进入实施，按 Day 1 起步 S-13 StockBalance 实体。|
