@@ -1,10 +1,10 @@
-# Sprint 10a 任务卡 — Codex 评审消化 + AI 真 LLM 接入 + SY-02 完整化 + 累计技术债扫尾（V0.1 草案）
+# Sprint 10a 任务卡 — Codex 评审消化 + AI 真 LLM 接入 + SY-02 完整化 + 累计技术债扫尾（V0.2 锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案，待评审锁版为 V0.2）
+**版本：** V0.2（锁版 · cici 评审通过 1B/2B/3A/4B/5B · 工时收口 11 → 10.5 PD）
 **日期：** 2026-05-13
-**文档性质：** 开发实施层 · Sprint 任务卡（草案）
-**适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 10a（10 工作日 / 约 2 周）
+**文档性质：** 开发实施层 · Sprint 任务卡
+**适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 10a（10 工作日 / 约 2 周 / 实际 10.5 PD）
 **并行轨道：** 与 Sprint 10b（设备运维 ML 接入 / 详设 07 V1.2 实施）平行
 
 **衔接文档：**
@@ -17,7 +17,7 @@
 
 ## 一、目标与范围
 
-### 1.1 V0.1 候选范围（约 11 PD，待评审收口到 ~10）
+### 1.1 V0.2 锁版范围（约 10.5 PD，含 0.5 PD buffer）
 
 Sprint 9a 闭环了 R-06/R-07/R-08 完整化 + AI Tool 接口骨架 + NC 部分成功 schema + Web.Tests + SY-02 字典化精简版。本期目标：**Codex 评审累计 9 commits 一次性消化 + AI Advisor 真 LLM 接入 + SY-02 SystemDictionary 表完整化 + Sprint 5-9 累计技术债扫尾**。
 
@@ -40,9 +40,9 @@ Sprint 8a + 9a 累计 9 个未评审 commit：
 Day 1 一次性 spawn 9 个 codex review，预计 5-10 分钟/commit，配合 cici daily quota 分批跑（每批 3-4 commits）。
 按 memory rule `feedback_auto_remind_codex_review.md` 不自动修复，列 finding 给 cici 决策。
 
-**B. AI Advisor 真 LLM 接入（~3 PD，Sprint 9a Day 6-7 顺延）**
+**B. AI Advisor 真 LLM 接入（~2.5 PD，V0.2 决策点 1B 自封装节省 0.5 PD）**
 
-- 引入 Claude API 客户端（`Anthropic.SDK` 或自封装 HttpClient + JSON）
+- 自封装 HttpClient + System.Text.Json（决策点 1B；复用 Sprint 7a `RealTenderPlatformApiService` 模式）
 - 实装 ClaudeReportAdvisorTool 三件套（PaymentDue / BondRelease / ContractExpiry）替换 MockStub
 - IOptions<ClaudeApiSettings>：ApiKey / Model（claude-opus-4-7）/ MaxTokens / Temperature
 - Prompt 构造：上下文裁剪 + System Prompt + Few-shot examples（接近详设 11 Tool 调用规范）
@@ -87,15 +87,15 @@ Day 1 一次性 spawn 9 个 codex review，预计 5-10 分钟/commit，配合 ci
 
 ---
 
-## 二、决策点（V0.1 草案，5 个）
+## 二、决策点（V0.2 锁版，5 个）
 
-| # | 决策点 | 选项 | V0.1 倾向 |
-|---|---|---|---|
-| 1 | Claude API 客户端选型 | A. `Anthropic.SDK` (NuGet 官方) / B. 自封装 HttpClient + System.Text.Json | A — 官方 SDK 维护成本低，但需评估 .NET 10 + ABP 10.1 兼容性 |
-| 2 | SY-02 SystemDictionary schema | A. 详设 06 §SY-02 完整（含 EffectiveDate 时间窗）/ B. 精简版（仅 Code/Value/DataType）| B — V1 精简，时间窗留 Sprint 11+；A 复杂度高 |
-| 3 | LLM 失败 fallback 策略 | A. Mock Stub 兜底 / B. 缓存最近成功响应 / C. 直接 IsFallback=true 错误返回 | A — Stub 已有，零成本兜底；B 缓存延后 Sprint 11 |
-| 4 | Codex 评审分批策略 | A. Day 1 一次性 9 commits / B. Day 1-3 每天 3 commits 分批 | B — Pro quota 防触顶；finding 列出后 cici 渐次决策 |
-| 5 | Sprint 5-9 技术债扫尾深度 | A. 全部修复 / B. 仅 P1（性能 + 安全相关）| B — 9 个 const 中只有 SafetyStock=0 / 线程安全两项必修 |
+| # | 决策点 | 选项 | V0.1 倾向 | **V0.2 锁版** |
+|---|---|---|---|---|
+| 1 | Claude API 客户端选型 | A. `Anthropic.SDK` / B. 自封装 HttpClient | A | **1B 自封装 ✅** — 官方仅 Python/TS SDK；`Anthropic.SDK` NuGet 是社区包（非官方）。Sprint 7a `RealTenderPlatformApiService` 已有完整 HttpClient+OAuth+retry 模板可复用，自封装维护成本可控且依赖最小。省 ~0.5 PD。|
+| 2 | SY-02 SystemDictionary schema | A. 完整（含 EffectiveDate）/ B. 精简版 | B | **2B 精简版 ✅** — 当前不需要时间窗；运行时设值即生效。|
+| 3 | LLM 失败 fallback 策略 | A. Mock Stub 兜底 / B. 缓存 / C. 错误返回 | A | **3A Mock Stub 兜底 ✅** — Sprint 9a Day 6-7 Stub 已落地，零成本兜底。|
+| 4 | Codex 评审分批策略 | A. 一次性 9 commits / B. 每天 3 分批 | B | **4B 分批 ✅** — Pro quota 已被验证有限制（Sprint 9a 阻断过），Day 1-3 分批稳。|
+| 5 | Sprint 5-9 技术债扫尾深度 | A. 全部修复 / B. 仅 P1 | B | **5B 仅 P1 ✅** — SafetyStock=0 + StockBalanceUpdater 线程安全 2 项 P1 必修；P2 留 Sprint 11。|
 
 ---
 
@@ -110,7 +110,7 @@ Day 1 一次性 spawn 9 个 codex review，预计 5-10 分钟/commit，配合 ci
 ### Day 2-3 — Codex finding 修复 + AI Advisor Claude API 起步（~2 PD）
 
 - D2 Codex finding 闭环（按 cici 决策修复）
-- D3-1 引入 `Anthropic.SDK` NuGet（决策点 1A）
+- D3-1 自封装 HttpClient 起步（决策点 1B；复用 Sprint 7a `RealTenderPlatformApiService` 模式）
 - D3-2 IClaudeApiClient 封装 + IOptions<ClaudeApiSettings>
 
 ### Day 4-5 — Claude API 三 Advisor 实装（~3 PD）
@@ -146,12 +146,13 @@ Day 1 一次性 spawn 9 个 codex review，预计 5-10 分钟/commit，配合 ci
 - Sprint-10a-Demo-脚本-V0.1.md
 - Sprint-11a-任务卡-V0.1.md（候选：详设 11 完整 LLM 编排 / AI 工作流 / Sprint 9-10 累计技术债）
 
-**Sprint 10a V0.1 总工时：** 1 + 2 + 3 + 2 + 1.5 + 1 + 0.5 = **11 PD**（需收口到 10）
+**Sprint 10a V0.2 锁版总工时：** 1 + 2 + 2.5 + 2 + 1.5 + 1 + 0.5 = **10.5 PD**（含 0.5 PD buffer）
 
-**收口候选：**
-- 决策点 1B 自封装 vs 官方 SDK（自封装省 SDK 学习成本 -0.5 PD）
-- 决策点 5B 仅 P1 技术债（D8 1.5 → 1 PD，-0.5 PD）
-- 总计可压缩到 **10 PD ✓**
+**V0.2 收口对比 V0.1**：
+- §1.1 B AI Advisor: 3 → 2.5 PD（-0.5）：决策点 1B 自封装替代官方 SDK 学习成本
+- §1.1 F 技术债：1.5 PD 保留（决策点 5B 仅 P1，原本就是 V0.1 计划）
+
+**§1.1 + Day 拆解后总 10.5 PD ≈ 10 PD 严卡** ✓
 
 ---
 
@@ -186,3 +187,4 @@ Day 1 一次性 spawn 9 个 codex review，预计 5-10 分钟/commit，配合 ci
 | 版本 | 日期 | 主要变更 |
 |---|---|---|
 | V0.1 | 2026-05-13 | 首版草案，基于 Sprint-9a-Demo-V0.1 D10 验收物起。7 类候选范围 ~11 PD（需收口到 10）。5 决策点待评审。Sprint 9a 决策点接收记入 §四（7 项）。重点：A Codex 9 commits 消化 + B 真 LLM 接入 + C SY-02 完整化 + D-G 累计技术债扫尾。|
+| V0.2 | 2026-05-13 | **锁版**（cici 评审通过）。5 决策点全部收口：**1B 自封装 HttpClient**（拒官方 SDK — 实为社区包 + 复用 Sprint 7a 模板，-0.5 PD）/ 2B SY-02 精简版 / 3A Mock Stub 兜底 / 4B Codex 评审分批 / 5B 仅 P1 技术债。工时 11 → 10.5 PD（决策点 1B -0.5 PD）。Sprint 10a 即刻进入实施，Day 1 起步 Codex 评审 9 commits 第一批（Pro quota 恢复后）。 |
