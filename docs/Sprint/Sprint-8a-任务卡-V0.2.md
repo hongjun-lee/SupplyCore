@@ -1,11 +1,11 @@
-# Sprint 8a 任务卡 — 库存联动 line 级收口 + C-09 NC 批次推送 + R-05/Hangfire + 合同/支付补强（V0.1 草案）
+# Sprint 8a 任务卡 — 库存联动 line 级收口 + C-09 NC 批次推送 + R-05/Hangfire + 合同/支付补强（V0.2）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案，待评审锁版为 V0.2）
+**版本：** V0.2（评审后锁版 / 实施基线）
 **日期：** 2026-05-13
-**文档性质：** 开发实施层 · Sprint 任务卡（草案）
+**文档性质：** 开发实施层 · Sprint 任务卡（实施基线）
 **适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 8a（预估 10 工作日 / 约 2 周）
-**并行轨道：** 与 Sprint 8b 设备运维 AI 深化 平行进行（草案待 b 起草）
+**并行轨道：** 与 Sprint 8b 设备运维 AI 深化 平行进行（详 [`Sprint-8b-任务卡-V0.1.md`](./Sprint-8b-任务卡-V0.1.md) — b 已起草，待 cici 评审锁版）
 
 **衔接文档：**
 
@@ -18,7 +18,7 @@
 
 ## 一、目标与范围
 
-### 1.1 V0.1 候选范围（约 12 PD，待评审收口到 ~10）
+### 1.1 V0.2 锁版范围（10 PD 严卡）
 
 Sprint 7a 闭环 S-13/S-14/S-21 库存余额 + C-09/C-10 付款后续 + R-04 PaymentDueNear 起步；Sprint 7b 闭环设备运维 4 大场景 + E-13 折旧起步。Sprint 8a 把"Sprint 5-7 累计技术债 + 顺延项 + 报表预警调度框架"统一收口。
 
@@ -62,24 +62,22 @@ Sprint 7a 闭环 S-13/S-14/S-21 库存余额 + C-09/C-10 付款后续 + R-04 Pay
 - Sprint-8a-Demo 脚本
 - Sprint-9a 任务卡草案
 
-### 1.2 V0.1 待评审决策点
+### 1.2 V0.2 评审决策点（已锁版 — cici 一次性 Y 通过全推荐版本 A/A/A/A/A）
 
-| # | 决策点 | 候选方案 | 倾向 |
+| # | 决策点 | 锁版结论 | 理由 |
 |---|--------|----------|------|
-| 1 | 5 处单据 line 级范围 | A. 5 处全做（S-05 / S-06 / S-09 / S-10 / S-12）/ B. 简化只做 2 处（S-05 + S-09）其余顺延 Sprint 9a | **A — 全做** — Sprint 5-7 累计 6+ 处 TODO 一次性消化；分批次只增加上下文切换成本；模式同（CreateDto Lines + ApplyDelta loop + S-21 N 行）|
-| 2 | C-09 NC 推送范围 | A. 完整 BIZ-PAY-BATCH 接入 + 失败 / 部分成功 / 重推 / 幂等四要素 / B. 仅 BIZ-PAY-BATCH stub（不实装失败 / 部分成功）顺延 Sprint 9a | **A — 完整** — 沿用 BIZ-PAY 模式工时 2 PD 内可控；批次推送是 C-09 价值核心，stub 化无意义 |
-| 3 | R-05 范围 | A. 完整 R-05 BondReleaseNear + Hangfire 调度框架 + 5 个 RecurringJob 注册 / B. 仅 R-05 实施（Hangfire 顺延 Sprint 9a 接）| **A — 完整 + Hangfire** — R-05 单独无价值（手工触发与 R-04 重复成本）；Hangfire 接入 ~1 PD 内可控；与 Sprint 7b E-13 折旧月度调度合并落地 |
-| 4 | C-02 PaidAmount 字段加在 Sprint 8a 还是 Sprint 9a | A. 加在 Sprint 8a / B. 顺延 Sprint 9a | **A — Sprint 8a 加** — 不阻塞 C-10 完整化，但减少人工跟单成本；工时仅 1 PD；C-10 已 Sprint 7a Day 5 落地，本期联动改动小 |
-| 5 | 与 b 集成测试边界 | A. a 不依赖 b（沿用 Sprint 6/7 §5A）/ B. a 需要 b 的 E-13 折旧 Hangfire 调度框架共享 | **A — 不依赖** — Sprint 6/7 双轨 5A 经验稳；Hangfire 框架 a/b 都用但各自注册各自 Job；共享 DI 配置即可 |
+| 1 | 5 处单据 line 级范围 | A. 5 处全做（S-05 / S-06 / S-09 / S-10 / S-12）/ B. 简化只做 2 处（S-05 + S-09）其余顺延 Sprint 9a | **A — 全做（线级 4 处：S-05/S-09/S-10/S-12，S-06 顺延 9a）** | Sprint 5-7 累计 6+ 处 TODO 一次性消化（S-06 已有 NC BIZ-RED 模式简单；分批次只增加上下文切换成本；模式同（CreateDto Lines + ApplyDelta loop + S-21 N 行）|
+| 2 | C-09 NC 推送范围 | A. 完整 BIZ-PAY-BATCH 接入 + 失败 / 部分成功 / 重推 / 幂等四要素 / B. 仅 BIZ-PAY-BATCH stub（不实装失败 / 部分成功）顺延 Sprint 9a | **A — 完整 BIZ-PAY-BATCH + 失败 / 部分成功 / 重推 / 幂等** | 沿用 BIZ-PAY 模式工时 2 PD 内可控；批次推送是 C-09 价值核心，stub 化无意义 |
+| 3 | R-05 范围 | A. 完整 R-05 BondReleaseNear + Hangfire 调度框架 + 5 个 RecurringJob 注册 / B. 仅 R-05 实施（Hangfire 顺延 Sprint 9a 接）| **A — 完整 R-05 + Hangfire（仅 R-04/R-05 RecurringJob，其他留 skeleton）** | R-05 单独无价值（手工触发与 R-04 重复成本）；Hangfire 接入 ~1 PD 内可控；与 Sprint 7b E-13 折旧月度调度合并落地 |
+| 4 | C-02 PaidAmount 字段加在 Sprint 8a 还是 Sprint 9a | A. 加在 Sprint 8a / B. 顺延 Sprint 9a | **A — Sprint 8a 加** | 不阻塞 C-10 完整化，但减少人工跟单成本；工时仅 1 PD；C-10 已 Sprint 7a Day 5 落地，本期联动改动小 |
+| 5 | 与 b 集成测试边界 | A. a 不依赖 b（沿用 Sprint 6/7 §5A）/ B. a 需要 b 的 E-13 折旧 Hangfire 调度框架共享 | **A — 不依赖（与 6/7 §5A 对称）** | Sprint 6/7 双轨 5A 经验稳；Hangfire 框架 a/b 都用但各自注册各自 Job；共享 DI 配置即可 |
 
-**总工时调整候选**（V0.1 12 PD → 收口 10 PD）：
+**总工时调整**（V0.1 12 PD → V0.2 10 PD 严卡，cici 选 A/A/A/A/A 全推荐版本）：
 
-- 决策点 1B（line 级简化只做 2 处）= -2 PD
-- 决策点 2B（C-09 stub 化）= -1 PD
-- 决策点 3B（Hangfire 顺延）= -1 PD
-- 决策点 4B（C-02 PaidAmount 顺延）= -1 PD
-
-> 若评审最终倾向 A/A/A/A/A 全做（推荐），则需在某子任务（如 §A line 级范围降到 4 处 / §C Hangfire RecurringJob 仅注册 2 个 R-04+R-05 不含其他候选 R-XX）压缩 2 PD。
+为保 10 PD 严卡，子任务范围微调（推荐版本下 -2 PD）：
+- **§A line 级范围降到 4 处**（S-05 / S-09 / S-10 / S-12，去 S-06 退货因 Sprint 5a 已有 NC BIZ-RED 模式简单可顺延 Sprint 9a）= **-1 PD**
+- **§C Hangfire RecurringJob 仅注册 2 个**（R-04 PaymentDueNear + R-05 BondReleaseNear，其他候选 R-06/R-07/R-08 仅留 Detector skeleton 不注册 Job）= **-1 PD**
+- 总计 **-2 PD** → V0.2 严卡 **10 PD ✓**
 
 ### 1.3 不在范围
 
@@ -89,12 +87,14 @@ Sprint 7a 闭环 S-13/S-14/S-21 库存余额 + C-09/C-10 付款后续 + R-04 Pay
 - R-06 / R-07 / R-08 完整 Detector 实施（本期仅 Hangfire 调度框架预留 RecurringJob 槽位 + 草拟 Detector skeleton）
 - 招采平台真接补强（Sprint 7a Day 9 已实施）
 
-### 1.4 基线（Sprint 7a/7b 收尾确认）
+### 1.4 基线
 
-- ✅ Sprint 7a Day 8 EF 层批量 commit `6c71293` push
-- ✅ Sprint 7b Day 4 commit `fc00968` push（Wave 49-51）
-- ✅ EF migrations 61 条全部 apply（Sprint 7a 加 6：Wave 56-61 / Sprint 7b 加 3：Wave 49-51）
-- ✅ sub_group_id 守护单测自动覆盖 Sprint 7a/7b 新增 9+ 实体（StockBalance/14/21 + C-09/C-10 + R-04 ReportAlert + E-07/E-08 + 其他）
+- ✅ Sprint 7a Day 1-10 完成（commit `24f0f07..09cd0b3` + Codex 修复 `4e2c61a` + `192975e` + Demo-7a `9ef16eb`）
+- ✅ Sprint 7b Day 1-10 完成（commit `fc00968..2857cd5` + Demo-7b `704dd31`）
+- ✅ EF migrations 实际 48+ 条全部 apply（Sprint 7a 加 Wave 56-61 合并 1 + Codex P2-1 修复 1 / Sprint 7b 加 Wave 49-53 + LeaseBilling fields = 共 7 个 migration）
+- ✅ sub_group_id 守护单测自动覆盖 Sprint 7a/7b 新增 14+ 实体（StockBalance/14/21 + C-09/C-10 + R-04 ReportAlert + E-07/E-08/E-06 BreakdownRequest/SparePart/Scrapping + EquipmentStatusChange + EquipmentDepreciation 等）
+- ✅ Codex 评审落地（Sprint 7a 首次启用 `codex review` 自动评审；闭环 P1 + P2 finding）
+- ✅ 测试基线 **929 全过**（Domain 609 / Application 310 / EFCore 10）
 - ✅ 测试基线 **870 全过**
 - ⚠️ Sprint 7a Day 9-10 / Sprint 7b Day 5-10 尚未完成（Day 9 集成 E2E + Day 10 Demo + Sprint-8a/Sprint-8b 草案）— Sprint 8a 起步前需完成
 
@@ -260,3 +260,4 @@ Sprint 6-7 完成阶段识别的决策点与备忘（任务卡 V0.2 §四 + Demo
 | 版本 | 日期 | 变更 |
 |------|------|------|
 | V0.1 | 2026-05-13 | 首版草案，由 c 子代理 Sprint 7a Day 8 EF 层批量 push (`6c71293`) 后起。范围 6 类候选：A 5 处单据 line 级 / B C-09 NC 批次推送 / C R-05 + Hangfire 调度框架（含 E-13 月度 Job 共享）/ D C-02 PaidAmount 字段 + 完成联动 / E C-08 支付退回状态 / F 验收 + Sprint 9a 草案，约 12 PD（需收口到 10 PD）。5 决策点待评审锁版（倾向 A/A/A/A/A 全做）。Sprint 6/7 决策点接收记入 §四：(1) Sprint 7a 2B 顺延 C-09 NC 推送 → Day 5；(2) Sprint 7a 4B 顺延 R-05 + Hangfire → Day 6-7；(3) Sprint 7a Day 2-2/3 跳过 line 级 → Day 1-4；(4) Sprint 7a Day 5 备忘 C-02 PaidAmount → Day 8；(5) Sprint 7a Day 5 备忘 C-08 支付退回 → Day 8；(6) Sprint 5-6 累计 6+ 库存 TODO → Day 1-4 合并；(7) Sprint 7b 4B 顺延 E-13 折旧 Hangfire → Day 6 共享框架。详设依据加入 09 V0.1（c 子代理本次同 commit 起草）。 |
+| V0.2 | 2026-05-13 | 评审 5 决策点一次性按 cici Y 推荐版本锁版：(1) **A — line 级 4 处**（S-05/S-09/S-10/S-12，S-06 顺延 9a 因已有 NC BIZ-RED 模式）；(2) **A — 完整 BIZ-PAY-BATCH + 四要素**；(3) **A — R-05 + Hangfire 仅注册 R-04/R-05 RecurringJob，其他 Detector 留 skeleton**；(4) **A — C-02 PaidAmount Sprint 8a 加**；(5) **A — a 不依赖 b**（与 6/7 §5A 对称）。§1.1 范围标题更新到 "10 PD 严卡"；§1.2 决策点表（候选/倾向 → 锁版结论/理由）+ 子任务范围微调公式 -2 PD（§A 5→4 处 -1 + §C Hangfire RecurringJob 仅 2 个 -1） → 10 PD ✓。§1.4 基线更新到 Sprint 7a/7b 实际收尾 commit + Codex 评审落地（首次启用 `codex review` + P1/P2 闭环 commit `4e2c61a`+`192975e`）；测试基线 **929 全过**（Domain 609 / App 310 / EFCore 10）。§1.5 验收门保持 ≥ 980（基线 929 + ~50 新增）。Sprint 8a 即刻进入实施，按 Day 1 起步 S-05 line 级收口。|
