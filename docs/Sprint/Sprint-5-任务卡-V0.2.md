@@ -39,7 +39,7 @@
 
 **A. 招投标后续（3.5 PD）**
 
-- T-06 EvaluationCommittee 评标委员会
+- T-06 TenderPlatformLog 招采平台对接日志（纯日志型，无状态机）
 - T-07 TenderPackageLine 标包明细
 - T-08 BidResponse 投标响应
 - T-09 EvaluationResult 评标结果明细
@@ -96,12 +96,12 @@
 
 **预估工时：** 1 PD
 
-### Day 1-2 — T-06 + T-07 标包后续
+### Day 1-2 — T-06 + T-07 招投标后续
 
 | # | 任务 | 详设引用 | 验收 |
 |---|------|---------|------|
-| D1-1 | T-06 EvaluationCommittee 实体 + 状态机（草稿 → 评标中 → 评标完成）| 04 §4.13 | 单测 ≥ 4 |
-| D1-2 | T-07 TenderPackageLine 实体（关联 T-03 / P-03 / M-05）| 04 §4.10.2 | 字段对齐 |
+| D1-1 | T-06 TenderPlatformLog 实体（招采平台对接日志，纯日志型无状态机）| 04 §4.13 | 字段对齐；枚举值白名单校验；单测 ≥ 4 |
+| D1-2 | T-07 TenderPackageLine 实体（关联 T-03 / P-03 / M-05，校验物料启用）| 04 §4.10.2 / §12.2 | 字段对齐 |
 | D2-1 | T-06 / T-07 AppService + Controller | — | 单测 ≥ 5 |
 | D2-2 | EF mapping + Add_Tender_T06_T07 migration | — | apply 通过 |
 
@@ -216,7 +216,7 @@
 | 风险 | 概率 | 影响 | 缓解 |
 |------|------|------|------|
 | Sprint 4 质量闸不先修，后续 E2E 固化错误流程 | 高 | 招投标和库存联动口径偏离 | D0 第一动作修复，不得后置 |
-| T-06~T-09 一次性补齐压缩工时 | 中 | Day 3-4 超时 | 严格做字段 + 状态机 + AppService 最小可用版，平台对接细节不进本 Sprint |
+| T-06~T-09 一次性补齐压缩工时 | 中 | Day 3-4 超时 | 严格做字段 + 业务规则 + AppService 最小可用版，平台对接细节不进本 Sprint |
 | 详设 07 V1.1 升版与代码落地互相阻塞 | 中 | D5-D7 延期 | D5-1 第一动作；文档与代码同周收口 |
 | Catio Workflow OAuth 凭据继续延期 | 高 | Stage B1 不能真接 | Stage B1 仅机会窗口，不占主线 |
 | NC 08B 回函继续延期 | 中 | BIZ 真接不能落 | Sprint 5 不承诺 NC 真接；继续用 Mock / 接口抽象 |
