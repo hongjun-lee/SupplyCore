@@ -1,7 +1,7 @@
-# Sprint 11a 任务卡 — 详设 11 LLM 编排 + Codex 14 commits 消化 + Sprint 5-10 累计技术债 P2 扫尾（V0.1 草案）
+# Sprint 11a 任务卡 — 详设 11 LLM 编排 + Codex 14 commits 消化 + Sprint 5-10 累计技术债 P2 扫尾（V0.2 锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审锁版）
+**版本：** V0.2（**锁版** · cici 2026-05-14 评审通过 1B / 2A / 3A / 4B / 5B / 6A · 工时 10.5 PD）
 **日期：** 2026-05-14
 **文档性质：** 开发实施层 · Sprint 任务卡
 **适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 11a（10 工作日 / 约 2 周 / 预算 ~10 PD）
@@ -17,7 +17,7 @@
 
 ## 一、目标与范围
 
-### 1.1 V0.1 候选范围（约 10 PD）
+### 1.1 V0.2 锁版范围（约 10.5 PD，含 0.5 PD buffer）
 
 Sprint 10a 闭环了国产 LLM 接入（DeepSeek+Qwen 三级 fallback）+ SY-02 SystemConfig 完整化 + Sprint 5-9 累计技术债 P1。本期目标：**详设 11 完整 LLM 编排 + Codex 累计 14 commits 一次性消化 + Sprint 5-10 累计技术债 P2 扫尾**。
 
@@ -89,15 +89,16 @@ Sprint 10a 仅启用 ConfigScope=全局。本期：
 
 ---
 
-## 二、决策点（V0.1 待评审，5 个）
+## 二、决策点（V0.2 锁版，6 个）
 
-| # | 决策点 | 选项 | V0.1 倾向 | 备注 |
+| # | 决策点 | 选项 | V0.1 倾向 | **V0.2 锁版** |
 |---|---|---|---|---|
-| 1 | LLM 多 Tool 协同实现路径 | A. 自封装 ToolRegistry（轻量）/ B. Lift Catio Nova.AiAssistant ToolRegistry / C. 跳过 Sprint 11a（仅做单 Tool 升级）| **B Lift Catio**（沿用 Sprint 10a 经验） | A 重复造轮 / B 风险低 / C 推迟会卡详设 11 落地 |
-| 2 | Real LLM 集成测试运行方式 | A. CI 跳过 + 本地手工跑 / B. 加 docker DeepSeek mock / C. Mock 即可不接通真 | **A** | C 失去本期价值；B 工程量大 |
-| 3 | SY-02 Org Scope schema | A. 改 Provider.GetIntForOrg 新签名 / B. 同签名内自动从 IAbpSession.OrgId 取（隐式）| **A 显式参数** | B 易出错且测试难 |
-| 4 | Codex 评审分批策略 | A. 一次性 14 commits / B. 4-5 commits 分批 | **B 分批** | Pro quota 持续触顶 |
-| 5 | StockBalanceUpdater 线程安全升级 | A. SemaphoreSlim / B. DB 唯一约束（Wave 72）/ C. 现状（继续延后） | **B DB 唯一约束** | A 跨实例无效；C 影响 Hangfire+业务并发场景信任 |
+| 1 | LLM 多 Tool 协同实现路径 | A. 自封装 ToolRegistry（轻量）/ B. Lift Catio Nova.AiAssistant ToolRegistry / C. 跳过 Sprint 11a（仅做单 Tool 升级）| B | **1B Lift Catio ✅**（沿用 Sprint 10a Lift Provider 经验；A 重复造轮 / C 卡详设 11 落地）|
+| 2 | Real LLM 集成测试运行方式 | A. CI 跳过 + 本地手工跑 / B. 加 docker DeepSeek mock / C. Mock 即可不接通真 | A | **2A CI 跳过 + 本地手工 ✅**（用 `[SkippableFact]` + CATIO_LLM_API_KEY 环境变量；C 失去本期价值；B 工程量大）|
+| 3 | SY-02 Org Scope schema | A. 改 Provider.GetIntForOrg 新签名 / B. 同签名内自动从 IAbpSession.OrgId 取（隐式）| A | **3A 显式参数 ✅**（Provider.GetIntForOrg(code, orgId, fallback) 新签名；B 易出错且测试难）|
+| 4 | Codex 评审分批策略 | A. 一次性 14 commits / B. 4-5 commits 分批 | B | **4B 分批 ✅**（Pro quota Sprint 9a/10a 已三次触顶；当前已分 3 批跑完 9/14，剩 5 批跑中）|
+| 5 | StockBalanceUpdater 线程安全升级 | A. SemaphoreSlim / B. DB 唯一约束（Wave 73）/ C. 现状（继续延后） | B | **5B DB 唯一约束 ✅**（A 跨实例无效；C 影响 Hangfire+业务并发场景信任；Wave 73 加 UQ on (alertCode, sourceBillType, sourceBillId) WHERE state=Pending）|
+| 6 | **P1-4 C-07 累计语义路线**（V0.2 新增 — Codex `42b4804` finding 触发）| A. 删 PaymentExecutionAppService.ApplyPayment（路线 A）/ B. 删 PaymentRequestAppService.ApplyPayment（路线 B）/ C. 双扣保留 + 新增 ReservedBudget 字段（路线 C）| — | **6A 路线 A ✅**（详 [`Sprint-11a-P1-4-路线分析-V0.1.md`](./Sprint-11a-P1-4-路线分析-V0.1.md)：代码 7 行 + 测试 32 行 / 路线 B 需详设 §4.7 业务规则重写 / 路线 C 1.5 PD）|
 
 ---
 
@@ -186,6 +187,7 @@ Sprint 10a 仅启用 ConfigScope=全局。本期：
 |---|---|---|
 | V0.1 | 2026-05-14 | 首版草案。基于 Sprint-10a-Demo-V0.1 D10 验收物。6 类候选范围 ~10.5 PD（需收口到 10）。5 决策点待评审。Sprint 10a 决策点接收记入 §四（7 项）。重点：A Codex 14 commits 消化 + B 详设 11 完整 LLM 编排 + C Real LLM 集成 + D SY-02 Org Scope + E P2 技术债扫尾。 |
 | V0.1+ (附录) | 2026-05-14 | **Codex 评审阶段性结果**：完成 9/14 commits（剩 5 commits 在跑中 Pro quota 触顶顺延次日 5:24 AM）。已知 finding **5 P1 / 10 P2 / 2 P3**（45554f7 P2 SafetyStock=0 已在 Sprint 10a D8-1 修复）。详 §七 Codex finding 附录。Day 1-2 工作量从 2 PD 重估为 ~2.5 PD（5 P1 修复约 1.5 PD + 跑剩 5 commits + 汇总 0.5 PD + buffer）。等 cici 评审 V0.2 锁版。|
+| V0.2 | 2026-05-14 | **锁版**（cici 评审通过）。6 决策点全部收口：**1B Lift Catio ToolRegistry** / **2A CI 跳过+本地** / **3A 显式 OrgId 参数** / **4B Codex 分批** / **5B DB 唯一约束 Wave 73** / **6A P1-4 路线 A**（V0.2 新增 — 详 P1-4 路线分析）。配套设计草案 3 份：[`Sprint-11a-Day3-Lift-设计-V0.1.md`](./Sprint-11a-Day3-Lift-设计-V0.1.md) / [`Sprint-11a-Day1-P1修复-设计-V0.1.md`](./Sprint-11a-Day1-P1修复-设计-V0.1.md) / [`Sprint-11a-P1-4-路线分析-V0.1.md`](./Sprint-11a-P1-4-路线分析-V0.1.md)。Pro quota 恢复后跑剩 5 commits Codex（task `binc9n5z2` background 中）→ 完整 finding 合入 §七 → Day 1-2 进 P1 修复实施。工时维持 10.5 PD（含 0.5 PD buffer）。|
 
 ---
 
