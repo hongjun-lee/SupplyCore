@@ -187,32 +187,34 @@ Sprint 10a 仅启用 ConfigScope=全局。本期：
 |---|---|---|
 | V0.1 | 2026-05-14 | 首版草案。基于 Sprint-10a-Demo-V0.1 D10 验收物。6 类候选范围 ~10.5 PD（需收口到 10）。5 决策点待评审。Sprint 10a 决策点接收记入 §四（7 项）。重点：A Codex 14 commits 消化 + B 详设 11 完整 LLM 编排 + C Real LLM 集成 + D SY-02 Org Scope + E P2 技术债扫尾。 |
 | V0.1+ (附录) | 2026-05-14 | **Codex 评审阶段性结果**：完成 9/14 commits（剩 5 commits 在跑中 Pro quota 触顶顺延次日 5:24 AM）。已知 finding **5 P1 / 10 P2 / 2 P3**（45554f7 P2 SafetyStock=0 已在 Sprint 10a D8-1 修复）。详 §七 Codex finding 附录。Day 1-2 工作量从 2 PD 重估为 ~2.5 PD（5 P1 修复约 1.5 PD + 跑剩 5 commits + 汇总 0.5 PD + buffer）。等 cici 评审 V0.2 锁版。|
-| V0.2 | 2026-05-14 | **锁版**（cici 评审通过）。6 决策点全部收口：**1B Lift Catio ToolRegistry** / **2A CI 跳过+本地** / **3A 显式 OrgId 参数** / **4B Codex 分批** / **5B DB 唯一约束 Wave 73** / **6A P1-4 路线 A**（V0.2 新增 — 详 P1-4 路线分析）。配套设计草案 3 份：[`Sprint-11a-Day3-Lift-设计-V0.1.md`](./Sprint-11a-Day3-Lift-设计-V0.1.md) / [`Sprint-11a-Day1-P1修复-设计-V0.1.md`](./Sprint-11a-Day1-P1修复-设计-V0.1.md) / [`Sprint-11a-P1-4-路线分析-V0.1.md`](./Sprint-11a-P1-4-路线分析-V0.1.md)。Pro quota 恢复后跑剩 5 commits Codex（task `binc9n5z2` background 中）→ 完整 finding 合入 §七 → Day 1-2 进 P1 修复实施。工时维持 10.5 PD（含 0.5 PD buffer）。|
+| V0.2 | 2026-05-14 | **锁版**（cici 评审通过）。6 决策点全部收口：**1B Lift Catio ToolRegistry** / **2A CI 跳过+本地** / **3A 显式 OrgId 参数** / **4B Codex 分批** / **5B DB 唯一约束 Wave 73** / **6A P1-4 路线 A**（V0.2 新增 — 详 P1-4 路线分析）。配套设计草案 3 份：[`Sprint-11a-Day3-Lift-设计-V0.1.md`](./Sprint-11a-Day3-Lift-设计-V0.1.md) / [`Sprint-11a-Day1-P1修复-设计-V0.1.md`](./Sprint-11a-Day1-P1修复-设计-V0.1.md) / [`Sprint-11a-P1-4-路线分析-V0.1.md`](./Sprint-11a-P1-4-路线分析-V0.1.md)。工时维持 10.5 PD（含 0.5 PD buffer）。|
+| V0.2+ (附录完整) | 2026-05-14 | **Codex 14/14 全部完成**（剩 5 commits 在 V0.2 锁版后跑完）。§七 附录从 9/14 升级到 14/14。新增：**1 P1**（c1173d4 P1-6 NC BatchDetails 部分确认 AllSuccess 错分类）+ **4 P2**（c1173d4 P2-10 / ccf7ff0 P2-11/P2-12/P2-13）+ **3 新 zero-finding**（7574ba5 / b8e0d61 / ad1bdfb）。最终统计：**6 P1 / 14 P2 / 2 P3 / 1 已修 / 4 zero-finding**。Day 1-2 工时 ~2 PD 维持不变（新 P1-6 同 NC BatchDetails 域 0.3 PD，吸收在 V0.2 §一A 预算内）。|
 
 ---
 
 ## 七、Codex 14 commits Finding 附录（阶段性 — 截至 2026-05-14 完成 9/14）
 
-### 7.1 整体统计
+### 7.1 整体统计（14/14 完成 — 2026-05-14）
 
-| Sprint | 总 commits | 已评 | finding 数 | 待评 |
-|---|---|---|---|---|
-| 8a | 4 | 4 | 5 (2 P1 + 4 P2 + 1 P3 + 1 已修) | 0 |
-| 9a | 6 | 3 | 4 (2 P1 + 1 P2 + 1 P3 + 0 finding 占 1) | 3 (`7574ba5` / `c1173d4` / `b8e0d61`) |
-| 10a | 4 | 2 | 3 (0 P1 + 3 P2) | 2 (`ccf7ff0` / `ad1bdfb`) |
-| **合计** | **14** | **9** | **5 P1 / 10 P2 / 2 P3 / 1 已修 / 1 zero-finding** | **5** |
+| Sprint | 总 commits | 已评 | finding 数 |
+|---|---|---|---|
+| 8a | 4 | 4 | 5 (2 P1 + 4 P2 + 1 P3 + 1 已修) |
+| 9a | 6 | 6 | 5 (2 P1 + 1 P2 + 1 P3 + **3 zero-finding**) |
+| 10a | 4 | 4 | 9 (1 P1 + 7 P2 + **1 zero-finding**) |
+| **合计** | **14** | **14** | **6 P1 / 14 P2 / 2 P3 / 1 已修 / 4 zero-finding** |
 
-### 7.2 5 个 P1 finding（业务路径不一致 — Day 1-2 优先修复）
+### 7.2 6 个 P1 finding（业务路径不一致 — Day 1-2 优先修复）
 
 | # | Commit | 文件 | 标题 | 影响 |
 |---|---|---|---|---|
 | P1-1 | `408545b` | `PaymentRequest.cs:204` | NC 失败时 C-08 仍 `已审`，`RefundPayment` 仅接受 `已支付` → 失败回执无法触发反向写回 | 详设 §4.8 "已审 → 支付退回" 路径不通 |
 | P1-2 | `408545b` | `Contract.cs:341` | 退款减 PaidAmount 后 ContractState 仍 `完成待确认`，Complete 不重算阈值 → 退款到 < 95% 仍可完成 | 合规：未达阈值已完成 |
 | P1-3 | `c8f2600` | `MonthlyPrepaymentSummaryManager.cs:66-70` | 月末 batch 包含已 push 的 C-08 → 同 C-08 重复推送 NC，覆盖 NcVoucherNo | NC 拒收 / 财务对账错乱 |
-| P1-4 | `42b4804` | `PaymentExecutionAppService.cs:77` | `MarkPaidAsync` 再调 C-07.ApplyPayment 重复扣 → 全额 throw / 分期 C-07 双扣 | Sprint 7a/8a 付款流程 corrupt |
+| P1-4 | `42b4804` | `PaymentExecutionAppService.cs:77` | `MarkPaidAsync` 再调 C-07.ApplyPayment 重复扣 → 全额 throw / 分期 C-07 双扣（✅ **路线 A 已锁** = 决策点 6A）| Sprint 7a/8a 付款流程 corrupt |
 | P1-5 | `42b4804` | `PaymentExecutionAppService.cs:68-73` | 非 Approved C-08 通过 idempotent skip 走 C-07/C-02 更新 → 绕过审批写款 | 合规风险 |
+| **P1-6** | `c1173d4` | `MonthlyPrepaymentSummaryAppService.cs:154-156` | NC BatchDetails 部分确认 + 返回项全 Success 时仍按 AllSuccess 分类 → **遗漏未确认的 C-08 永不被处理**且 summary 不可 retry | NC 部分成功路径数据丢失 |
 
-### 7.3 10 个 P2 finding
+### 7.3 14 个 P2 finding
 
 | # | Commit | 文件 | 标题 |
 |---|---|---|---|
@@ -225,6 +227,10 @@ Sprint 10a 仅启用 ConfigScope=全局。本期：
 | P2-7 | `519ee83` | `LlmAdvisorHelper.cs:60-63` | Fallback Qwen ApiKey=REPLACE_ME 仍被调用 → 把 prompt 泄露给未配置 provider |
 | P2-8 | `519ee83` | `LlmAdvisorHelper.cs:122-125` | Broad catch 吞掉 OperationCanceledException → 取消后仍走 fallback |
 | P2-9 | `c1667b9` | `NovaSupplyCoresApplicationModule.cs:52-59` | LLM HttpClient 硬编码 deepseek/qwen，配其他 provider 时 BaseAddress 未设 |
+| **P2-10** | `c1173d4` | `MonthlyPrepaymentSummaryAppService.cs:153` | PartialSuccess/AllFailed 时把 NcResponseCode 当 NcVoucherNo / 伪造 NC-PAY-BATCH-* → 失败记录看起来像有 voucher |
+| **P2-11** | `ccf7ff0` | `Migrations/Add_SystemConfig_Wave71.cs:15-17` | 已部署 `sy.system_dictionary` 的 DB 升级时不 rename / copy → 旧表 operator 改的阈值丢失 |
+| **P2-12** | `ccf7ff0` | `Migrations/Add_SystemConfig_Wave71.cs:75-80` | Seed 显式 id INSERT 不 advance IdentityByDefaultColumn 序列 → 下次 SystemConfigAppService.SetAsync 抛 PK 冲突 |
+| **P2-13** | `ccf7ff0` | `Hangfire/SupplyCoresRecurringJobHandlers.cs:111` | C-09 Hangfire 单 UoW 包整个 Org 循环 → 单 Org 失败若 EF flush 后无法独立回滚（与 D8-4 catch+continue 设计冲突）→ 需 per-Org fresh UoW |
 
 ### 7.4 2 个 P3 finding
 
@@ -239,11 +245,13 @@ Sprint 10a 仅启用 ConfigScope=全局。本期：
 |---|---|
 | `45554f7` P2 — SafetyStock=0 两 path 不一致 | ✅ Sprint 10a D8-1 已修（`ccf7ff0`）|
 | `e586638` Sprint 9a R-08 InventoryNearExpiry | ✨ 0 finding — 干净通过 |
+| `7574ba5` Sprint 9a AI Tool 接口 + 3 Mock Stub | ✨ 0 finding — "isolated advisor contracts/tests, no functional regression" |
+| `b8e0d61` Sprint 9a Web.Tests + Hangfire 注册守护 | ✨ 0 finding — "Web test + Hangfire guard, no correctness issue" |
+| `ad1bdfb` Sprint 10a D9 LlmAdvisor + SY02Config E2E | ✨ 0 finding — "only adds tests, consistent with existing patterns" |
 
-### 7.6 待评 5 commits（明早 5:24 AM Pro quota 恢复后续跑）
+### 7.6 Day 1-2 工作量重估（V0.2 锁版后）
 
-- `7574ba5` Sprint 9a AI Tool 接口骨架 + 3 Mock Stub
-- `c1173d4` Sprint 9a NC BatchDetails 部分成功 schema
-- `b8e0d61` Sprint 9a Web.Tests + Hangfire 注册守护
-- `ccf7ff0` Sprint 10a D8 SY-02 rename + 累计技术债 P1
-- `ad1bdfb` Sprint 10a D9 LlmAdvisor + SY02Config E2E
+- 6 P1 修复：~1.8 PD（5 P1 设计已落 Day1-P1修复-V0.1，新 P1-6 同 NC BatchDetails 域 0.3 PD）
+- 4 个新 P2 + 9 个老 P2 → 13 P2：14 P2 现在不在 Day 1-2 修复范围，Sprint 12a 评估累计修复
+- 2 P3：Sprint 12a 评估
+- **Day 1-2 总工时维持 ~2 PD**（V0.2 §一A 预算内）
