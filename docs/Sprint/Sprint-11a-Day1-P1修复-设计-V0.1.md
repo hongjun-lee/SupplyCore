@@ -17,7 +17,7 @@
 | P1-1 | PaymentRequest 失败 path 进不了 refund state | 低 | 0.2 PD | 低 — 仅扩 EnsureState |
 | P1-2 | 退款减后 ContractState 未 demote | 中 | 0.3 PD | 中 — 状态机扩展，测试需覆盖完整 |
 | P1-3 | 月末 batch 包含已 push 的 C-08 | 低 | 0.2 PD | 低 — query filter 加 1 条件 |
-| P1-4 | MarkPaidAsync 重复扣 C-07 | **高** | **0.5 PD** | **高 — 涉及 reconciliation 公式选择 + Sprint 10a D8-3 测试需改** |
+| P1-4 | MarkPaidAsync 重复扣 C-07 | 中（**路线 A 已锁**）| **0.5 PD** | 中 — 测试 32 行改动（含 reconciliation F-2 公式注释修订）|
 | P1-5 | 非 Approved C-08 可被 MarkPaid | 中 | 0.3 PD | 中 — 幂等逻辑改造 |
 
 **合计：~1.5 PD**（Sprint-11a-V0.1 §一A Day 1-2 预算 2.5 PD，剩余 1 PD 给跑 5 commits Codex + 汇总 + buffer）
@@ -171,7 +171,7 @@ var requests = requestQuery
 
 ---
 
-## 五、P1-4 MarkPaidAsync 重复扣 C-07（**核心矛盾，需 cici 决策**）
+## 五、P1-4 MarkPaidAsync 重复扣 C-07（✅ **路线 A 已锁定** — 2026-05-14 cici 决策 / 详 [`Sprint-11a-P1-4-路线分析-V0.1.md`](./Sprint-11a-P1-4-路线分析-V0.1.md)）
 
 ### 5.1 现状
 
@@ -196,9 +196,11 @@ var requests = requestQuery
 **Sprint 10a D8-3 reconciliation 测试基于路线 B**。
 **当前代码同时做了 A + B（双扣）** — bug。
 
-### 5.3 修复方案
+✅ **2026-05-14 cici 决策：采用路线 A**（详 P1-4 路线分析 §五推荐 5 条理由 + 源码注释 PaymentRequestAppService.cs:111 强烈倾向）。
 
-**推荐路线 A**（最小侵入 — 修 1 行 + 删 Sprint 10a D8-3 F-2 假设）：
+### 5.3 修复方案（✅ 锁定路线 A）
+
+**锁定路线 A**（最小侵入 — 修 1 行 + 删 Sprint 10a D8-3 F-2 假设）：
 
 ```csharp
 // PaymentExecutionAppService.MarkPaidAsync — 删除 line 75-78 的 C-07 累计调用
@@ -212,11 +214,7 @@ var requests = requestQuery
 - F-1 正向不变：`Contract.PaidAmount = SUM(C-07.CumulativePaidAmount)`
 - F-2 反向改：`C-07.CumulativePaidAmount = SUM(C-08.RequestAmount WHERE ApprovalState ∈ {Approved, Paid, Refunded})` — 已审/已付/已退累计；MarkPaid 阶段差异为零（仅状态推进）
 
-**备选路线 B**（更接近"实付"语义，但侵入大）：
-- 删除 ApproveAsync line 121 的 C-07.ApplyPayment
-- MarkPaidAsync line 77 保留
-- Approve 阶段 C-07 仅 MarkFulfilled（条件满足，但未累计）
-- 影响：Sprint 9a Day 4 之前所有 PaymentPlan 测试期望需改
+**~~备选路线 B~~**（已弃用 — cici 决策路线 A）
 
 ### 5.4 测试
 
@@ -227,7 +225,10 @@ var requests = requestQuery
 
 ### 5.5 风险
 
-**高**。这是设计矛盾不是 simple bug。路线 A/B 任一选择都影响 Sprint 6a-10a 已经写过的 ~30 个 PaymentPlan / Contract / Reconciliation 相关测试。建议：cici 在 V0.2 锁版评审时 **新增一个决策点（决策点 6）专门决定路线 A/B**。
+✅ **路线 A 已锁定**（2026-05-14 cici）。剩余风险：
+- reconciliation F-2 公式注释修订（C02PaidAmountReconciliation_Tests.cs ~30 行机械改动 — 低风险）
+- PaymentExecutionAppService_Tests 2 处断言期望改 0（机械改动 — 低风险）
+- 全量回归确认无意外破坏（1189 基线）
 
 ---
 
@@ -298,3 +299,4 @@ else
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-14 | 首版草案。5 P1 finding 逐项修复设计。**核心矛盾**：P1-4 涉及 C-07 累计语义（路线 A 已批准 vs 路线 B 已实付），影响 Sprint 6a-10a ~30 个测试，建议 V0.2 锁版加 决策点 6 专项评审。其他 4 P1 修复方案低/中风险，可常规实施。总工时 ~1.5 PD。|
+| V0.1+ (P1-4 锁定) | 2026-05-14 | **cici 决策：P1-4 采用路线 A**。§五 风险降级（高 → 中）。其他 4 P1 修复方案（P1-1/2/3/5）保持等 V0.2 主任务卡整体锁版后实施。Day 1-2 总工时维持 ~1.5 PD。|
