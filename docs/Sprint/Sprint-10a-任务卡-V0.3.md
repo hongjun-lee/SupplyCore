@@ -1,10 +1,10 @@
-# Sprint 10a 任务卡 — Codex 评审消化 + AI 真 LLM 接入 + SY-02 完整化 + 累计技术债扫尾（V0.2 锁版）
+# Sprint 10a 任务卡 — Codex 评审消化 + 国产 LLM 接入（DeepSeek+Qwen）+ SY-02 完整化 + 累计技术债扫尾（V0.3 锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（锁版 · cici 评审通过 1B/2B/3A/4B/5B · 工时收口 11 → 10.5 PD）
+**版本：** V0.3（锁版 · cici 修订决策点 1 — 国产 LLM 接入 + 参考 Catio Nova.AiAssistant 模式 · 工时 10 PD）
 **日期：** 2026-05-13
 **文档性质：** 开发实施层 · Sprint 任务卡
-**适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 10a（10 工作日 / 约 2 周 / 实际 10.5 PD）
+**适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 10a（10 工作日 / 约 2 周 / 实际 10 PD）
 **并行轨道：** 与 Sprint 10b（设备运维 ML 接入 / 详设 07 V1.2 实施）平行
 
 **衔接文档：**
@@ -40,10 +40,18 @@ Sprint 8a + 9a 累计 9 个未评审 commit：
 Day 1 一次性 spawn 9 个 codex review，预计 5-10 分钟/commit，配合 cici daily quota 分批跑（每批 3-4 commits）。
 按 memory rule `feedback_auto_remind_codex_review.md` 不自动修复，列 finding 给 cici 决策。
 
-**B. AI Advisor 真 LLM 接入（~2.5 PD，V0.2 决策点 1B 自封装节省 0.5 PD）**
+**B. AI Advisor 真 LLM 接入 — 国产模型 DeepSeek + Qwen（~2 PD，V0.3 决策点 1C 修订）**
 
-- 自封装 HttpClient + System.Text.Json（决策点 1B；复用 Sprint 7a `RealTenderPlatformApiService` 模式）
-- 实装 ClaudeReportAdvisorTool 三件套（PaymentDue / BondRelease / ContractExpiry）替换 MockStub
+- **Lift Catio Nova.AiAssistant LlmProvider 模式**（cici 修订指引）— 4 个核心文件复制 + 微调：
+  - `ILlmProvider` 接口（CompleteAsync + StreamAsync）+ LlmRequest/LlmResponse POCO
+  - `LlmOptions` + `LlmProviderConfig`（Provider 切换 + Fallback）
+  - `OpenAiCompatibleProvider`（rename from DeepSeekProvider — 同时支持 DeepSeek + Qwen 等 OpenAI 兼容 API）
+  - `LlmProviderFactory`（按名创建 primary + fallback）
+- **国产模型配置**（参考 Catio Web/appsettings.json）：
+  - DeepSeek 主：`https://api.deepseek.com/` + `deepseek-chat`
+  - Qwen fallback：`https://dashscope.aliyuncs.com/compatible-mode/` + `qwen-plus`（OpenAI 兼容模式）
+- 实装 ClaudeReportAdvisor → **LlmReportAdvisor** 三件套（PaymentDue / BondRelease / ContractExpiry）替换 MockStub
+- 不引入完整 AiAssistant 模块依赖（避免拉 Hrx/WeightAudit/Kaoqin 业务模块）
 - IOptions<ClaudeApiSettings>：ApiKey / Model（claude-opus-4-7）/ MaxTokens / Temperature
 - Prompt 构造：上下文裁剪 + System Prompt + Few-shot examples（接近详设 11 Tool 调用规范）
 - 失败软降级保留：API 失败 fallback 到 MockStub 输出
@@ -91,7 +99,7 @@ Day 1 一次性 spawn 9 个 codex review，预计 5-10 分钟/commit，配合 ci
 
 | # | 决策点 | 选项 | V0.1 倾向 | **V0.2 锁版** |
 |---|---|---|---|---|
-| 1 | Claude API 客户端选型 | A. `Anthropic.SDK` / B. 自封装 HttpClient | A | **1B 自封装 ✅** — 官方仅 Python/TS SDK；`Anthropic.SDK` NuGet 是社区包（非官方）。Sprint 7a `RealTenderPlatformApiService` 已有完整 HttpClient+OAuth+retry 模板可复用，自封装维护成本可控且依赖最小。省 ~0.5 PD。|
+| 1 | LLM 接入方案 | A. Claude API（境外） / B. 自封装 HttpClient / **C. Lift Catio LlmProvider（国产 DeepSeek+Qwen）** | C | **1C Lift Catio 国产 LLM ✅**（**V0.3 修订**）— cici 指引：参考 Catio Nova.AiAssistant 接入的 DeepSeek（主）+ Qwen（fallback），两者都用 OpenAI 兼容 API。Lift 4 个核心文件（ILlmProvider/LlmOptions/OpenAiCompatibleProvider/LlmProviderFactory），rename DeepSeekProvider 为通用 OpenAiCompatibleProvider。境内服务延迟低 + 合规（避免 Claude 跨境数据问题）+ 复用 Catio 久经验证的实现。 |
 | 2 | SY-02 SystemDictionary schema | A. 完整（含 EffectiveDate）/ B. 精简版 | B | **2B 精简版 ✅** — 当前不需要时间窗；运行时设值即生效。|
 | 3 | LLM 失败 fallback 策略 | A. Mock Stub 兜底 / B. 缓存 / C. 错误返回 | A | **3A Mock Stub 兜底 ✅** — Sprint 9a Day 6-7 Stub 已落地，零成本兜底。|
 | 4 | Codex 评审分批策略 | A. 一次性 9 commits / B. 每天 3 分批 | B | **4B 分批 ✅** — Pro quota 已被验证有限制（Sprint 9a 阻断过），Day 1-3 分批稳。|
@@ -110,16 +118,16 @@ Day 1 一次性 spawn 9 个 codex review，预计 5-10 分钟/commit，配合 ci
 ### Day 2-3 — Codex finding 修复 + AI Advisor Claude API 起步（~2 PD）
 
 - D2 Codex finding 闭环（按 cici 决策修复）
-- D3-1 自封装 HttpClient 起步（决策点 1B；复用 Sprint 7a `RealTenderPlatformApiService` 模式）
-- D3-2 IClaudeApiClient 封装 + IOptions<ClaudeApiSettings>
+- D3-1 Lift Catio LlmProvider 4 文件（决策点 1C）：复制 + rename DeepSeekProvider → OpenAiCompatibleProvider
+- D3-2 SupplyCores Domain/Llm 命名空间整理 + IOptions<LlmOptions> 注入（含 DeepSeek 主 + Qwen fallback）
 
-### Day 4-5 — Claude API 三 Advisor 实装（~3 PD）
+### Day 4-5 — 国产 LLM 三 Advisor 实装（~2 PD，V0.3 收口）
 
-- D4-1 ClaudePaymentDueAdvisor + Prompt template + Few-shot examples
-- D4-2 ClaudeBondReleaseAdvisor 同模式
-- D5-1 ClaudeContractExpiryAdvisor 同模式
-- D5-2 失败软降级（fallback 到 MockStub）
-- D5-3 单测 ≥ 8（mock HttpHandler + Stub-vs-真 LLM 切换）
+- D4-1 LlmPaymentDueAdvisor + Prompt template + Few-shot examples（中文 prompt）
+- D4-2 LlmBondReleaseAdvisor 同模式
+- D5-1 LlmContractExpiryAdvisor 同模式
+- D5-2 失败软降级 — DeepSeek 失败 → Qwen fallback → MockStub 兜底（三级 fallback）
+- D5-3 单测 ≥ 8（mock HttpMessageHandler + DeepSeek/Qwen 切换 + 三级 fallback 链）
 
 ### Day 6-7 — SY-02 SystemDictionary 表（~2 PD）
 
@@ -146,13 +154,15 @@ Day 1 一次性 spawn 9 个 codex review，预计 5-10 分钟/commit，配合 ci
 - Sprint-10a-Demo-脚本-V0.1.md
 - Sprint-11a-任务卡-V0.1.md（候选：详设 11 完整 LLM 编排 / AI 工作流 / Sprint 9-10 累计技术债）
 
-**Sprint 10a V0.2 锁版总工时：** 1 + 2 + 2.5 + 2 + 1.5 + 1 + 0.5 = **10.5 PD**（含 0.5 PD buffer）
+**Sprint 10a V0.3 锁版总工时：** 1 + 2 + 2 + 2 + 1.5 + 1 + 0.5 = **10 PD**（V0.3 修订决策点 1C 再省 0.5 PD）
 
-**V0.2 收口对比 V0.1**：
-- §1.1 B AI Advisor: 3 → 2.5 PD（-0.5）：决策点 1B 自封装替代官方 SDK 学习成本
-- §1.1 F 技术债：1.5 PD 保留（决策点 5B 仅 P1，原本就是 V0.1 计划）
+**V0.3 收口对比 V0.2**：
+- §1.1 B AI Advisor: 2.5 → 2 PD（-0.5）：决策点 1C Lift Catio 现成模式（无自封装设计成本）
 
-**§1.1 + Day 拆解后总 10.5 PD ≈ 10 PD 严卡** ✓
+**V0.2 → V0.3 修订说明**：cici 指引"LLM 接入国产模型 + 参考 Catio"，决策点 1 从 1B 自封装 → 1C Lift Catio LlmProvider。
+决策点 2/3/4/5 保持 V0.2 锁版结论不变。
+
+**§1.1 + Day 拆解后总 10 PD 严卡** ✓
 
 ---
 
@@ -174,8 +184,8 @@ Day 1 一次性 spawn 9 个 codex review，预计 5-10 分钟/commit，配合 ci
 
 | # | 风险 | 等级 | 对策 |
 |---|---|---|---|
-| 1 | Anthropic.SDK 与 .NET 10 / ABP 10.1 兼容 | 中 | Day 3-1 第一动作做 spike（Hello World 调用），不兼容退到 1B 自封装 |
-| 2 | Claude API 单测无真 API key（CI 跑不动）| 中 | mock HttpMessageHandler + 录制响应 fixture（参考 RealTenderPlatformApiService_Tests 模式）|
+| 1 | Catio LlmProvider Lift 时命名空间 / DI 冲突（如 Nova.AiAssistant.Llm vs SupplyCores Domain）| 低 | Day 3-1 复制时 rename 命名空间 `Nova.SupplyCores.Llm`；DI 在 Application Module 显式注册 |
+| 2 | DeepSeek/Qwen API 单测无真 API key（CI 跑不动）| 中 | mock HttpMessageHandler + 录制响应 fixture（参考 RealTenderPlatformApiService_Tests 模式）|
 | 3 | SY-02 表运行时切换不破现有 Detector 单测 | 中 | ISettingProvider 默认提供 IOptions 兼容 fallback；Detector 测试无需改 |
 | 4 | Codex 9 commits 累计 finding 过多 | 中 | Day 2 留缓冲 buffer 处理 P1；P2 累计记入 Sprint 11 |
 | 5 | 实时触发钩子线程安全（Hangfire + ApplyDelta 并发）| 中 | Day 8 第一动作 review；如严重则加 SemaphoreSlim per (org, warehouse, material) |
@@ -188,3 +198,4 @@ Day 1 一次性 spawn 9 个 codex review，预计 5-10 分钟/commit，配合 ci
 |---|---|---|
 | V0.1 | 2026-05-13 | 首版草案，基于 Sprint-9a-Demo-V0.1 D10 验收物起。7 类候选范围 ~11 PD（需收口到 10）。5 决策点待评审。Sprint 9a 决策点接收记入 §四（7 项）。重点：A Codex 9 commits 消化 + B 真 LLM 接入 + C SY-02 完整化 + D-G 累计技术债扫尾。|
 | V0.2 | 2026-05-13 | **锁版**（cici 评审通过）。5 决策点全部收口：**1B 自封装 HttpClient**（拒官方 SDK — 实为社区包 + 复用 Sprint 7a 模板，-0.5 PD）/ 2B SY-02 精简版 / 3A Mock Stub 兜底 / 4B Codex 评审分批 / 5B 仅 P1 技术债。工时 11 → 10.5 PD（决策点 1B -0.5 PD）。Sprint 10a 即刻进入实施，Day 1 起步 Codex 评审 9 commits 第一批（Pro quota 恢复后）。 |
+| V0.3 | 2026-05-13 | **修订决策点 1**：cici 指引"LLM 接入国产模型，参考 Catio Nova.AiAssistant"。**1B 自封装 → 1C Lift Catio LlmProvider** — 复制 4 个核心文件（ILlmProvider/LlmOptions/OpenAiCompatibleProvider/LlmProviderFactory）+ rename DeepSeekProvider 为 OpenAiCompatibleProvider（同时支持 DeepSeek + Qwen OpenAI 兼容 API）。**国产模型**：DeepSeek 主 (api.deepseek.com / deepseek-chat) + Qwen fallback (dashscope.aliyuncs.com/compatible-mode / qwen-plus)。**三级 fallback**：DeepSeek → Qwen → MockStub。**优势**：境内服务低延迟 + 合规（无跨境数据）+ Catio 久经验证实现。决策点 2/3/4/5 保持 V0.2 不变。工时 10.5 → **10 PD**（决策点 1C 再省 0.5 PD，无自封装设计成本）。 |
