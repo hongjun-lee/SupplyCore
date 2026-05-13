@@ -1,9 +1,9 @@
 """
 批量后处理发标包 docx 样式：
-  1. 所有正文字体统一为宋体 14pt（中英文同字号，中文走 eastAsia）
-  2. 所有标题段落（Heading 1~6 / Title）加粗，字号按层级放大
-  3. 所有表格单元格四周加实体边框（single line, 4pt 宽度, 黑色）
-  4. 表格单元格内文字也同样强制为宋体 14pt
+  1. 正文：仿宋_GB2312 小三 (15pt)
+  2. 文章标题（Title / Heading 1）：仿宋 三号 (16pt) 加粗 居中
+  3. 章节标题（Heading 2~6）：仿宋 小三 (15pt) 加粗
+  4. 表格单元格四周加实体边框（single line, 4pt 宽度, 黑色），单元格文字同正文样式
 
 用法:
   python3 scripts/apply_docx_style.py "docs/招标/word"
@@ -15,28 +15,33 @@ from pathlib import Path
 
 from docx import Document
 from docx.shared import Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn, nsmap
 from docx.oxml import OxmlElement
 
 
-ZH_FONT = "宋体"
-EN_FONT = "宋体"
-BASE_PT = 14
-HEADING_PT = {
-    "Title": 22,
-    "Heading 1": 20,
-    "Heading 2": 14,
-    "Heading 3": 16,
-    "Heading 4": 15,
-    "Heading 5": 14,
-    "Heading 6": 14,
+ZH_FONT_BODY = "仿宋_GB2312"
+ZH_FONT_HEADING = "仿宋"
+EN_FONT = "Times New Roman"
+BASE_PT = 15  # 小三
+
+# 标题样式配置：字号 / 中文字体 / 是否居中（统一加粗）
+HEADING_CONFIG: dict[str, dict] = {
+    "Title":     {"pt": 16, "zh_font": ZH_FONT_HEADING, "center": True},   # 三号
+    "Heading 1": {"pt": 16, "zh_font": ZH_FONT_HEADING, "center": True},   # 文章标题：三号 居中
+    "Heading 2": {"pt": 15, "zh_font": ZH_FONT_HEADING, "center": False},  # 章节标题：小三
+    "Heading 3": {"pt": 15, "zh_font": ZH_FONT_HEADING, "center": False},
+    "Heading 4": {"pt": 15, "zh_font": ZH_FONT_HEADING, "center": False},
+    "Heading 5": {"pt": 15, "zh_font": ZH_FONT_HEADING, "center": False},
+    "Heading 6": {"pt": 15, "zh_font": ZH_FONT_HEADING, "center": False},
 }
 BORDER_SIZE = "4"
 BORDER_COLOR = "000000"
 
 
-def set_run_font(run, size_pt: int, bold: bool | None = None):
-    run.font.name = EN_FONT
+def set_run_font(run, size_pt: int, bold: bool | None = None,
+                 zh_font: str = ZH_FONT_BODY, en_font: str = EN_FONT):
+    run.font.name = en_font
     run.font.size = Pt(size_pt)
     if bold is not None:
         run.bold = bold
@@ -45,10 +50,10 @@ def set_run_font(run, size_pt: int, bold: bool | None = None):
     if rFonts is None:
         rFonts = OxmlElement("w:rFonts")
         rPr.insert(0, rFonts)
-    rFonts.set(qn("w:ascii"), EN_FONT)
-    rFonts.set(qn("w:hAnsi"), EN_FONT)
-    rFonts.set(qn("w:eastAsia"), ZH_FONT)
-    rFonts.set(qn("w:cs"), EN_FONT)
+    rFonts.set(qn("w:ascii"), en_font)
+    rFonts.set(qn("w:hAnsi"), en_font)
+    rFonts.set(qn("w:eastAsia"), zh_font)
+    rFonts.set(qn("w:cs"), en_font)
 
     sz = rPr.find(qn("w:sz"))
     if sz is None:
@@ -62,17 +67,17 @@ def set_run_font(run, size_pt: int, bold: bool | None = None):
     szCs.set(qn("w:val"), str(size_pt * 2))
 
 
-def paragraph_size_and_bold(paragraph) -> tuple[int, bool | None]:
+def paragraph_settings(paragraph) -> tuple[int, bool | None, str, bool]:
+    """返回 (字号pt, 是否加粗, 中文字体, 是否居中)"""
     style_name = paragraph.style.name if paragraph.style else ""
-    if style_name in HEADING_PT:
-        return HEADING_PT[style_name], True
-    if style_name.startswith("TOC"):
-        return BASE_PT, None
-    return BASE_PT, None
+    if style_name in HEADING_CONFIG:
+        cfg = HEADING_CONFIG[style_name]
+        return cfg["pt"], True, cfg["zh_font"], cfg["center"]
+    return BASE_PT, None, ZH_FONT_BODY, False
 
 
 def style_paragraph(paragraph):
-    size, bold = paragraph_size_and_bold(paragraph)
+    size, bold, zh_font, center = paragraph_settings(paragraph)
     if not paragraph.runs:
         pPr = paragraph._p.get_or_add_pPr()
         rPr = pPr.find(qn("w:rPr"))
@@ -80,12 +85,14 @@ def style_paragraph(paragraph):
             rPr = OxmlElement("w:rPr")
             pPr.append(rPr)
     for run in paragraph.runs:
-        set_run_font(run, size, bold)
+        set_run_font(run, size, bold, zh_font=zh_font)
 
-    # 标题段落启用"与下段同页"，避免末尾孤行或与下方图表被分页拆开
     style_name = paragraph.style.name if paragraph.style else ""
-    if style_name in HEADING_PT:
+    if style_name in HEADING_CONFIG:
+        # 标题段落启用"与下段同页"，避免末尾孤行或与下方图表被分页拆开
         paragraph.paragraph_format.keep_with_next = True
+        if center:
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
 
 def set_cell_border(cell):
@@ -137,9 +144,14 @@ def style_table(table):
                 style_table(nested)
 
 
+_HEADING_STYLE_IDS = {"Title", "Heading1", "Heading2", "Heading3", "Heading4", "Heading5", "Heading6"}
+
+
 def style_normal_definition(document):
     styles_element = document.styles.element
     for style in styles_element.findall(qn("w:style")):
+        style_id = style.get(qn("w:styleId")) or ""
+        zh_font = ZH_FONT_HEADING if style_id in _HEADING_STYLE_IDS else ZH_FONT_BODY
         rPr = style.find(qn("w:rPr"))
         if rPr is None:
             rPr = OxmlElement("w:rPr")
@@ -150,7 +162,7 @@ def style_normal_definition(document):
             rPr.insert(0, rFonts)
         rFonts.set(qn("w:ascii"), EN_FONT)
         rFonts.set(qn("w:hAnsi"), EN_FONT)
-        rFonts.set(qn("w:eastAsia"), ZH_FONT)
+        rFonts.set(qn("w:eastAsia"), zh_font)
         rFonts.set(qn("w:cs"), EN_FONT)
 
 

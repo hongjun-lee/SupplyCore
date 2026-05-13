@@ -5,7 +5,8 @@
     python convert_md_to_doc.py <input.md> [--format word|pdf] [--output <output>] [--no-style]
 
 默认转换完成后会自动调用 apply_docx_style.process_docx 对产物应用本项目
-统一样式（宋体 14pt / 标题加粗 / 表格边框）。用 --no-style 可跳过。
+统一样式（正文 仿宋_GB2312 小三 / 标题 仿宋 加粗 / 文章标题居中 / 表格边框）。
+用 --no-style 可跳过。
 """
 
 import re
@@ -29,7 +30,7 @@ except ImportError:
 
 try:
     from docx import Document
-    from docx.shared import Inches, Pt
+    from docx.shared import Inches, Pt, Cm
     from docx.enum.text import WD_ALIGN_PARAGRAPH
 except ImportError:
     print("错误: 需要安装 python-docx 库")
@@ -236,7 +237,7 @@ def apply_project_style(docx_path: str) -> bool:
 
     try:
         apply_docx_style.process_docx(Path(docx_path))
-        print(f"  🎨 已应用项目样式（宋体 14pt / 标题加粗 / 表格边框）")
+        print(f"  🎨 已应用项目样式（正文 仿宋_GB2312 小三 / 标题 仿宋 加粗 / 文章标题居中 / 表格边框）")
         return True
     except Exception as e:
         print(f"  ⚠️  应用样式失败: {e}")
@@ -258,19 +259,23 @@ def markdown_to_word(md_file: str, output_file: str, image_dir: Path):
     # 创建 Word 文档
     doc = Document()
 
-    # 收窄页边距，给大图（尤其是 mermaid 长图）留出更多可用空间。
-    # A4 为 8.27"×11.69"，边距 0.5" 后可用区 ~7.27"×10.69"。
+    # 页边距策略：
+    #   有图（mermaid 已替换为 ![]，或 md 内含图片引用）→ 左右 0.5"，给大图最大可用宽度
+    #   无图 → 左右 0.5" + 0.5cm，排版更舒展
+    has_images = bool(re.search(r'!\[[^\]]*\]\([^\)]+\)', md_content))
+    side_margin = Inches(0.5) if has_images else (Inches(0.5) + Cm(0.5))
     for section in doc.sections:
         section.top_margin = Inches(0.5)
         section.bottom_margin = Inches(0.5)
-        section.left_margin = Inches(0.5)
-        section.right_margin = Inches(0.5)
+        section.left_margin = side_margin
+        section.right_margin = side_margin
+    print(f"  📐 页边距：上下 0.5\"，左右 {'0.5\" (含图)' if has_images else '0.5\" + 0.5cm (无图)'}")
 
-    # 设置默认字体
+    # 设置默认字体（apply_docx_style 会再做一遍一致性收口）
     style = doc.styles['Normal']
     font = style.font
-    font.name = '微软雅黑'
-    font.size = Pt(10.5)
+    font.name = '仿宋_GB2312'
+    font.size = Pt(15)
     
     # 解析 Markdown
     lines = md_content.split('\n')
