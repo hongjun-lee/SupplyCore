@@ -1,10 +1,10 @@
-# Sprint 9a 任务卡 — 09 详设升版 + R-06/R-07/R-08 完整化 + AI 报表起步 + 技术债扫尾（V0.1 草案）
+# Sprint 9a 任务卡 — 09 详设升版 + R-06/R-07/R-08 完整化 + AI 报表起步 + 技术债扫尾（V0.2 锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案，待评审锁版为 V0.2）
+**版本：** V0.2（锁版 · cici 评审通过 1A/2A/3B/4A/5A · 工时收口 12.5 → 10.5 PD）
 **日期：** 2026-05-13
-**文档性质：** 开发实施层 · Sprint 任务卡（草案）
-**适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 9a（10 工作日 / 约 2 周）
+**文档性质：** 开发实施层 · Sprint 任务卡
+**适用范围：** 后端工程 `SupplyCores` 仓库 Sprint 9a（10 工作日 / 约 2 周 / 实际 10.5 PD）
 **并行轨道：** 与 Sprint 9b（AI 设备预警深化 / 折旧调度完整化 / 详设 07 V1.2）平行
 
 **衔接文档：**
@@ -18,7 +18,7 @@
 
 ## 一、目标与范围
 
-### 1.1 V0.1 候选范围（约 11 PD，待评审收口到 ~10）
+### 1.1 V0.2 锁版范围（约 10.5 PD，含 0.5 PD buffer）
 
 Sprint 8a 闭环了库存联动 line 级 + C-09 BIZ-PAY-BATCH + R-05 + Hangfire + C-02/C-08 财务联动。本期目标：**详设 09 升版定型 + 报表 3 个 Detector 完整化 + AI 工具骨架起步 + Sprint 5-8 累计技术债扫尾 + Codex 评审 4 commits 补评**。
 
@@ -38,7 +38,7 @@ Sprint 8a 闭环了库存联动 line 级 + C-09 BIZ-PAY-BATCH + R-05 + Hangfire 
 - 沿用 R-04/R-05 Detector 模式 + ReportAlert.CreateXxx 工厂 + Hangfire 接通（占位 Job 接通真 Detector）
 - 测试 ≥ 15（每 Detector ≥5）
 
-**C. AI 报表智能建议起步（~3 PD，09 V1.2 §七 + 11 详设）**
+**C. AI 报表智能建议起步（~2 PD，V0.2 收口 -1 PD：仅 stub mock，不真接 LLM）**
 
 - 基于 C-07 历史付款 / R-04 PaymentDueNear / R-05 BondReleaseNear 数据
 - AI Tool 接口骨架（IReportAdvisorTool）+ stub 实现（返回 mock 建议）
@@ -46,7 +46,7 @@ Sprint 8a 闭环了库存联动 line 级 + C-09 BIZ-PAY-BATCH + R-05 + Hangfire 
 - 不引入真 LLM；纯接口骨架 + mock 输出（Sprint 10+ 接 Claude API/OpenAI）
 - 测试 ≥ 6（含 prompt 构造 / 上下文裁剪 / 失败软降级）
 
-**D. Sprint 5-8 累计技术债扫尾（~1.5 PD）**
+**D. Sprint 5-8 累计技术债扫尾（~1 PD，V0.2 收口 -0.5 PD：SY-02 字典化精简到 4 个 const）**
 
 - SY-02 字典化全量（含 R-05 BondReleaseAlertDays / DedupWindowHours / CompletionThresholdRate / Sprint 8a 硬编码 const 7+）
 - NC 接口 idempotent 增强（C-09 部分成功回执 schema 设计 + 测试覆盖 — Sprint 8a Day 5 简化为 all-or-nothing 现补全）
@@ -73,15 +73,15 @@ Sprint 8a 闭环了库存联动 line 级 + C-09 BIZ-PAY-BATCH + R-05 + Hangfire 
 
 ---
 
-## 二、决策点（V0.1 草案，5 个）
+## 二、决策点（V0.2 锁版，5 个）
 
-| # | 决策点 | 选项 | V0.1 倾向 |
-|---|---|---|---|
-| 1 | C-02 字段补强范围 | A. 加 BondReleaseState + BondReleaseDate 双字段 / B. 仅加 BondReleaseDate（用 BondState 现有映射推导 ReleaseState） | A — 详设 09 V0.1 §4.2 明确两字段；A 兼容性强 |
-| 2 | R-07 实时触发 vs 批处理 | A. 出库后实时检测 + 批处理兜底 / B. 仅批处理（每小时） | A — 出库后立即检测用户体验更佳，性能影响小（仅 S-13 查询） |
-| 3 | AI Tool 接口设计 | A. 单 Tool（通用 advisor） / B. 多 Tool（每 report 一个 advisor） | B — 详设 11 推荐多 Tool 模式，便于后期独立优化 prompt |
-| 4 | NC 部分成功回执 schema | A. 详细 schema（每 C-08 成功/失败状态分别）/ B. 沿用 all-or-nothing | A — 真接联调需要真 schema；A 准备真实生产场景 |
-| 5 | Codex 评审范围 | A. 评 Sprint 8a 全 4 commits + Sprint 9a 新模块 / B. 仅 Sprint 9a 新模块 | A — Sprint 8a 顺延评审必须补，避免技术债越积越多 |
+| # | 决策点 | 选项 | V0.1 倾向 | **V0.2 锁版** |
+|---|---|---|---|---|
+| 1 | C-02 字段补强范围 | A. 加 BondReleaseState + BondReleaseDate 双字段 / B. 仅加 BondReleaseDate | A | **1A ✅** — 详设 09 V0.1 §4.2 明确两字段；R-05 简化版完整回归 |
+| 2 | R-07 实时触发 vs 批处理 | A. 出库后实时检测 + 批处理兜底 / B. 仅批处理（每小时） | A | **2A ✅** — 出库后立即检测，业务体验佳 |
+| 3 | AI Tool 接口设计 | A. 单 Tool（通用 advisor） / B. 多 Tool（每 report 一个 advisor） | B | **3B ✅** — 详设 11 推荐多 Tool；后期独立 prompt 优化 |
+| 4 | NC 部分成功回执 schema | A. 详细 schema / B. 沿用 all-or-nothing | A | **4A ✅** — 真接联调需要真 schema |
+| 5 | Codex 评审范围 | A. 评 Sprint 8a 全 4 commits + Sprint 9a 新模块 / B. 仅 Sprint 9a 新模块 | A | **5A ✅** — Sprint 8a 顺延评审必须补 |
 
 ---
 
@@ -145,13 +145,13 @@ Sprint 8a 闭环了库存联动 line 级 + C-09 BIZ-PAY-BATCH + R-05 + Hangfire 
 - Sprint-9a-Demo-脚本-V0.1.md
 - Sprint-10a-任务卡-V0.1.md 候选范围（AI 报表深化 + LLM 真接 + ML 设备预警 / Sprint 9 累计技术债）
 
-**Sprint 9a V0.1 总工时：** 1 + 1 + 1.5 + 3 + 3 + 1.5 + 1 + 0.5 = **12.5 PD**（超 10 PD 上限 → 待评审收口）
+**Sprint 9a V0.2 锁版总工时：** 1 + 1 + 1 + 3 + 2 + 1.5 + 1 + 0.5 = **11 PD**
 
-**收口候选：**
-- 决策点 3B（单 Tool 通用 advisor，省 ~0.5 PD）
-- 决策点 4B（沿用 all-or-nothing，省 ~1 PD）
-- 决策点 5B（仅 Sprint 9a 新模块评审，省 ~0.5 PD）
-- 总计可压缩到 **10.5 PD ≈ 10 PD ✓**
+**V0.2 收口对比 V0.1**：
+- §1.1 C AI Tool：3 → 2 PD（-1）：仅 stub mock，真 LLM 接入留 Sprint 10
+- §1.1 D 技术债：1.5 → 1 PD（-0.5）：SY-02 字典化精简到 4 个核心 const
+
+**§1.1 + Day 拆解后总 11 PD 含 0.5 PD buffer，实际 10.5 PD ≈ 10 PD 严卡** ✓
 
 ---
 
@@ -203,3 +203,4 @@ Sprint 8a 闭环了库存联动 line 级 + C-09 BIZ-PAY-BATCH + R-05 + Hangfire 
 | 版本 | 日期 | 主要变更 |
 |---|---|---|
 | V0.1 | 2026-05-13 | 首版草案，基于 Sprint-8a-Demo-V0.1 D10-4 验收物起。范围 7 类候选：A 09 详设升版 / B R-06/R-07/R-08 Detector / C AI Tool 骨架 / D 技术债扫尾 / E Sprint 8a Codex 评审补评 / F Web.Tests 项目 / G E2E + Demo + Sprint 10a 草案，约 12.5 PD（需收口到 10 PD）。5 决策点待评审。Sprint 8a 决策点接收记入 §四（8 项）。 |
+| V0.2 | 2026-05-13 | **锁版**（cici 评审通过）。5 决策点全部收口：1A 双字段补强 / 2A R-07 实时触发 / **3B AI 多 Tool 接口** / 4A NC 详细 schema / 5A 评 Sprint 8a 全 4 commits。工时 12.5 → 11 PD（含 0.5 buffer）：§1.1 C AI Tool 3→2 PD（-1）+ §1.1 D 技术债 1.5→1 PD（-0.5）。Sprint 9a 立即进入实施，Day 1 起步 09 详设升版 + Codex 4 commits 补评（待配额恢复 11:56 PM 后跑）。 |
