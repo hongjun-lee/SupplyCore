@@ -51,11 +51,21 @@
 | 3 | OAuth2 Token 持久化 cache（一期内存重启重取，可加 Redis 缓存）| 低 | 0.5 PD |
 | 4 | NC 真端点切换 checklist §五 实际执行追踪 | 低 | 0.3 PD |
 
-### 2.2 Codex 17a 顺延（待评审后补 §六附录）
+### 2.2 Codex 17a 顺延（评审完成 · 0 顺延）
 
-> 占位 — Codex 17a 评审完成后从顺延清单挑选补到本节。
+Codex 17a 评审 5 commits 共 0 P1 + 3 P2 + 3 P3，P2 已在 commit `4a6054b` 当 Sprint 全修：
+- P2-1 RefreshAsync epoch double-check 防并发 N 倍调 token endpoint
+- P2-2 InvokeAsync/QueryStatusAsync response Dispose 防 connection 泄漏
+- P2-3 Wave 87 测试硬编码 dev DB 密码（env-only）
 
-**预估合计 ~3-4 PD**（占位等评审后修订）
+P3 3 项顺延 Sprint 18a：
+- P3-4 GetStatus 无锁读 _cachedToken / _cachedExpiresAt（监控 DTO 罕见不一致）
+- P3-5 PeriodCloseManager TotalEntryCount 命名与语义偏移（Sprint 18a NC ledger_sum 真接时重构）
+- P3-6 WireMockExtended BuildFixture maxRetry 形参 `_ = maxRetry` 死参数
+
+**0 顺延 P2** — Codex 0 顺延记录连续 6 Sprint（12a/13a/14a/15a/16a/17a）。
+
+**预估合计 ~0.5 PD**（P3 顺延项轻量）
 
 ---
 
@@ -96,16 +106,29 @@
 
 ---
 
-## 六、Codex 17a Finding 附录（占位 — 待评审后补）
+## 六、Codex 17a Finding 附录（评审完成 · 0 顺延 P2）
 
-| Sprint 17a Commits | 已评 | finding 数 |
-|---|---|---|
-| `9f4857f` D1 NC OAuth2 TokenService | _待评_ | - |
-| `7c109f1` D2 401 retry + Wave 87 边界 | _待评_ | - |
-| `dc0c69c` D3-4 WireMock + SY-02 + reconcile | _待评_ | - |
-| `2e69a2a` D5-6 NC Health Snapshot + WireMock chaos | _待评_ | - |
-| `84cde86` D7 Demo 脚本 | _待评_ | - |
-| **合计** | 5 | **0** | _待评_ |
+| Sprint 17a Commits | 已评 | P1 | P2 | P3 | 当 Sprint 修 | 顺延 |
+|---|---|---|---|---|---|---|
+| `9f4857f` D1 NC OAuth2 TokenService | Y | 0 | 1 (epoch double-check) | 1 (GetStatus 无锁) | 1 P2 | 1 P3 |
+| `7c109f1` D2 401 retry + Wave 87 边界 | Y | 0 | 2 (response Dispose + 测试密码) | 0 | 2 P2 | 0 |
+| `dc0c69c` D3-4 WireMock + SY-02 + reconcile | Y | 0 | 0 | 1 (TotalEntryCount 命名) | 0 | 1 P3 |
+| `2e69a2a` D5-6 NC Health Snapshot + WireMock chaos | Y | 0 | 0 | 1 (maxRetry 死参数) | 0 | 1 P3 |
+| `84cde86` D7 Demo 脚本 | Y | 0 | 0 | 0 | 0 | 0 |
+| **合计** | 5 | **0** | **3** | **3** | **3 P2** | **3 P3** |
+
+**修复 commit**：`4a6054b` "Sprint 17a Codex 17a 评审修复（3 P2 全修 0 顺延，连续 6 Sprint）"
+
+**Codex 0 顺延 P2 连续 6 Sprint 记录**：
+
+| Sprint | 评审 commits | P1+P2 | 当 Sprint 修 P2 | 顺延 P2 |
+|---|---|---|---|---|
+| 12a | 2 | - | - | 0 |
+| 13a | 2 | - | - | 0 |
+| 14a | 3 | - | - | 0 |
+| 15a | 2 | - | - | 0 |
+| 16a | 2 | 3 | 3 | 0 |
+| **17a** | **5** | **3** | **3** | **0** |
 
 ---
 
@@ -114,3 +137,4 @@
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-14 | 初版草案 — 5 候选方向（A NC 真端点 phase 2 顺延 / B/C/F/G）+ 4 累计技术债 + 5 决策点 |
+| V0.1.1 | 2026-05-14 | Codex 17a 评审完成补 §二.2 + §六附录（0 P1 + 3 P2 全修 + 3 P3 顺延 18a，连续 6 Sprint 0 顺延 P2 记录）|
