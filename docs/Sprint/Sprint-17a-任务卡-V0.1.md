@@ -56,11 +56,16 @@
 | 3 | PeriodCloseManager reconcile 完整化（一期仅 CHK-001 占位）| 中 | 1 PD |
 | 4 | WireMock.Net 集成测试扩展（一期仅 BIZ-005A POC）| 中 | 0.5-1 PD |
 
-### 2.2 Codex 16a 顺延（待评审后补 §六附录）
+### 2.2 Codex 16a 顺延（评审完成 · 0 顺延）
 
-> 占位 — Codex 16a 评审完成后从顺延清单挑选补到本节。
+Codex 16a 评审 2 commits（`6452501` + `f32ab52`）共 1 P1 + 2 P2，已在 commit `7f68eb0` 当 Sprint 全修：
+- P1 orgId 透传（IInterfaceContributor + 23 Contributor）
+- P2-1 InterfaceHealthCheckService UoW.Begin 包裹
+- P2-2 Sprint16aMonthlyClose E2E ApprovalManager stub
 
-**预估合计 ~2-3 PD**（占位等评审后修订）
+**0 顺延** — Codex 0 顺延记录连续 5 Sprint（12a/13a/14a/15a/16a）。
+
+**预估合计 0 PD**（全修无顺延 → 技术债节省 ~2 PD）
 
 ---
 
@@ -101,13 +106,25 @@
 
 ---
 
-## 六、Codex 16a Finding 附录（占位 — 待评审后补）
+## 六、Codex 16a Finding 附录（评审完成 · 0 顺延）
 
-| Sprint 16a Day | Commits | 已评 | finding 数 |
-|---|---|---|---|
-| Day 1-X 三轨第一波 | `6452501` | _待评_ | - |
-| Day 8 E2E + Demo | _待 commit_ | _待评_ | - |
-| **合计** | 2 | **0** | _待评_ |
+| Sprint 16a Commits | 已评 | P1 | P2 | 当 Sprint 修 | 顺延 |
+|---|---|---|---|---|---|
+| `6452501` 三轨第一波（9 BIZ + F-10/F-11/F-12 + Wave 87/88）| Y | 1（orgId 透传断裂）| 1（HostedService UoW）| 2 | 0 |
+| `f32ab52` E2E + Demo | Y | 0 | 1（E2E ApprovalManager null）| 1 | 0 |
+| **合计** | 2 | **1** | **2** | **3** | **0** |
+
+**修复 commit**：`7f68eb0` "Sprint 16a Codex 16a 评审修复（1 P1 + 2 P2 全修 0 顺延）"
+
+**Codex 0 顺延连续 5 Sprint 记录**：
+
+| Sprint | 评审 commits | P1+P2 | 当 Sprint 修 | 顺延 |
+|---|---|---|---|---|
+| 12a | 2 | - | - | 0 |
+| 13a | 2 | - | - | 0 |
+| 14a | 3 | - | - | 0 |
+| 15a | 2 | - | - | 0 |
+| **16a** | **2** | **3** | **3** | **0** |
 
 ---
 
@@ -116,3 +133,4 @@
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-14 | 初版草案 — 5 候选方向（D NC OAuth2 / B 详设 10 / C 看板 / F 招投标 / G 库存超储+暂估）+ 4 累计技术债 + 5 决策点 |
+| V0.1.1 | 2026-05-14 | Codex 16a 评审完成补 §二.2 + §六附录（1 P1 + 2 P2 全修 0 顺延，连续 5 Sprint 记录）|
