@@ -1,16 +1,33 @@
-# Sprint 19b 任务卡 V0.1（草案）
+# Sprint 19b 任务卡 V0.2（锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（锁版 · cici 2026-05-15 选 A 双轨 UI MVP + A2' / 模块化 frontend）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19b 起步草案
-**配套：** [`Sprint-19a-Demo-脚本-V0.1.md`](./Sprint-19a-Demo-脚本-V0.1.md) §四 候选范围
+**文档性质：** 实施层 · Sprint 19b 锁版任务卡
+**配套：** [`Sprint-19a-Demo-脚本-V0.1.md`](./Sprint-19a-Demo-脚本-V0.1.md) §四 候选范围、Sprint-19b-V0.1（已锁定）、52 HTML 原型 `../../prototype/`
 
 ---
 
-## 一、Sprint 19b 候选方向（待 cici V0.1 锁版决策点 1）
+## 一、Sprint 19b 主线方向（锁版 · 双轨 UI MVP + A2'）
 
-### 候选 A2'：NC 真端点联调 phase 2（Sprint 19a 顺延 · 待 NC 端反馈）
+### 主轨 UI MVP：5-8 核心页面（基于 52 HTML 原型 + Catio React 19 + DevExtreme 25）
+
+cici 2026-05-15 关键决策（plan `melodic-doodling-wirth.md`）：
+- 基于 SupplyCore/prototype/ 已有 **52 HTML 原型**（覆盖采购/库存/合同付款/接口/报表/审批 全域）
+- 复用 Catio nova.platform/frontend/ 模块化 React 架构
+- **模块化要求**：前端必须放 `modules/nova.supplycores/frontend/`（与 src/ 同级），**不能**起在 Host (`src/SupplyCores.Web/`) 中
+
+| Task | 范围 | 工时 |
+|---|---|---|
+| 19b-UI-D0 | Sprint V0.2 锁版（本文档） | 0.3 PD |
+| 19b-UI-D1 | 模块化 frontend 骨架 + Health Snapshot 联调（NcHealthSnapshotDto 渲染） | 0.5-1 PD |
+| 19b-UI-D2-5 | 5-8 MVP 页面（approval-center / inventory / purchase-orders / reports / nc-interface / material-master + 可选 contract-list / dashboard-bigscreen） | 3-4 PD |
+| 19b-UI-D6 | 全量页面 API 联调 + cross-org RBAC + 少量 E2E 测试 | 0.5-1 PD |
+| 19b-UI-D7 | Demo 脚本 + 收尾 | 0.5 PD |
+
+**预算 UI MVP**：5-7 PD（5 必选页面 + 1-3 可选）
+
+### 副轨 A2'：NC 真端点联调 phase 2（Sprint 19a 顺延 · 待 NC 端反馈）
 
 | Task | 范围 | 工时 | 依赖 NC 端 |
 |---|---|---|---|
@@ -21,13 +38,13 @@
 
 **预算 A2'**：4-4.5 PD（强依赖 NC 端反馈）
 
-### 候选 X1：OAuth2 Token Redis 持久化缓存（Sprint 17a 顺延）
+### 累计技术债 X1：OAuth2 Token Redis 持久化缓存（Sprint 17a 顺延）
 
 | Task | 范围 | 工时 |
 |---|---|---|
 | 19b-X1 | NcOAuth2TokenService 加 IDistributedCache 抽象 + Redis 配置 + InMemory fallback + 测试 | 0.5 PD |
 
-### 候选 X2：A2-1' 占位稿 NC 端反馈调整（NC-1-7 NCC OpenAPI 适配）
+### 累计技术债 X2：A2-1' 占位稿 NC 端反馈调整（NC-1-7 NCC OpenAPI 适配）
 
 | Task | 范围 | 工时 |
 |---|---|---|
@@ -37,32 +54,30 @@
 
 **预算 X1+X2**：1.5-3 PD（部分条件触发）
 
-### 候选 C：详设 09 看板剩 5 类 + OLAP（不依赖 NC 端，可单线推进）
+### 顺延候选（Sprint 19c+ 重新评估）
 
-| Task | 范围 | 工时 |
-|---|---|---|
-| 19b-C1 | 5 类看板 R-01~R-08（剔除 R-09 已落）：库存日报 / 周报 / 月报 / 供应商看板 / 财务看板 | 4-5 PD |
-| 19b-C2 | OLAP 数据模型 + 物化视图设计 | 2-3 PD |
-| 19b-C3 | 看板守护测试 + 性能基线 | 1-2 PD |
-
-**预算 C**：7-10 PD（独立可推进）
-
-### 候选 G：详设 06 库存超储处置 + 暂估完整化（不依赖 NC 端，可单线推进）
-
-详 Sprint 17a/18a 候选 G。**预算 5-6 PD**
+- 候选 C：详设 09 看板剩 5 类 + OLAP（7-10 PD 独立 — 与 reports.html 联动）
+- 候选 G：详设 06 库存超储处置 + 暂估完整化（5-6 PD 独立）
 
 ---
 
-## 二、推荐策略：双轨 A2' + C 或 A2' + G（避免 A2' 二次顺延反模式）
-
-**V0.1 倾向**：
-- **首选**：双轨 A2' + C（完成详设 09 看板剩余）
-- **次选**：双轨 A2' + G（完成详设 06 库存超储）
-- **风险触发**：若 NC 端 19b 仍无反馈 → A2' 二次顺延 = 反模式（连续 2 Sprint 顺延），届时需 cici V0.2 重评策略（如临时撤掉 A2' 改单线 C/G）
+## 二、双轨策略说明（V0.2 锁版）
 
 **双轨执行节奏**：
-- 主代理 a：副轨 C 或 G 主线（B/C/G sweet spot 已验证 60%+ 提速）
-- 子代理 b：A2'（NC 反馈到位时启动；阻塞时机会主义跑 X1/X2 子任务）
+- **主代理 a**：UI MVP 主轨（19b-UI-D0~D7 完整链路）
+- **子代理 b**：A2' 副轨（NC 反馈到位时启动 A2-1~A2-4；阻塞时机会主义跑 X1 OAuth2 Redis 0.5 PD）
+- **子代理 c**：累计技术债（X2 NC 反馈触发 / WF-MDT/RPT 节点重评）/ Day 6 联调测试辅助
+
+**模块化 frontend 关键约束**（cici 反馈）：
+- ❌ **不能**建在 `src/SupplyCores.Web/clientapp/`（Host 中）
+- ❌ **不能**建在 `modules/nova.supplycores/src/Nova.SupplyCores.Web/clientapp/`（Web 项目内）
+- ✅ **必须**建在 `modules/nova.supplycores/frontend/`（模块内 frontend/ 与 src/ 同级，参考 Catio 5 模块统一模式）
+
+理由：Nova Satellite Module Pattern + ABP Host 仅 Razor Pages 壳 + 与 Catio 5 模块（platform/kaoqin/workflow/hrx/weightaudit）一致。
+
+**避免 A2' 二次顺延反模式**：
+- A2' 副轨保留 — 子代理 b 在 NC 反馈到位时立即推进
+- 即使 19b 期间 NC 端仍无反馈，子代理 b 跑 X1 OAuth2 Redis 兜底；A2' 真正顺延 19c 也不属于反模式（首先 19a 已是顺延，19b 转 UI MVP 主轨非 A2' 二次顺延语义 — 19b 主线已变更为 UI MVP）
 
 ---
 
@@ -122,3 +137,4 @@ Sprint 19a Demo 脚本 §五 已写就触发提示词：
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — 双轨 A2' + C/G 策略（A2' 二次顺延反模式触发）+ 4 累计技术债 + 6 决策点 + 4 风险（NC 端反馈仍极高风险）|
+| **V0.2** | **2026-05-15** | **cici 选 A 双轨 UI MVP + A2'**（plan `melodic-doodling-wirth.md`）：基于 52 HTML 原型 + 61 Controller + Catio React 19 三重就绪；模块化 `modules/nova.supplycores/frontend/`（不在 Host 中）；UI MVP 5-8 页面 5-7 PD + A2' 4 PD（NC 反馈触发）+ X1 0.5 PD = 8-10 PD；§一/§二/§四 双轨结构 + 模块化决策 |
