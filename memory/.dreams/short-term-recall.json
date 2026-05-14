@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-10T18:35:06.437Z",
+  "updatedAt": "2026-05-13T22:34:10.071Z",
   "entries": {
     "memory:memory/2026-05-01.md:3:4": {
       "key": "memory:memory/2026-05-01.md:3:4",
@@ -205,13 +205,13 @@
       "endLine": 5,
       "source": "memory",
       "snippet": "- 2026-03-20 12:53 CST Spencer 在群里明确：当前工作目录聚焦‘物资供应系统’的设计。 - 2026-03-20 13:00 CST 已完成对 SupplyCore 仓库首轮扫描：当前仓库以“物资供应系统”方案文档为主，尚无业务代码；核心是《物资编码规范文档》V1.6 与《物资管理与财务接口规范》V1.1，项目处于需求/规则定稿阶段。 - 2026-03-20 13:16 CST Spencer 明确要求当前阶段不进入编码，优先梳理“物资供应系统”需求；已在群里给出《项目目标与范围说明（初稿）》，下一步继续输出《业务流程与单据清单（初稿）》。 - 2026-03-20 13:23 CST 用户补充长期工作原则：其身份为网信办主任；当前撰写 SupplyCore 相关内容，主要用于与管理人员/业务人员沟通、明确功能边界、支撑招标，以及后续指导开发与实施。 - 2026-03-20 13:34 CST 用户确认：后续围绕 SupplyCore 的输出默认按“需求沟通 + 招标基础 + 开发指导”口径推进，不偏向直接编码实现。",
-      "recallCount": 18,
+      "recallCount": 21,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 18,
+      "totalScore": 21,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-02T00:53:34.849Z",
-      "lastRecalledAt": "2026-05-10T18:35:06.437Z",
+      "lastRecalledAt": "2026-05-13T22:34:10.071Z",
       "queryHashes": [
         "24dfe088e4a7",
         "5ab4aeca48c9",
@@ -230,7 +230,10 @@
         "7e3e0dc39b0d",
         "e05ae2640fe1",
         "9e2b4be062dd",
-        "5393f8169aea"
+        "5393f8169aea",
+        "102e82271c6f",
+        "20e4be86662c",
+        "623bc0f2523d"
       ],
       "recallDays": [
         "2026-05-02",
@@ -238,7 +241,8 @@
         "2026-05-06",
         "2026-05-07",
         "2026-05-08",
-        "2026-05-11"
+        "2026-05-11",
+        "2026-05-14"
       ],
       "conceptTags": [
         "v1.6",
@@ -291,13 +295,13 @@
       "endLine": 9,
       "source": "memory",
       "snippet": "- 2026-03-21 Spencer 在 Cursor 中开启新会话，要求了解 SupplyCore 项目全貌。 - 2026-03-21 项目整理：将根目录下两份详细规则文档（物资编码规范文档.md、物资管理与财务接口规范.md）移至 docs/详细规则/，更新 README 和 00 文档中的路径引用，完成本地提交 0eb197e。 - 2026-03-21 Spencer 提供关键组织架构信息：物资公司服务阜新矿业（二级集团），上位系统 Nova Platform 组织层级从辽宁能源集团开始（5 级：集团→二级集团→厂矿→部门→班组）。 - 2026-03-21 已阅读 Nova Platform 三份核心设计文档（基础数据模块 v3.0、权限总纲 v2.6、ORG_ROLE 审批人 v3.0），提取关键信息写入 USER.md：集团全称、组织层级、数据隔离边界、Nova 技术栈和权限体系、对 SupplyCore 的对接影响。 - 2026-03-21 经讨论确定关键架构决策： 1. 技术栈：.NET（C#），不开放给其他语言 2. 数据库：独立部署，采用 PG 兼容的国产信创数据库（瀚高/金仓等），不与 Nova 共用数据库 3. Nova 作为上位平台，与业务系统保持低耦合：通过 API 提供组织/人员/权限/SSO 服务 4. 物资系统本地同步组织/人员数据副本，但权威源在平台侧；物料编码由物资系统自身作为权威源",
-      "recallCount": 19,
+      "recallCount": 22,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 19,
+      "totalScore": 22,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-02T00:53:34.849Z",
-      "lastRecalledAt": "2026-05-10T18:35:06.437Z",
+      "lastRecalledAt": "2026-05-13T22:34:10.071Z",
       "queryHashes": [
         "24dfe088e4a7",
         "5ab4aeca48c9",
@@ -317,7 +321,10 @@
         "7e3e0dc39b0d",
         "e05ae2640fe1",
         "9e2b4be062dd",
-        "5393f8169aea"
+        "5393f8169aea",
+        "102e82271c6f",
+        "20e4be86662c",
+        "623bc0f2523d"
       ],
       "recallDays": [
         "2026-05-02",
@@ -325,7 +332,8 @@
         "2026-05-06",
         "2026-05-07",
         "2026-05-08",
-        "2026-05-11"
+        "2026-05-11",
+        "2026-05-14"
       ],
       "conceptTags": [
         "物资编码规范文档.md",
@@ -504,13 +512,13 @@
       "endLine": 4,
       "source": "memory",
       "snippet": "- Spencer 提醒已上传《报审-物管系统开发项目功能及需求报告.docx》（2026-03-21，阜矿集团物资公司整理）。 - 文档内容：14条总体要求 + 8大板块功能清单（库存、计划、招投标、合同、物资信息库、数据统计分析、供应商、设备资产）。 - 初步判断：偏使用单位业务诉求汇总，适合作为需求输入材料；后续需按“范围、流程、角色权限、接口、数据标准、验收”结构化纳入现有 SupplyCore 文档体系。 - 已对照上传 `docx` 与当前仓库文档进行复核，确认大部分板块需求已被吸收，但仍存在 4 类需补齐问题：1）顶层仍有“9模块/合同轻量版”旧口径，未完全反映合同管理和供应商管理一期独立模块化；2）缺少“新旧系统并行运行、比对、回退”刚性要求；3）缺少“数据导出权限、导出留痕、水印/追踪”等数据安全细化要求；4）二期招投标/能源集团电子商务平台对接缺少“按标包生成采购文件并上传平台”等具体动作描述。",
-      "recallCount": 19,
+      "recallCount": 22,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 19,
+      "totalScore": 22,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-02T01:01:11.428Z",
-      "lastRecalledAt": "2026-05-10T18:35:06.437Z",
+      "lastRecalledAt": "2026-05-13T22:34:10.071Z",
       "queryHashes": [
         "0292c077f030",
         "97f01d65f0f0",
@@ -530,7 +538,10 @@
         "7e3e0dc39b0d",
         "e05ae2640fe1",
         "9e2b4be062dd",
-        "5393f8169aea"
+        "5393f8169aea",
+        "102e82271c6f",
+        "20e4be86662c",
+        "623bc0f2523d"
       ],
       "recallDays": [
         "2026-05-02",
@@ -538,7 +549,8 @@
         "2026-05-06",
         "2026-05-07",
         "2026-05-08",
-        "2026-05-11"
+        "2026-05-11",
+        "2026-05-14"
       ],
       "conceptTags": [
         "报审-物管系统开发项目功能及需求报告.docx",
@@ -558,13 +570,13 @@
       "endLine": 8,
       "source": "memory",
       "snippet": "- 2026-03-20 13:23 CST 用户补充长期工作原则：其身份为网信办主任；当前撰写 SupplyCore 相关内容，主要用于与管理人员/业务人员沟通、明确功能边界、支撑招标，以及后续指导开发与实施。 - 2026-03-20 13:34 CST 用户确认：后续围绕 SupplyCore 的输出默认按“需求沟通 + 招标基础 + 开发指导”口径推进，不偏向直接编码实现。 - 2026-03-20 13:41 CST 已将需求沟通成果正式落盘到仓库文档：新增 README 与 docs/需求梳理 下 3 份初稿文档（项目目标与范围、业务流程与单据、主数据与编码规则），并完成本地 git 提交：e997e3e（docs: 初始化物资供应系统需求梳理资料）。 - 2026-03-20 13:50 CST 继续补齐需求文档：新增《待确认事项清单（初稿）》与《财务与NC接口需求说明（初稿）》，同步更新 README 文档索引，并完成第二次本地 git 提交：2117672（docs: 补充待确认事项与NC接口需求）。 - 2026-03-20 14:12 CST 已继续补齐面向管理沟通/招标的文档：新增《模块功能清单（招标沟通版）》与《角色权限与审批矩阵（初稿）》，并完成第三次本地 git 提交：b7cd023（docs: 补充模块功能与权限审批矩阵）。",
-      "recallCount": 18,
+      "recallCount": 21,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 18,
+      "totalScore": 21,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-02T03:15:18.856Z",
-      "lastRecalledAt": "2026-05-10T18:35:06.437Z",
+      "lastRecalledAt": "2026-05-13T22:34:10.071Z",
       "queryHashes": [
         "92e8f7bd30d4",
         "5ab4aeca48c9",
@@ -583,7 +595,10 @@
         "7e3e0dc39b0d",
         "e05ae2640fe1",
         "9e2b4be062dd",
-        "5393f8169aea"
+        "5393f8169aea",
+        "102e82271c6f",
+        "20e4be86662c",
+        "623bc0f2523d"
       ],
       "recallDays": [
         "2026-05-02",
@@ -591,7 +606,8 @@
         "2026-05-06",
         "2026-05-07",
         "2026-05-08",
-        "2026-05-11"
+        "2026-05-11",
+        "2026-05-14"
       ],
       "conceptTags": [
         "主要用于与管理人员/业务人员沟通",
@@ -1908,18 +1924,22 @@
       "endLine": 2,
       "source": "memory",
       "snippet": "- 2026-05-08 13:55 CST Spencer 要求补齐 SupplyCore 原型。已将原型从 v0.5 升级到 v0.6，新增 4 个静态 HTML 页面：`prototype/inventory-flow.html`（库存流转：领料/退料/调拨）、`prototype/supplier-performance.html`（供应商履约画像）、`prototype/tender-archive.html`（招投标过程归档）、`prototype/alert-rules.html`（预警规则配置/报表订阅）。同步更新 `prototype/assets/chrome.js` 导航、`prototype/README.md`、`docs/原型设计/01-原型页面盘点与补齐清单-V0.1.md`。本地检查确认 prototype 下共 33 个 HTML，导航 href 无缺失。",
-      "recallCount": 1,
+      "recallCount": 4,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 4,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-10T18:35:06.437Z",
-      "lastRecalledAt": "2026-05-10T18:35:06.437Z",
+      "lastRecalledAt": "2026-05-13T22:34:10.071Z",
       "queryHashes": [
-        "5393f8169aea"
+        "5393f8169aea",
+        "102e82271c6f",
+        "20e4be86662c",
+        "623bc0f2523d"
       ],
       "recallDays": [
-        "2026-05-11"
+        "2026-05-11",
+        "2026-05-14"
       ],
       "conceptTags": [
         "v0.5",
@@ -1930,6 +1950,161 @@
         "prototype/alert-rules.html",
         "预警规则配置/报表订阅",
         "prototype/assets/chrome.js"
+      ]
+    },
+    "memory:memory/2026-05-10.md:20:21": {
+      "key": "memory:memory/2026-05-10.md:20:21",
+      "path": "memory/2026-05-10.md",
+      "startLine": 20,
+      "endLine": 21,
+      "source": "memory",
+      "snippet": "astChannel 跨页验证）。`node --check` 4 个 JS 文件全部通过。**Week 1 天 4-5 pending**：`mock-nc.js`（1-2 秒延迟 + 5% 失败率 + 重推）、`chrome.js` 升级 + `roles.js`（6 角色：采购员/计划员/物资主管/财务/IT/集团委员会）+ `ui-helper.js`（确认对话框/Toast）。原型升 v0.10 = v0.9 + 引擎层。 - 2026-05-10 CST 推进原型 v0.9 P1 收口（Spencer 拍板\"A 合同变更 + 设备租赁两项一起做\"），不新增页面，4 页深化：**(1) 合同变更与履约节点**（contract-detail 加顶部冻结 banner + 履约节点表 C-04 履约视角 + C-05 变更记录 2 例（数量变更已审 + 付款条件变更待审）+ 履约预警对齐 09 V1.2 §六 ALR-CON-* + 变更冻结控制 KV；contract-list 加变更列含 changeCount + 待审角标；payment-request 加变更冻结提示卡。data.js contractDetail 加 milestones / changes / paymentLockState / complianceAlerts 4 个字段；contracts 列表加 changeCount +",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-10T22:28:07.759Z",
+      "lastRecalledAt": "2026-05-10T22:28:07.759Z",
+      "queryHashes": [
+        "9290b74051ac"
+      ],
+      "recallDays": [
+        "2026-05-11"
+      ],
+      "conceptTags": [
+        "4-5",
+        "mock-nc.js",
+        "1-2",
+        "chrome.js",
+        "roles.js",
+        "采购员/计划员/物资主管/财务/it/集团委员会",
+        "ui-helper.js",
+        "确认对话框/toast"
+      ]
+    },
+    "memory:memory/2026-05-10.md:15:15": {
+      "key": "memory:memory/2026-05-10.md:15:15",
+      "path": "memory/2026-05-10.md",
+      "startLine": 15,
+      "endLine": 15,
+      "source": "memory",
+      "snippet": "送失败 / 招标流标 / 审批超时）+ 单条预警标记已确认 → 已处理流转。(3) **`linkage.js` 扩展 3 个自动预警 + 1 个 mock 触发器**：emit 函数封装 SC.store.create('R-05')；T-03:流标 → ALR-PUR-002 重要级 / F-01:推送失败 → ALR-INT-001（一般 vs 紧急 by retry_count ≥ 2）/ S-13 update or create → quantity < 50 触发 ALR-INV-001 低储 / > 1500 触发 ALR-INV-002 超储；mockTriggerWFTimeout 给所有 P-01/P-02 待审单据创建 ALR-WF-001（替代时间穿越）。(4) **`chrome.js` v0.14 动态徽标**：SC.updateBadges 函数在 SC.b indRoleSwitch 末尾 setTimeout 200ms 调用；从 SC.roles.badgeCounts() 取 todo/alert 计数；动态更新 sidebar 中\"审批中心\"和\"预警规则\"链接的 .badge 红点；引擎未加载时静默不影响静态徽标。chrome.js header logo + footer 升 v0.14；README 加 Week 5 章节 + 端到端演示路径。**Week 5 完成 100%**。Week 6（核心报表 E3 + 整体验收）pending。",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-10T22:28:07.759Z",
+      "lastRecalledAt": "2026-05-10T22:28:07.759Z",
+      "queryHashes": [
+        "9290b74051ac"
+      ],
+      "recallDays": [
+        "2026-05-11"
+      ],
+      "conceptTags": [
+        "linkage.js",
+        "sc.store.create",
+        "r-05",
+        "t-03",
+        "alr-pur-002",
+        "f-01",
+        "alr-int-001",
+        "retry-count"
+      ]
+    },
+    "memory:memory/2026-05-10.md:15:16": {
+      "key": "memory:memory/2026-05-10.md:15:16",
+      "path": "memory/2026-05-10.md",
+      "startLine": 15,
+      "endLine": 16,
+      "source": "memory",
+      "snippet": "indRoleSwitch 末尾 setTimeout 200ms 调用；从 SC.roles.badgeCounts() 取 todo/alert 计数；动态更新 sidebar 中\"审批中心\"和\"预警规则\"链接的 .badge 红点；引擎未加载时静默不影响静态徽标。chrome.js header logo + footer 升 v0.14；README 加 Week 5 章节 + 端到端演示路径。**Week 5 完成 100%**。Week 6（核心报表 E3 + 整体验收）pending。 - 2026-05-10 CST 续做档 A 一期 **Week 4 核心联动 + NC mock**（档 A 一期演示亮点，按 02 V0.4 §八 第 4 周路线图）：(1) **新建 `prototype/purchase-receipt.html`**（02 V0.4 附录 A 决策的独立采购入库页，区别于到货验收）— S-05 入库审核 + 实时观察原子事务效应；点\"+ 创建 S-05 草稿\"自动带 3 行 mock S-25（锚杆 200/雷管 1000/截齿 80）；点\"审核通过\"触发 SC.sm.transition('S-05', id, '审核通过') → linkage `S-05:已审` 在 SC.store.transaction 包裹下原子完成：每行 S-21 流水 + S-13 余额（移动平均 unit_cost = (旧总额 + 入库金额) / (旧数量 +",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-10T22:28:07.759Z",
+      "lastRecalledAt": "2026-05-10T22:28:07.759Z",
+      "queryHashes": [
+        "9290b74051ac"
+      ],
+      "recallDays": [
+        "2026-05-11"
+      ],
+      "conceptTags": [
+        "sc.roles.badgecounts",
+        "todo/alert",
+        "chrome.js",
+        "v0.14",
+        "v0.4",
+        "prototype/purchase-receipt.html",
+        "s-05",
+        "s-25"
+      ]
+    },
+    "memory:memory/2026-05-10.md:20:20": {
+      "key": "memory:memory/2026-05-10.md:20:20",
+      "path": "memory/2026-05-10.md",
+      "startLine": 20,
+      "endLine": 20,
+      "source": "memory",
+      "snippet": "次 + F-01 NC 接口任务，事务包裹保证原子性）、`F-01:推送失败`→30 秒后自动重推（≤3 次，超 3 升 F-08）；(4) **`assets/seed-data.js`** 主数据预填 — M-01 组织(6) + M-02 仓库(6 含火工品专管) + M-05 物料(10) + M-09 供应商(5 含 role_tags) + M-12 成本中心(4) + F-13 NC 开关(4，BIZ-001 默认开，002/005/013 关移二期) + 业务种子（P-01 ×2、P-02 ×1、P-03 ×2）；(5) **`prototype/_engine-test.html`** 烟雾测试页 — 6 个验证卡（Seed 状态/P-01 CRUD+状态迁移/P-02 审批→linkage 自动生成 P-05+分解路径分流/状态机调试/linkage 调试/Broadc astChannel 跨页验证）。`node --check` 4 个 JS 文件全部通过。**Week 1 天 4-5 pending**：`mock-nc.js`（1-2 秒延迟 + 5% 失败率 + 重推）、`chrome.js` 升级 + `roles.js`（6 角色：采购员/计划员/物资主管/财务/IT/集团委员会）+ `ui-helper.js`（确认对话框/Toast）。原型升 v0.10 = v0.9 + 引擎层。",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-10T22:28:07.759Z",
+      "lastRecalledAt": "2026-05-10T22:28:07.759Z",
+      "queryHashes": [
+        "9290b74051ac"
+      ],
+      "recallDays": [
+        "2026-05-11"
+      ],
+      "conceptTags": [
+        "f-01",
+        "f-08",
+        "assets/seed-data.js",
+        "m-01",
+        "m-02",
+        "m-05",
+        "m-09",
+        "role-tags"
+      ]
+    },
+    "memory:memory/2026-05-10.md:19:19": {
+      "key": "memory:memory/2026-05-10.md:19:19",
+      "path": "memory/2026-05-10.md",
+      "startLine": 19,
+      "endLine": 19,
+      "source": "memory",
+      "snippet": "- 2026-05-10 CST 续做档 A 一期 Week 1 天 4-5，**Week 1 框架层完整收口**：(1) **`assets/mock-nc.js`** NC 推送 mock — `SC.nc.push(taskId)` 1-2 秒延迟 + 5% 失败率（可配 setConfig）；成功创建 F-03 凭证回执（NC + YYYYMMDD + 4 位序号）+ 更新 F-01 task_state=推送成功 + finance_state=已记账；失败 emit `F-01:推送失败` 触发 linkage 自动重推（≤3 次，超 3 升 F-08）；3 种 mock 错误码（NC-MOCK-001 接口超时/002 供应商编码不存在/003 科目映射缺失）；调试用 `simulateSuccess/simulateFailure` 强制结果。(2) **`assets/r oles.js`** 6 角色定义 — buyer/planner/storage_mgr/finance/it/group_committee；每角色含 menus（按需可见菜单 ID 列表）+ dataScope（GROUP/OWN_MINE/OWN_DEPT 三档）+ defaultLanding + description；API：current/currentInfo/set/list/canSee(menu)/dataFilter(entity)/badgeCounts；`set()` 触发 BroadcastChannel `{type:'role-change'}` 跨页广播",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-10T22:28:07.759Z",
+      "lastRecalledAt": "2026-05-10T22:28:07.759Z",
+      "queryHashes": [
+        "9290b74051ac"
+      ],
+      "recallDays": [
+        "2026-05-11"
+      ],
+      "conceptTags": [
+        "4-5",
+        "assets/mock-nc.js",
+        "sc.nc.push",
+        "1-2",
+        "f-03",
+        "f-01",
+        "task-state",
+        "finance-state"
       ]
     }
   }

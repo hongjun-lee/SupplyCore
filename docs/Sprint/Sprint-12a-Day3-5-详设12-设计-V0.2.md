@@ -1,27 +1,27 @@
-# Sprint 12a Day 3-5 详设 12 报表统计完善 — 实施设计草案（V0.1）
+# Sprint 12a Day 3-5 详设 12 报表统计完善 — 实施设计（V0.2 锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（cici 锁版 · 2026-05-14）
 **日期：** 2026-05-14
 **文档性质：** 实施层 · Sprint 12a Day 3-5 实施细化设计
 **配套：** [`Sprint-12a-任务卡-V0.1.md`](./Sprint-12a-任务卡-V0.1.md) §一C 候选 1
-**衔接：** Sprint 11a Day 4-7（r.alert_log / R-04~R-08 Detector / SY-02 Org Scope）已落地 — 本期基于稳定的 r.* 表做跨域聚合 + 自助报表 + 导出
+**衔接：** Sprint 11a Day 4-7（r.alert_log / R-04~R-08 Detector / SY-02 Org Scope）已落地 — 本期基于稳定的 r.* 表做跨域聚合 + 自助报表 + Excel 导出
 
 ---
 
-## 一、范围（D3-1 ~ D5-1，~3.5 PD）
+## 一、范围（D3-1 ~ D5-1，~3.0 PD · V0.2 锁版砍 PDF 顺延 Sprint 13a）
 
 | Day | Task | 工时 | 说明 |
 |---|---|---|---|
-| D3-1 | r.alert_aggregate_daily 维度表 schema 设计 + Wave 76 migration | 0.5 PD | 三维聚合（day / org_id / alert_code / source_bill_type），复合索引（day, org_id, alert_code）|
-| D3-2 | `AlertAggregateDailyAggregator` Hangfire 02:00 任务（聚合昨日 r.alert_log → 维度表）| 0.5 PD | 同 §一B Token DailyAggregator 模式，IRecurringJobManager 注册 |
+| D3-1 | r.alert_aggregate_daily 维度表 schema 设计 + Wave 76 migration（含 30 天历史回填）| 0.7 PD | 三维聚合（day / org_id / alert_code / source_bill_type），复合索引（day, org_id, alert_code）；Wave 76 含 30 天 backfill SQL |
+| D3-2 | `AlertAggregateDailyAggregator` Hangfire 02:00 任务（聚合昨日 r.alert_log → 维度表）| 0.5 PD | 含 org_id=0 集团合计行；IRecurringJobManager 注册（Satellite Pattern）|
 | D3-3 | `ReportAggregatorAppService` 4 endpoint | 0.8 PD | GetDailyTrend / GetWeeklyTrend / GetOrgRanking / GetTypeDistribution |
-| D4-1 | `SelfServiceReportAppService` 自助筛选 endpoint | 0.5 PD | multi-dim filter + groupBy（基础版 4 维度，可扩展）|
+| D4-1 | `SelfServiceReportAppService` 自助筛选 endpoint | 0.5 PD | multi-dim filter + groupBy（**限 4 维度 + 4 measure**，不支持 OLAP 自定义 SQL）|
 | D4-2 | Excel 导出（ClosedXML）| 0.4 PD | RFC 4180 兼容 CSV 兜底；header 用 SY-02 国际化 |
-| D4-3 | PDF 导出（QuestPDF）| 0.5 PD | 简单表格 + 分页 + Org logo（占位 stub）|
-| D5-1 | 测试 ≥ 10（聚合 / 导出 / 跨域 join 性能）| 0.3 PD | 含 1 个 1k 行级 perf smoke |
+| ~~D4-3~~ | ~~PDF 导出（QuestPDF）~~ | ~~0.5 PD~~ | **V0.2 砍 — 顺延 Sprint 13a 看板期复用 Org logo 管理** |
+| D5-1 | 测试 ≥ 11（聚合 / 导出 / 跨域 join 性能 / backfill）| 0.3 PD | 含 1 个 1k 行级 perf smoke + 1 个 backfill smoke |
 
-**合计 ~3.5 PD**（Sprint 12a V0.1 §一C 预算 3-4 PD 内）
+**合计 ~3.0 PD**（V0.2 锁版砍 PDF 0.5 PD，节省工时转 D7-8 P3 扫尾或 Sprint 13a）
 
 ---
 
@@ -191,17 +191,13 @@ public class SelfServiceReportRequest
 - 模式：StreamingExportWorker 异步导出（万行级避免阻塞 HTTP）
 - 文件存 ABP BlobStorage（按 Sprint 6b D-09 附件存储模式）+ 返回 download token
 
-### 5.3 PDF 导出（D4-3，QuestPDF 0.5 PD）
+### 5.3 ~~PDF 导出（D4-3）~~ — V0.2 砍掉 顺延 Sprint 13a
 
-- 包：`QuestPDF` 2024.x（行业 OSS，MIT 协议）
-- 模式：QuestPDF Document Builder fluent API（参考官方 Invoice 样例）
-- 简单表格（不含 chart — Sprint 13a 看板 8 PD/个再做）
-
-**决策点**（P0）：Excel/PDF 是否一期都做？V0.1 倾向都做（业务部门常用），cici 评审时可砍 PDF（Excel 一期足够，PDF 顺延 Sprint 13a）。
+cici V0.2 锁版决策：仅 Excel 一期，PDF 顺延 Sprint 13a 看板期复用 Org logo 管理。节省 0.5 PD。
 
 ---
 
-## 六、测试矩阵（D5-1，~0.3 PD，≥ 10 个）
+## 六、测试矩阵（D5-1，~0.3 PD，≥ 11 个）
 
 | # | 测试 | 类型 | 关键断言 |
 |---|---|---|---|
@@ -213,8 +209,8 @@ public class SelfServiceReportRequest
 | 6 | GetTypeDistribution_Should_Include_All_5_Alert_Codes | Application | R-04~R-08 全覆盖即使当日 0 行 |
 | 7 | SelfServiceReport_Should_Filter_By_Org_Scope | Application | 跨 Org 数据隔离（同 Sprint 12a P1-α 模式）|
 | 8 | ExcelExport_Should_Stream_10k_Rows | Performance | 1 万行 < 5 秒导出完成 |
-| 9 | PdfExport_Should_Render_Simple_Table | Application | QuestPDF Document.Generate 不抛异常 |
-| 10 | AlertAggregateDaily_Migration_Wave76 | EFCore.Tests | 表存在 + UK + 索引齐 |
+| 9 | AlertAggregateDaily_Migration_Wave76 | EFCore.Tests | 表存在 + UK + 索引齐 + 30 天 backfill seed |
+| 10 | Wave76_Backfill_Should_Populate_30_Days | EFCore.Tests | backfill 后维度表含最近 30 天聚合行 |
 | 11 | AggregatorDay_Cron_Should_Be_Registered | Smoke | RecurringJobHandlers 注册 "alert-aggregate-daily" |
 | 12 | GetDailyTrend_Should_Respect_Caller_Org_Scope | Security | LLM 传 orgId 跨域时 fail（同 P1-α-1 守护）|
 
@@ -234,15 +230,15 @@ public class SelfServiceReportRequest
 
 ---
 
-## 八、决策点（待 cici V0.1 评审锁版）
+## 八、决策点（V0.2 cici 锁版 · 2026-05-14）
 
-| # | 决策点 | V0.1 倾向 | 影响 |
-|---|---|---|---|
-| 1 | Excel 一期 + PDF 顺延 Sprint 13a？还是都做 | 都做（业务部门常用）| 砍 PDF 节省 0.5 PD → 转 D7-8 P3 |
-| 2 | DailyAggregator 是否含 org_id=0 集团合计行 | 含（业务上需要）| 不含则集团 dashboard 需 SUM 子公司 |
-| 3 | SelfServiceReport 是否支持自定义 SQL（OLAP）| 不支持（V0.1 限 4 维度）| 业务部门可能不满足 |
-| 4 | 维度表 Wave 76 是否含历史回填（一次性 backfill）| 不回填（仅 02:00 开始向前聚合）| 历史月份 dashboard 空，需补 |
-| 5 | 12 报表统计完善 vs 顺手做详设 13 招采域升级 | 先 12 完整闭环 | 详设 13 是 Sprint 13a 大块 |
+| # | 决策点 | V0.1 倾向 | **V0.2 锁版** | 影响 |
+|---|---|---|---|---|
+| 1 | 详设 12 完善 vs 详设 13 招采升级 | 先 12 完整闭环 | ✅ **先详设 12 完整闭环** | 详设 13 进 Sprint 13a 独立 |
+| 2 | Excel + PDF 都做 vs 仅 Excel | 都做 | ✅ **仅 Excel 一期，PDF 顺延 Sprint 13a 看板期** | 砍 0.5 PD（PDF）转 D7-8 P3 扫尾 |
+| 3 | DailyAggregator 是否含 org_id=0 集团合计行 | 含（业务必需）| ✅ **含集团合计行**（org_id=0）| 集团 dashboard 查询不需 SUM 子公司 |
+| 4 | SelfServiceReport 是否支持 OLAP 自定义 SQL | 不支持（V0.1 限 4 维度）| ✅ **不支持** OLAP 自定义 SQL | V0.1 限 4 维度 + 4 measure；Sprint 13a 看板期评估业务真实需求 |
+| 5 | 维度表是否回填历史数据 | 不回填 | ✅ **30 天回填** | dashboard 上线即可看 1 个月趋势，+0.2 PD（D3-1 加 backfill SQL）|
 
 ---
 
@@ -251,3 +247,4 @@ public class SelfServiceReportRequest
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-14 | 初版草案 — 范围（7 task ~3.5 PD）+ schema 设计 + 4 endpoint + 测试矩阵 + 5 决策点 |
+| V0.2 | 2026-05-14 | **cici 锁版** — 砍 D4-3 PDF（0.5 PD 顺延 Sprint 13a 看板期）；D3-1 加 30 天 backfill（+0.2 PD）；明确含 org_id=0 集团合计行；明确不支持 OLAP 自定义 SQL；锁先 12 后 13；合计 3.5 → 3.0 PD |
