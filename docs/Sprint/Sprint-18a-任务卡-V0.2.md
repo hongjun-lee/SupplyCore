@@ -1,26 +1,30 @@
-# Sprint 18a 任务卡 V0.1（草案）
+# Sprint 18a 任务卡 V0.2（锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（锁版 · cici 2026-05-14 评审锁定主线 A）
 **日期：** 2026-05-14
-**文档性质：** 实施层 · Sprint 18a 起步草案
-**配套：** [`Sprint-17a-Demo-脚本-V0.1.md`](./Sprint-17a-Demo-脚本-V0.1.md) §四 候选范围
+**文档性质：** 实施层 · Sprint 18a 锁版任务卡
+**配套：** [`Sprint-17a-Demo-脚本-V0.1.md`](./Sprint-17a-Demo-脚本-V0.1.md) §四 候选范围、Sprint 18a-V0.1（已锁定）
 
 ---
 
-## 一、Sprint 18a 候选方向（待 cici V0.1 锁版决策点 1）
+## 一、Sprint 18a 主线方向（锁版 · 决策点 1）
 
-### 候选 A：NC 真端点联调 phase 2（Sprint 17a 顺延 · V0.1 倾向）
+### 主线 A：NC 真端点联调 phase 2（Sprint 17a 顺延）
 
-| Task | 范围 | 工时 |
-|---|---|---|
-| 18a-A1 | NC 端配合度评估完成（OAuth2 endpoint + Client 颁发 + 接口 schema）| 1 PD |
-| 18a-A2 | 23 NC 接口路径 + 业务码对照实测 phase 1（MD-001/004 + 4 BIZ + 5 CHK）| 2-3 PD |
-| 18a-A3 | F-12 NcAccountRule ledger_sum 实接（NC 凭证 sum 字段升级 amount/decimal）| 1 PD |
-| 18a-A4 | 真端点 chaos 测试 + 实际限流 / 401 等异常实测 | 1 PD |
-| 18a-A5 | 灰度上线 1 个 BIZ-005A 单接口 + 监控 dashboard 实际值 | 1 PD |
+| Task | 范围 | 工时 | 依赖 NC 端 | 子代理 |
+|---|---|---|---|---|
+| 18a-A1 | NC 端配合度评估清单 + 状态追踪文档 | 0.5 PD | 部分 | 主代理 a |
+| 18a-A2 | 23 NC 接口路径 + 业务码对照实测 phase 1（MD-001/004 + 4 BIZ + 5 CHK）| 2-3 PD | **强** | 主代理 a（等 NC 端）|
+| 18a-A3 | F-06 ReconciliationRecord ledger_sum amount 字段升级 + Wave 89 + reconcile by_chk JSON 升级 | 1 PD | 无 | 主代理 a |
+| 18a-A4 | 真端点 chaos 测试 phase 2（基于实测限流 / 401 / 5xx 等场景扩展）| 1 PD | 部分 | 子代理 b |
+| 18a-A5 | 灰度上线 checklist + 监控 dashboard 实际值看板设计 | 1 PD | 部分 | 子代理 c |
 
-**预算**：~6-7 PD（强依赖 NC 端配合）
+**预算**：~6-7 PD（A2 强依赖 NC 端，A1/A3/A4/A5 可独立推进）
+
+### 风险隔离策略
+
+A2 强依赖 NC 端 — 若 NC 端配合度评估（A1）阻塞，主代理可优先做 A3（F-06 schema 升级，独立可做）+ A4/A5（子代理并行准备工作）；A2 留在 NC 端就绪后再推进，必要时顺延 Sprint 19a。
 
 ### 候选 B：详设 10 剩 12 类审批模板 + 高级
 
@@ -69,15 +73,15 @@ P3 3 项顺延 Sprint 18a：
 
 ---
 
-## 三、V0.1 决策点（待 cici 评审）
+## 三、锁版决策（V0.2）
 
-| # | 决策点 | V0.1 倾向 |
+| # | 决策点 | V0.2 锁版结论 |
 |---|---|---|
-| 1 | Sprint 18a 主线方向（A/B/C/F/G）| **A** NC 真端点 phase 2（Sprint 17a 顺延关键依赖）|
-| 2 | 4 累计技术债哪些必修 | 全修（~3-4 PD）— A2/A3 主线吸收 #1/#2 |
-| 3 | 工时预算 | 8-11 PD（A 6-7 + 技术债 3-4 + 缓冲）|
-| 4 | 子代理并行策略 | 主+2 子代理 sweet spot 3.8x |
-| 5 | Codex 17a 评审时机 | Sprint 17a 收尾后 cici 触发（D7 Demo 完成）|
+| 1 | Sprint 18a 主线方向 | **A NC 真端点 phase 2（Sprint 17a 顺延关键依赖）** |
+| 2 | 4 累计技术债哪些必修 | **全修**（A3 主线吸收 #1/#2 + OAuth2 Redis 缓存 / checklist 追踪 独立走）|
+| 3 | 工时预算 | **8-11 PD**（A 6-7 + 技术债 3-4 + 缓冲）|
+| 4 | 子代理并行策略 | **主+2 子代理 sweet spot 3.8x**（A1/A3 主线 a + A4 子代理 b + A5 子代理 c）|
+| 5 | Codex 17a 评审 | 已完成 0 P1 + 3 P2 全修（commit `4a6054b`）连续 6 Sprint 0 顺延 P2 |
 
 ---
 
@@ -138,3 +142,4 @@ P3 3 项顺延 Sprint 18a：
 |---|---|---|
 | V0.1 | 2026-05-14 | 初版草案 — 5 候选方向（A NC 真端点 phase 2 顺延 / B/C/F/G）+ 4 累计技术债 + 5 决策点 |
 | V0.1.1 | 2026-05-14 | Codex 17a 评审完成补 §二.2 + §六附录（0 P1 + 3 P2 全修 + 3 P3 顺延 18a，连续 6 Sprint 0 顺延 P2 记录）|
+| **V0.2** | **2026-05-14** | **cici 评审锁版主线 A NC 真端点 phase 2；全修 4 累计技术债 + 3 P3 顺延项；8-11 PD 预算；主+2 子代理 sweet spot 3.8x；A2 强依赖 NC 端可顺延 19a 风险隔离** |
