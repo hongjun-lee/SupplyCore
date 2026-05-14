@@ -1,7 +1,7 @@
-# Sprint 16a Day 1-X A+E 双轨 — 实施设计草案（V0.1）
+# Sprint 16a Day 1-X A+E 双轨 — 实施设计（V0.2 锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（cici 锁版 · 2026-05-14）
 **日期：** 2026-05-14
 **文档性质：** 实施层 · Sprint 16a A+E 双轨实施细化设计
 **配套：** [`Sprint-16a-任务卡-V0.2.md`](./Sprint-16a-任务卡-V0.2.md) §一A + 详设 08 V1.1 §5.2 / §6.10-6.14
@@ -228,15 +228,15 @@ public async Task<PeriodReverseRequest> ApplyReverseAsync(...)
 
 ---
 
-## 八、决策点（待 cici V0.1 评审）
+## 八、决策点（V0.2 cici 锁版 · 2026-05-14）
 
-| # | 决策点 | V0.1 倾向 |
-|---|---|---|
-| 1 | 一期 BIZ 数（9 个 vs 6 个） | 9 个全做（合 6.4 PD 内）|
-| 2 | F-12 NC 凭证规则一期 SY-02 化 vs 硬编码 | 硬编码 6 规则 fallback（Sprint 17a 升 SY-02）|
-| 3 | InterfaceTask OrgId Wave 88 强制非空 vs 默认 0 | 默认 0（向后兼容历史 task）|
-| 4 | NC 真端点 HealthCheck 触发时机（启动期 vs 每 N 次调用）| 启动期一次 + 失败时再 check |
-| 5 | WireMock.Net 覆盖范围（仅 BIZ-005A vs 全 BIZ）| 仅 BIZ-005A（POC，扩展 Sprint 17a） |
+| # | 决策点 | V0.1 倾向 | **V0.2 锁版** |
+|---|---|---|---|
+| 1 | 一期 BIZ 数 | 9 个 | ✅ **9 个全做**（合 6.4 PD 内）|
+| 2 | F-12 NC 凭证规则 | 硬编码 | ✅ **硬编码 6 规则 fallback**（Sprint 17a 升 SY-02）|
+| 3 | InterfaceTask OrgId Wave 88 默认 | 默认 0 | ✅ **默认 0**（向后兼容历史 task）|
+| 4 | NC 真端点 HealthCheck 触发 | 启动 + 失败 | ✅ **启动期一次 + 失败时再 check** |
+| 5 | WireMock.Net 覆盖范围 | 仅 BIZ-005A | ✅ **仅 BIZ-005A POC**（Sprint 17a 扩展） |
 
 ---
 
@@ -245,3 +245,4 @@ public async Task<PeriodReverseRequest> ApplyReverseAsync(...)
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-14 | 初版草案 — 9 BIZ Contributor + F-10/F-11/F-12 月结反结 + 3 累计技术债 + 5 决策点 |
+| V0.2 | 2026-05-14 | **cici 锁版** — 5 决策点全 V0.1 倾向：9 BIZ 全做 / F-12 硬编码 6 规则 / OrgId 默认 0 / HealthCheck 启动+失败 / WireMock.Net 仅 BIZ-005A POC |
