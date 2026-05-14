@@ -61,11 +61,13 @@
 
 ### 3.1 Sprint 18b 后续技术债
 
-| # | 项 | 来源 | 工时 |
-|---|---|---|---|
-| 1 | A2-1/A2-2/A2-3/A2-4 Sprint 18b 顺延（待 NC 端） | 18b 顺延 | 4 PD（融入候选 A2'）|
-| 2 | OAuth2 Token Redis 持久化缓存（Sprint 17a 顺延） | 17a 顺延 | 0.5 PD |
-| 3 | A2-1' 23 接口 schema 占位稿 NC 端反馈后调整 | 18b 起 | 0.5-1 PD（融入 A2-1）|
+| # | 项 | 来源 | 工时 | 状态 |
+|---|---|---|---|---|
+| 1 | A2-1/A2-2/A2-3/A2-4 Sprint 18b 顺延（待 NC 端） | 18b 顺延 | 4 PD（融入候选 A2'）| 等 NC 端 |
+| 2 | OAuth2 Token Redis 持久化缓存（Sprint 17a 顺延） | 17a 顺延 | 0.5 PD | 待 19a |
+| 3 | A2-1' 23 接口 schema 占位稿 NC 端反馈后调整 | 18b 起 | 0.5-1 PD（融入 A2-1）| 等 NC 端 |
+| 4 | InterfaceTask LastModificationTime 索引 Wave 91（dashboard OR 窗口 BitmapOr 性能） | Codex 18b P3-3 | 0.2 PD | ✅ **已完成 commit `e371f84`** |
+| 5 | InterfaceMonitorAppService catch(NRE) 加 LogDebug trace（脏数据可追溯） | Codex 18b P3-4 | 0.2 PD | ✅ **已完成 commit `e371f84`** |
 
 ### 3.2 Codex 18b 顺延（评审完成 · 0 顺延 P2）
 
@@ -145,3 +147,4 @@ P3 2 项顺延 Sprint 19a：
 |---|---|---|
 | V0.1 | 2026-05-14 | 初版草案 — 双轨 A2' + B/C/G 策略（避免首次"主线大头顺延"重演）+ 3 累计技术债 + 6 决策点 + 4 风险（NC 端反馈仍极高风险）|
 | V0.1.1 | 2026-05-15 | Codex 18b 评审完成补 §三.2 + §六附录（0 P1 + 2 P2 全修 + 2 P3 顺延 19a，连续 **8 Sprint** 0 顺延 P2 记录）|
+| V0.1.2 | 2026-05-15 | Sprint 19a 预热 — Codex 18b 2 P3 提前消化（commit `e371f84`）：累计技术债 #4 Wave 91 LastModificationTime 索引 / #5 catch(NRE) LogDebug trace 已完成；§三.1 状态回填 |
