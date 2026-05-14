@@ -1,7 +1,7 @@
-# Sprint 19a B1 — 12 类审批模板设计 V0.1
+# Sprint 19a B1 — 12 类审批模板设计 V0.2（锁版）
 
 **项目**：阜矿物资供应管理系统 / SupplyCore
-**版本**：V0.1（草案 · 待 cici 评审）
+**版本**：V0.2（锁版 · cici 2026-05-15 一键采纳 9 决策点）
 **日期**：2026-05-15
 **文档性质**：详细设计层 · 配套实施稿
 **配套**：
@@ -701,3 +701,4 @@ public async Task WF_CON_002_Should_Initiate_With_ChainSnapshot()
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版 — 12 类审批模板详细设计：节点表 / chain_snapshot JSON / NCalc condition_expr / A-20 接入 TriggerContext / SENS-* 联动 / DataSeed 实施计划（13 含 WF-REV-001 收编）/ A-20 接入测试计划（39 测试）/ Sprint 19a B 副轨工作量评估 8.4-8.9 PD / 9 项待评审决策点 |
+| **V0.2** | **2026-05-15** | **cici 一键采纳子代理建议 9 决策点全锁定**：简短角色编码 / CON-002 节点 3 并行会签 / TRF 同组织跨仓不走 WF / EQP-001 报废业务层串接 SCP-001 / RNT 5w 阈值 GM 终审 / MDT-001 仅变更走 WF（新增不走）/ RPT-001 不叠加业务会签 / 同步收编 WF-REV-001 inline seed / NCalc 不满足时节点 pass —— 启动 B1-2 实施 |
