@@ -67,11 +67,19 @@
 | 2 | OAuth2 Token Redis 持久化缓存（Sprint 17a 顺延） | 17a 顺延 | 0.5 PD |
 | 3 | A2-1' 23 接口 schema 占位稿 NC 端反馈后调整 | 18b 起 | 0.5-1 PD（融入 A2-1）|
 
-### 3.2 Codex 18b 顺延（待评审后补 §六附录）
+### 3.2 Codex 18b 顺延（评审完成 · 0 顺延 P2）
 
-> 占位 — Codex 18b 评审完成后从顺延清单挑选补到本节。
+Codex 18b 评审 4 commits 共 0 P1 + 2 P2 + 2 P3，2 P2 已在 commit `ab710c1` 当 Sprint 全修：
+- P2-1 ReadStringFlexible Object/Array 数据截断风险（"INVALID_TYPE" 兜底守住列长度）
+- P2-2 dashboard 时间窗口语义统一（4 endpoint OR 窗口对齐 GetNcHealthSnapshotAsync）
 
-**预估合计 ~1-2 PD**（占位等评审后修订）
+P3 2 项顺延 Sprint 19a：
+- P3-3 OR 索引退化（last_modification_time 无索引；建议拓宽 CreationTime 窗口 -2h 让索引可用 / 或加双列索引）
+- P3-4 catch(NRE){} 可能掩盖脏数据 NRE（建议 LogDebug trace 或 mock 检测条件化静默）
+
+**0 顺延 P2** — Codex 0 顺延 P2 连续 **8 Sprint** 记录达成（12a/13a/14a/15a/16a/17a/18a/18b）。
+
+**预估合计 ~0.3 PD**（仅 P3，可融入候选 B/C/G 旁路修）
 
 ---
 
@@ -99,11 +107,35 @@
 
 ---
 
-## 六、Codex 18b 评审待触发（已就绪）
+## 六、Codex 18b Finding 附录（评审完成 · 0 顺延 P2 连续 8 Sprint）
 
-Sprint 18b Demo 脚本 §五 已写就触发提示词：
+| Sprint 18b Commits | 已评 | P1 | P2 | P3 | 当 Sprint 修 P2 | 顺延 19a |
+|---|---|---|---|---|---|---|
+| `f4378ab` A2-5 Codex 18a 4 P3 全修 | Y | 0 | 2（ReadStringFlexible 截断 + dashboard 窗口不一致）| 2（OR 索引退化 + NRE 静默吞）| 2 | 2 P3 |
+| `7fc0694` / `5ffa69e` / `a7a3c88` docs commits | Y | 0 | 0 | 0 | - | - |
+| **合计** | 4 | **0** | **2** | **2** | **2** | **2 P3** |
 
-> "评审 Sprint 18b 共 4 commits（`7fc0694` V0.2 / `f4378ab` A2-5 / `5ffa69e` V0.2.1 / `a7a3c88` A2-1'）— 重点关注 A2-5 4 P3 修复边界（特别是 ReadStringFlexible Object/Array 归一化 + OR 条件 SQL 性能 + NullReferenceException catch 误吞）"
+**修复 commit**：`ab710c1` "Sprint 18b Codex 18b 评审修复（0 P1 + 2 P2 全修 0 顺延，连续 8 Sprint）"
+
+**2 P3 顺延清单**（融入 §三.1 累计技术债）：
+
+| P3 # | finding | 顺延项 | 工时 |
+|---|---|---|---|
+| P3-3 | `Add_InterfaceTask_CreationTime_Index_Wave90.cs` — OR 索引退化（last_modification_time 无索引）| 加 LastModificationTime 索引 OR 改 CreationTime -2h 窗口拓宽 | 0.2 PD |
+| P3-4 | `InterfaceMonitorAppService.cs:360` — catch(NRE){} 可能掩盖脏数据 NRE | LogDebug trace + 测试 mock 改用空集而非 null Task | 0.2 PD |
+
+**Codex 0 顺延 P2 连续 8 Sprint 记录**：
+
+| Sprint | 评审 commits | P1+P2 | 当 Sprint 修 P2 | 顺延 P2 |
+|---|---|---|---|---|
+| 12a | 2 | - | - | 0 |
+| 13a | 2 | - | - | 0 |
+| 14a | 3 | - | - | 0 |
+| 15a | 2 | - | - | 0 |
+| 16a | 2 | 3 | 3 | 0 |
+| 17a | 5 | 3 | 3 | 0 |
+| 18a | 2 | 0 | 0 | 0 |
+| **18b** | **4** | **2** | **2** | **0** |
 
 ---
 
@@ -112,3 +144,4 @@ Sprint 18b Demo 脚本 §五 已写就触发提示词：
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-14 | 初版草案 — 双轨 A2' + B/C/G 策略（避免首次"主线大头顺延"重演）+ 3 累计技术债 + 6 决策点 + 4 风险（NC 端反馈仍极高风险）|
+| V0.1.1 | 2026-05-15 | Codex 18b 评审完成补 §三.2 + §六附录（0 P1 + 2 P2 全修 + 2 P3 顺延 19a，连续 **8 Sprint** 0 顺延 P2 记录）|
