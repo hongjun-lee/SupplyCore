@@ -18,14 +18,24 @@
 | **D1-X** | A 主线 8 BIZ Contributor + 9 smoke 测试 | `2380a9b` | a |
 | **D1-X** | D NcInterfaceHttpClient Polly 三层（Timeout+Retry+CircuitBreaker）+ 8 测试 | `2380a9b` | **b（子代理）** |
 | **D1-X** | 累计技术债 3 项（NC 异常压测 + cross-org RBAC + Wave 86）+ 13 测试 | `2380a9b` | **c（子代理）** |
-| **D8** | Sprint15aNcInterface_E2E（2 全链路场景 BIZ-002 成功 + BIZ-008 异常）| 本 commit | a |
-| D9 | Demo 脚本 + Sprint 16a 草案 | 本文档 | a |
+| **D8** | Sprint15aNcInterface_E2E（2 全链路场景 BIZ-002 成功 + BIZ-008 异常）| `70a5cff` | a |
+| D9 | Demo 脚本 + Sprint 16a 草案 | `d8fb4b3` | a |
+| D10 | **Codex 15a 评审修复**（1 P1 + 2 P2 全修 0 顺延）| `187eaf5` | a |
 
 **测试基线演进**：
 - Sprint 14a 收尾：**1484**
 - Sprint 15a Day 1-X 三轨第一波：**1514**（+30）
-- **Sprint 15a Day 8 E2E**：**1516**（+2）
-- Domain 850 / Application 622 / EFCore 38 / Web 6
+- Sprint 15a Day 8 E2E：**1516**（+2）
+- **Sprint 15a D10 Codex 15a 修复**：**1519**（+3 守护测试）
+- Domain 850 / Application 625 / EFCore 38 / Web 6
+
+**Codex 15a 修复要点**（commit `187eaf5`）：
+- **P1**：NcInterfaceHttpClient HTTP 200 但业务码非 0000 → 标 Success=true（拒收凭证误进 Success 不进 F-08 重试）
+  - 修复：严格判定 `ncCode == "0000"` 才 Success=true / 缺失 code → `MISSING_CODE`
+- **P2-1**：NcInterfaceHttpClient Transient 注册 → CircuitBreaker 状态不跨次累积
+  - 修复：DI 改 AddSingleton（CircuitBreaker 实例级共享）
+- **P2-2**：Polly retry 丢弃 5xx HttpResponseMessage 未 dispose（连接池耗尽风险）
+  - 修复：onRetry callback `outcome.Result?.Dispose()`
 
 ---
 
@@ -70,7 +80,8 @@
 | 6 | InterfaceMonitor cross-org RBAC scope | ✅ |
 | 7 | Wave 86 PG timezone NOTICE | ✅ |
 | 8 | 集成 E2E 2 场景 | ✅ |
-| 9 | 基线 ≥ 1500（实际 1516）| ✅ |
+| 9 | 基线 ≥ 1500（实际 1519，含 Codex 15a 修复 +3 守护）| ✅ |
+| 10 | Codex 15a 评审 1 P1 + 2 P2 全修 0 顺延 | ✅ |
 
 ---
 
@@ -103,3 +114,4 @@
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-14 | 初版 — Sprint 15a 收尾 Demo + Sprint 16a 候选 |
+| V0.1+ | 2026-05-14 | 补 D10 Codex 15a 评审修复（commit `187eaf5`，1 P1 + 2 P2 全修 0 顺延）+ 验收要点 +1 / 基线 1516 → 1519 |
