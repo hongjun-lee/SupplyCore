@@ -1,37 +1,47 @@
-# Sprint 14a Day 1-X 详设 08 NC 接口联调 — 实施设计草案（V0.1）
+# Sprint 14a Day 1-X 详设 08 NC 接口联调 — 实施设计（V0.2 锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（cici 锁版 · 2026-05-14）
 **日期：** 2026-05-14
 **文档性质：** 实施层 · Sprint 14a A 主线实施细化设计
 **配套：** [`Sprint-14a-任务卡-V0.2.md`](./Sprint-14a-任务卡-V0.2.md) §一A + 详设 08 V1.1 §五
 
 ---
 
-## 一、范围（A1-A6，~8-10 PD · 主代理 a 主线）
+## 一、范围（A1-A8，~11 PD · 主代理 a 主线）
 
 详设 08 V1.1 共 29 接口（MD-001~005 / BIZ-001~020 / CHK-001~005）。
-本 Sprint 一期聚焦 **8 个核心接口 + F-01~F-04 任务/报文/回执/日志框架 + 接口监控 dashboard**。
+本 Sprint 一期聚焦 **8 个核心接口 + F-14/F-13/F-01/F-02/F-03/F-04/F-06/F-08 表骨架 + NC Mock Client + 接口监控 dashboard**。
 
 | Day | Task | 工时 | 说明 |
 |---|---|---|---|
 | **D1-1** | F-14 interface_definition + F-13 interface_switch + F-01 interface_task 表骨架 + Wave 84 migration | 0.8 PD | schema "f"；F-01 状态机（待处理→处理中→成功/失败）|
-| **D1-2** | F-02 interface_message + F-03 interface_receipt + F-04 interface_log + Wave 84 续 | 0.8 PD | 报文 / 回执 / 日志三表 |
+| **D1-2** | F-02 interface_message + F-03 interface_receipt + F-04 interface_log + **F-08 exception_record** + Wave 84 续 | 1 PD | 报文 / 回执 / 日志 / 异常台账 4 表（**V0.2 改进 #1**：补 F-08 表）|
 | **D2-1** | INcInterfaceClient HTTP 抽象 + 重试 + 死信队列 | 1 PD | HttpClientFactory + Polly retry policy；幂等键（详设 §7.2）|
 | **D2-2** | InterfaceTaskManager 状态机 + IRecurringJobManager 调度（Hangfire）| 0.8 PD | 周期跑 F-01 待处理任务 → 调 NC API → 回写 F-03 |
-| **D3-1** | MD-001 物料-存货映射同步（M-14 → NC） | 0.5 PD | 物资→NC 推送，M-14 映射启用触发 |
-| **D3-2** | MD-004 成本中心对照同步（NC → 物资） | 0.5 PD | NC→物资 拉取，定时 |
-| **D4-1** | BIZ-001 采购入库（S-05 → NC）| 0.5 PD | S-05 入库审核通过 + 发票匹配 → 推 NC 凭证 |
-| **D4-2** | BIZ-005 领料出库（S-09 → NC）| 0.5 PD | S-09 出库审核通过 → 推 NC |
-| **D5-1** | BIZ-014 预付款登记（C-08/C-10 → NC，已有 C-09 基础）| 0.5 PD | 复用 Sprint 8a/12a 已落审计链 |
-| **D5-2** | BIZ-020 付款执行（C-08+C-10 → NC，已有 BIZ-PAY-BATCH 基础）| 0.5 PD | 同上 |
+| **D2-3** | **NC Mock Stub Client**（INcInterfaceClient 测试/本地开发实现）| 0.5 PD | **V0.2 改进 #2**：解锁本地联调，不依赖 NC 厂商响应；含 8 接口的 mock JSON 响应 |
+| **D3-1** | MD-001 物料-存货映射同步（M-14 → NC）| 0.7 PD | 物资→NC 推送（V0.2 改进 #3 工时 0.5→0.7）|
+| **D3-2** | MD-004 成本中心对照同步（NC → 物资）| 0.7 PD | NC→物资 拉取，定时 |
+| **D4-1** | BIZ-001 采购入库（S-05 → NC）| 0.7 PD | S-05 入库审核 + 发票匹配 → 推 NC 凭证 |
+| **D4-2** | BIZ-005 领料出库（S-09 → NC）| 0.7 PD | S-09 出库审核通过 → 推 NC |
+| **D5-1** | BIZ-014 预付款登记（C-08/C-10 → NC，已有 C-09 基础）| 0.7 PD | 复用 Sprint 8a/12a 已落审计链 |
+| **D5-2** | BIZ-020 付款执行（C-08+C-10 → NC，已有 BIZ-PAY-BATCH 基础）| 0.7 PD | 同上 |
 | **D6-1** | CHK-001 日对账（物资↔NC 笔数/金额）+ F-06 reconciliation_record | 0.8 PD | Hangfire 每日 03:00 跑 |
-| **D6-2** | CHK-004 接口状态查询（NC→物资/物资→NC）| 0.4 PD | 实时查 F-01/F-03/F-04 |
+| **D6-2** | CHK-004 接口状态查询（NC→物资/物资→NC）| 0.5 PD | 实时查 F-01/F-03/F-04 |
 | **D7-1** | InterfaceMonitorAppService + Controller（dashboard 4 endpoint：成功率/失败率/耗时/重试数）| 0.8 PD | dashboard 综合 4 指标 |
-| **D7-2** | 异常监控（F-08 exception_record 触发 R-09 类预警 + LogWarning stub）| 0.5 PD | 复用 Sprint 12a Token 监控 stub 模式 |
+| **D7-2** | 异常监控（F-08 exception_record 触发 R-09 类预警 + LogWarning stub）| 0.5 PD | **V0.2 改进 #5**：A 主线保留 stub log 作兜底；R-09 SMTP 真接通由 c 子代理做（§二 #4）|
 | **D8** | 测试 ≥ 18（接口任务状态机 + 重试 + 死信 + 对账 + dashboard）| 0.8 PD | 含 1 E2E 全链路 |
 
-**合计 ~9.7 PD**（V0.2 §一A 预算 8-10 PD 内）
+**合计 ~11 PD**（V0.2 §一A 预算 8-10 PD，略超上限 1 PD 可接受，对应 V0.2 任务卡 §三决策点 3 锁定 12-15 PD 总预算内）
+
+### 累计技术债子代理分工（V0.2 改进 #4，详 Sprint 14a V0.2 §三决策点 4）
+
+A 主线由主代理 a 完成（~11 PD）；累计技术债 9 项 5.5 PD 由 **b/c 子代理并行**：
+
+| 子代理 | 范围 | 工时 |
+|---|---|---|
+| **b** | Codex 13a 顺延 5 项（R-09 调度顺序 / OrgId dup / SupplierId scope / TopOrgs scope / ReportExport audit OrgId）| ~1.7 PD |
+| **c** | 决策点顺延 4 项（CostEstimate SY-02 / NCalc 表达式引擎 / 完整 RBAC / **R-09 SMTP 接通**）| ~3.8 PD |
 
 **一期不做（顺延 Sprint 15a/16a）**：
 - 剩 14 BIZ 接口（BIZ-002~004/006~013/015~019）
@@ -203,15 +213,15 @@ RESTful Controller：`/api/supply-cores/interface-monitor/`
 
 ---
 
-## 九、决策点（待 cici V0.1 评审）
+## 九、决策点（V0.2 cici 锁版 · 2026-05-14）
 
-| # | 决策点 | V0.1 倾向 |
-|---|---|---|
-| 1 | 一期接口数（V0.1 8 个 vs 6 个 vs 10 个）| 8 个（核心覆盖 + 9.7 PD 内合理）|
-| 2 | NC API URL 配置化方式 | appsettings.json（一期简化）；Sprint 15a 改 SY-02 配置 |
-| 3 | 异常监控接 R-09 vs 新 R-10 | 复用 R-09（一期）；Sprint 15a 拆 R-10 InterfaceFailed |
-| 4 | F-05 重推记录 vs F-08 异常台账 | 仅 F-08（一期，重推用 retry_count）；F-05 顺延 |
-| 5 | dashboard 综合 endpoint vs 拆分 endpoint | 拆 4 endpoint（V0.1 倾向）|
+| # | 决策点 | V0.1 倾向 | **V0.2 锁版** |
+|---|---|---|---|
+| 1 | 一期接口数 | 8 个 | ✅ **8 个核心接口**（MD ×2 + BIZ ×4 + CHK ×2）|
+| 2 | NC API URL 配置化方式 | appsettings.json | ✅ **appsettings.json 一期**，Sprint 15a 改 SY-02 配置 |
+| 3 | 异常监控接 R-09 vs 新 R-10 | 复用 R-09 | ✅ **复用 R-09 一期**，Sprint 15a 拆 R-10 InterfaceFailed |
+| 4 | F-05 重推记录 vs F-08 异常台账 | 仅 F-08 | ✅ **仅 F-08**（retry_count 代替 F-05），F-05 顺延 |
+| 5 | dashboard 综合 endpoint vs 拆分 endpoint | 拆 4 endpoint | ✅ **拆 4 endpoint** |
 
 ---
 
@@ -220,3 +230,4 @@ RESTful Controller：`/api/supply-cores/interface-monitor/`
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-14 | 初版草案 — 8 接口 + F-14/F-01/F-02/F-03/F-04/F-06 schema + INcInterfaceClient + dashboard + 5 决策点 |
+| V0.2 | 2026-05-14 | **cici 锁版 + 5 处改进**：①补 F-08 exception_record 表（D1-2）②新增 D2-3 NC Mock Stub Client 解锁本地联调 ③接口工时 0.5→0.7 PD 实测口径 ④加 b/c 子代理分工（Codex 13a 5 项 + 决策点 4 项）⑤R-09 SMTP 接通由 c 做（D7-2 仅 stub log 兜底）；合计 9.7 → 11 PD（V0.2 任务卡 12-15 PD 总预算内）|
