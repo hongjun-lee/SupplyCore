@@ -1,7 +1,7 @@
-# Sprint 13a Day 1-3 详设 10 权限审批 — 实施设计草案（V0.1）
+# Sprint 13a Day 1-3 详设 10 权限审批 — 实施设计（V0.2 锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（cici 锁版 · 2026-05-14）
 **日期：** 2026-05-14
 **文档性质：** 实施层 · Sprint 13a A 主线实施细化设计
 **配套：** [`Sprint-13a-任务卡-V0.2.md`](./Sprint-13a-任务卡-V0.2.md) §一A + 详设 10 V1.2
@@ -170,14 +170,14 @@ public interface IApprovalAppService : IApplicationService
 
 ---
 
-## 八、决策点（待 cici V0.1 评审）
+## 八、决策点（V0.2 cici 锁版 · 2026-05-14）
 
-| # | 决策点 | V0.1 倾向 |
-|---|---|---|
-| 1 | 一期模板数（V0.1 8 类 vs 10 类 vs 12 类）| 8 类（核心覆盖 + 6 PD 内合理）|
-| 2 | 高敏感拦截器实现（V0.1 AppService 显式校验 vs ABP Interceptor）| AppService 显式（一期简化）|
-| 3 | condition_expr 表达式引擎 | 硬编码 if-else（一期）|
-| 4 | A-20 approval_instance 是否复用 vs 新建 | 复用（schema 已存在）|
+| # | 决策点 | V0.1 倾向 | **V0.2 锁版** |
+|---|---|---|---|
+| 1 | 一期模板数 | 8 类 | ✅ **8 类**（核心覆盖 + 6 PD 内合理）|
+| 2 | 高敏感拦截器实现 | AppService 显式 | ✅ **AppService 显式**（一期简化，Sprint 14a 改 ABP Interceptor）|
+| 3 | condition_expr 表达式引擎 | 硬编码 if-else | ✅ **硬编码 if-else**（一期，Sprint 14a 改 NCalc）|
+| 4 | A-20 approval_instance 复用 vs 新建 | 复用 | ✅ **复用现有 schema** |
 
 ---
 
@@ -186,3 +186,4 @@ public interface IApprovalAppService : IApplicationService
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-14 | 初版草案 — 8 模板 + 8 高敏感 + 4 endpoint + 测试矩阵 + 4 决策点 |
+| V0.2 | 2026-05-14 | **cici 锁版** — 4 决策点全 V0.1 倾向：8 类核心模板 / AppService 显式校验 / 硬编码 if-else / A-20 复用 |
