@@ -1,7 +1,7 @@
-# Sprint 15a Day 1-X A+D 双轨 — 实施设计草案（V0.1）
+# Sprint 15a Day 1-X A+D 双轨 — 实施设计（V0.2 锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（cici 锁版 · 2026-05-14）
 **日期：** 2026-05-14
 **文档性质：** 实施层 · Sprint 15a A+D 双轨实施细化设计
 **配套：** [`Sprint-15a-任务卡-V0.2.md`](./Sprint-15a-任务卡-V0.2.md) §一A + §一D + 详设 08 V1.1 §5.2
@@ -211,15 +211,15 @@ public class NcInterfaceHttpClient : INcInterfaceClient
 
 ---
 
-## 七、决策点（待 cici V0.1 评审）
+## 七、决策点（V0.2 cici 锁版 · 2026-05-14）
 
-| # | 决策点 | V0.1 倾向 |
-|---|---|---|
-| 1 | 一期 BIZ 数（V0.1 8 个 vs 10 个 vs 14 全做） | 8 个核心（合 3-4 PD）|
-| 2 | NcInterfaceHttpClient Polly 策略（retry+熔断+timeout 全做 vs 仅 retry） | 三层全做（生产标准）|
-| 3 | C-1 NC 异常压测含 WireMock.Net？ | 不含（一期单测足够）|
-| 4 | NC 认证机制（Bearer stub vs OAuth2） | Bearer Token stub（Sprint 16a 升 OAuth2）|
-| 5 | Mock↔Real 切换粒度（按 interface vs 全局） | 全局（appsettings NcInterface:UseMock）|
+| # | 决策点 | V0.1 倾向 | **V0.2 锁版** |
+|---|---|---|---|
+| 1 | 一期 BIZ 数 | 8 个 | ✅ **8 个核心**（合 3-4 PD）|
+| 2 | NcInterfaceHttpClient Polly 策略 | 三层 | ✅ **retry + 熔断 + Timeout 三层**（生产标准）|
+| 3 | C-1 NC 异常压测含 WireMock.Net？ | 不含 | ✅ **不含**（一期单测足够，Sprint 16a 评估）|
+| 4 | NC 认证机制 | Bearer stub | ✅ **Bearer Token stub**（Sprint 16a 升 OAuth2）|
+| 5 | Mock↔Real 切换粒度 | 全局 | ✅ **全局**（appsettings NcInterface:UseMock）|
 
 ---
 
@@ -228,3 +228,4 @@ public class NcInterfaceHttpClient : INcInterfaceClient
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-14 | 初版草案 — 8 BIZ Contributor + NcInterfaceHttpClient + Polly retry + 4 累计技术债 + 5 决策点 |
+| V0.2 | 2026-05-14 | **cici 锁版** — 5 决策点全 V0.1 倾向：8 核心 BIZ / Polly 三层（retry+熔断+Timeout）/ 不含 WireMock.Net / Bearer Token stub / 全局 Mock↔Real 切换 |
