@@ -100,16 +100,18 @@ cici 2026-05-15 关键决策（plan `melodic-doodling-wirth.md`）：
 
 ---
 
-## 四、V0.1 决策点（待 cici 评审）
+## 四、锁版决策（V0.2）
 
-| # | 决策点 | V0.1 倾向 |
+| # | 决策点 | V0.2 锁版结论 |
 |---|---|---|
-| 1 | Sprint 19b 主线方向 | **双轨 A2' + C 或 A2' + G**（不允许 A2' 二次顺延 + 单线 19b 反模式）|
-| 2 | 4 累计技术债哪些必修 | **全修** ~5-7 PD（A2' 主线 / X1 副 / X2 副 / WF-MDT/RPT 节点重评） |
-| 3 | 工时预算 | **A2' 4 + C/G 5-10 + 技术债 1-2 + 缓冲 = 12-18 PD（C 双轨）/ 9-13 PD（G 双轨）** |
-| 4 | 子代理并行策略 | 主+1 子代理 sweet spot 2x（19a 实测 4x 含模板批量），首选副轨 C/G + A2' 子代理 |
-| 5 | Codex 19a 评审 | Sprint 19a 收尾后 cici 触发（Demo 脚本 `55f86f4` 已就绪）|
-| 6 | NC 端反馈窗口 | 19b 启动前 cici 给出 NC 端反馈时间线（无反馈 → A2' 强行二次顺延 = 反模式触发）|
+| 1 | Sprint 19b 主线方向 | **双轨 主轨 UI MVP + 副轨 A2'**（cici 选 A 方案 plan `melodic-doodling-wirth.md` / 利用 52 原型 + 61 Controller + Catio React 三重就绪窗口）|
+| 2 | 累计技术债 | **全修** ~1-2 PD（X1 OAuth2 Redis 0.5 / X2 NC 反馈触发 / WF-MDT/RPT 节点重评）|
+| 3 | 工时预算 | **UI MVP 5-7 + A2' 4 触发 + X1 0.5 + 缓冲 = 8-10 PD** |
+| 4 | 子代理并行策略 | **主代理 a UI MVP + 子代理 b A2'（NC 反馈触发 / X1 兜底）+ 子代理 c 联调辅助** sweet spot 2-3x |
+| 5 | Codex 19a 评审 | Sprint 19a 收尾后 cici 触发（Demo 脚本 `55f86f4` 已就绪） |
+| 6 | NC 端反馈窗口 | 19b 任意时段反馈到位即可触发 A2'；阻塞 → X1 兜底 + 19c 重评 A2' |
+| 7 | **模块化 frontend 位置** | **`modules/nova.supplycores/frontend/`**（与 src/ 同级，参考 Catio 5 模块；不在 Host 中）|
+| 8 | UI MVP 5-8 页面选定 | 必选 6：approval-center / inventory / purchase-orders / reports / nc-interface / material-master；可选 2：contract-list / dashboard-bigscreen |
 
 ---
 
