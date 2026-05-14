@@ -55,14 +55,26 @@
 
 ## 二、累计技术债（Sprint 14a 必修，决策点 2）
 
+### 2.1 Sprint 11a/12a/13a 决策点顺延
+
 | # | 项 | 复杂度 | 工时 |
 |---|---|---|---|
 | 1 | **CostEstimate** 改 SY-02 模型价格表（Sprint 12a P2-9 顺延 + Sprint 13a A 决策点 3 NCalc 引擎前置） | 中 | 0.8 PD |
 | 2 | **A-20 chain_snapshot** schema 升级到 ABP NCalc / 表达式引擎（Sprint 13a 决策点 3 顺延） | 中 | 1 PD |
-| 3 | **角色权限矩阵 + ICurrentUser.OrgId 扩展**（Sprint 13a A 决策点 2 顺延） | 中 | 1 PD |
+| 3 | **角色权限矩阵 + ICurrentUser.OrgId 扩展 + 完整 RBAC**（Sprint 13a A 决策点 2 顺延 + Codex 13a P1 完整版） | 中 | 1.5 PD |
 | 4 | **R-09 SMTP 邮件接通**（Sprint 13a C-1 stub log 转真邮件） | 低 | 0.5 PD |
 
-**合计 ~3.3 PD**
+### 2.2 Sprint 13a Codex 13a 顺延 P2（详 §七 附录）
+
+| # | 来源 commit | 项 | 复杂度 | 工时 |
+|---|---|---|---|---|
+| 5 | edb640b | R-09 调度顺序（DailyAggregator 触发 R-09 时机优化）| 低 | 0.3 PD |
+| 6 | edb640b | ReportAlert OrgId=0 dup 防御（dedup 范围扩展）| 低 | 0.3 PD |
+| 7 | edb640b | MonthlyPrepayment SupplierId scope 增强 | 中 | 0.5 PD |
+| 8 | 8694eba | AiTokenDashboard TopOrgs OrgId scope 校验 | 低 | 0.3 PD |
+| 9 | 8694eba | ReportExport audit inputParams 补 OrgId / AlertCode | 低 | 0.3 PD |
+
+**合计 ~5.5 PD**（Sprint 决策点顺延 3.8 PD + Sprint 13a Codex 顺延 1.7 PD）
 
 ---
 
@@ -90,21 +102,67 @@
 
 ---
 
-## 五、Sprint 13a Codex 12a 评审已完成
+## 五、Codex 13a 评审已完成
 
-Codex 12a 评审 13 commits 完成（详 Sprint-13a-V0.2 §七）：
-- 4 P1 全修：Wave 78 setval / Hangfire reports / HTTP Controller / smoke 守护
-- 8 P2 已修：守护强化 / filter 校验 / 软删 UK / Wave 81 / cross-org 审计 / Wave 79
-- 2 P2 顺延（已在 Sprint 13a 完成）
-
-Codex 13a 评审待 cici Sprint 13a 收尾后触发：
-- 累计 ~5 commits（edb640b / 8694eba + E2E + Demo + 本任务卡）
-- 预计 finding 数 ~3-5（按 Sprint 12a 7 commits 经验外推）
+Codex 13a 评审 3 commits 完成（commits edb640b / 8694eba / bcf6f7f）：
+- 2 P1 全修（commit `091c276`）：ApprovalAppService self-approve 防御 + my-pending 按 caller 过滤
+- 4 P2 修：ApprovalInstance partial unique（Wave 82）+ Wave 83 Repair_Aggregate_Data（修 Wave 79 软删孤儿 + Wave 76 UTC bucket）
+- 3 P2 顺延 Sprint 14a §二.2
+- 1 zero-finding ✨：bcf6f7f E2E
 
 ---
 
-## 六、版本沿革
+## 六、Codex 13a Finding 附录（完成 3/3 — 2026-05-14）
+
+### 6.1 整体统计
+
+| Sprint 13a Day | Commits | 已评 | finding 数 |
+|---|---|---|---|
+| Day 1-2 三轨第一波 | edb640b | 1 | 5 (0 P1 + 5 P2) |
+| Day 3 三轨第二波 | 8694eba | 1 | 4 (**2 P1** + 2 P2) |
+| Day 4 集成 E2E | bcf6f7f | 1 | 0 ✨ |
+| **合计** | 3 | **3** | **2 P1（全修）/ 7 P2（4 修 + 3 顺延）/ 1 zero-finding** |
+
+### 6.2 P1 finding（2 个 · 全修 commit `091c276`）
+
+| # | Commit | 文件 | 标题 | 修复 |
+|---|---|---|---|---|
+| P1-1 | `8694eba` | `ApprovalAppService.cs:54` | approve/reject 仅校验登录态，未防 self-approve / 任意用户推进他人审批 | self-approve 防御（caller != InitiatorUserId）|
+| P1-2 | `8694eba` | `ApprovalAppService.cs:83-87` | my-pending 返回全系统 InProgress 泄露他人待办 | 按 InitiatorUserId == caller 过滤 |
+
+> 一期简化版（完整 RBAC 顺延 §二.1 #3 Sprint 14a 角色权限矩阵接通）
+
+### 6.3 P2 finding（7 个）
+
+**已修 4 个（commit `091c276`）**：
+
+| # | Commit | 标题 | 修复 |
+|---|---|---|---|
+| P2-1 | `edb640b` | Wave79 DROP IsDeleted 前未删软删孤儿 → 已升级 DB 有"复活"行 | Wave 83 Repair_Aggregate_Data DELETE + UTC bucket 重建 |
+| P2-2 | `edb640b` | Wave76 backfill 用 date_trunc 依赖 session timezone | 同上 Wave 83 UTC bucket |
+| P2-3 | `edb640b` | ApprovalInstance InProgress 并发竞态可创建多实例 | Wave 82 partial unique index ON (business_entity, business_id) WHERE state='审批中' |
+| P2-4 | `8694eba` | （已并入 P2-1 修复链路 — Wave 83 + Wave 82 双管齐下）| ✅ |
+
+**顺延 Sprint 14a §二.2（3 个 P2-中低）**：
+
+| # | Commit | 标题 |
+|---|---|---|
+| P2-5 | `edb640b` | R-09 调度顺序（DailyAggregator 末尾触发 R-09 时机优化）|
+| P2-6 | `edb640b` | ReportAlert OrgId=0 dup 防御（dedup 范围扩展跨集团合计行）|
+| P2-7 | `edb640b` | MonthlyPrepayment SupplierId scope 增强（除 OrgId+Month 外加 SupplierId）|
+| P2-8 | `8694eba` | AiTokenDashboard TopOrgs 未应用 OrgId scope 校验 |
+| P2-9 | `8694eba` | ReportExport audit inputParams 未带 OrgId/AlertCode（cross-org 留痕粒度不够） |
+
+### 6.4 Zero-finding（Codex 认可干净）
+
+| Commit | 状态 |
+|---|---|
+| `bcf6f7f` Sprint 13a Day 4 集成 E2E（4 全链路场景）| ✨ "did not identify a discrete regression" |
+
+---
+
+## 七、版本沿革
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
-| V0.1 | 2026-05-14 | 初版草案 — 3 候选方向（A NC / B 详设 10 / C 看板）+ 4 累计技术债 + 5 决策点 |
+| V0.1 | 2026-05-14 | 初版草案 — 3 候选方向（A NC / B 详设 10 / C 看板）+ 9 累计技术债（4 决策点顺延 + 5 Codex 13a 顺延）+ 5 决策点 + §六 Codex 13a 3/3 评审附录（2 P1 全修 + 4 P2 已修 + 3 P2 顺延 + 1 ✨）|
