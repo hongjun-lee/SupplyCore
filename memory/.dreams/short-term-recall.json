@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-13T22:34:10.071Z",
+  "updatedAt": "2026-05-14T05:10:43.653Z",
   "entries": {
     "memory:memory/2026-05-01.md:3:4": {
       "key": "memory:memory/2026-05-01.md:3:4",
@@ -2105,6 +2105,166 @@
         "f-01",
         "task-state",
         "finance-state"
+      ]
+    },
+    "memory:memory/2026-05-13.md:60:67": {
+      "key": "memory:memory/2026-05-13.md:60:67",
+      "path": "memory/2026-05-13.md",
+      "startLine": 60,
+      "endLine": 67,
+      "source": "memory",
+      "snippet": "- `dotnet build modules/nova.supplycores/src/Nova.SupplyCores.Application/Nova.SupplyCores.Application.csproj --no-restore` → `APP_BUILD:0`, log `/tmp/sc-review-app-build.log`. - `dotnet build modules/nova.supplycores/src/Nova.SupplyCores.HttpApi/Nova.SupplyCores.HttpApi.csproj --no-restore` → `HTTP_BUILD:0`, log `/tmp/sc-review-http-build.log`. - `dotnet test modules/nova.supplycores/test/Nova.SupplyCores.Domain.Tests/Nova.SupplyCores.Domain.Tests.csproj --no-restore --filter \"FullyQualifiedName~PaymentPlan|FullyQualifiedName~LeaseContract|FullyQualifiedName~LeaseBilling|FullyQualifiedName~EquipmentEntry|FullyQualifiedName~EquipmentExit\"` → `DOMAIN_TEST:0`, log `/tmp/sc-review-domain-",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-14T04:46:27.715Z",
+      "lastRecalledAt": "2026-05-14T05:10:43.653Z",
+      "queryHashes": [
+        "c8ecf4cafd7d",
+        "f93420601cba"
+      ],
+      "recallDays": [
+        "2026-05-14"
+      ],
+      "conceptTags": [
+        "no-restore",
+        "app-build",
+        "tmp/sc-review-app-build.log",
+        "http-build",
+        "tmp/sc-review-http-build.log",
+        "domain-test",
+        "tmp/sc-review-domain",
+        "dotnet"
+      ]
+    },
+    "memory:memory/2026-05-13.md:69:72": {
+      "key": "memory:memory/2026-05-13.md:69:72",
+      "path": "memory/2026-05-13.md",
+      "startLine": 69,
+      "endLine": 72,
+      "source": "memory",
+      "snippet": "- Latest preserved user-facing task: `/review` in implementation repo `/Users/lihongjun/aizhetech/SupplyCores`; default behavior is review only, not code changes, unless Spencer explicitly asks to fix. - Recent completed review conclusion already sent to chat for uncommitted SupplyCores work: 1 `critical` + 2 `major`; recommendation was do not merge yet. - Critical finding to preserve exactly: EF model mismatch for Wave 45 entities. `LeaseContract` / `EquipmentEntry` / `LeaseBilling` / `EquipmentExit` have migration/table work but no `DbSet<>` in `modules/nova.supplycores/src/Nova.SupplyCores.EntityFrameworkCore/SupplyCoresDbContext.cs:167-186` and no `builder.Entity<...>` mapping in `module",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-14T04:46:27.715Z",
+      "lastRecalledAt": "2026-05-14T05:10:43.653Z",
+      "queryHashes": [
+        "c8ecf4cafd7d",
+        "f93420601cba"
+      ],
+      "recallDays": [
+        "2026-05-14"
+      ],
+      "conceptTags": [
+        "user-facing",
+        "migration/table",
+        "167-186",
+        "builder.entity",
+        "latest",
+        "preserved",
+        "facing",
+        "task"
+      ]
+    },
+    "memory:memory/2026-05-02.md:14:15": {
+      "key": "memory:memory/2026-05-02.md:14:15",
+      "path": "memory/2026-05-02.md",
+      "startLine": 14,
+      "endLine": 15,
+      "source": "memory",
+      "snippet": "- 2026-05-02 Spencer 提醒：`../SupplyCores` 已创建程序框架，依据 `../Catio/docs/Nova_Architecture_独立可插拔模块架构_v1.0_20260502.md`（Satellite Module Pattern）搭建。已确认当前结构为 ABP + Nova Platform 的独立可插拔模块框架：`src/SupplyCores.Web` 与 `src/SupplyCores.DbMigrator` 是薄主机/迁移脚手架，核心业务资产在 `modules/nova.supplycores/`；本地通过 `Directory.Build.props` 自动检测并引用并列 `../Catio`，CI/生产应切到 NuGet 包。后续开发原则：业务代码放模块内，`src/` 只做主机配置；数据库独立，业务表显式 schema；前端按 `modules/nova.supplycores/frontend` 的 Vite/React 模式推进；注意当前 `SupplyCores` 工作区存在一批未提交的重命名/迁移改动，后续不得覆盖。",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-14T04:46:27.715Z",
+      "lastRecalledAt": "2026-05-14T05:10:43.653Z",
+      "queryHashes": [
+        "c8ecf4cafd7d",
+        "f93420601cba"
+      ],
+      "recallDays": [
+        "2026-05-14"
+      ],
+      "conceptTags": [
+        "src/supplycores.web",
+        "src/supplycores.dbmigrator",
+        "是薄主机/迁移脚手架",
+        "modules/nova.supplycores",
+        "directory.build.props",
+        "ci/生产应切到",
+        "vite/react",
+        "工作区存在一批未提交的重命名/迁移改动"
+      ]
+    },
+    "memory:memory/2026-05-13.md:37:46": {
+      "key": "memory:memory/2026-05-13.md:37:46",
+      "path": "memory/2026-05-13.md",
+      "startLine": 37,
+      "endLine": 46,
+      "source": "memory",
+      "snippet": "- Important process preference from today: when reviewing in active multi-track work, avoid mixing uncommitted changes from other tracks; state the exact commit reviewed and exclusions clearly. ## 2026-05-13 16:26 Pre-compaction flush - Current task: Spencer asked “你直接修复吧” after Codex review context around SupplyCores Sprint 5a / T-08 BidResponse + T-09 EvaluationResult fixes. - Work in progress in `/Users/lihongjun/aizhetech/SupplyCores` (not yet verified after edits): - Added XML doc summaries for T-08 DTOs in `modules/nova.supplycores/src/Nova.SupplyCores.Application.Contracts/BidResponses/BidResponseDto.cs` and `CreateBidResponseDto.cs`. - Updated `modules/nova.supplycores/src/Nova",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-14T04:46:27.715Z",
+      "lastRecalledAt": "2026-05-14T05:10:43.653Z",
+      "queryHashes": [
+        "c8ecf4cafd7d",
+        "f93420601cba"
+      ],
+      "recallDays": [
+        "2026-05-14"
+      ],
+      "conceptTags": [
+        "multi-track",
+        "pre-compaction",
+        "t-08",
+        "t-09",
+        "createbidresponsedto.cs",
+        "important",
+        "process",
+        "preference"
+      ]
+    },
+    "memory:memory/2026-05-13.md:53:61": {
+      "key": "memory:memory/2026-05-13.md:53:61",
+      "path": "memory/2026-05-13.md",
+      "startLine": 53,
+      "endLine": 61,
+      "source": "memory",
+      "snippet": "- Review scope called out in the compacted context: Sprint 6b/Wave 45-49 style additions around C-07 `PaymentPlan`, E-09 `LeaseContract`, E-10 `EquipmentEntry`, E-11 `LeaseBilling`, E-12 `EquipmentExit`, and the linkage in `ContractPaymentNodeAppService`. - Important exact state from prior review attempt: - Repo path: `/Users/lihongjun/aizhetech/SupplyCores`. - HEAD at that time: `38e6be7 (HEAD -> main, origin/main, origin/HEAD) Sprint 6b Day 5: E-03 Manufacturer + E-04 InstallationLocation 设备字典扩展（Wave 43/44）`. - Modified tracked files included `modules/nova.supplycores/src/Nova.SupplyCores.Application/ContractPaymentNodes/ContractPaymentNodeAppService.cs`, EF DbContext/model snapshot",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-14T04:46:27.715Z",
+      "lastRecalledAt": "2026-05-14T05:10:43.653Z",
+      "queryHashes": [
+        "c8ecf4cafd7d",
+        "f93420601cba"
+      ],
+      "recallDays": [
+        "2026-05-14"
+      ],
+      "conceptTags": [
+        "6b/wave",
+        "45-49",
+        "c-07",
+        "e-09",
+        "e-10",
+        "e-11",
+        "e-12",
+        "origin/main"
       ]
     }
   }
