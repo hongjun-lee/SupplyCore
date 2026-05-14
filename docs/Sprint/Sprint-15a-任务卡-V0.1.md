@@ -72,24 +72,20 @@
 
 ## 二、累计技术债（Sprint 15a 必修，决策点 2）
 
-### 2.1 Sprint 14a 决策点顺延（已识别）
-
-> 占位待 Sprint 14a Codex 评审 finding 累计补充。
+### 2.1 Sprint 14a 后续技术债（待评审）
 
 | # | 项 | 复杂度 | 工时 |
 |---|---|---|---|
-| 1 | _占位_ — Sprint 14a Codex 评审 P2 顺延（待评审）| - | - |
-| 2 | _占位_ — Sprint 14a A 主线一期未覆盖 NC 异常场景压测（如断网 / 5XX / 慢响应）| 中 | 0.5-1 PD |
-| 3 | _占位_ — 接口监控 dashboard cross-org 视图 scope（一期监控视图未应用 RBAC OrgId 过滤）| 中 | 0.5 PD |
-| 4 | _占位_ — Wave 84 升级前 PG session timezone NOTICE（参考 Wave 81 模式）| 低 | 0.3 PD |
+| 1 | NC 异常场景压测（断网 / 5XX / 慢响应 / NC 厂商 SLA 边界）| 中 | 0.5-1 PD |
+| 2 | 接口监控 dashboard cross-org 视图 scope（一期监控视图未应用 RBAC OrgId 过滤）| 中 | 0.5 PD |
+| 3 | Wave 84 升级前 PG session timezone NOTICE（参考 Wave 81 模式）| 低 | 0.3 PD |
+| 4 | NcInterfaceHttpClient 真 HTTP 实现 + Polly retry（Sprint 14a 仅落 Mock）| 中 | 1-1.5 PD |
 
-### 2.2 Codex 14a 顺延 P2（待评审后补 §七 附录）
+### 2.2 Codex 14a P2 顺延
 
-> 占位 — Codex 14a 三波评审完成后从顺延清单挑出 P2-低复杂度补到本节。
+> **无顺延** — Sprint 14a Codex 评审 3 P1 + 7 P2 全部在当 Sprint 修复（commit `225ff71`）。详 §六。
 
-**当前已知占位**：3 commits（`4b867c3` Day 1-2 第一波 + `9169816` Day 2-3 第二波 + Day 3 第三波待 commit）等 Codex 评审。
-
-**预估合计 ~2-4 PD**（占位等评审后修订）
+**合计 ~2-3 PD**（仅 Sprint 14a 后续 4 项 + Codex 14a 零顺延）
 
 ---
 
@@ -118,25 +114,50 @@
 
 ---
 
-## 五、Codex 14a 评审待触发
+## 五、Codex 14a 评审已完成
 
-> 占位 — Sprint 14a 完成时（D8 后）触发 Codex 14a 评审 3 commits（`4b867c3` Day 1-2 第一波 + `9169816` Day 2-3 第二波 + Day 3 第三波）
-
-**评审重点（建议提示词）**：
-- A 主线 NC 接口框架（F-01 状态机幂等键 / 重试 backoff / F-08 异常台账 / NcInterfaceMockClient stub 安全性）
-- C 决策点顺延（NCalc 沙箱 + 白名单 / RBAC role resolver / R-09 SMTP fail-safe）
-- D7 dashboard 视图（SuccessRate 边界值 / 时间窗默认值 / 分页防 SQL injection）
+Codex 14a 评审 3 commits 完成（commits `4b867c3` / `9169816` / `3d38611`）：
+- **3 P1 全修**（commit `225ff71`）：NC client DI 注册 / 8 Contributor payload+retry / RBAC 复合角色+starter 节点
+- **7 P2 全修**（commit `225ff71`）：TopOrgs scope / SystemConfigTool fallback / my-pending RBAC / 幂等键 payload 验证 / CHK-004 target / CHK-001 daily window / Dashboard OpenException
+- **0 顺延 Sprint 15a**（全部当 Sprint 修复落地）
 
 ---
 
-## 六、Codex 14a Finding 附录（占位 — 待评审后补）
+## 六、Codex 14a Finding 附录（完成 3/3 — 2026-05-14）
+
+### 6.1 整体统计
 
 | Sprint 14a Day | Commits | 已评 | finding 数 |
 |---|---|---|---|
-| Day 1-2 三轨第一波 | `4b867c3` | _待评_ | - |
-| Day 2-3 三轨第二波 | `9169816` | _待评_ | - |
-| Day 3 三轨第三波 + D7 + Demo | _待 commit_ | _待评_ | - |
-| **合计** | 3 | **0** | _待评_ |
+| Day 1-2 三轨第一波（NC 框架 + Codex 13a + CostEstimate + R-09） | `4b867c3` | 1 | 2 (0 P1 + 2 P2) |
+| Day 2-3 三轨第二波（D2 Manager + MD + NCalc + RBAC） | `9169816` | 1 | 7 (2 P1 + 5 P2 — 去重) |
+| Day 3 三轨第三波（BIZ × 4 + CHK × 2 + Dashboard） | `3d38611` | 1 | 3 (1 P1 + 3 P2) |
+| **合计** | 3 | **3** | **3 P1 / 7 P2（全修）/ 0 顺延** |
+
+### 6.2 P1 finding（3 个去重 · 全修 commit `225ff71`）
+
+| # | Commit | 文件 | 标题 | 修复 |
+|---|---|---|---|---|
+| P1-1 | `9169816` | `NovaSupplyCoresApplicationModule.cs` + `NcInterfaceMockClient.cs` | NC client 未 DI 注册，UseMock=true 时所有 task 启动崩 | Module.ConfigureServices 加 NcInterface:UseMock 注册 MockClient |
+| P1-2 | `9169816` + `3d38611` | 6 个 push Contributor（MD-001/BIZ-001/005/014/020/CHK-001） | InvokeAsync 传 `new {}` 而非 F-02 真 payload + NC 抛异常时 task 卡 InProgress 不 retry | ContributorPayloadHelper.ResolvePayloadAsync + try/catch MarkFailedOrRetryAsync + rethrow |
+| P1-3 | `9169816` | `ApprovalInstanceManager.cs` | RBAC starter 节点（"业务发起"）拒真审批人 + 复合角色（"LEGAL+SAFETY"）整串匹配 | starter 节点透传 + 复合角色 `+` 拆分匹配 |
+
+### 6.3 P2 finding（7 个 · 全修 commit `225ff71`）
+
+| # | Commit | 文件 | 标题 |
+|---|---|---|---|
+| P2-1 | `4b867c3` | `AiTokenDashboardAppService.cs` | TopOrgs input.OrgId 信任绕过 caller claim |
+| P2-2 | `4b867c3` | `GetSystemConfigTool.cs` | LLM cost fallback 0m vs aggregator 0.001/0.002 不一致 |
+| P2-3 | `9169816` | `ApprovalAppService.cs` | my-pending 未按 caller 角色过滤（暴露他人待办） |
+| P2-4 | `9169816` | `InterfaceTaskManager.cs` | 幂等键命中时未验证 payload（同 key 不同 payload 静默接受错误 task） |
+| P2-5 | `3d38611` | `Chk004InterfaceStatusQueryContributor.cs` | 查询永远查自己 wrapper，不是真正请求的 target task |
+| P2-6 | `3d38611` | `Chk001DailyReconciliationContributor.cs` | 用 UtcNow.Date 而非 task.BusinessId 解析日 → 跨午夜对账周期错位 |
+| P2-7 | `3d38611` | `InterfaceMonitorAppService.cs` | GetExceptionList 不过滤 IsResolved（应默认仅未解决） |
+
+### 6.4 修复落地
+
+- **commit `225ff71`** — 三轨并行：a NC DI + RBAC / b 8 Contributor payload + retry / c 7 P2 finding
+- 基线 1472 → 1484（+12 守护测试，3 P1 + 7 P2 全部 0 顺延）
 
 ---
 
