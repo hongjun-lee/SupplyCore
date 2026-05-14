@@ -12,15 +12,21 @@
 
 ### 主线 A2：NC 真端点联调 phase 2（Sprint 18a 顺延）
 
-| Task | 范围 | 工时 | 依赖 NC 端 |
-|---|---|---|---|
-| 18b-A2-1 | NC 端配合度评估完成确认（18a A1 评估清单 7 项追踪） | 0.5 PD | **强** |
-| 18b-A2-2 | OAuth2 token endpoint 真接通 + 业务码字典升级 | 1 PD | **强** |
-| 18b-A2-3 | 23 NC 接口 phase 1 实测（MD-001/004 + 4 BIZ + 5 CHK） | 2 PD | **强** |
-| 18b-A2-4 | BIZ-005A 单接口灰度上线 + Health Snapshot 真值验证 | 0.5 PD | **强** |
-| 18b-A2-5 | Codex 18a 4 P3 finding 修复（索引 / catch / LastModif / ValueKind 守卫） | 1 PD | 无 |
+| Task | 范围 | 工时 | 依赖 NC 端 | 实际状态 |
+|---|---|---|---|---|
+| 18b-A2-1 | NC 端配合度评估完成确认（18a A1 评估清单 7 项追踪） | 0.5 PD | **强** | **顺延 19a**（NC 暂无法反馈）|
+| 18b-A2-1' | **替代** — 单边生成 23 接口 JSON schema 占位稿（基于详设 08 + Sprint 17a Mock） | 1 PD | 无 | Day 1 进行中（子代理 b） |
+| 18b-A2-2 | OAuth2 token endpoint 真接通 + 业务码字典升级 | 1 PD | **强** | **顺延 19a** |
+| 18b-A2-3 | 23 NC 接口 phase 1 实测（MD-001/004 + 4 BIZ + 5 CHK） | 2 PD | **强** | **顺延 19a** |
+| 18b-A2-4 | BIZ-005A 单接口灰度上线 + Health Snapshot 真值验证 | 0.5 PD | **强** | **顺延 19a** |
+| 18b-A2-5 | Codex 18a 4 P3 finding 修复（索引 / catch / LastModif / ValueKind 守卫） | 1 PD | 无 | ✅ 已完成（commit `f4378ab`）|
 
-**预算**：~5 PD（A2-1 至 A2-4 强依赖 NC 端，A2-5 可独立做）
+**预算**：原 5 PD（A2-1~A2-4 强依赖 NC 端） → **实际 18b 落地 ~2.3 PD**（A2-1' + A2-5），其余 ~4 PD 顺延 Sprint 19a
+
+### 范围调整说明（cici 2026-05-14 决策）
+
+NC 端暂时无法反馈 Sprint 18a A1 配合度评估清单 — cici 决定 18b Day 1 改做 A2-1'（单边出 JSON schema 占位稿），等 NC 端反馈后 Sprint 19a 推进 A2-2 至 A2-4 实测对接。
+A2-1' 占位稿基于详设 08 §5 接口列表 + Sprint 17a Mock Contributor 现有 payload 模式 + Sprint 18a chaos 5 + phase 2 5 = 10 边界场景守护参考。
 
 ### 候选 B：详设 10 剩 12 类审批模板（顺延候选）
 
@@ -132,3 +138,4 @@ Codex 18a 评审 2 代码 commits（`9b57f08` A3 / `641ff0e` A4+A5）共 **0 P1 
 |---|---|---|
 | V0.1 | 2026-05-14 | 初版草案 — A2 NC 真端点 phase 2（V0.1 倾向）+ 6 累计技术债（含 Codex 18a 4 P3）+ 6 决策点 + 连续 7 Sprint 0 顺延 P2 记录 |
 | **V0.2** | **2026-05-14** | **cici 评审锁版主线 A2 NC 真端点 phase 2；全修 6 累计技术债（A2-5 吸收 Codex 18a 4 P3）；7-8 PD 预算；主+2 子代理 sweet spot 3.8x；A2-5 独立可做 Day 1 优先 / A2-1~4 等 NC 端反馈 19a 顺延** |
+| V0.2.1 | 2026-05-14 | NC 端暂无法反馈 → §一 加 A2-1' 替代项（单边出 23 接口 JSON schema 占位稿）；A2-1/A2-2/A2-3/A2-4 标 "顺延 19a"；A2-5 标 "已完成 commit `f4378ab`"；实际 18b 落地 ~2.3 PD（原预算 7-8 PD）|
