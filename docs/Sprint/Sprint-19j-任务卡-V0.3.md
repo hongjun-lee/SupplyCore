@@ -1,10 +1,10 @@
-# Sprint 19j 任务卡 V0.2（锁版 + A2' 9 次顺延正式撤架历史性决策）
+# Sprint 19j 任务卡 V0.3（锁版 + A2' 撤架 + Codex 19j 评审 P2 当 Sprint 修留痕）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（锁版 · cici 2026-05-15 AskUserQuestion 必决策"路径 B 正式撤架 + 6 endpoint" — A2' 9 次顺延 5 月历史性决策）
+**版本：** V0.3（锁版 + Codex 19j 评审 · cici 2026-05-15 触发 Codex 19j 评审完成 — A 级 0 P1 + 3 P2 (0.6 PD) + 3 P3 顺延 19k）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19j 锁版任务卡 + A2' 撤架决策留痕
-**配套：** [`Sprint-19i-Demo-脚本-V0.1.md`](./Sprint-19i-Demo-脚本-V0.1.md) §四 候选范围 + 19d V0.2 §一 A2' 5 步重启路径（17a-19i 资产保留声明）
+**文档性质：** 实施层 · Sprint 19j 锁版任务卡 + A2' 撤架决策留痕 + Codex 19j 评审 P2 全修留痕
+**配套：** [`Sprint-19i-Demo-脚本-V0.1.md`](./Sprint-19i-Demo-脚本-V0.1.md) §四 候选范围 + 19d V0.2 §一 A2' 5 步重启路径
 
 ---
 
@@ -167,12 +167,39 @@
 | 19i | V0.2 cici AskUserQuestion 必决策"路径 2 缩范围"（A2' 顺延 19j 评估）| 5 月累计无反馈 |
 | **19j** | **V0.2 cici AskUserQuestion 必决策"路径 B 正式撤架"** | **NC 端 5 月无反馈 — 不可接受继续顺延** |
 
-### 6.2 cici 撤架理由
+### 6.2 cici 撤架理由（Codex 19j P2-1 修 — 补量化指标）
 
-- ✅ NC 端 5 月持续无反馈 — 单向沟通无法支撑技术接通
-- ✅ Codex 17a-19h 多 Sprint 评估"反模式深化"+"产品 ROI 偏低"+ 终局评估指标
-- ✅ 业务方协调路径需 cici 与 PO 明确（17a-19i 单 cici 推动失败 5 月）
-- ✅ 现实路径：6 endpoint 业务方协调 mock → real 更接近交付（业务方多个 vs NC 单点）
+- ✅ **NC 端 5 月持续无反馈** — 单向沟通无法支撑技术接通
+  - 量化：17a-19i 9 次顺延 / 5 月 / 累计推动 9 次 NC 端对接尝试 0 反馈
+- ✅ **Codex 17a-19h 多 Sprint 评估**"反模式深化"+"产品 ROI 偏低"+ 终局评估指标
+  - 量化：年化继续顺延成本 — 假设每 Sprint 0.1 PD 重新评估 + 占位稿维护 → 4-6 Sprint × 0.1 = 0.4-0.6 PD/年；撤架损失 = 0（资产 100% 保留 §七）
+- ✅ **业务方协调路径需 cici 与 PO 明确**（17a-19i 单 cici 推动失败 5 月）
+  - 量化：5 月 0 业务方介入 vs 6 endpoint 6 业务方协调点（财务/质保/设备/仓储/SQA + 1 PO）— 协调界面比 1 v 1 NC 厂商更具系统性
+- ✅ **现实路径**：6 endpoint 业务方协调 mock → real 更接近交付（业务方多个 vs NC 单点）
+  - 量化：6 endpoint mock → real 预估 0.5-1.5 PD/endpoint（详 §六.4）vs A2' 重启 4 PD + NC 反馈不确定性
+
+### 6.4 6 endpoint mock → real 改动范围分级（Codex 19j P2-2 修 — 业务方反馈后改动预期）
+
+按业务方反馈差距 3 个 level：
+
+| Level | 改动范围 | 预估 / endpoint | 总 19k 工作量 |
+|---|---|---|---|
+| **L1 最优**（业务方反馈 = 19j DTO 字段 + 命名一致）| 仅替 AppService `BuildMock*` return → `_repository.GetListAsync(...)` | 0.3-0.5 PD | 1.5-3 PD |
+| **L2 中等**（业务方反馈缺/改字段名 1-3 个）| AppService Mock 替 + DTO 加/删字段 + frontend binding 微调 | 0.5-1 PD | 3-6 PD |
+| **L3 最坏**（业务方 spec 与 19j 反推差异大 ≥ 5 字段）| DTO 重构 + AppService 改 + frontend binding 改 + E2E spec 改 | 1-1.5 PD | 6-9 PD |
+
+**19j 设计目标**：争取 L1（19j DTO 已按 19f React mock 完整反推 + 110+ [⚠️ 业务方 spec 确认] 标记完整）
+
+### 6.5 5 步重启路径前置条件（Codex 19j P2-1 修 — fallback 方案）
+
+**NC 反馈到位启动条件**（V0.3 量化）：
+- 必反馈 ≥ 5 项关键差异（详 18b NC 接口 JSON-Schema 占位稿 V0.1 — 60 ⚠️ 中 cici 与 PO 共选 5 项必反馈）
+- 项目级正式协调会议机制建立（财务方业务负责人 + NCC 厂商客户经理）
+- 反馈周期不超过 5 个 Sprint（约 2.5 月）
+
+**Fallback 方案**（NC 端反馈 < 5 项关键差异时）：
+- A2'-PAUSE：保留 8 项资产 + 占位稿不维护更新（避免持续投入）
+- 评估替代方案：F-01 NC 接口转手动凭证录入（业务方介入）/ 第三方 NC API gateway 服务（购买）
 
 ### 6.3 撤架范围
 
@@ -216,23 +243,60 @@ A2' 撤架不丢失任何代码资产 — 续 Sprint NC 反馈到位时快速重
 
 ---
 
-## 六、Codex 19i Finding 附录（占位 · 待评审完成补全）
+## 九、Codex 19j Finding 附录（评审完成 · 3 P2 当 Sprint 修 + A2' 撤架风险评估 + 双子代理 0 race 第 6 次反向验证）
 
-> 占位 — Codex 19i 评审完成后从顺延清单挑选补到本节。
+cici 2026-05-15 触发 Codex 风评审子代理（read-only 评 4 commits — code 2 + docs 2）— **A 级 0 P1 评审**：
 
-**评审重点候选**（详 19i Demo §五）：
-- Codex pre-merge hook 设计正确性
-- RbacTestUserDataSeedContributor + login helper + rbac.spec.ts 场景 2 真验证
-- CI workflow artifact upload 覆盖度
-- **双子代理 0 race 连续 2 Sprint 稳定性反向验证**
+| 等级 | # | Finding | 涉及文件 | 工作量 | 状态 |
+|---|---|---|---|---|---|
+| **P2** | **1** | A2' 撤架理由 4 项缺量化指标 + 5 步重启路径前置条件 | 19j-任务卡-V0.3.md §六.2/§六.5 | 0.2 PD | ✅ **当 Sprint 修**（V0.3 §六.2 量化 + §六.5 fallback）|
+| **P2** | **2** | 6 endpoint Mock SeedData 来源 / Entity 依赖 / 19k 改动预期 xmldoc 缺失 | 6 AppService 类 xmldoc + 19j V0.3 §六.4 | 0.3 PD | ✅ **当 Sprint 修**（V0.3 §六.4 L1/L2/L3 分级 + 6 AppService 类 xmldoc 引用）|
+| **P2** | **3** | Codex pre-merge hook OpenAI quota 耗尽预案缺失 | docs/internal/codex_review_hook.md V1.1 → V1.2 | 0.1 PD | ✅ **当 Sprint 修**（V1.2 §4.2.3 quota 预案 + §6.2.4 升版条件）|
+| P3 | 1 | 19k V0.1 双路径 A/B 触发阈值不清晰 | 19k 任务卡 V0.1 | 0.05 PD | 顺延 19k V0.2 锁版时补 |
+| P3 | 2 | 6 endpoint Permission 与业务方岗位权限分层一致性 | 19k 业务方协调会议 agenda | 0 PD | 顺延 19k 业务方协调时 |
+| P3 | 3 | 3 secrets 验证 checklist 模板化（.github/workflows/secrets-check.yml）| 19k 优化 | 0.2 PD | 顺延 19k |
 
-**触发提示词**：详 19i Demo §五
+**修复 commit**：`<待 commit>` "fix(supplycores): Sprint 19j Codex 评审 P2 当 Sprint 全修（3 项 0.6 PD）"
+
+**A2' 撤架风险评估**（Codex 19j 评审）：
+| 维度 | 评估 | 风险 |
+|---|---|---|
+| 撤架决策完整性 | ✅ 4 项理由 + 8 项资产保留 + 5 步重启路径 | 🟢 低 |
+| 资产保留有效性 | ✅ OAuth2/Polly/chaos + 21 Contributor + 占位稿 + Monitor + memory 全保留 | 🟢 低 |
+| 5 步重启路径可执行性 | ⚠️ cici 与 NC 端对接人确认是关键（V0.3 §六.5 fallback 已补）| 🟡 中 |
+| NC 反馈到位启动条件 | ⚠️ "反馈 ≥ 5 项关键差异"V0.3 §六.5 已量化 | 🟡 中 |
+| 续 Sprint 重启成本 | ✅ 2-3 PD 评估合理（基础设施就绪 + 仅新接 endpoint）| 🟢 低 |
+
+**总体风险：中**（撤架本身严谨 + 续 Sprint 重启依赖 cici-NC 沟通质量）
+
+**双子代理 0 race 第 6 次反向验证**（Codex 19j 评审）：
+
+| Sprint | 子代理 | commit | race | 任务边界 |
+|---|---|---|---|---|
+| 19h | b/c | a07120b + 3c8f6a5 | 0 race × 2 | 天然分离 |
+| 19i | b/c | 7fa526c + 296f716 | 0 race × 2 | 天然分离 |
+| 19j | b/c | 8b6738a + 2cbacba | 0 race × 2 | 天然分离 |
+
+**累计 6 commits 全 0 race / 0 误纳** — 治理升级稳定有效
+
+**Codex 升级建议**：
+- 续 Sprint 任务边界天然分离仍是关键因素（19h-19j 实测）
+- **当双子代理改同模块（如同改 Application/）时验证条件未达** — 续 Sprint 评估"同源文件锁定约束"必要性
+- **建议 19k 起评估** [P0] 强制 → [P1] 高优先级降级（6 Sprint 0 race 历史足够说服力）
+
+**Codex 0 顺延 P2 连续记录调整**：
+- 12a-19i 16 Sprint（13 完整 + 2 闭环 + 1 部分顺延 19h→19i 闭环）
+- **19j**: 3 P2 全当 Sprint 修（V0.3 §六.2/§六.4/§六.5 + 6 AppService xmldoc + codex_review_hook V1.2）
+- **累计 17 Sprint 中 14 Sprint 完整 0 P2 顺延 / 2 闭环 / 0 部分顺延（19j 0 P2 顺延）**
+
+新表述："**0 关键 P2 顺延 14 Sprint + 19b vendor 闭环 + 19g/19h 强绑定闭环（19h 自闭环）+ 19j A 级评审 P2 全修**"
 
 ---
 
-## 九、版本沿革
+## 十、版本沿革
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — A2' 9 次顺延红线 cici 必决策（重启 / 撤架 / 继续顺延极高风险）+ 3 路径方案（A NC 反馈 / B 撤架转 6 endpoint / C 撤架转 UI-3）+ 23 累计技术债 + cici 19j 启动前 3 决策点 |
-| **V0.2** | **2026-05-15** | **cici AskUserQuestion 必决策"路径 B 正式撤架 A2' + 6 endpoint"** — A2' 9 次顺延 5 月历史性决策；主轨 6 endpoint 归属 2.5-3 PD + 副轨 CI/CD secrets + Codex hook 实测 0.8 PD + A2' 撤架文档化 0.5 PD = **3.8-4.3 PD**；§六 A2' 撤架决策记录（顺延历史 9 次 / cici 撤架理由 4 项 / 撤架范围）+ §七 17a-19i 资产保留清单（8 项资产无丢失）+ §八 撤后续重启 5 步路径 |
+| V0.2 | 2026-05-15 | cici AskUserQuestion 必决策"路径 B 正式撤架 A2' + 6 endpoint" — A2' 9 次顺延 5 月历史性决策；主轨 6 endpoint 归属 + 副轨 CI/CD secrets + A2' 撤架文档化 3.8-4.3 PD；§六 A2' 撤架决策记录 + §七 17a-19i 资产保留清单 + §八 撤后续重启 5 步路径 |
+| **V0.3** | **2026-05-15** | **Codex 19j 评审完成 A 级 + 3 P2 当 Sprint 全修** — §六.2 cici 撤架理由量化指标 + §六.4 6 endpoint mock → real L1/L2/L3 改动范围分级 + §六.5 5 步重启路径前置条件 + Fallback 方案；§九 Codex 19j Finding 附录（A 级 / 0 P1 + 3 P2 当 Sprint 修 / 3 P3 顺延 19k / A2' 撤架风险评估 / 双子代理 0 race 第 6 次反向验证 / 升级建议 [P0] → [P1]）；累计 P2 记录调整 — 17 Sprint 14 完整 + 2 闭环 |
