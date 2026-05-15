@@ -1,10 +1,10 @@
-# Sprint 19m 任务卡 V0.1（草案）
+# Sprint 19m 任务卡 V0.2（锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审 — 方案 B 基础资料补完已决策）
+**版本：** V0.2（锁版 · cici 2026-05-15 方案 B 决策直接接受 — 主轨基础资料补完 3 原型 + 副轨 E2E 扩展 + 旁路 19l Codex P3 消化 ~3 PD）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19m 起步草案
-**配套：** [`Sprint-19l-Demo-脚本-V0.1.md`](./Sprint-19l-Demo-脚本-V0.1.md) §四 候选范围 + cici 19l 期间方案 B 决策（基础资料 UI 补完）
+**文档性质：** 实施层 · Sprint 19m 锁版任务卡
+**配套：** [`Sprint-19l-任务卡-V0.3.md`](./Sprint-19l-任务卡-V0.3.md) §六 Codex 19l A 级评审 + [`Sprint-19l-Demo-脚本-V0.1.md`](./Sprint-19l-Demo-脚本-V0.1.md)
 
 ---
 
@@ -102,20 +102,21 @@ cici 19l 期间发现"基础资料 UI 缺口"询问 → AskUserQuestion 选**方
 
 ---
 
-## 四、V0.1 决策点（待 cici 评审）
+## 四、锁版决策（V0.2）
 
-| # | 决策点 | V0.1 倾向 |
+| # | 决策点 | V0.2 锁版结论 |
 |---|---|---|
-| 1 | Sprint 19m 主线方向 | **cici 方案 B 已决策** — 主轨基础资料补完 3 原型 + 副轨 E2E 扩展 + 旁路 Codex P3 消化 ~3 PD |
-| 2 | 30 累计技术债 | #29 基础资料主轨 + #30 E2E 副轨 + 旁路 Codex P3 + 19l Codex P3 |
-| 3 | 工时预算 | 主轨 1.5 + 副轨 1-1.5 + 旁路 0.5 + 缓冲 = **~3 PD** |
-| 4 | 子代理并行策略 | 主代理 a 协调 + 子代理 b 基础资料 3 原型 + 子代理 c E2E 扩展 19l 5 + 19m 3 spec |
-| 5 | Codex 19l 评审 | **待 cici 触发**（提示词详 19l Demo §五 — 重点 0 race 第 10 次 + race 治理 [P0] 保留 + 基础资料缺口决策）|
-| 6 | 6 业务方反馈状态 | **19m 启动前 cici 评估** — 仍未反馈 → 主轨基础资料 / ≥ 3 反馈 → 切路径 A 主轨 6 endpoint mock → real |
-| 7 | CI/CD secrets 自助配 | **cici 19m D0 自助** — 已配 → 副轨切 CI 真实运行验证 / 未配 → 副轨 E2E 扩展 |
-| 8 | 基础资料 3 原型业务范围 | base-archive（组织/仓库/货位）+ master-data-admin（物料分类/编码/BOM）+ tender-archive（招标静态档案） |
-| 9 | spawn 子代理 prompt 引用约束 | 必含 AGENTS.md V1.4 + spawn_template V1.1 §八/§九（19h-19l 10 commits 0 race 稳定）|
-| 10 | 任务边界设计原则 | spawn 前评估任务边界天然分离（19l 实测 0 文件交集）|
+| 1 | Sprint 19m 主线方向 | **方案 B 主轨基础资料补完 3 原型**（cici 2026-05-15 已决策）— 主轨 1.5 PD + 副轨 E2E 扩展 1-1.5 PD + 旁路 19l Codex P3 消化 0.3 PD = **~3 PD** |
+| 2 | 30 累计技术债 | **#29 基础资料主轨 + #30 E2E 副轨 + 19l P3-1/-2 旁路** |
+| 3 | 工时预算 | **基础资料 1.5 + E2E 8 spec 1-1.5 + 19l P3 0.3 + 缓冲 = 3-3.5 PD**（缩范围方便 cici 业务方协调时间）|
+| 4 | 子代理并行策略 | **主代理 a 协调 + V0.2 锁版 + 19l P3-1 i18n 完整性扫描 + 子代理 b 基础资料 3 原型（base-archive + master-data-admin + tender-archive）+ 子代理 c E2E 扩展 19l b 5 + 19m b 3 = 8 spec + 19l P3-2 path-trigger V0.2 §5 实测填充** sweet spot 2x |
+| 5 | Codex 19l 评审 | **已完成**（commit `c244193` V0.3 §六 A 级 0 P1+P2 + 18a 模式直接延续）|
+| 6 | 6 业务方反馈状态 | **未反馈 5/5** — 持续顺延 19n（cici 推动 + mock 数据继续支撑 Demo）|
+| 7 | CI/CD secrets 自助配 | **未配** — 持续顺延 19n；19m 不依赖 secrets 路径 |
+| 8 | 基础资料 3 原型业务范围 | **base-archive**（组织/仓库/货位/集团子公司 — 详设 02）+ **master-data-admin**（物料分类/编码/BOM — 详设 03）+ **tender-archive**（招标静态档案 — 详设 04 / 19l tender 业务流配套）|
+| 9 | spawn 子代理 prompt 引用约束 | **必含** AGENTS.md V1.4 + spawn_template V1.1 §八/§九（19h-19l 10 commits 0 race 稳定）|
+| 10 | 任务边界设计原则 | spawn 前评估任务边界天然分离（b src/pages 3 新基础资料 / c tests/e2e 8 spec + docs/internal — 0 文件交集）|
+| 11 | race 治理 [P0] 保留 + 同模块场景验证 | **保留 [P0] 续观察 19n+**（19m 仍边界分离 — 触发条件未达 / race-governance V0.1 §四 触发条件文档化）|
 
 ---
 
@@ -149,3 +150,4 @@ cici 19l 期间发现"基础资料 UI 缺口"询问 → AskUserQuestion 选**方
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — **cici 方案 B 主轨基础资料补完 3 原型** + 副轨 E2E 扩展 19l b 5 + 19m 3 spec + 旁路 19l Codex P3 + 30 累计技术债（19l 闭环 #28 + 新增 #29 #30）+ §六 Codex 19l Finding 附录占位 + cici 19m 启动前 3 决策点（业务方反馈 / secrets 配 / 基础资料范围）|
+| **V0.2** | **2026-05-15** | **cici 方案 B 决策直接接受锁版** — 主轨基础资料补完 3 原型（base-archive + master-data-admin + tender-archive）1.5 PD + 副轨 E2E 扩展 8 spec（19l b 5 + 19m b 3）1-1.5 PD + 旁路 19l Codex P3-1/-2 消化 0.3 PD = **3-3.5 PD**；§四 锁版决策 + 决策 6/7 业务方+secrets 顺延 19n + 决策 11 race 治理保留 [P0] |
