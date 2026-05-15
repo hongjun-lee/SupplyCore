@@ -1,9 +1,9 @@
-# Sprint 19k 任务卡 V0.2（锁版）
+# Sprint 19k 任务卡 V0.3（锁版 + Codex 19k 评审 P2 当 Sprint 修留痕）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（锁版 · cici 2026-05-15 AskUserQuestion 必决策"路径 B 缩范围 + UI-3 phase 3 主轨" — 19j 撤架决策当日 / 5 业务方未反馈 / cici 未配 secrets）
+**版本：** V0.3（锁版 + Codex 19k 评审 · cici 2026-05-15 触发 Codex 19k 评审完成 — A 级 0 P1 + 2 P2 / P2-2 当 Sprint 修 / P2-1 顺延 19l 业务方反馈触发 + 3 P3 顺延 19l）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19k 锁版任务卡
+**文档性质：** 实施层 · Sprint 19k 锁版任务卡 + Codex 19k 评审留痕
 **配套：** [`Sprint-19j-任务卡-V0.3.md`](./Sprint-19j-任务卡-V0.3.md) §九 Codex 19j 评审 P2 全修 + [`Sprint-19j-Demo-脚本-V0.1.md`](./Sprint-19j-Demo-脚本-V0.1.md)
 
 ---
@@ -161,9 +161,56 @@
 
 ---
 
-## 七、版本沿革
+## 七、Codex 19k Finding 附录（评审完成 · A 级 0 P1 + P2-2 当 Sprint 修 + 双子代理 0 race 第 8 次反向验证）
+
+cici 2026-05-15 触发 Codex 风评审子代理（read-only 评 4 commits — code 2 + docs 2）— **A 级 0 P1**：
+
+| 等级 | # | Finding | 涉及文件 | 工作量 | 状态 |
+|---|---|---|---|---|---|
+| **P2** | **1** | UI-3 phase 3 业务流选择 — material-issuance 优先级偏高（领料末端流程） | frontend src/pages/material-issuance + vite.config 等 | 0.3 PD | **顺延 19l 业务方反馈触发调整**（19k 已交付 27 files 返工成本高 / 业务方反馈强绑定）|
+| **P2** | **2** | i18n 双语 10 keys 标点不统一（半角 vs 全角括号混用）| zh-Hans.json 6 Menu keys | 0.1 PD | ✅ **当 Sprint 修**（zh-Hans 中文全角 / en 英文半角统一）|
+| P3 | 1 | path-trigger-thresholds.md V0.1 §5 实测 checklist 未验证 | path-trigger-thresholds.md §5.1/5.2 | 0.2 PD | 顺延 19l 主代理 a 实测 |
+| P3 | 2 | secrets-check.yml continue-on-error 冗余 + exit 0 含义不明 | .github/workflows/secrets-check.yml | 0.15 PD | 顺延 19l |
+| P3 | 3 | actionlint 修复日志缺工具链版本 + 文件统计 | codex_review_hook.md §6.5 | 0.05 PD | 顺延 19l |
+
+**修复 commit**：`<待 commit>` "fix(supplycores): Sprint 19k Codex 评审 P2-2 i18n 标点统一（当 Sprint 修 0.1 PD）"
+
+**Codex 0 顺延 P2 连续记录调整**：
+- 12a-19j 17 Sprint（14 完整 + 2 强绑定闭环 + 19i/19j 闭环）
+- **19k**: 1 P2 当 Sprint 修（P2-2 i18n 标点）+ 1 P2 强绑定顺延 19l（P2-1 material-issuance 业务方反馈触发调整 — 与 19l 6 endpoint mock → real 协调相关性强绑定）
+- **累计 19 Sprint 中 14 完整 + 3 强绑定闭环（19b vendor + 19g/19h CI + 19k 业务方反馈）+ 19i/19j 闭环 = 0 关键 P2 顺延维持**
+
+新表述："**0 关键 P2 顺延 14 Sprint + 19b vendor 闭环 + 19g/19h CI 强绑定 + 19i/19j 自闭环 + 19k P2-2 当 Sprint 修 + P2-1 业务方反馈强绑定顺延**"
+
+---
+
+## 八、双子代理 0 race 第 8 次稳定反向验证（Codex 19k 评审重点）
+
+**关键数据 8 commits 0 race**：
+
+| # | Sprint | 子代理 | commit | 教训 6 [P0] | 教训 7 [P0] | race |
+|---|---|---|---|---|---|---|
+| 1-2 | 19h | b/c | a07120b/3c8f6a5 | ✓ | ✓ | 0 |
+| 3-4 | 19i | b/c | 7fa526c/296f716 | ✓ | ✓ | 0 |
+| 5-6 | 19j | b/c | 8b6738a/2cbacba | ✓ | ✓ | 0 |
+| 7-8 | 19k | b/c | bb70f0e/181e43c | ✓ | ✓ | 0 |
+
+**反向验证结论（Codex 19k 评审）**：
+- **治理升级"有效但非因果链"**：8 commits 0 race 主要因任务边界天然分离（0 文件交集），非教训 6/7 [P0] 强制约束的直接因果
+- **[P0] → [P1] 降级条件未达**：续 Sprint 同模块场景（b/c 同改 Application）需要 ≥ 2 Sprint 0 race 实测才能验证 [P1] 强度足够
+- **保留 [P0] 强制约束**：续 Sprint 19l 同模块场景出现时再实测 [P1] 表现
+
+**升级触发条件演进**：
+- 19j Codex 升级建议 → 19k 反向评估"非因果链 + 任务边界分离掩盖效应"
+- 19k 决策：保持 [P0] 继续观察期
+- 19l+ 同模块场景实测后 ≥ 2 Sprint 0 race → 评估 [P0] → [P1] 降级
+
+---
+
+## 九、版本沿革
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — 双路径（业务方反馈到位 / 缩范围）+ 6 endpoint mock → real + CI 真实验证 + Codex hook 实测 + UI-3 phase 3 部分 + E2E 集成 + 25 累计技术债（19j 闭环 #1/#14/#16/#23 + 新增 #24/#25）+ §六 Codex 19j Finding 附录占位 + cici 19k 启动前 3 决策点 |
-| **V0.2** | **2026-05-15** | **cici AskUserQuestion 必决策"路径 B 缩范围 + UI-3 phase 3 主轨"** — 19j 撤架当日 / 5 业务方未反馈 / cici 未配 secrets；主轨 UI-3 phase 3 部分 5 原型 2-3 PD + 副轨 CI/Codex 入粒静态评估 0.3-0.5 PD + 旁路 19j P3 消化 0.5 PD = **3.3-4 PD**；§四 锁版决策 + 决策 6 业务方顺延 19l + 决策 11 race 治理升级降级评估（继续观察期）|
+| V0.2 | 2026-05-15 | cici AskUserQuestion 必决策"路径 B 缩范围 + UI-3 phase 3 主轨" — 19j 撤架当日 / 5 业务方未反馈 / cici 未配 secrets；主轨 UI-3 phase 3 部分 5 原型 2-3 PD + 副轨 CI/Codex 入粒静态评估 0.3-0.5 PD + 旁路 19j P3 消化 0.5 PD = 3.3-4 PD；§四 锁版决策 + 决策 6 业务方顺延 19l + 决策 11 race 治理升级降级评估（继续观察期）|
+| **V0.3** | **2026-05-15** | **Codex 19k 评审完成 A 级 + P2-2 当 Sprint 修 + P2-1 业务方反馈触发顺延 19l** — §七 Codex 19k Finding 附录（A 级 0 P1 / 2 P2：P2-2 i18n 标点当 Sprint 修 / P2-1 material-issuance 业务流优先级强绑定顺延 19l / 3 P3 顺延 19l）；§八 双子代理 0 race 第 8 次反向验证（治理升级"有效但非因果链" / 任务边界天然分离掩盖效应 / [P0] 保留续 Sprint 同模块场景实测）；累计 P2 记录调整 — 19 Sprint 14 完整 + 3 强绑定闭环 + 19i/19j 自闭环 + 19k 当 Sprint 修 + 强绑定顺延 |
