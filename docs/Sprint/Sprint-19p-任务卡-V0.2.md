@@ -1,10 +1,10 @@
-# Sprint 19p 任务卡 V0.1（草案）
+# Sprint 19p 任务卡 V0.2（锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（锁版 · cici 2026-05-15 /loop continue — 主轨 LOGIN-FIX 0.3-0.5 PD + 副轨 race-governance V0.4 line-level 方案设计 + Codex 评审历史汇总 ~1-1.5 PD）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19p 起步草案
-**配套：** [`Sprint-19o-Demo-脚本-V0.1.md`](./Sprint-19o-Demo-脚本-V0.1.md)
+**文档性质：** 实施层 · Sprint 19p 锁版任务卡
+**配套：** [`Sprint-19o-Demo-脚本-V0.1.md`](./Sprint-19o-Demo-脚本-V0.1.md) + [`Sprint-19o-任务卡-V0.3.md`](./Sprint-19o-任务卡-V0.3.md) §七 Codex 19o A 级评审
 
 ---
 
