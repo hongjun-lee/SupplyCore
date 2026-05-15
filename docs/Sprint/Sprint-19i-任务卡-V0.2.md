@@ -1,10 +1,10 @@
-# Sprint 19i 任务卡 V0.1（草案）
+# Sprint 19i 任务卡 V0.2（锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（锁版 · cici 2026-05-15 必决策"路径 2 缩范围"— 主轨 CI/CD 真实验证 + secrets + 副轨 RBAC 场景 2 接通 + 旁路 Codex pre-merge hook + 19h 顺延 P2-3/P3 / A2' + 6 endpoint 顺延 19j）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19i 起步草案
-**配套：** [`Sprint-19h-Demo-脚本-V0.1.md`](./Sprint-19h-Demo-脚本-V0.1.md) §四 候选范围 + 19h 收尾 race 治理升级 0 race 实测
+**文档性质：** 实施层 · Sprint 19i 锁版任务卡
+**配套：** [`Sprint-19h-任务卡-V0.3.md`](./Sprint-19h-任务卡-V0.3.md) §六 Codex 19h 评审 + §七 race 治理反向验证 + §八 A2' 8 次顺延评估 + [`Sprint-19h-Demo-脚本-V0.1.md`](./Sprint-19h-Demo-脚本-V0.1.md)
 
 ---
 
@@ -134,18 +134,20 @@
 
 ---
 
-## 四、V0.1 决策点（待 cici 评审）
+## 四、锁版决策（V0.2）
 
-| # | 决策点 | V0.1 倾向 |
+| # | 决策点 | V0.2 锁版结论 |
 |---|---|---|
-| 1 | Sprint 19i 主线方向 | **路径 1（NC 反馈到位）双轨 A2' + 6 endpoint** 或 **路径 2 双轨 CI/CD 真实验证 + RBAC 场景 2 + Codex hook**（cici 19i 启动前评估）|
-| 2 | 21 累计技术债 | 视 cici 路径选择：路径 1 = #1 #14 主线；路径 2 = #19 #20 #21 主线 |
-| 3 | 工时预算 | 路径 1：5-7 PD（饱和）；路径 2：2.3 PD（缩范围）|
-| 4 | 子代理并行策略 | 路径 1：a A2' 重启 + b 6 endpoint 协调 + c CI/CD secrets 兜底；路径 2：a CI/CD secrets + b RBAC 场景 2 + c Codex hook |
-| 5 | Codex 19h 评审 | **待 cici 触发**（提示词详 19h Demo §五 — 重点 race 治理升级反向验证）|
-| 6 | A2' 重启决策 | **19i 启动前 cici 评估 NC 端反馈窗口**（无反馈 8 次顺延 → 路径 2 缩范围；反馈到位 → 路径 1 饱和）|
-| 7 | 6 endpoint 业务方协调时机 | **19i 启动前 cici 通知 5 业务方对接人** — 协调到位则路径 1 副轨启动 |
+| 1 | Sprint 19i 主线方向 | **路径 2 缩范围**（cici 2026-05-15 AskUserQuestion 必决策 — NC 无反馈默认顺延 + 风险评估）— 主轨 CI/CD 真实验证 + secrets + 副轨 RBAC 场景 2 + 旁路 Codex pre-merge hook |
+| 2 | 21 累计技术债 | **#19 CI/CD secrets 主轨 + #20 RBAC 场景 2 副轨 + #21 Codex hook 旁路 + 19h 顺延 P2-3/P3-1/P3-2 一并** |
+| 3 | 工时预算 | **CI/CD 0.5 + RBAC 1.0 + Codex hook 0.8 + 19h 顺延 0.3 + 缓冲 = 2.6-3.0 PD** |
+| 4 | 子代理并行策略 | **主代理 a 协调 + V0.2 锁版 + 19h P3-2 + 子代理 b RBAC 场景 2（含 19h P3-1 3 App.tsx title testid）+ 子代理 c Codex pre-merge hook（含 19h P2-3 CI workflow e2e 日志 artifact）** sweet spot 2x |
+| 5 | Codex 19h 评审 | **已完成**（read-only 子代理 commit `460ed6a` P1+P2 4 当 Sprint 修 + `e4ab206` 19h V0.3 §六/§七/§八）|
+| 6 | A2' 重启决策 | **顺延 19j 重新评估** — NC 端无反馈 5 月 8 次顺延（cici 19j 启动前再评估 NC 反馈 / 业务方协调 / A2' vs UI-3 phase 3 优先级 PO 明确）|
+| 7 | 6 endpoint 业务方协调时机 | **顺延 19j** — cici 与 5 业务方协调时机不在 19i |
 | 8 | CI/CD secrets 配置时机 | **cici 19i D0 自助配 GitHub secrets**（PAT + DEVEXTREME LICENSE 0.1 PD）|
+| 9 | spawn 子代理 prompt 引用约束 | **必含** AGENTS.md V1.2 §多子代理协作约束 + subagent_spawn_template.md V1.1 §八/§九（19h 双子代理 0 race 治理升级实测验证有效）|
+| 10 | 任务边界设计原则（19h 新加）| spawn 双子代理时主代理 a 先评估"任务边界是否天然分离"，若否则考虑串行 spawn 或更明确的文件归属约束 |
 
 ---
 
@@ -180,3 +182,4 @@
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — 双路径（NC 反馈到位 / 缩范围）+ A2' 重启 + 6 endpoint + CI/CD 真实验证 + RBAC 场景 2 接通 + Codex pre-merge 评审 hook + 21 累计技术债（19h 闭环 #5/#15/#16/#17 + 新增 #19/#20/#21）+ §六 Codex 19h Finding 附录占位 + cici 19i 启动前 3 决策点（NC 反馈 / 业务方协调 / CI/CD secrets）|
+| **V0.2** | **2026-05-15** | **cici AskUserQuestion 必决策"路径 2 缩范围"** — NC 无反馈 5 月 8 次顺延 + Codex 19h §八 风险评估 → 主轨 CI/CD 真实验证 + secrets 0.5 PD + 副轨 RBAC 场景 2 接通 1 PD + 旁路 Codex pre-merge hook 0.8 PD + 19h 顺延 P2-3/P3 0.3 PD = **2.6-3.0 PD**；A2' + 6 endpoint 顺延 19j；§四 锁版决策 + 决策 9（spawn 子代理 prompt 必引 AGENTS.md V1.2 + spawn_template V1.1 §八/§九）+ 决策 10（任务边界天然分离 19h 新加原则）|
