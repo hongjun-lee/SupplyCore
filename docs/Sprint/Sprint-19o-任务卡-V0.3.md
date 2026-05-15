@@ -1,9 +1,9 @@
-# Sprint 19o 任务卡 V0.2（锁版）
+# Sprint 19o 任务卡 V0.3（锁版 + Codex 19o A 级评审 ★★★★★ + 19l/19m/19n/19o 18a 模式连续 4 Sprint）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（锁版 · cici 2026-05-15 选 1 = 场景 2 推荐 — cici 配 secrets + Full ABP OpenIddict 实施 + race [P0] 同模块实测真触发 ~2.5-2.7 PD）
+**版本：** V0.3（锁版 + Codex 19o 评审 · cici 2026-05-15 触发 Codex 19o 评审完成 — **A 级 / 0 P1+P2 / 18a 模式直接延续连续 4 Sprint** / 同事评审 ROI 初验 33% 节省 / race [P0] line-level 真实测仍不充分）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19o 锁版任务卡
+**文档性质：** 实施层 · Sprint 19o 锁版任务卡 + Codex 19o 评审留痕
 **配套**：
 - [`Sprint-19a-19n-Retrospective-V0.1.md`](./Sprint-19a-19n-Retrospective-V0.1.md) §五 4 必修红线
 - [`Roadmap-19o-19s-V0.1.md`](./Roadmap-19o-19s-V0.1.md) §二 4 轨道 + §三 3 场景
@@ -181,9 +181,60 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 
 ---
 
-## 七、版本沿革
+## 七、Codex 19o Finding 附录（评审完成 · A 级 / 0 P1+P2 / 18a 模式连续 4 Sprint）
+
+cici 2026-05-15 触发 Codex 19o 风评审（read-only 评 7 commits — code 4 + docs 3）— **A 级 / 0 P1 + 0 P2 / 类 19l/19m/19n 18a 模式直接延续**：
+
+### 7.1 5 维度评分
+
+| 维度 | 评分 | 说明 |
+|---|---|---|
+| Full ABP OpenIddict 完整性 | ★★★★★ | 框架 100% wire + 验收通过 + Login UI 顺延 19p（已知设计债 / 路径清晰）|
+| race [P0] 真验证 | ★★★☆☆ | file-level ✓ / line-level ✗ / 证据链未达 ≥ 3 |
+| 同事评审 ROI（外部视角介入）| ★★★★☆ | 1.8 PD vs avg 3.6 节省 33% / 续 19p LOGIN-FIX 反向验证 |
+| 文档治理 | ★★★★★ | AGENTS V1.5 + race-governance V0.3 + 接口清单 完整 |
+| 顺延管理 | ★★★★☆ | LOGIN-FIX 修路径清晰 / 19p 启动条件明确 |
+| **总体评分** | **A 级** | **0 P1+P2 + 18a 模式直接延续连续 4 Sprint（19l/19m/19n/19o）**|
+
+### 7.2 关键反思
+
+**race [P0] file-level vs line-level 反思**（19o 评审重点）：
+- 19o 首次 file-level 同改 SupplyCoresWebModule.cs ✓（c `90e9624` + b `b8b5d52` git auto-merge）
+- **但 line-level 物理错开掩盖**（c 注释 line 26-40 / b 类体 115-180）
+- 教训 6/7 [P0] 对"精确 add + fetch 核实"有效 — 但未验证 line-level 真冲突防御
+- **续 19p+ 建议**：故意设计 line-level 冲突验证（如 DependsOn 数组同时编辑）才能真验证治理升级通用防御力
+
+**同事评审 ROI 初验**：
+- 19f-19n avg 3.6 PD/Sprint vs 19o 1.8 PD（**节省 33%**）
+- 推论：同事评审"质量优先于推 Sprint"模式推动工时压缩 + 质量稳定
+- 反向验证：19p LOGIN-FIX 0.3-0.5 PD 若顺利则 ROI 成立
+
+**Full ABP OpenIddict 框架 vs Login UI 设计债**：
+- 框架 100% 完整（Migration 17K 行 / OIDC discovery / Identity LeptonX UI）
+- Login UI scheme check 顺延 19p（IAuthenticationSchemeProvider 空集 — 修路径清晰）
+- 设计债不影响框架交付评分
+
+### 7.3 Codex 0 顺延 P2 连续记录调整
+
+- 12a-19n 22 Sprint（17 完整 + 3 强绑定闭环 + 19i/19j 自闭环 + 19l/19m/19n 18a 模式延续 3 Sprint）
+- **19o**: 0 P1 + 0 P2 — A 级 — **19l/19m/19n 模式延续连续 4 Sprint**
+- **累计 23 Sprint 中 18 完整 + 3 强绑定闭环 + 19i/19j 自闭环 + 19l/19m/19n/19o 18a 模式延续连续 4 Sprint = 0 关键 P2 顺延维持**
+
+新表述："**0 关键 P2 顺延 18 Sprint + 19b/19g/19h 闭环 + 19i/19j 自闭环 + 19k 当 Sprint 修 + 19l/19m/19n/19o 18a A 级直接延续连续 4 Sprint**"
+
+### 7.4 续 19p 关键关注
+
+1. **LOGIN-FIX 优先级最高**（19o b 顺延 — D0 启动）
+2. **race line-level 故意冲突验证**（可选追加）
+3. **同事评审 ROI 反向验证**（LOGIN-FIX ≤ 0.5 PD 即成立）
+4. **业务方反馈机制建立**（财务 10 页 ROI 最高）
+
+---
+
+## 八、版本沿革
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — **基于 4 文档综合数据驱动**（Retrospective + Roadmap + 接口清单 + 同事评审 P0 修复）+ 3 场景（A 业务方反馈 / B cici secrets / C 双未）+ Full ABP OpenIddict 实施 plan + cici 19o 启动前 5 决策点 + 19n Codex P3 顺延 |
-| **V0.2** | **2026-05-15** | **cici 选 1 = 场景 2 锁版** — cici 配 secrets + Full ABP OpenIddict 实施 0.8-1 PD + race [P0] 同模块实测 0.5 PD（19h-19n 14 commits 0 race 后**首次真实同模块场景实测** — b/c 同改 SupplyCoresWebModule.cs）+ E2E smoke 0.3 PD + CI/CD secrets 验证 0.3 PD = **~2.5-2.7 PD**；§四 锁版决策 |
+| V0.2 | 2026-05-15 | cici 选 1 = 场景 2 锁版 — Full ABP OpenIddict 实施 0.8-1 PD + race [P0] 同模块实测 0.5 PD + E2E smoke 0.3 PD = ~2.5-2.7 PD |
+| **V0.3** | **2026-05-15** | **Codex 19o 评审完成 A 级 + 18a 模式连续 4 Sprint** — 实际 1.8 PD（节省 33% vs V0.2）+ Full ABP OpenIddict 100% wire（Login UI 顺延 19p）+ race [P0] file-level 同改成功（line-level 错开掩盖 / 证据链未达 ≥ 3）+ 同事评审 ROI 初验（avg 3.6 → 1.8 PD 节省 33%）；§七 Codex 19o Finding 附录（5 维度评分 + 关键反思 + Codex 0 顺延 P2 调整 23 Sprint + 续 19p 关注）|
