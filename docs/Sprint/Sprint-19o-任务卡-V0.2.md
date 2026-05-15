@@ -1,9 +1,9 @@
-# Sprint 19o 任务卡 V0.1（草案）
+# Sprint 19o 任务卡 V0.2（锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审 — **基于 4 文档综合数据驱动**）
+**版本：** V0.2（锁版 · cici 2026-05-15 选 1 = 场景 2 推荐 — cici 配 secrets + Full ABP OpenIddict 实施 + race [P0] 同模块实测真触发 ~2.5-2.7 PD）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19o 起步草案
+**文档性质：** 实施层 · Sprint 19o 锁版任务卡
 **配套**：
 - [`Sprint-19a-19n-Retrospective-V0.1.md`](./Sprint-19a-19n-Retrospective-V0.1.md) §五 4 必修红线
 - [`Roadmap-19o-19s-V0.1.md`](./Roadmap-19o-19s-V0.1.md) §二 4 轨道 + §三 3 场景
@@ -145,13 +145,13 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 
 ---
 
-## 四、V0.1 决策点（待 cici 评审）
+## 四、锁版决策（V0.2）
 
-| # | 决策点 | V0.1 倾向 |
+| # | 决策点 | V0.2 锁版结论 |
 |---|---|---|
-| 1 | Sprint 19o 主线方向 | **场景 2 推荐**（cici 配 secrets + Full Identity 实施）— 不强求业务方反馈即可推进 |
-| 2 | Full ABP OpenIddict 实施 | **19o 必修**（解锁登录 / E2E / cici 实际验收）|
-| 3 | 业务方反馈状态评估 | cici 19o D0 与 PO 协调机制建立 — 财务方 10 页 mock 最高 ROI |
+| 1 | Sprint 19o 主线方向 | **场景 2 锁版**（cici 选 1 — cici 配 secrets + Full ABP OpenIddict 实施 + race [P0] 同模块实测）~2.5-2.7 PD |
+| 2 | Full ABP OpenIddict 实施 | **19o 必修主轨**（解锁登录 + E2E + cici 实际验收）— 0.8-1 PD |
+| 3 | 业务方反馈状态评估 | cici D0 与 PO 协调（财务方 10 页 ROI 最高）— 19o 不阻塞主轨 |
 | 4 | CI/CD secrets 自助配 | cici 19o D0 自助 5 分钟 |
 | 5 | race [P0] 同模块实测 | 旁路（0.5 PD）+ 19o c 子代理执行 |
 | 6 | E2E smoke + 全跑 | Identity 实施后 0.3 PD（场景 2/3 必含）|
@@ -186,3 +186,4 @@ public override void ConfigureServices(ServiceConfigurationContext context)
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — **基于 4 文档综合数据驱动**（Retrospective + Roadmap + 接口清单 + 同事评审 P0 修复）+ 3 场景（A 业务方反馈 / B cici secrets / C 双未）+ Full ABP OpenIddict 实施 plan + cici 19o 启动前 5 决策点 + 19n Codex P3 顺延 |
+| **V0.2** | **2026-05-15** | **cici 选 1 = 场景 2 锁版** — cici 配 secrets + Full ABP OpenIddict 实施 0.8-1 PD + race [P0] 同模块实测 0.5 PD（19h-19n 14 commits 0 race 后**首次真实同模块场景实测** — b/c 同改 SupplyCoresWebModule.cs）+ E2E smoke 0.3 PD + CI/CD secrets 验证 0.3 PD = **~2.5-2.7 PD**；§四 锁版决策 |
