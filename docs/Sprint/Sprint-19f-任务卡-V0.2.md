@@ -1,16 +1,16 @@
-# Sprint 19f 任务卡 V0.1（草案）
+# Sprint 19f 任务卡 V0.2（锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（锁版 · cici 2026-05-15 同意推荐方案 A：双轨 UI-3 phase 2 + UI-FIX + STYLE-OPT 旁路）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19f 起步草案
+**文档性质：** 实施层 · Sprint 19f 锁版任务卡
 **配套：** [`Sprint-19e-Demo-脚本-V0.1.md`](./Sprint-19e-Demo-脚本-V0.1.md) §四 候选范围 + 19e 收尾 Codex 19d/19e 评审修复
 
 ---
 
-## 一、Sprint 19f 候选方向（待 cici V0.1 锁版决策点 1）
+## 一、Sprint 19f 主线方向（锁版 · 双轨 UI-3 phase 2 + UI-FIX）
 
-### 候选 UI-3 phase 2：5 核心 HTML 原型 React 化（19e 顺延）
+### 主轨 UI-3 phase 2：5 核心 HTML 原型 React 化（19e 顺延）
 
 复用 19e ABP multi-page + UI-STYLE 品牌色基础（提速 40%+）：
 
@@ -24,7 +24,7 @@
 
 **预算 UI-3 phase 2**：3.5-4 PD
 
-### 候选 UI-FIX：abp install-libs + Razor Page Permission 细粒度（19e 顺延）
+### 副轨 UI-FIX：abp install-libs + Razor Page Permission 细粒度（19e 顺延）
 
 | Task | 范围 | 工时 |
 |---|---|---|
@@ -34,7 +34,7 @@
 
 **预算 UI-FIX**：0.8 PD
 
-### 候选 STYLE-OPT：vendor brotli + lazy-load（19b/19d 累计顺延）
+### 旁路 STYLE-OPT：vendor brotli + lazy-load（19b/19d 累计顺延）
 
 | Task | 范围 | 工时 |
 |---|---|---|
@@ -109,16 +109,16 @@
 
 ---
 
-## 四、V0.1 决策点（待 cici 评审）
+## 四、锁版决策（V0.2）
 
-| # | 决策点 | V0.1 倾向 |
+| # | 决策点 | V0.2 锁版结论 |
 |---|---|---|
-| 1 | Sprint 19f 主线方向 | **双轨 主轨 UI-3 phase 2 + 副轨 UI-FIX**（推荐 — 19e 顺延双消化）|
-| 2 | 13 累计技术债 | **#5 E2E + #6 vendor + #9-#10 UI-FIX 19f 必修** ~3 PD（其他顺延 19g 或等业务方）|
+| 1 | Sprint 19f 主线方向 | **双轨 主轨 UI-3 phase 2 + 副轨 UI-FIX + 旁路 STYLE-OPT**（cici 同意推荐方案 A）|
+| 2 | 13 累计技术债 | **#5 E2E 顺延 19g + #6 vendor 旁路 + #9-#10 UI-FIX 必修** ~2-3 PD |
 | 3 | 工时预算 | **UI-3 phase 2 3.5-4 + UI-FIX 0.8 + STYLE-OPT 0.5-1 + 缓冲 = 5-7 PD** |
-| 4 | 子代理并行策略 | **主代理 a UI-3 phase 2 5 页面 + 子代理 b UI-FIX abp install-libs + 子代理 c STYLE-OPT vendor brotli** sweet spot 3x |
-| 5 | Codex 19e 评审 | 已完成（commit `813d93f`）连续 13 Sprint 中 12 Sprint 0 P2 顺延 |
-| 6 | A2' 重启决策 | 19f 启动前 cici 评估 NC 端反馈窗口 |
+| 4 | 子代理并行策略 | **主代理 a 协调 + 子代理 b UI-3 phase 2 5 页面 + 子代理 c UI-FIX + STYLE-OPT 合并** sweet spot 2x（19e 实测多子代理 30-40% 提速）|
+| 5 | Codex 19e 评审 | 已完成（commit `813d93f` 修复 + `96134d5` 19f V0.1 §六附录）|
+| 6 | A2' 重启决策 | **19f 启动前 cici 评估 NC 端反馈窗口**（无反馈 → 继续顺延性质改变；反馈 ≥ 5 项 → 撤主轨改 A2'-RESTART）|
 
 ---
 
@@ -158,3 +158,4 @@
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — 双轨 UI-3 phase 2 + UI-FIX 副轨（19e 顺延 abp install-libs + Razor Page Permission）+ STYLE-OPT 旁路 + 13 累计技术债 + §六 Codex 19d/19e Finding 附录（3 P2 当 Sprint 全修） |
+| **V0.2** | **2026-05-15** | **cici 同意推荐方案 A — 双轨 UI-3 phase 2 + UI-FIX + STYLE-OPT 旁路 5-7 PD**；§一 主线/副轨/旁路 结构 + §四 锁版决策 + sweet spot 2x（主代理协调 + 子代理 b UI-3 + 子代理 c UI-FIX/STYLE-OPT）|
