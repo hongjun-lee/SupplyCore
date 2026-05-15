@@ -1,10 +1,10 @@
-# Sprint 19l 任务卡 V0.2（锁版）
+# Sprint 19l 任务卡 V0.3（锁版 + Codex 19l 评审 A 级 0 P1+P2 直接延续）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（锁版 · cici 2026-05-15 AskUserQuestion 必决策"路径 C 双未 + UI-3 续" — 19j 撤架后第 2 Sprint / 5 业务方未反馈 / cici 未配 secrets）
+**版本：** V0.3（锁版 + Codex 19l 评审 · cici 2026-05-15 触发 Codex 19l 评审完成 — **A 级 0 P1 + 0 P2 + 2 P3 全顺延 19m**，类似 18a"0 P1+P2 直接延续 0 顺延"模式）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19l 锁版任务卡
-**配套：** [`Sprint-19k-任务卡-V0.3.md`](./Sprint-19k-任务卡-V0.3.md) §七 Codex 19k 评审 + §八 双子代理 0 race 第 8 次反向验证 + [`Sprint-19k-Demo-脚本-V0.1.md`](./Sprint-19k-Demo-脚本-V0.1.md)
+**文档性质：** 实施层 · Sprint 19l 锁版任务卡 + Codex 19l 评审留痕
+**配套：** [`Sprint-19k-任务卡-V0.3.md`](./Sprint-19k-任务卡-V0.3.md) §七 Codex 19k 评审 + [`Sprint-19k-Demo-脚本-V0.1.md`](./Sprint-19k-Demo-脚本-V0.1.md)
 
 ---
 
@@ -161,17 +161,81 @@
 
 ---
 
-## 六、Codex 19k Finding 附录（占位 · 待评审完成补全）
+## 六、Codex 19l Finding 附录（评审完成 · A 级 0 P1+P2 直接延续 / 18a 模式 / 2 P3 顺延 19m）
 
-> 占位 — Codex 19k 评审完成后从顺延清单挑选补到本节。
+cici 2026-05-15 触发 Codex 风评审子代理（read-only 评 4 commits — code 2 + docs 2）— **A 级 0 P1 + 0 P2**：
 
-**评审重点候选**（详 19k Demo §五）：
-- UI-3 phase 3 5 原型 React 化设计正确性 + 业务流选择合理性
-- CI/Codex workflow 静态评估完整性 + secrets-check.yml 设计
-- codex_review_hook.md V1.3 §6.5 静态评估留痕
-- **双子代理 0 race 第 8 次稳定 + race 治理升级 [P0] → [P1] 降级评估**
+| 等级 | # | Finding | 涉及文件 | 工作量 | 状态 |
+|---|---|---|---|---|---|
+| **P1** | - | **无 P1 finding** | - | - | - |
+| **P2** | - | **无 P2 finding** | - | - | - |
+| P3 | 1 | i18n 括号规范完整性验证（19l 5 menu keys 全角已遵守，建议补 19m 完整性扫描清单）| zh-Hans / en.json | 0.1 PD | 顺延 19m 基础资料 i18n 清单合并 |
+| P3 | 2 | path-trigger-thresholds.md V0.2 §5 实测验证段占位（设计预留合理）| path-trigger-thresholds.md §5.1/5.2 | 0 PD | 设计预留 — 19m+ 实测填充 |
 
-**触发提示词**：详 19k Demo §五
+**18a 模式延续**（cici memory「0 P1+P2 直接延续 0 顺延记录」）：
+- 19l = 18a 类型：A 级 0 P1+P2 + P3 全顺延 — 无修复 commit，仅文档侧 V0.3 留痕
+
+**核心评审结论**（4 维度）：
+
+### 6.1 双子代理 0 race 第 10 次反向验证
+
+| 维度 | 评估 |
+|---|---|
+| 19h-19l 累计 | 10 commits 全 0 race / 0 误纳 |
+| 边界分离 | b src/pages 顶层 / c tests/e2e + .github + docs — **0 文件交集** |
+| **关键结论** | **治理升级与低 race 率无因果关联 — 任务边界分离红利掩盖治理升级真效能** |
+| [P0] 保留 | ✅ 续 Sprint 同模块场景验证条件未达 |
+| 19m 同模块 | b 基础资料 3 / c E2E 5 + 3 spec — 仍边界分离（未达验证条件）|
+
+### 6.2 race-governance-downgrade-evaluation.md V0.1 评估
+
+| 节 | 评估 |
+|---|---|
+| §一/§二 | 19j 升级建议 + 19k 反向验证结论准确引用 ✓ |
+| §三 [P0] 保留 3 理由 | 验证条件未达 + ROI 倾向保留 + 同模块候选识别 — **逻辑严密** ✓ |
+| §四 降级触发 3 条件 | 同模块 + 时间窗口 + 错位率 — **定义清晰** ✓ |
+| §五 19m+ 验证 checklist | 场景识别 / 实测表格 / 升级路径 A/B/C — **设计周密** ✓ |
+| 结论 | [P0] 保留至少观察到 19m+ — V0.2 决策 11 客观合理 |
+
+### 6.3 cici 基础资料 UI 缺口决策（方案 B）评估
+
+| 维度 | 方案 A（19l b 改动）| 方案 B（19m 独立主轨）|
+|---|---|---|
+| 19l 工时 | +0.5 PD（5 原型 → 3 业务流 + 3 基础资料替换）| 0 PD（5 业务流保留）|
+| 19l 完成度 | 降低（demo 3 业务流 + 3 基础资料混杂）| 保持（demo 5 业务流完整）|
+| 基础资料质量 | 仓促（挤压工时）| 充分（19m 独占 1.5 PD）|
+| 19m 工时 | -1 PD（不补）| +1.5 PD（主轨补完）|
+| Demo 演示价值 | 削弱（基础资料琐碎）| 强化（5 核心业务流完整演示）|
+| **客观结论** | 表面零增长 + 质量折扣 | **方案 B 合理** — 避免挤压 / 强化聚焦 / 基础资料主轨化 |
+
+### 6.4 5 业务流复杂度形态错开评估
+
+| 19k 5 业务流（已落地）| 19l 5 业务流（本 Sprint）| 形态错开 |
+|---|---|---|
+| purchase-planning list+drilldown | tender list+drilldown+timeline | + timeline |
+| three-way-match drilldown | goods-receipt list+明细 | - drilldown / + 明细行 |
+| supplier-performance dashboard | payment-request form-heavy+timeline | - dashboard / + form-heavy |
+| material-issuance list+form | stocktake list+diff | - form / + diff |
+| funding-plan list+chart | alert-rules dashboard+filter | - chart / + filter |
+
+**评估**：10 业务流形态均衡覆盖（4 list+各扩展 / 2 dashboard / 1 timeline / 1 form-heavy / 1 drilldown）— 业务流原型库设计合理 ✓
+
+**Codex 0 顺延 P2 连续记录调整**：
+- 12a-19k 19 Sprint（14 完整 + 3 强绑定闭环 + 19i/19j 自闭环 + 19k 当 Sprint 修 + 强绑定顺延）
+- **19l**: 0 P1 + 0 P2 — A 级评审 — 18a 模式直接延续 0 顺延记录
+- **累计 20 Sprint 中 15 完整 + 3 强绑定闭环 + 19i/19j 自闭环 + 19l 18a 直接延续 = 0 关键 P2 顺延维持**
+
+新表述："**0 关键 P2 顺延 15 Sprint + 19b vendor 闭环 + 19g/19h CI 强绑定 + 19i/19j 自闭环 + 19k 当 Sprint 修 + 19l 18a A 级直接延续**"
+
+---
+
+## 七、版本沿革
+
+| 版本 | 日期 | 变更 |
+|---|---|---|
+| V0.1 | 2026-05-15 | 初版草案 — 3 路径（A 业务方反馈到位 / B cici 配 secrets 未协调 / C 未配 + 未协调）+ 28 累计技术债（19k 闭环 #16/#23 + 新增 #26/#27/#28）+ §六 Codex 19k Finding 附录占位 + cici 19l 启动前 3 决策点 |
+| V0.2 | 2026-05-15 | cici AskUserQuestion 必决策"路径 C 双未 + UI-3 续" — 主轨 UI-3 phase 3 续 5 原型 2-3 PD + 副轨 E2E 扩展 19k 5 业务流 1 PD + 旁路 race 治理降级评估 0.3 PD + 19k P3 消化 0.5 PD = 3.3-4.3 PD；§四 锁版决策 + 决策 11 race 治理保留 [P0] |
+| **V0.3** | **2026-05-15** | **Codex 19l 评审完成 A 级 0 P1+P2 直接延续**（18a 模式）+ 2 P3 顺延 19m — §六 Codex 19l Finding 附录（4 维度评审 / 双子代理 0 race 第 10 次反向验证 / race-governance V0.1 评估 / cici 方案 B 评估 / 10 业务流形态错开评估）；累计 P2 记录调整 — 20 Sprint 15 完整 + 3 强绑定闭环 + 19i/19j 自闭环 + 19l 18a 模式直接延续 |
 
 ---
 
