@@ -1,18 +1,18 @@
-# Sprint 19q 任务卡 V0.3（D1-3 完整闭环 · 收尾锁版）
+# Sprint 19q 任务卡 V0.4（D1-3 完整闭环 + NC 协调扩展 · 收尾锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.3（D1-3 完整闭环锁版 · 主代理 a 2026-05-16 00:15 — PO 协调 5 文档 + E2E-SMOKE 89.5% + race line-level 阶段一 + build error 修）
+**版本：** V0.4（D1-3 完整闭环 + NC 协调扩展锁版 · 主代理 a 2026-05-16 00:55 — PO 协调 5+1 文档 / E2E-SMOKE 89.5% / race 阶段一 / build error 修 / Codex P1 立修 / 5 memory 跨 session）
 **日期：** 2026-05-16
 **文档性质：** 实施层 · Sprint 19q 收尾锁版任务卡
-**配套：** [`Sprint-19p-任务卡-V0.3.md`](./Sprint-19p-任务卡-V0.3.md) + 5 PO 协调文档（`19q-PO-协调-*.md`）
+**配套：** [`Sprint-19p-任务卡-V0.3.md`](./Sprint-19p-任务卡-V0.3.md) + 6 PO 协调文档（`19q-PO-协调-*.md` / 含 NC 业务方反馈清单）
 
 ---
 
 ## 一、Sprint 19q D1-3 实际交付（V0.2 → V0.3）
 
-### 1.1 主代理 a 主轨 — PO 协调 5 文档（0.6 PD / 预算 0.5-0.7 PD ✓）
+### 1.1 主代理 a 主轨 — PO 协调 6 文档（0.8 PD / 预算 0.5-0.7 PD 略超 0.1 PD / cici 询问 NC 后扩 6/5）
 
-5 commits push 到 SupplyCore docs 仓：
+6 commits push 到 SupplyCore docs 仓（5 基础 + 1 NC 扩展）：
 
 | # | 文档 | commit | PD |
 |---|---|---|---|
@@ -21,8 +21,13 @@
 | 3/5 | [`19q-PO-协调-反馈模板-V0.1.md`](./19q-PO-协调-反馈模板-V0.1.md) | `0c19855` | 0.1 |
 | 4/5 | [`19q-PO-协调-反馈跟踪表-V0.1.md`](./19q-PO-协调-反馈跟踪表-V0.1.md) | `0c19855`（合并）| 0.05 |
 | 5/5 | [`19q-PO-协调-会议议程-V0.1.md`](./19q-PO-协调-会议议程-V0.1.md) | `0c19855`（合并）| 0.1 |
+| **6/5** | [`19q-PO-协调-NC业务方反馈清单-V0.1.md`](./19q-PO-协调-NC业务方反馈清单-V0.1.md) | `cfddeaf` | 0.2 |
 
 **cici 与 PO 1h 会议工具包就绪** — V0.2 §三 cici 外部行动项启动条件达成。
+
+**V0.4 NC 扩展**：cici 询问 NC 业务方反馈策略后增 6/5 文档 — 85 个 `[⚠️ NC 端待确认]` 分类分级（11 全局 G + 7 NCC-OpenAPI + 67 接口级）+ NC-1-7 鉴权关键问题（OAuth2 vs Sign）+ 5 核心接口优先级（MD-001/MD-004/BIZ-001/005/005A）。
+
+**会议议程扩展为 65 min**（V0.1 议程 60 + NC 协调专项 5 min）— cici 与 PO 会议同步谈 NC 业务方协调（一次会议双重资产过渡 / 避免后续重复）。
 
 ### 1.2 子代理 b 副轨 — E2E-SMOKE（1.1 PD / 预算 1-1.5 PD ✓）
 
@@ -138,13 +143,19 @@ c push 期间 working tree 有 b 未 stage 改动（appsettings.json）— c 精
 
 ### 6.2 短期（19q D4-7 / 19r 启动前）
 
-3. **cici 与 PO 1h 会议执行**（5 文档已备）
-4. **5 业务方对接人花名册填完**
-5. **3 业务方对接 endpoint 反馈**
+3. **cici 与 PO 1h 会议执行**（**6 文档已备 / 65 min 含 NC 协调专项 5 min**）
+4. **6 业务方对接人花名册填完**（含 NC 业务方对接人）
+5. **3 业务方 + NC 业务方对接 endpoint 反馈到位**
 
-### 6.3 中期（19r 启动）
+### 6.3 NC 业务方协调（V0.4 新增 / 与 PO 协调同步推进）
 
-6. **Sprint 19r 主轨决策**：业务方反馈到位 → mock → real（财务方优先 10 页）/ 反馈未到 → 升级到上级管理
+- **G-1~G-11 + NC-1-7** 1 周内决策（cici 与 NC 业务方 30 min）
+- **5 NC 核心接口反馈**（MD-001/MD-004/BIZ-001/005/005A）2-3 周内联调
+- **NC-1-7 鉴权关键问题**：cici 现场必问 NC 业务方"OAuth2 vs Sign 签名"
+
+### 6.4 中期（19r 启动）
+
+6. **Sprint 19r 主轨决策**：业务方反馈到位 → mock → real（财务方优先 10 页 + 5 NC 核心接口）/ 反馈未到 → 升级到上级管理
 
 ---
 
@@ -155,3 +166,4 @@ c push 期间 working tree 有 b 未 stage 改动（appsettings.json）— c 精
 | V0.1 | 2026-05-15 23:10 | 草案 — 主代理 a /loop continue dynamic mode 预产；19p 完整闭环后 19q 4 候选方向 + 推荐主轨 E2E-SMOKE 1-1.5 PD + 副轨 race line-level 方案 D 0.5 PD + 4 决策点 + 子代理 spawn 预案 |
 | V0.2 | 2026-05-15 23:20 | 锁版 — cici 战略调整：主轨改 PO 协调材料（5 文档 / 0.5-0.7 PD / 主代理 a 主导）+ 副轨 E2E-SMOKE（子代理 b / 1-1.5 PD）+ 第三轨 race line-level（子代理 c / 0.5 PD）+ §三 cici 外部行动项 + §五 风险 4 红线 + §七 race 实测方案 |
 | V0.3 | 2026-05-16 00:15 | **D1-3 完整闭环收尾锁版** — §一 实际交付（主代理 a PO 协调 5 文档 0.6 PD ✓ / 子代理 b E2E-SMOKE 1.1 PD ✓ / 子代理 c race 阶段一 0.5 PD ✓ / 主代理 a 收尾 build error 修 + 全量 E2E 89.5% 0.2 PD）+ §二 race 实测重要发现（spawn 串行化 + 教训 6 防误纳首次成功 + 证据链 2/3）+ §三 cici D4-7 外部行动项 + §五 Codex 19q 提示词（6 重点）+ 累计 2.4 PD / 9 commits 双仓 |
+| V0.4 | 2026-05-16 00:55 | **NC 协调扩展锁版** — §1.1 加 PO 协调 6/5 文档（NC 业务方反馈清单 V0.1 / 85 个 `[⚠️]` 分类分级 / NC-1-7 鉴权关键问题）+ 会议议程扩 65 min（NC 协调专项 5 min）+ §6.3 NC 业务方协调子段（G-1~G-11 + NC-1-7 1 周决策 / 5 NC 核心接口 2-3 周联调）+ Codex 19q P1 立修 (commit 1101c34 / SeedTestUsers 默认 false / Codex 0 顺延 24 Sprint 保持) + 累计 ~2.65 PD / 13 commits 双仓 + 5 新 memory 跨 session（DevExtreme license / spawn worktree / codex CLI / NC 单边 JSON 占位 + 之前的）|
