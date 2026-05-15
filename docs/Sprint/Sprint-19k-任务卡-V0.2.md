@@ -1,10 +1,10 @@
-# Sprint 19k 任务卡 V0.1（草案）
+# Sprint 19k 任务卡 V0.2（锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（锁版 · cici 2026-05-15 AskUserQuestion 必决策"路径 B 缩范围 + UI-3 phase 3 主轨" — 19j 撤架决策当日 / 5 业务方未反馈 / cici 未配 secrets）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19k 起步草案
-**配套：** [`Sprint-19j-Demo-脚本-V0.1.md`](./Sprint-19j-Demo-脚本-V0.1.md) §四 候选范围 + 19j 收尾 A2' 撤架 + 6 endpoint 骨架
+**文档性质：** 实施层 · Sprint 19k 锁版任务卡
+**配套：** [`Sprint-19j-任务卡-V0.3.md`](./Sprint-19j-任务卡-V0.3.md) §九 Codex 19j 评审 P2 全修 + [`Sprint-19j-Demo-脚本-V0.1.md`](./Sprint-19j-Demo-脚本-V0.1.md)
 
 ---
 
@@ -122,16 +122,17 @@
 
 | # | 决策点 | V0.1 倾向 |
 |---|---|---|
-| 1 | Sprint 19k 主线方向 | **路径 A（业务方反馈到位 ≥ 3 endpoint）**：6 endpoint mock → real 主轨 + CI 真实验证副轨 + E2E 集成旁路 4.3-5.3 PD；或 **路径 B（业务方未协调）**：CI 真实验证主轨 + UI-3 phase 3 部分副轨 + partial 6 endpoint 旁路 3.3-4.8 PD |
-| 2 | 25 累计技术债 | 视 cici 路径：路径 A = #24 主线；路径 B = #19/#22 + #18 主线 |
-| 3 | 工时预算 | 路径 A：4.3-5.3 PD（饱和）；路径 B：3.3-4.8 PD（缩范围）|
-| 4 | 子代理并行策略 | 路径 A：a 协调 + b 6 endpoint mock → real（≥3 endpoint）+ c CI 验证 + E2E 集成；路径 B：a CI 验证 + b UI-3 phase 3 部分 + c partial 6 endpoint |
-| 5 | Codex 19j 评审 | **待 cici 触发**（提示词详 19j Demo §五 — 重点 A2' 撤架完整性 + Mock SeedData 合理性 + 治理升级第 6 次稳定）|
-| 6 | 6 业务方反馈状态 | **19k 启动前 cici 评估业务方反馈状态** — 到位 ≥ 3 endpoint → 路径 A；< 3 → 路径 B |
-| 7 | CI/CD secrets 自助配 | **cici 19k D0 自助配**（OPENAI_API_KEY / PAT / DEVEXTREME LICENSE）— 0.1 PD |
-| 8 | UI-3 phase 3 优先级（路径 B 触发）| cici 与 PO 确认业务价值（5-10 PD 大投入是否值得）|
-| 9 | spawn 子代理 prompt 引用约束 | 必含 AGENTS.md V1.3 + spawn_template V1.1 §八/§九（19h+19i+19j 三 Sprint 0 race 稳定有效）|
-| 10 | 任务边界设计原则 | spawn 前评估任务边界天然分离（19j 实测有效 0 文件交集）|
+| 1 | Sprint 19k 主线方向 | **路径 B 缩范围**（cici 2026-05-15 AskUserQuestion 必决策 — 19j 撤架当日 / 5 业务方未反馈 / cici 未配 secrets）— 主轨 UI-3 phase 3 部分（5 高价值原型 React 化）+ 副轨 CI/Codex 入粒静态评估 + 旁路 19j Codex P3 顺延消化 |
+| 2 | 25 累计技术债 | **#18 UI-3 phase 3 部分主轨 + #19 CI/#22 Codex 静态评估副轨 + 19j P3-1/-2/-3 旁路** |
+| 3 | 工时预算 | **UI-3 phase 3 部分 2-3 PD + CI/Codex 静态 0.3-0.5 PD + 19j P3 消化 0.5 PD + 缓冲 = 3.3-4 PD** |
+| 4 | 子代理并行策略 | **主代理 a 协调 + V0.2 锁版 + 19j P3 消化 + 子代理 b UI-3 phase 3 5 原型 React 化（按 19f UI-3 phase 2 模板）+ 子代理 c CI/Codex 静态评估 + 19j P3-1 阈值 + P3-3 secrets-check workflow** sweet spot 2x |
+| 5 | Codex 19j 评审 | **已完成**（commit `36c72c6` P2-2/P2-3 当 Sprint 修 + `fad45d1` 19j V0.3 §九/§十）|
+| 6 | 6 业务方反馈状态 | **未协调 5/5 业务方未反馈** — 顺延 19l（cici 持续推动 + mock 数据继续支撑 Demo）|
+| 7 | CI/CD secrets 自助配 | **未配** — 顺延 19l；19k 仅做静态评估 + workflow lint（continue-on-error 兜底持续）|
+| 8 | UI-3 phase 3 优先级（路径 B 触发）| **业务价值 cici 默认接受子代理 b 自选 5 高价值原型**（按 prototype/ 剩余 36+ 文件业务流相关性 + Demo 价值）|
+| 9 | spawn 子代理 prompt 引用约束 | **必含** AGENTS.md V1.3 + spawn_template V1.1 §八/§九（19h+19i+19j 三 Sprint 0 race 6 commits 稳定有效）|
+| 10 | 任务边界设计原则 | spawn 前评估任务边界天然分离（b UI-3 phase 3 改 frontend / c 改 .github + docs — 0 文件交集）|
+| 11 | **race 治理升级 [P0] → [P1] 降级评估**（Codex 19j 升级建议）| **19k 继续观察**（教训 6/7 仍 [P0] 强制；19k 实测后评估 — 6 Sprint 0 race 历史 + 19k 任务边界天然分离同 19i/19j）|
 
 ---
 
@@ -165,3 +166,4 @@
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — 双路径（业务方反馈到位 / 缩范围）+ 6 endpoint mock → real + CI 真实验证 + Codex hook 实测 + UI-3 phase 3 部分 + E2E 集成 + 25 累计技术债（19j 闭环 #1/#14/#16/#23 + 新增 #24/#25）+ §六 Codex 19j Finding 附录占位 + cici 19k 启动前 3 决策点 |
+| **V0.2** | **2026-05-15** | **cici AskUserQuestion 必决策"路径 B 缩范围 + UI-3 phase 3 主轨"** — 19j 撤架当日 / 5 业务方未反馈 / cici 未配 secrets；主轨 UI-3 phase 3 部分 5 原型 2-3 PD + 副轨 CI/Codex 入粒静态评估 0.3-0.5 PD + 旁路 19j P3 消化 0.5 PD = **3.3-4 PD**；§四 锁版决策 + 决策 6 业务方顺延 19l + 决策 11 race 治理升级降级评估（继续观察期）|
