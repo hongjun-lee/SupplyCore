@@ -1,10 +1,10 @@
-# Sprint 19h 任务卡 V0.1（草案）
+# Sprint 19h 任务卡 V0.2（锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（锁版 · cici 2026-05-15 "继续" = 接受 V0.1 路径 2 缩范围 — 主轨 E2E 扩展 + 副轨 CI/CD 集成（含 19g 顺延 P1-1/P2-1）+ 旁路 race hook 继续观察 / A2' + 6 endpoint 顺延 19i）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19h 起步草案
-**配套：** [`Sprint-19g-Demo-脚本-V0.1.md`](./Sprint-19g-Demo-脚本-V0.1.md) §四 候选范围 + 19g 收尾双 race 治理债深化
+**文档性质：** 实施层 · Sprint 19h 锁版任务卡
+**配套：** [`Sprint-19g-任务卡-V0.3.md`](./Sprint-19g-任务卡-V0.3.md) §七 Codex 19g 评审 + §八 race hook 继续观察期 + [`Sprint-19g-Demo-脚本-V0.1.md`](./Sprint-19g-Demo-脚本-V0.1.md)
 
 ---
 
@@ -128,18 +128,19 @@
 
 ---
 
-## 四、V0.1 决策点（待 cici 评审）
+## 四、锁版决策（V0.2）
 
-| # | 决策点 | V0.1 倾向 |
+| # | 决策点 | V0.2 锁版结论 |
 |---|---|---|
-| 1 | Sprint 19h 主线方向 | **路径 1（NC 反馈到位）双轨 A2' + 6 endpoint** 或 **路径 2 双轨 E2E 扩展 + CI/CD**（cici 19h 启动前评估 NC 端反馈窗口决策）|
-| 2 | 18 累计技术债 | 视 cici 路径选择：路径 1 = #1 #14 主线；路径 2 = #16 #17 主线 |
-| 3 | 工时预算 | 路径 1：6.5-8.5 PD（饱和）；路径 2：2.5-3.5 PD（缩范围）|
-| 4 | 子代理并行策略 | 路径 1：a A2' 重启 + b 6 endpoint 协调 + c E2E 扩展 旁路；路径 2：a E2E 扩展 + b RBAC + c CI/CD + 旁路 race hook |
-| 5 | Codex 19g 评审 | **待 cici 触发**（提示词详 19g Demo §五 — 重点双 race 治理债建议升级）|
-| 6 | A2' 重启决策 | **19h 启动前 cici 评估 NC 端反馈窗口**（无反馈 7 次顺延 → 路径 2 缩范围；反馈到位 → 路径 1 饱和）|
-| 7 | 6 endpoint 业务方协调时机 | **19h 启动前 cici 通知 5 业务方对接人** — 协调到位则路径 1 副轨启动 |
-| 8 | race hook 紧迫性 | **连续 2 次 race 是否需 mechanical 防范升级**（path 2 旁路评估）|
+| 1 | Sprint 19h 主线方向 | **路径 2 缩范围**（cici "继续" = 接受 V0.1 路径 2）— 主轨 E2E 扩展 + RBAC 1-1.5 PD + 副轨 CI/CD 集成（含 19g 顺延 P1-1 webServer + P2-1 spec 容错）1-1.5 PD + 旁路 race hook 继续观察 + 19g P3 消化 |
+| 2 | 18 累计技术债 | **#17 E2E + CI/CD 主线 + 19g 顺延 P1-1/P2-1 强绑定 CI/CD 子任务 + #16 race hook 旁路评估 + #11 OEE 顺延 19i** |
+| 3 | 工时预算 | **E2E 1-1.5 + CI/CD 1-1.5（含 19g 顺延）+ race hook 评估 0.2 + P3 消化 0.3 + 缓冲 = 3-4 PD** |
+| 4 | 子代理并行策略 | **主代理 a 协调 + 子代理 b CI/CD 集成（含 19g 顺延 P1-1/P2-1）+ 子代理 c E2E 扩展 + RBAC 测试** sweet spot 2x（19g spawn 模板 V1.1 §八 git 禁忌 + §九 自检 必引用）|
+| 5 | Codex 19g 评审 | **已完成**（read-only 子代理 commit `1dd09e7` P2-2 当 Sprint 修 + `f9821dc` 19g V0.3 §七/§八）|
+| 6 | A2' 重启决策 | **顺延 19i** — 7 次顺延（性质改变）；cici 19i 启动前重新评估 |
+| 7 | 6 endpoint 业务方协调 | **顺延 19i** — cici 与业务方协调时机不在 19h；mock 数据继续支撑 Demo |
+| 8 | race hook 紧迫性 | **19h 继续观察期** — 教训落地有效（19g c b9622d8 自我应用 100%）；Hook ROI 偏低；触发阈值连续 3 次 race 或同子代理 2 次 race → P1 实施；19h 旁路评估文档化 0.2 PD |
+| 9 | spawn 子代理 prompt 引用约束（19g 新加）| **必含** — AGENTS.md §多子代理协作约束 + subagent_spawn_template.md §八 git 禁忌 + §九 commit 后自检 |
 
 ---
 
@@ -173,3 +174,4 @@
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — 双路径（NC 反馈到位 / 缩范围）+ A2' 重启 + 6 endpoint + E2E 扩展 + CI/CD + race hook + 18 累计技术债 + §六 Codex 19g Finding 附录占位 + cici 19h 启动前 3 决策点（NC 反馈 / 业务方协调 / race hook 紧迫性）|
+| **V0.2** | **2026-05-15** | **cici "继续" = 接受 V0.1 路径 2 缩范围** — 主轨 E2E 扩展 + RBAC 1-1.5 PD + 副轨 CI/CD 集成（含 19g 顺延 P1-1 webServer + P2-1 spec 容错）1-1.5 PD + 旁路 race hook 继续观察期 + P3 消化 = **3-4 PD**；A2' + 6 endpoint 顺延 19i；§四 锁版决策 + 决策 9（spawn 子代理 prompt 必引用 AGENTS.md V1.1 + spawn_template V1.1 §八/§九）|
