@@ -1,10 +1,10 @@
-# Sprint 19n 任务卡 V0.1（草案）
+# Sprint 19n 任务卡 V0.2（锁版）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（草案 · 待 cici 评审）
+**版本：** V0.2（锁版 · cici 2026-05-15 AskUserQuestion 必决策"路径 C 双未 + race [P0] 同模块实测尝试" — 19j 撤架后第 4 Sprint / 5 业务方未反馈 / cici 未配 secrets / 19f-19m 累计 ~30 PD）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19n 起步草案
-**配套：** [`Sprint-19m-Demo-脚本-V0.1.md`](./Sprint-19m-Demo-脚本-V0.1.md)
+**文档性质：** 实施层 · Sprint 19n 锁版任务卡
+**配套：** [`Sprint-19m-任务卡-V0.3.md`](./Sprint-19m-任务卡-V0.3.md) §六 Codex 19m A 级评审 + [`Sprint-19m-Demo-脚本-V0.1.md`](./Sprint-19m-Demo-脚本-V0.1.md)
 
 ---
 
@@ -48,20 +48,21 @@
 
 ---
 
-## 四、V0.1 决策点（待 cici 评审）
+## 四、锁版决策（V0.2）
 
-| # | 决策点 | V0.1 倾向 |
+| # | 决策点 | V0.2 锁版结论 |
 |---|---|---|
-| 1 | Sprint 19n 主线方向 | **视 cici 启动前状态** — 业务方反馈 ≥ 3 → 路径 A / cici 配 secrets → 路径 B / 仍双未 → 路径 C |
-| 2 | 工时预算 | 路径 A ~5 PD / 路径 B ~3 PD / 路径 C ~3 PD |
-| 3 | 子代理并行策略 | 视路径 — sweet spot 2x |
-| 4 | Codex 19m 评审 | **待 cici 触发**（提示词详 19m Demo §五）|
-| 5 | 6 业务方反馈状态 | **19n 启动前 cici 评估** |
-| 6 | CI/CD secrets 自助配 | **cici 19n D0 自助** |
-| 7 | UI-3 phase 3 续优先级 | **cici 与 PO 协商业务价值** |
-| 8 | race 治理 [P0] 同模块实测时机 | 19n+ 任务设计触发（b/c 同改 Application） |
-| 9 | spawn 子代理 prompt 引用约束 | 必含 AGENTS.md V1.4 + spawn_template V1.1 §八/§九 |
-| 10 | 任务边界设计原则 | spawn 前评估任务边界天然分离 |
+| 1 | Sprint 19n 主线方向 | **路径 C 双未 + race [P0] 同模块实测尝试**（cici 2026-05-15 AskUserQuestion 必决策）— 主轨 UI-3 续 5 原型 + 副轨 race [P0] 同模块实测方案设计 + 旁路 19m P3-3 path-trigger 补注 |
+| 2 | 累计技术债 | #18 UI-3 续主轨 + #28 race [P0] 同模块实测副轨（race-governance V0.1 §四 触发评估）+ 19m P3-3 旁路 |
+| 3 | 工时预算 | **UI-3 续 5 原型 2-3 PD + race 同模块实测方案设计 0.5 PD + 19m P3-3 0.05 PD + 缓冲 = 3 PD** |
+| 4 | 子代理并行策略 | **主代理 a 协调 + V0.2 锁版 + 19m P3-3 path-trigger 补注 + 子代理 b UI-3 续 5 原型（src/pages 5 新 + ABP 整合）+ 子代理 c race [P0] 同模块实测方案设计文档（race-governance V0.2）** sweet spot 2x |
+| 5 | Codex 19m 评审 | **已完成** ★★★★★ A 级 / 0 P1+P2 / APPROVED for merge（19l 模式延续）|
+| 6 | 6 业务方反馈状态 | **持续顺延 19o**（cici 推动 + mock 数据继续）|
+| 7 | CI/CD secrets 自助配 | **持续顺延 19o**（cici 自助）|
+| 8 | race 治理 [P0] 同模块实测 | **19n 旁路方案设计**（race-governance V0.2 §六 加同模块实测计划 — 不真触发只设计）；19o+ 主代理 a 故意设计冲突任务实测 |
+| 9 | spawn 子代理 prompt 引用约束 | 必含 AGENTS.md V1.4 + spawn_template V1.1 §八/§九（19h-19m 12 commits 0 race 稳定）|
+| 10 | 任务边界设计原则 | spawn 前评估任务边界天然分离（19n 仍 b src/pages / c docs/internal — 0 文件交集）|
+| 11 | 19f-19m 累计 ~30 PD | cici 提示工作量信号 — 19n 路径 C 缩范围 3 PD 保持节奏 |
 
 ---
 
@@ -87,3 +88,4 @@
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — 3 路径（A 业务方反馈到位 / B cici 配 secrets / C 双未）+ 累计技术债 + §六 Codex 19m 占位 + cici 19n 启动前 3 决策点 |
+| **V0.2** | **2026-05-15** | **cici AskUserQuestion 必决策"路径 C 双未 + race [P0] 同模块实测尝试"** — 19j 撤架后第 4 Sprint / 5 业务方未反馈 / cici 未配 secrets / 19f-19m ~30 PD；主轨 UI-3 续 5 原型 + 副轨 race [P0] 同模块实测方案设计 + 旁路 19m P3-3 = **~3 PD**；§四 锁版决策 + 决策 11 19f-19m 累计工作量信号 |

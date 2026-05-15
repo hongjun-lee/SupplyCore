@@ -1,9 +1,9 @@
-# Sprint 19m 任务卡 V0.2（锁版）
+# Sprint 19m 任务卡 V0.3（锁版 + Codex 19m A 级评审 ★★★★★ APPROVED for merge）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（锁版 · cici 2026-05-15 方案 B 决策直接接受 — 主轨基础资料补完 3 原型 + 副轨 E2E 扩展 + 旁路 19l Codex P3 消化 ~3 PD）
+**版本：** V0.3（锁版 + Codex 19m 评审 · cici 2026-05-15 触发 Codex 19m 评审完成 — **A 级 ★★★★★ / 0 P1 + 0 P2 + 1 P3 顺延 19n / APPROVED for merge** / 19l 模式直接延续）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19m 锁版任务卡
+**文档性质：** 实施层 · Sprint 19m 锁版任务卡 + Codex 19m 评审留痕
 **配套：** [`Sprint-19l-任务卡-V0.3.md`](./Sprint-19l-任务卡-V0.3.md) §六 Codex 19l A 级评审 + [`Sprint-19l-Demo-脚本-V0.1.md`](./Sprint-19l-Demo-脚本-V0.1.md)
 
 ---
@@ -131,17 +131,47 @@ cici 19l 期间发现"基础资料 UI 缺口"询问 → AskUserQuestion 选**方
 
 ---
 
-## 六、Codex 19l Finding 附录（占位 · 待评审完成补全）
+## 六、Codex 19m Finding 附录（评审完成 ★★★★★ A 级 + 19l 模式直接延续 / 1 P3 顺延 19n / APPROVED for merge）
 
-> 占位 — Codex 19l 评审完成后从顺延清单挑选补到本节。
+cici 2026-05-15 触发 Codex 风评审子代理（read-only 评 4 commits）— **★★★★★ A 级 / 0 P1 + 0 P2 / APPROVED for merge**：
 
-**评审重点候选**（详 19l Demo §五）：
-- UI-3 phase 3 续 5 业务流选择合理性
-- E2E 扩展 19k 5 业务流 + race 治理 [P0] 保留评估
-- AGENTS.md V1.4 + race-governance V0.1 + path-trigger V0.2 + codex_review_hook V1.4 治理升级
-- **双子代理 0 race 第 10 次稳定 + 基础资料 UI 缺口决策（方案 B 19m）**
+| 等级 | # | Finding | 工作量 | 状态 |
+|---|---|---|---|---|
+| **P1** | - | **无 P1 finding** | - | - |
+| **P2** | - | **无 P2 finding** | - | - |
+| P3 | 1 | path-trigger V0.3 §5.1 补注"19m b 基础资料 0 新增 mock 命中数 — 仅 React 前端"| 0.05 PD | 顺延 19n |
 
-**触发提示词**：详 19l Demo §五
+**19l 模式直接延续**（cici memory「18a 0 P1+P2 直接延续」）：
+- 19m = 19l 模式：A 级 0 P1+P2 + P3 顺延 — 无修复 commit，仅文档侧 V0.3 留痕
+
+**核心评审结论**（4 维度）：
+
+### 6.1 双子代理 0 race 第 12 次稳定反向验证
+- 19h+19i+19j+19k+19l+19m 累计 12 commits 全 0 race / 0 误纳
+- 19m b/c 0 文件交集（b 19 files 前端+ABP / c 10 files tests+docs）
+- 边界分离掩盖效应延续 — [P0] 保留续观察 19n+
+
+### 6.2 教训 8 [P0 候选] 评估
+- **不足以独立加入 AGENTS.md V1.5** — 仅"边界分离有效但未实测压力场景"
+- **正式认可条件**：连续 8 Sprint（19h-19o）边界分离仍 0 race / 或 19n+ 主动同模块冲突测试 0 race
+
+### 6.3 cici 方案 B 基础资料补完完整性 ★★★★★
+- 覆盖：详设 02 + 03 + 04 §4.10 三域完整 ✓
+- 复杂度：base-archive 1.0 / master-data-admin 1.2 / tender-archive 0.8 PD = 1.4 PD vs 1.5 预算 ✓
+- Demo 价值：8 完整链路（基础资料 3 + 19l 5 业务流）★★★★★
+- 续 Sprint 可行：业务方反馈 → DTO 字段调整 [⚠️] 标记预留 ✓
+
+### 6.4 ABP 整合 + i18n 完整性 ★★★★★
+- 3 Permission Default + Provider + 3 Razor [Authorize] + 3 MenuContributor 入"基础档案"分组 + 6 i18n 双语全角/半角规范 + vite 29 entries ✓
+
+**Codex 19m APPROVED for merge** — 高质 + 工时下限节省 + 0 顺延 P2 期望保持
+
+**Codex 0 顺延 P2 连续记录调整**：
+- 12a-19l 20 Sprint（15 完整 + 3 强绑定闭环 + 19i/19j 自闭环 + 19l 18a 直接延续）
+- **19m**: 0 P1 + 0 P2 — A 级 ★★★★★ — 19l 模式直接延续 0 顺延记录
+- **累计 21 Sprint 中 16 完整 + 3 强绑定闭环 + 19i/19j 自闭环 + 19l/19m 18a 模式直接延续 = 0 关键 P2 顺延维持**
+
+新表述："**0 关键 P2 顺延 16 Sprint + 19b vendor 闭环 + 19g/19h CI 强绑定 + 19i/19j 自闭环 + 19k 当 Sprint 修 + 19l/19m 18a A 级直接延续**"
 
 ---
 
@@ -150,4 +180,5 @@ cici 19l 期间发现"基础资料 UI 缺口"询问 → AskUserQuestion 选**方
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — **cici 方案 B 主轨基础资料补完 3 原型** + 副轨 E2E 扩展 19l b 5 + 19m 3 spec + 旁路 19l Codex P3 + 30 累计技术债（19l 闭环 #28 + 新增 #29 #30）+ §六 Codex 19l Finding 附录占位 + cici 19m 启动前 3 决策点（业务方反馈 / secrets 配 / 基础资料范围）|
-| **V0.2** | **2026-05-15** | **cici 方案 B 决策直接接受锁版** — 主轨基础资料补完 3 原型（base-archive + master-data-admin + tender-archive）1.5 PD + 副轨 E2E 扩展 8 spec（19l b 5 + 19m b 3）1-1.5 PD + 旁路 19l Codex P3-1/-2 消化 0.3 PD = **3-3.5 PD**；§四 锁版决策 + 决策 6/7 业务方+secrets 顺延 19n + 决策 11 race 治理保留 [P0] |
+| V0.2 | 2026-05-15 | cici 方案 B 决策直接接受锁版 — 主轨基础资料补完 3 原型 1.5 PD + 副轨 E2E 扩展 8 spec 1-1.5 PD + 旁路 19l Codex P3-1/-2 消化 0.3 PD = 3-3.5 PD |
+| **V0.3** | **2026-05-15** | **Codex 19m 评审完成 ★★★★★ A 级 APPROVED for merge** — 0 P1+P2 + 1 P3 顺延 19n + 19l 模式直接延续；§六 Codex 19m Finding 附录（4 维度 ★★★★★ — 0 race 第 12 次反向验证 + 教训 8 [P0 候选] 评估"不足独立" + 方案 B 完整性 + ABP 整合）；累计 P2 记录调整 — 21 Sprint 16 完整 + 19l/19m 18a 模式直接延续 |
