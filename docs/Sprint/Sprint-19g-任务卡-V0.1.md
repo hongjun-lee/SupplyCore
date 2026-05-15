@@ -89,7 +89,7 @@
 | 3 | A2-1' 占位稿 NC 反馈调整 | 18b 起 | 1-2 PD | 等 NC 端 |
 | 4 | InventoryBalance / PurchaseOrders P-04 完整化 | 19c | 1 PD | 19g 评估 |
 | 5 | UI-2-5 E2E Playwright | 19c-19f 4 次顺延 | 1-1.5 PD | **19g 必修** ✅ |
-| 6 | ~~vendor brotli + lazy-load~~ | 19b/19d | 0.5-1 PD | **19f STYLE-OPT 已落地** ✅ |
+| 6 | ~~vendor brotli + lazy-load~~ | 19b/19d | 0.5-1 PD | **19f STYLE-OPT 已落地** ✅（DevExtreme custom bundler ROI 评估顺延 — 触发条件：19g/19h 部署 Sentry RUM 后实测 LCP > 2.5s 或 FCP > 1.8s 才启动 — 当前 brotli 后 414 KB 传输已达良好基线 / 详 19f Codex P2-2）|
 | 7 | UI-STYLE | 19e/19f | 0 | **已完成** ✅ |
 | 8 | minSignCount 4 模板真接通后业务回归测试 | 19d | 0.5 PD | 19g 候选 |
 | 9 | ~~Razor Page 细粒度 Permission~~ | 19e 起 | 0.5 PD | **19f UI-FIX 已落地** ✅ |
@@ -133,18 +133,34 @@
 
 ---
 
-## 六、Codex 19f Finding 附录（占位 · 待评审完成补全）
+## 六、Codex 19f Finding 附录（评审完成 · P1+P2 全修留痕）
 
-> 占位 — Codex 19f 评审完成后从顺延清单挑选补到本节。
+cici 2026-05-15 触发 Codex 风评审子代理（read-only 评 7 commits），独立 finding 清单：
 
-**评审重点候选**（详 19f Demo §五）：
-- UI-3 phase 2 5 React 页面架构正确性
-- UI-FIX 11 Razor Page Permission 完整性
-- STYLE-OPT brotli 配置 + closeBundle order
-- 5 fix 修复完整性
-- **协作 race 治理建议**（commit message 误差教训）
+| 等级 | # | Finding | 涉及文件 | 工作量 | 状态 |
+|---|---|---|---|---|---|
+| **P1** | 1 | 5 新 React Razor Page 权限设计遗漏（67cb4aa 仅修 11 既有，新 5 页面仍 [Authorize]）| SupplyCoresPermissions.cs / Provider / 5 PageModel / i18n × 2 | 0.2 PD | ✅ **当 Sprint 修** |
+| P1 | 2 | commit message 与内容严重不符（03de782 message 5 React 页面 vs 实际 vite/package；dc69418 message STYLE-OPT vs 实际 b 22 文件 + brotli）| git history（不可修历史）| 0 | ✅ V0.3 §八 治理债附录已落地 + 19g #15 子代理模板优化 |
+| P2 | 1 | React Island mount root id 命名规范文档缺失（虽 16 个 root id 实际一致 kebab-case `#{page-slug}-root`）| frontend/README.md | 0.1 PD | ✅ **当 Sprint 修** |
+| P2 | 2 | DevExtreme 25.2.4 lazy-load 评估留档触发条件不明确 | vite.config.ts 注释 + 19g §三 #6 | 0 | ✅ §三 #6 sub-note 加 Sentry RUM LCP/FCP 触发条件 |
+| P2 | 3 | scrap-disposal Popup race fix 验证 | scrap-disposal/App.tsx | 0 | ✅ 验证：scrap-disposal 0 Popup → race fix N/A（评审条件不成立）|
+| P3 | 1 | eslint.config.mjs ignore 相对路径混合（`dist` vs `../src/...`）| eslint.config.mjs L11-16 | 0.05 PD | 顺延 19g/19h |
+| P3 | 2 | 5 新页面 AbortController lifecycle 文档（dashboard / mobile / xinchuang 接真端点后需补 race fix 注释）| 3 App.tsx | 0 | 顺延 19g 接真端点时一并 |
 
-**触发提示词**：详 19f Demo §五
+**修复 commit**：`<待 P1+P2 全修 commit>` "fix(supplycores): Sprint 19f Codex 评审 P1+P2 全修（5 新页面 Permission + mount naming + 19g §三 #6 触发条件）"
+
+**Codex 0 顺延 P2 连续 Sprint 记录调整**：
+- 12a-19e 13 Sprint（含 19b 1 P2 闭环）
+- **19f**: 0 P2 顺延（含 5 fix 全修 + Codex 评审 P1+P2 全修 — 总 0.3 PD ≤ 0.5 PD 阈值）
+- **累计 15 Sprint 中 14 Sprint 完整 0 P2 顺延 / 1 P2 闭环（19b vendor → 19f STYLE-OPT 落地）**
+
+新表述："**0 关键 P2 顺延 14 Sprint（11a/13a-19a/19c/19d/19e/19f 跳 19b）+ 1 工作量超阈值 P2 闭环（19b vendor）**"
+
+**协作 race 治理建议（续 19g 子代理 spawn 模板要点）**：
+1. 双轨同改 vite.config.ts / package.json 时主代理 spawn 前明确"谁先 commit、谁等对方完成"
+2. 子代理回滚 push 后 commit 应先 `git fetch + git log origin/<branch>` 核实远程
+3. Codex 评审对 commit message 与内容不符时应逐文件 `git show --stat` 核实
+4. 续 19g 主代理 review 子代理报告时必须 `git log + show --stat` 核实，不信赖 message 描述
 
 ---
 
