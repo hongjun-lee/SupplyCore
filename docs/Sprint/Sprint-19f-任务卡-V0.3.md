@@ -1,9 +1,9 @@
-# Sprint 19f 任务卡 V0.2（锁版）
+# Sprint 19f 任务卡 V0.3（锁版 + 同事评审 5 fix）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（锁版 · cici 2026-05-15 同意推荐方案 A：双轨 UI-3 phase 2 + UI-FIX + STYLE-OPT 旁路）
+**版本：** V0.3（锁版 · cici 2026-05-15 同意范围扩大 — V0.2 双轨 + V0.3 同事评审 5 fix 4 修 1 自解决）
 **日期：** 2026-05-15
-**文档性质：** 实施层 · Sprint 19f 锁版任务卡
+**文档性质：** 实施层 · Sprint 19f 锁版任务卡 + 范围扩大
 **配套：** [`Sprint-19e-Demo-脚本-V0.1.md`](./Sprint-19e-Demo-脚本-V0.1.md) §四 候选范围 + 19e 收尾 Codex 19d/19e 评审修复
 
 ---
@@ -109,16 +109,17 @@
 
 ---
 
-## 四、锁版决策（V0.2）
+## 四、锁版决策（V0.3）
 
-| # | 决策点 | V0.2 锁版结论 |
+| # | 决策点 | V0.3 锁版结论 |
 |---|---|---|
-| 1 | Sprint 19f 主线方向 | **双轨 主轨 UI-3 phase 2 + 副轨 UI-FIX + 旁路 STYLE-OPT**（cici 同意推荐方案 A）|
-| 2 | 13 累计技术债 | **#5 E2E 顺延 19g + #6 vendor 旁路 + #9-#10 UI-FIX 必修** ~2-3 PD |
-| 3 | 工时预算 | **UI-3 phase 2 3.5-4 + UI-FIX 0.8 + STYLE-OPT 0.5-1 + 缓冲 = 5-7 PD** |
-| 4 | 子代理并行策略 | **主代理 a 协调 + 子代理 b UI-3 phase 2 5 页面 + 子代理 c UI-FIX + STYLE-OPT 合并** sweet spot 2x（19e 实测多子代理 30-40% 提速）|
-| 5 | Codex 19e 评审 | 已完成（commit `813d93f` 修复 + `96134d5` 19f V0.1 §六附录）|
+| 1 | Sprint 19f 主线方向 | **双轨 主轨 UI-3 phase 2 + 副轨 UI-FIX + 旁路 STYLE-OPT + V0.3 同事评审 5 fix 副轨**（cici 同意推荐方案 A + 范围扩大）|
+| 2 | 13 累计技术债 + 5 fix | **#5 E2E 顺延 19g + #6 vendor 旁路 ✅ + #9-#10 UI-FIX ✅ + 5 fix 4 修 1 自解决** ~4 PD |
+| 3 | 工时预算 | **V0.2 5-7 PD + V0.3 5 fix 范围扩大 0.6 PD（主代理 a 4 fix 修）= 5.6-7.6 PD** |
+| 4 | 子代理并行策略 | **主代理 a 协调 + 子代理 b UI-3 phase 2 5 页面 + 子代理 c UI-FIX + STYLE-OPT 合并 + 主代理 a 5 fix 串行**（双子代理 sweet spot 实测 ~2x）|
+| 5 | Codex 19e 评审 | 已完成（commit `813d93f` 修复 + V0.1 §六附录）|
 | 6 | A2' 重启决策 | **19f 启动前 cici 评估 NC 端反馈窗口**（无反馈 → 继续顺延性质改变；反馈 ≥ 5 项 → 撤主轨改 A2'-RESTART）|
+| 7 | 同事评审 5 fix（V0.3 新加）| **4 真实修 + 1 自解决**（#1 root redirect / #3 ESLint flat / #4 chunk 简化 / #5 body scope **真实** ✅ + #2 stale assets **已自解决** — copyToMainApp 修复落地 dc69418）|
 
 ---
 
@@ -145,17 +146,68 @@
 
 **Codex 0 顺延 P2 连续 Sprint 记录调整**：
 - 11a-19a 9 Sprint 完整 0 P2 顺延 ✓
-- 19b 1 P2 显式顺延（vendor 工作量超阈值 / 与 Catio 同等技术债 #6）
+- 19b 1 P2 显式顺延（vendor 工作量超阈值 / 与 Catio 同等技术债 #6 — 19f STYLE-OPT 已落地）
 - 19c/19d/19e 各 0 P2 顺延（全当 Sprint 修）
-- **累计 13 Sprint 中 12 Sprint 完整 0 P2 顺延 / 1 P2 显式顺延**
+- 19f 0 P2 顺延（含 5 fix 全修）
+- **累计 14 Sprint 中 13 Sprint 完整 0 P2 顺延 / 1 P2 显式顺延已闭环**
 
-新表述："**0 关键 P2 顺延 12 Sprint（11a/13a-19a/19c/19d/19e 跳 19b）+ 1 工作量超阈值 P2 显式顺延（19b vendor）**"
+新表述："**0 关键 P2 顺延 13 Sprint（11a/13a-19a/19c/19d/19e/19f 跳 19b）+ 1 工作量超阈值 P2 闭环（19b vendor → 19f STYLE-OPT 落地）**"
 
 ---
 
-## 七、版本沿革
+## 七、V0.3 同事评审 5 fix 附录（commit `3f245f2`）
+
+cici 2026-05-15 提交同事独立评审（针对 `813d93f` 预热修复后状态）发现 5 个结构性问题。
+主代理 a 验证 + 落地：**4 真实修 + 1 自解决**。
+
+| # | Fix | 同事描述 | 主代理 a 验证 | 状态 |
+|---|---|---|---|---|
+| 1 | /supplycores/ root redirect | 仅 /{slug} 具体页，无 / 或 root | grep 确认无 root 路由 | ✅ 修（RazorPagesOptions.Conventions.AddPageRoute × 2）|
+| 2 | Host stale assets 58 个 | 83 vs 25 | 当前模块 69 + Host 69 一致 | ❌ 自解决（同事检查为中间态；dc69418 closeBundle order:"post" sequential:true 修复落地）|
+| 3 | ESLint flat config | npm run lint 报"couldn't find eslint.config.*" | 确认缺 config（package.json ESLint 9 已装但无 config） | ✅ 修（新建 eslint.config.mjs flat config）|
+| 4 | DevExtreme manualChunks 5 条 Circular warning | vendor-devextreme-X ⇄ vendor-devextreme 互引 | npm run build 输出 5 条 Circular | ✅ 修（撤 19d B1 4 chunk → 1 大 chunk）|
+| 5 | index.css:15 body { ... } 影响 ABP/LeptonX 外壳 | 全局 body selector 污染 | 第 15 行 body selector 真实存在 | ✅ 修（body → `[id$="-root"]` 属性 selector）|
+
+**实测验收**：
+- npm run build 16 entries + brotli/gzip pre-compress 完整 + 0 Circular warning
+- vendor-devextreme.js 1898 KB raw → 414 KB brotli（21.8% / 78% 节省）
+- npm run lint 0 errors 0 warnings 通过
+- dotnet build 0 错误
+
+**工作量**：主代理 a 0.6 PD（vs 范围扩大 1.5 PD 预估 节省 60%）
+
+---
+
+## 八、协作 race 治理债附录（commit message 与内容误差）
+
+Sprint 19f Day 1-3 双子代理 b/c 并行执行时发生 git race：
+
+| commit | message 声明 | 实际 stat | 真实内容 |
+|---|---|---|---|
+| 03de782 | "5 React 页面" | 3 files 139+/42- | 实际仅 vite.config.ts + package.json + package-lock.json（b 提早 38s 抓走 c 的 STYLE-OPT 改动）|
+| dc69418 | "STYLE-OPT brotli + lazy-load 评估" | 26 files 3145+/4- | 实际含 b 全部 22 React/Razor 文件 + c 的 brotli 配置 |
+| 67cb4aa | "UI-FIX abp install-libs + Permission" | 准确 | 内容与 message 一致 |
+| 3f245f2 | "Day 4 同事评审 4 fix" | 准确 | 内容与 message 一致 |
+
+**根因**：双子代理并行改 vite.config.ts / package.json 时未协调 commit 时序，b 在 c 完成 STYLE-OPT 后 38s 抓 stage area；c 后续 reset --soft + reset 撤回 dc69418（误判"夹带 b 文件"）但远程已 push。
+
+**影响**：功能完整落地 main 分支（dc69418 = b 22 文件 + c brotli 完整集）；治理债 — commit history 与 message 错位。
+
+**教训**：
+- 双子代理改同源文件（vite.config.ts / package.json）需明确"谁先 commit"协调
+- 子代理 c reset --soft 撤回 push 后 commit 前，应先 `git fetch + log origin/main` 核实远程状态
+- 主代理 a 收到子代理报告后必须 `git log + show --stat` 核实而非信赖 message 描述（19f 本 commit `8b56c61` 试图修治理债被 pull --rebase 自动 skip 验证内容已同步）
+
+**后续行动**：
+- Codex 19f 评审重点关注 dc69418 commit message 与内容误差治理建议
+- 续 Sprint 子代理 spawn 时加"协调 commit 时序"明确提示（main 文件改动同源时）
+
+---
+
+## 九、版本沿革
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-15 | 初版草案 — 双轨 UI-3 phase 2 + UI-FIX 副轨（19e 顺延 abp install-libs + Razor Page Permission）+ STYLE-OPT 旁路 + 13 累计技术债 + §六 Codex 19d/19e Finding 附录（3 P2 当 Sprint 全修） |
-| **V0.2** | **2026-05-15** | **cici 同意推荐方案 A — 双轨 UI-3 phase 2 + UI-FIX + STYLE-OPT 旁路 5-7 PD**；§一 主线/副轨/旁路 结构 + §四 锁版决策 + sweet spot 2x（主代理协调 + 子代理 b UI-3 + 子代理 c UI-FIX/STYLE-OPT）|
+| V0.2 | 2026-05-15 | cici 同意推荐方案 A — 双轨 UI-3 phase 2 + UI-FIX + STYLE-OPT 旁路 5-7 PD；§一 主线/副轨/旁路 结构 + §四 锁版决策 + sweet spot 2x（主代理协调 + 子代理 b UI-3 + 子代理 c UI-FIX/STYLE-OPT）|
+| **V0.3** | **2026-05-15** | **同事评审 5 fix 范围扩大** — 4 真实修（commit `3f245f2` 主代理 a 0.6 PD）+ 1 自解决；§四 锁版决策加决策 7；§七 同事评审 5 fix 附录；§八 协作 race 治理债（commit message 误差教训）；版本沿革加 V0.3；累计 5.6-7.6 PD 含 5 fix |
