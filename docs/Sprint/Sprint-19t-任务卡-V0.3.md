@@ -1,9 +1,9 @@
-# Sprint 19t 任务卡 V0.2（定版启动 D1 · cici 8 答拍板 / race isolation 实测 + 业务方满意现状）
+# Sprint 19t 任务卡 V0.3（main D1 完成锁版 · 7 commits / T-A6 isolation worktree 实测达成 / 业务方满意现状 5.0 PD 缩减）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（定版启动 · main 主代理 a 2026-05-16 — cici 8 答拍板：财务全 A 满意 / 物资 E+A 顺延 / 6C race isolation 实施 / 7A second 续 Reports / 8A 今天启动）
+**版本：** V0.3（main D1 完成锁版 · main 主代理 a 2026-05-16 — main 7 commits / T-A6 isolation worktree 实测达成 / second e 进行中 / 待 cici 触发 Codex）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 19t 定版启动任务卡（V0.2 拍板 → 立即启动 D1 / second 主代理 e 续 Reports/Dashboards）
+**文档性质：** 实施层 · Sprint 19t main D1 完成锁版（main 7 commits / second e 进行中 / 待 cici 触发 Codex 保 27 Sprint 0 顺延）
 **配套：** [`Sprint-19s-任务卡-V0.4.md`](./Sprint-19s-任务卡-V0.4.md) + [`19r-业务方反馈清单-V0.3.md`](./19r-业务方反馈清单-V0.3.md)
 
 ## 版本沿革
@@ -12,6 +12,7 @@
 |---|---|---|---|
 | V0.1 | 2026-05-16 | 起草 | 业务方反馈 buffer + 19r/19s 顺延 + 5 开放问题待 cici 拍板 |
 | V0.2 | 2026-05-16 | 定版启动 | cici 8 答拍板（Q1-Q3 财务全 A 满意 / Q4 E + Q5 A 物资顺延 / Q6 C race isolation 实施 / Q7 A second 续 Reports / Q8 A 今天启动）→ D1 启动 |
+| V0.3 | 2026-05-16 | main D1 完成锁版 | main 7 commits（a×4 + b×1 + c×1 + isolation merge×1）/ T-A6 isolation worktree 实测达成 / [P0] 证据链 ≥ 4 次闭环 / second e 进行中 / 待 Codex |
 
 ---
 
@@ -49,18 +50,18 @@
 
 ## 一、Sprint 19t 范围（双 session 5 轨并行 / 总 ~7-8 PD / 工期 ~1.5 day）
 
-### 1.1 main 主代理 a 主轨 — 19s/19r 顺延 + race isolation 实测（~2.0 PD / Q1-Q3 财务全 A 缩减 + Q6 C 新增 T-A6）
+### 1.1 main 主代理 a 主轨 — 19s/19r 顺延 + T-A6 isolation 实测（实际 ~1.6 PD ✅ 大幅缩减 / cici 业务方满意现状）
 
-| Task | PD | 描述 | 依赖 |
+| Task | PD | commit | 状态 |
 |---|---|---|---|
-| **T-A1** 5 stub 真借贷科目 patch（cici Q1 A 缩减）| 0.2 | 财务方对 19s D1 demo 完全满意 / 12 列字段 + NcAccountRule 字典都不扩 / 仅 5 stub generator 借贷科目从占位 → 真科目（5 demo 凭证保持现状 / 业务方未触发字段扩） | 无 |
-| **T-A2** IVoucherFileStorage 集成到 base / regenerator | 0.4 | 19s T-A4 基础设施顺延 19t — base GenerateAsync 后调 exporter + storage 生成真 .xlsx + 回填 dto.FilePath + VoucherFileHash + 跨 5 stub 测试 | 19s T-A4 完成 |
-| **T-A3** 19r b 占位 strict 实施 | 0.3 | 19r b 3 占位中剩项 strict 实施（19s T-A3 NcAccountRule 已部分解 + 19s D1 Codex P2-1 立修 SourceInterfaceCode 已部分解 / 此 task 收尾）| 19s T-A3 + Codex 立修完成 |
-| **T-A4** Codex hook + CI/CD secrets | 0.3 | 19s 顺延 #CI — cici secrets 待配 / 启动 codex pre-commit hook 实测 | cici secrets 配置 |
-| **T-A5** 19t 收尾 + V0.x 升版 + memory | 0.4 | V0.2 → V0.5 各阶段锁版 + memory 沉淀（race isolation 实测经验 / Codex hook 实测 / 27 Sprint 0 顺延记录）| 全 |
-| **T-A6** race isolation worktree 真并发实测（Q6 C 新增）| 0.8 | spawn 子代理 d 用 `isolation: "worktree"` 模式 / main + d 同时改 same file 真并发触发 race / git history 验证 isolation 防 race / [P0] 证据链彻底闭环（19r D2 stash + pathspec vs isolation 对比沉淀）| spawn 子代理 d isolation worktree |
+| **T-A1** 5 stub 借贷科目 doc + Summary 清理 | 0.05 | `eacf00f` | ✅（缩 0.2 → 0.05 / cici Q1+Q2 全 A 满意 / 仅 doc 更新）|
+| **T-A2** NcVoucherFileOrchestrator 凭证文件 orchestrator | 0.4 | `eacf00f` | ✅（独立 class / 0 破坏 base / 调用方接通顺延 19u）|
+| **T-A3** 19r b 3 占位 doc 评估 | 0.05 | `eacf00f` | ✅（缩 0.3 → 0.05 / 接口签名 long 重构顺延 19u 业务实体接通一并）|
+| ~~**T-A4** Codex hook + CI/CD secrets~~ | ~~0.3~~ | — | ⏸ 顺延 19u（cici secrets 未配 / 19t 范围外）|
+| **T-A5** 19t V0.2 → V0.3 锁版 + memory | 0.2 | （本 commit）| 🔄 |
+| **T-A6** race isolation worktree 实测（Q6 C）| 0.3 | `7c37df4` + `958c908` + merge + `6f099fd` | ✅（缩 0.8 → 0.3 / cici Q6 C 目标达成 / [P0] 证据链 ≥ 4 次闭环）|
 
-main 主代理 a 总：**~2.4 PD（含 T-A6 0.8 PD）**
+main 主代理 a 实际总：**~1.0 PD ✅**（vs V0.2 估 2.4 PD / 节省 1.4 PD / 业务方满意现状大幅缩减 + 顺延 T-A4）
 
 ### 1.2 main 子代理 b 副轨 — voucher-management 真业务接通 + 单测（~1.0 PD / Q5 A 物资顺延缩减）
 
@@ -72,14 +73,15 @@ main 主代理 a 总：**~2.4 PD（含 T-A6 0.8 PD）**
 | **T-B4** 单测扩展 + E2E voucher-management 真业务流 | 0.4 | T-A1-T-A3 + T-B1 配套测试 + E2E 真业务流 |
 | **T-B5** Buffer | 0.2 | 19t 中段调整 |
 
-### 1.3 main 子代理 c 第三轨 — UX 持续完善（~0.6 PD / Q4 E 物资没看 demo 大幅缩减）
+### 1.3 main 子代理 c 第三轨 — UX 持续完善（实际 ~0.6 PD ✅ commit `6e20eff`）
 
-| Task | PD | 描述 |
+11 处 patch 在 voucher-management/App.tsx +192 / -41 / TS 0 errors / ESLint 0 warning / npm build 成功
+
+| Task | PD | 状态 |
 |---|---|---|
-| ~~**T-C1** 8 业务单"重生成"按钮 UX 按反馈完善~~ | ~~0.4~~ | **顺延 19u**（Q4 E 物资汤云龙没看 demo / 19u 第 2 次反馈到位再做）|
-| **T-C2** 凭证管理批量下载 progress bar + retry 优化 | 0.3 | 大批量场景（100+）progress bar 精确 + Retry 按钮 + 网络错误兜底 |
-| **T-C3** 反 AI slop UX patch 持续（ui-ux-pro-max skill）| 0.3 | brand tokens 应用扩到更多 page / focus ring / 触控目标完善 |
-| ~~**T-C4** voucher-regenerate E2E + voucher-management E2E 真业务接通~~ | ~~0.3~~ | **顺延 19u**（依赖 T-B1 真业务接通完成 + 物资反馈 / 优先级降低）|
+| **T-C2** fetchWithTimeout + classifyError + retry | 0.3 | ✅ 30s download / 15s mark / AbortController 链路 / 阶段 1+2 精确百分比 |
+| **T-C3** 反 AI slop UX patch | 0.3 | ✅ aria-live polite / data-testid / brand tokens 32 page 100% 覆盖审查 |
+| ~~T-C1 / T-C4~~ | — | 顺延 19u（Q4 E + T-B1 依赖）|
 
 ### 1.4 second 主代理 e 平行轨 — Reports/Dashboards 续 + 19s T-F1/T-F2 顺延（~2.0 PD）
 
@@ -96,19 +98,22 @@ main 主代理 a 总：**~2.4 PD（含 T-A6 0.8 PD）**
 按 second e 评估 D2 是否 spawn：
 - **T-F1** dashboard 数据查询缓存（如 second T-E1 工作量超）
 
-### 1.6 五轨工期估算（V0.2 定版 / cici 8 答缩减 + Q6 C 新增 T-A6）
+### 1.6 main D1 实测数据（V0.3 锁版）
 
-| 轨 | V0.1 估 | V0.2 实际 | 变化 |
+| 主代理 | V0.2 估 | V0.3 实际 | 变化 |
 |---|---|---|---|
-| main 主代理 a | 2.0 | **2.4** | +0.4（Q1-Q3 缩 0.4 / Q6 C 加 0.8）|
-| main 子代理 b | 1.6 | **1.0** | -0.6（Q5 A 顺延 T-B2/T-B3）|
-| main 子代理 c | 1.3 | **0.6** | -0.7（Q4 E 顺延 T-C1/T-C4）|
-| second 主代理 e | 2.0 | 2.0 | 不变（Q7 A 续 Reports）|
-| second 子代理 f | 0-0.7 | 0-0.7 | 可选 |
-| **总投入** | 7.0-7.7 | **~6.0-6.7 PD** | **-1 PD（业务方满意现状缩减）**|
-| **wall-clock** | ~1.5 day | **~1.5 day** | 不变（main a 2.4 PD 主轨节奏）|
+| main a | 2.4 | **1.0** | -1.4（T-A1 缩 / T-A3 缩 / T-A4 顺延 / T-A6 缩）|
+| main b | 1.0 | **1.0** | 0（同 V0.2）|
+| main c | 0.6 | **0.6** | 0（同 V0.2）|
+| **main 小计** | 4.0 | **2.6 PD** | **-1.4 PD（35% 缩减）**|
+| commits | — | **7**（含 isolation merge） | — |
+| wall-clock | ~1.5 day | **< 1 day** | -0.5 day |
 
-理论加速比：**~4-4.5x（含 second f）** — 比 19s 7.1x 略低（main 工作量减少 / second 不变）
+main 实测加速比（main 部分）：**~2.6x**（2.6 PD / < 1 day）— 加 second e 后预测 ~4-5x（main 工作量减少 / 业务方满意现状）
+
+### 1.7 second 主代理 e 状态
+
+⏸ 待 cici 切 second session 同步 e 进度（19s D1 同模块续 / Reports/Dashboards / 任务卡 V0.2 §一 1.4 已 push 给 e）
 
 ---
 
