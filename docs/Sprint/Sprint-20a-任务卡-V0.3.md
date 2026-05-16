@@ -1,7 +1,7 @@
-# Sprint 20a 任务卡 V0.2（定版启动 D1 · cici 5 答拍板 / 接口签名 long 完整重构 + Orchestrator regen 接通）
+# Sprint 20a 任务卡 V0.3（main D1 完成锁版 · 7 commits / T-A1 long 重构 + T-A2 Orchestrator 接通 / second e mock-to-real 真业务）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（定版启动 · cici 5 答拍板：1A 完整重构 / 2B regen 优先 / 3B 保留观察 / 4A 续 Reports / 5A 今天启动）
+**版本：** V0.3（main D1 完成锁版 · main 7 commits / T-A1 接口 long + T-A2 Orchestrator + T-A4 race [P0] 5 Sprint 观察 + T-A5 worktree cleanup / second e ff8f9e5 mock-to-real / 待 Codex）
 **日期：** 2026-05-16
 **文档性质：** 实施层 · Sprint 20a 定版启动任务卡（V0.2 拍板 → 立即启动 D1）
 **配套：** [`Sprint-19t-任务卡-V0.3.md`](./Sprint-19t-任务卡-V0.3.md) + 19r/19s/19t 顺延债清单
