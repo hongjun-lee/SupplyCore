@@ -1,9 +1,9 @@
-# Sprint 20d 任务卡 V0.2（cici 5 答 B/A/B/A/A 拍板启动 D1 · NC 真接通预备启动 / G-12 B 后台 endpoint 实现 / 31 Sprint 0 顺延目标）
+# Sprint 20d 任务卡 V0.3（main D1 完成锁版 · 1 commit / T-A3 NC 真号回写 endpoint 完成 / T-A1+T-A2 顺延 task 0 PD 验证 / 23/23 测试全过 / 待 Codex）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（cici 5 答 B/A/B/A/A 拍板 · 主题 NC 真接通预备启动 / G-12 B 触发后台 endpoint 实现 / 业务方反馈仅未闭环项 / race 被动记录第 4 Sprint / 紧接 20c V0.4 启动 D1）
+**版本：** V0.3（main D1 完成锁版 · main 1 commit be849e5 T-A3 NC 真号回写 endpoint / T-A1+T-A2 顺延 task 0 PD 验证 / T-A4 race 0 实际 / 23/23 测试全过 / 待 Codex 评审）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 20d 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答拍板 → 立即启动 D1 / G-12 B NC 真号回写 endpoint 实现）
+**文档性质：** 实施层 · Sprint 20d D1 完成锁版任务卡（V0.2 拍板 → V0.3 main D1 完成 → 待 Codex 立修 → V0.4 / 31 Sprint 0 顺延 / 连续 8 立修目标）
 **配套：** [`Sprint-20c-任务卡-V0.2.md`](./Sprint-20c-任务卡-V0.2.md) + 20c D2-D3 收尾后续顺延债 + 业务方持续反馈
 
 ---
@@ -178,6 +178,7 @@
 |---|---|---|
 | V0.1 | 2026-05-16 | main a 起草 · 提前规划框架 / 范围待 20c 收尾后具体化 / 5 开放问题待 cici 答 |
 | V0.2 | 2026-05-16 | **cici 5 答 B/A/B/A/A 拍板**（Q1B NC 真接通预备 / Q2A 业务方反馈仅未闭环项 / Q3B 20d 启动 NC 真接通 / Q4A race 被动记录第 4 Sprint / Q5A 紧接 20c V0.4 启动）· 启动 D1 |
+| V0.3 | 2026-05-16 | **main D1 完成锁版** · main 1 commit `be849e5`（T-A3 NC 真号回写 endpoint 实现 / 4 文件 +105 行 / 23/23 测试全过）/ T-A1+T-A2 顺延 task 验证现状 0 PD（feedback_carryover_task_verify_first）/ T-A4 race 0 实际 5 Sprint 窗口第 4 / 等 Codex 评审 |
 
 ---
 
@@ -221,4 +222,44 @@
 
 ---
 
-**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答 B/A/B/A/A 拍板 → 立即启动 D1 / G-12 B NC 真号回写 endpoint 实现 / 31 Sprint 0 顺延目标
+## 九、main D1 实测数据（V0.3 锁版）
+
+### 9.1 main 主代理 a D1 完成清单
+
+| Task | 计划 PD | 实际 PD | commit | 状态 | 备注 |
+|---|---|---|---|---|---|
+| T-A1 20c 顺延 task 收口 | 0.2 | **0** | - | ✅ 完成 | 顺延 task 验证 0 个需收口（20c F-3 已在 demo checklist / 节省 0.2 PD）|
+| T-A2 业务方 F-3 持续验收 | 0.1 | **0** | - | ✅ 完成 | F-3 12 列 Excel 演练 step 已存在 §五 L69 / 节省 0.1 PD |
+| T-A3 NC 真号回写 endpoint | 0.4 | **~0.4** | `be849e5` | ✅ 完成 | 4 文件 +105 行 / 23/23 测试全过 / 双号制完整链路 |
+| T-A4 race [P0] 观察记录 | 0.1 | **0.05** | memory | ✅ 完成 | 5 Sprint 窗口第 4 / 0 race 实际 / 连续 4 Sprint 0 race |
+| T-A5 Codex 20d 评审 + 立修 | 0.3 | TBD | TBD | ⏳ Codex 后台跑（PID 59625）| 评审 main 1 commit |
+| T-A6 V0.x 升版 + memory | 0.4 | TBD | TBD | ⏳ V0.3 锁版完成 / 待 V0.4 | 教训 13 模板第 8 次维持记录 |
+
+main D1 实际：**~0.45 PD**（计划 1.5 / 早完 1.05 PD / T-A1+T-A2 顺延验证已存在 + T-A4 simple）
+
+### 9.2 T-A3 NC 真号回写 endpoint 完整实现（V0.3 留痕）
+
+**G-12 B 业务方决策实现**（vs G-12 A SQL 运维手动）：
+
+| 文件 | 改动 | 说明 |
+|---|---|---|
+| `IInterfaceReceiptAppService.cs` | +24 / -1 | UpdateNcVoucherNumberDto 类（[Required] + StringLength(64, MinimumLength=1)）+ UpdateNcVoucherNumberAsync 方法声明 |
+| `InterfaceReceiptAppService.cs` | +11 / 0 | 实现 UpdateNcVoucherNumberAsync：repo.GetAsync(id) + 设 NcVoucherNumber + UpdateAsync(autoSave: true) + ABP 自动审计 |
+| `InterfaceReceiptsController.cs` | +8 / 0 | PUT /api/supply-cores/interface-receipts/{id}/nc-voucher-number / [FromBody] DTO |
+| `InterfaceReceiptAppService_Tests.cs` | +63 / 0 | 3 新测试：Set_NcVoucherNumber_Preserve_NcVoucherNo + Overwrite_Existing + Throw_When_Id_Not_Found |
+
+测试验证：dotnet test --filter InterfaceReceiptAppService = **23/23 全过 ✓**
+
+双号制完整链路：
+- NcVoucherNo（SC-2026-05-NNNNNN / 系统生成 / 业务号）
+- NcVoucherNumber（财务回填 NC 真号 / G-12 B endpoint）
+
+### 9.3 second e 状态（cici 切 second 给 e 续 prompt）
+
+- 计划任务：T-E1 dashboard 4 → 6+ aggregator + T-E2 Reports 11 → 13+ + T-E3 E2E spec 加严 + T-E4 收尾（总 ~1.5 PD）
+- 第 6 次连续 Reports/Dashboards 同模块（19s + 19t + 20a + 20b + 20c + 20d）
+- 1c 模块隔离表稳定 / 连续 4 Sprint 0 race 实测（20a-20c-20d）
+
+---
+
+**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答 B/A/B/A/A 拍板 → V0.3 main D1 完成锁版（main 1 commit / ~0.45 PD / 早完 1.05 PD）→ 待 Codex 立修 → V0.4 / 31 Sprint 0 顺延准备
