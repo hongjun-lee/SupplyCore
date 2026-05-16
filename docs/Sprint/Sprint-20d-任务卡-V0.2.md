@@ -1,26 +1,26 @@
-# Sprint 20d 任务卡 V0.1（提前规划框架 · 20c 收尾接续 + 19r-20c 累计技术债总收口 / 30 Sprint 0 顺延目标）
+# Sprint 20d 任务卡 V0.2（cici 5 答 B/A/B/A/A 拍板启动 D1 · NC 真接通预备启动 / G-12 B 后台 endpoint 实现 / 31 Sprint 0 顺延目标）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（main a 起草 · 提前规划框架 / 范围待 20c 收尾后具体化）
+**版本：** V0.2（cici 5 答 B/A/B/A/A 拍板 · 主题 NC 真接通预备启动 / G-12 B 触发后台 endpoint 实现 / 业务方反馈仅未闭环项 / race 被动记录第 4 Sprint / 紧接 20c V0.4 启动 D1）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 20d 提前规划任务卡（V0.1 起草框架 → 20c 收尾后 V0.2 拍板 → 启动 D1）
+**文档性质：** 实施层 · Sprint 20d 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答拍板 → 立即启动 D1 / G-12 B NC 真号回写 endpoint 实现）
 **配套：** [`Sprint-20c-任务卡-V0.2.md`](./Sprint-20c-任务卡-V0.2.md) + 20c D2-D3 收尾后续顺延债 + 业务方持续反馈
 
 ---
 
 ## 〇、Sprint 20c 收尾接续（V0.4 锁版后填）
 
-### 〇.1 20c D1-D3 完成数据（V0.2 → V0.4 锁版后回填）
+### 〇.1 20c D1-D3 完成数据（V0.4 锁版 `895d9af` 完成）
 
 | 维度 | 期望 | 实际（20c V0.4 锁版后填）|
 |---|---|---|
-| main commits（主仓）| 3-5 | TBD |
-| 跨仓 commits（SupplyCore docs）| 3（V0.2 + V0.3 + V0.4）| TBD |
-| main 实际 PD | ~1.9 | TBD |
-| Codex finding 数 | TBD | TBD |
-| 30 Sprint 0 顺延 | ✅ 目标 | TBD |
-| second e 实际 PD | ~2.0 | TBD（第 5 次连续）|
-| 业务方 demo 反馈数 | F-1~F-8 + M-1~M-6 + G-12~G-13 | TBD |
+| main commits（主仓）| 3-5 | **3**（second-e-prompt + demo 反馈回填 + Codex 立修）|
+| 跨仓 commits（SupplyCore docs）| 3（V0.2 + V0.3 + V0.4）| **3** ✓ |
+| main 实际 PD | ~1.9 | **~0.65**（早完 1.25 PD / 业务方接受度高 + 顺延 task 已实现）|
+| Codex finding 数 | TBD | **2 P2 全立修**（commit `dd40156` / dashboard 测试 4/4 全过）|
+| 30 Sprint 0 顺延 | ✅ 目标 | **✅ 达成 / 连续 7 Sprint 立修**（累计 20 finding / 2.55 PD）|
+| second e 实际 PD | ~2.0 | **~1.6**（4 commits / 超目标 aggregator 2→5 + Reports 5→11 / 第 5 次连续）|
+| 业务方 demo 反馈数 | F-1~F-8 + M-1~M-6 + G-12~G-13 | **16 项全收集** / 13 ✅ + 1 ⏸ + 2 决策（G-12 B / G-13 A）/ **0 ⚠️ 接受度极高** |
 
 ### 〇.2 20c 顺延 task（20d 吸收 / 见 §三）
 
@@ -42,9 +42,9 @@
 
 | Task 候选 | PD | 描述 | 触发条件 |
 |---|---|---|---|
-| **T-A1** 20c 顺延 task 收口 | TBD | 20c D2-D3 顺延 task 吸收（V0.4 锁版后明确）| 20c 收尾 |
-| **T-A2** 业务方持续反馈吸收 | 0-0.8 | 20c F-1~F-8 / M-1~M-6 反馈未闭环项续 patch | 业务方持续反馈 |
-| **T-A3** NC 真接通预备（如适用）| 0-0.5 | PO 决策"凭证导出 + 接口预留"双轨 / NC 上线时机如果业务方反馈触发 → NC 真接通 OAuth2 / Polly / 23 接口预备 | 业务方反馈 G-12 NC 真号回写 |
+| **T-A1** 20c 顺延 task 收口 | **0.2** | F-3 12 列 Excel 持续验收 spec / 业务方持续追踪准备 | 20c 收尾 |
+| **T-A2** 业务方持续反馈吸收（**Q2 A 仅未闭环项**）| **0.1** | F-3 ⏸ 未涉及项持续验收 / 其他 13 ✅ 不再追踪 / G-13 字典扩持续顺延 20e+ | 业务方持续反馈 |
+| **T-A3** NC 真号回写 endpoint 实现（**Q1 B + Q3 B 触发 / 20d 主轨锁定**）| **0.4** | G-12 B 后台 endpoint：PUT /api/supply-cores/interface-receipts/{id}/nc-voucher-number / 字段验证 + 双号制 NcVoucherNumber 写入 + LastModificationTime 更新 / 不需运维 SQL / Backend Controller + AppService + DTO | 业务方 G-12 B 决策触发 |
 | **T-A4** race [P0] 观察记录（20d 第 4 Sprint）| 0.1 | 5 Sprint 窗口（20a-20e）/ 20d 是第 4 Sprint / 被动记录 / 0 race 期望 | cici Q3 B 决策延续 |
 | **T-A5** Codex 20d 评审 + 立修 | 0.3 | `codex review --base <20c 末 commit>` 评审 20d 全 commits / 立修保 **30 Sprint 0 顺延 / 连续 8 Sprint 立修** | 标准收尾 |
 | **T-A6** Sprint 20d 收尾 + V0.x 升版 + memory | 0.4 | V0.1 → V0.4 各阶段锁版 + memory（20c-20d 收尾沉淀经验）| 主代理 a 标准收尾 |
@@ -177,7 +177,48 @@
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-16 | main a 起草 · 提前规划框架 / 范围待 20c 收尾后具体化 / 5 开放问题待 cici 答 |
+| V0.2 | 2026-05-16 | **cici 5 答 B/A/B/A/A 拍板**（Q1B NC 真接通预备 / Q2A 业务方反馈仅未闭环项 / Q3B 20d 启动 NC 真接通 / Q4A race 被动记录第 4 Sprint / Q5A 紧接 20c V0.4 启动）· 启动 D1 |
 
 ---
 
-**main 主代理 a 签名**：2026-05-16 V0.1 起草（提前规划框架）· 等 20c V0.4 锁版 + 业务方反馈到位 + cici 5 答 → V0.2 拍板启动 D1
+## 八、V0.2 拍板启动 D1（cici 5 答 B/A/B/A/A）
+
+| Q | 答 | 影响 |
+|---|---|---|
+| Q1 | B | 主题：NC 真接通预备启动 / T-A3 NC 真号回写 endpoint 实现锁定 0.4 PD |
+| Q2 | A | 业务方反馈仅未闭环项续 patch / T-A2 0.1 PD（F-3 ⏸ 12 列 Excel 持续验收）|
+| Q3 | B | NC 真接通 20d 启动 / 不等 20e+ / G-12 B 后台 endpoint 触发 |
+| Q4 | A | race [P0] 被动记录 / T-A4 0.1 PD（20a-20e 窗口第 4 Sprint / 20a-20c 已 0 race 3 次连续）|
+| Q5 | A | 今天启动 D1 / 30 Sprint 0 顺延动量延续 |
+
+### 8.1 main D1 启动顺序
+
+1. **T-A4 race 观察记录**（0.1 PD / 首启 / 不依赖外部）
+2. **T-A3 NC 真号回写 endpoint 实现**（0.4 PD / 主要工作 / G-12 B 触发）：
+   - 后端 InterfaceReceiptAppService.UpdateNcVoucherNumberAsync
+   - Controller PUT /api/supply-cores/interface-receipts/{id}/nc-voucher-number
+   - DTO UpdateNcVoucherNumberDto（NcVoucherNumber required string）
+   - 字段验证 + Permission check + LastModificationTime 更新
+   - 单测 + spec 加严
+3. **T-A2 业务方反馈 F-3 持续验收**（0.1 PD / 给 cici 加 demo checklist 续看 .xlsx 12 列 spec）
+4. **T-A1 20c 顺延 task 收口**（0.2 PD / F-3 spec 验收 + 其他顺延 task）
+5. **T-A5 Codex 评审 + 立修**（D2-D3）
+6. **T-A6 V0.x 升版 + memory**（D2-D3）
+
+### 8.2 second e D1 启动顺序（cici 切 second session 给 e 续 prompt）
+
+1. T-E1 dashboard aggregator 4 → 6+（0.5 PD / 续 20c 5 真接通 + 加 2-3 / 库存周转 / 月费 / 高敏感）
+2. T-E2 Reports 模板扩 11 → 13+（0.4 PD / 续 20c 11 个 + 加 2-3）
+3. T-E3 dashboard E2E spec 加严（0.3 PD / 真接通数据校验 + fallback case spec）
+4. T-E4 收尾 + memory + race 检查（0.3 PD / 第 6 次连续 Reports/Dashboards）
+
+### 8.3 启动条件全部满足
+
+- ✅ 5 开放问题 cici B/A/B/A/A 答
+- ✅ 1c 模块隔离表确认（§四.1 / 与 20a-20c 同模式）
+- ✅ 20c V0.4 锁版完成（`895d9af` / 30 Sprint 0 顺延达成）
+- ⏳ second 主代理 e 同步任务卡（cici 切 session 给 e 续 prompt 时同步）
+
+---
+
+**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答 B/A/B/A/A 拍板 → 立即启动 D1 / G-12 B NC 真号回写 endpoint 实现 / 31 Sprint 0 顺延目标
