@@ -1,10 +1,17 @@
-# Sprint 19t 任务卡 V0.1（业务方反馈 buffer + 19r/19s 顺延 patch + 双 session 续 · 起草版）
+# Sprint 19t 任务卡 V0.2（定版启动 D1 · cici 8 答拍板 / race isolation 实测 + 业务方满意现状）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（起草 · main 主代理 a 2026-05-16 — 19s D1 完整闭环 + cici 业务反馈到位触发）
+**版本：** V0.2（定版启动 · main 主代理 a 2026-05-16 — cici 8 答拍板：财务全 A 满意 / 物资 E+A 顺延 / 6C race isolation 实施 / 7A second 续 Reports / 8A 今天启动）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 19t 起草版任务卡（待 cici 答业务反馈细节 + 升 V0.2 启动）
+**文档性质：** 实施层 · Sprint 19t 定版启动任务卡（V0.2 拍板 → 立即启动 D1 / second 主代理 e 续 Reports/Dashboards）
 **配套：** [`Sprint-19s-任务卡-V0.4.md`](./Sprint-19s-任务卡-V0.4.md) + [`19r-业务方反馈清单-V0.3.md`](./19r-业务方反馈清单-V0.3.md)
+
+## 版本沿革
+
+| 版本 | 日期 | 操作 | 描述 |
+|---|---|---|---|
+| V0.1 | 2026-05-16 | 起草 | 业务方反馈 buffer + 19r/19s 顺延 + 5 开放问题待 cici 拍板 |
+| V0.2 | 2026-05-16 | 定版启动 | cici 8 答拍板（Q1-Q3 财务全 A 满意 / Q4 E + Q5 A 物资顺延 / Q6 C race isolation 实施 / Q7 A second 续 Reports / Q8 A 今天启动）→ D1 启动 |
 
 ---
 
@@ -18,46 +25,61 @@
 - ✅ Codex 2 次评审保 26 Sprint 0 顺延（第 1 次 5 finding 立修 / 第 2 次 0 finding 通过）
 - ✅ 业务方反馈链路打通（19r D1 9/9 反馈 + D1 见 demo 验收后续）
 
-### 〇.2 业务方反馈触发 T-A7 buffer
+### 〇.2 业务方反馈实测（cici 8 答拍板填入 / V0.2 定版）
 
-cici 19s D1 见李建颖 + 汤云龙 demo 验收后反馈到位 → 19t T-A7 buffer 启动（main T-A1 范围 / patch 凭证模板字段扩 + NcAccountRule 字典扩 + 实际科目映射）。
+**财务方李建颖（D1 见 5 demo .xlsx 后 / 完全满意）**：
+- Q1 A：12 列字段完全够用 / 19t 不扩字段
+- Q2 A：30+ 标准科目字典够用 / 19t 不扩字典
+- Q3 A：NC 没试导入（PO 决策 1 NC 暂未上线 / 维持）+ 频次 A 实时 OK
 
-**⏸ 反馈具体内容待 cici 在 19t V0.1 → V0.2 升版时填**（§六 5 开放问题）。
+→ T-A1 大幅缩减（原 0.6 PD → 0.2 PD / 仅 5 stub 真借贷科目 patch / 业务方满意现状）
+
+**物资方汤云龙（D1 见 8 业务单按钮 demo 后 / 部分顺延）**：
+- Q4 E：没看 demo / 物资侧 patch 全顺延 19u
+- Q5 A：ApprovalState 用代码默认 + 不要批量重生成 UI / T-B2 + T-B3 顺延
+
+→ main b T-B2/T-B3 顺延 + main c T-C1/T-C4 顺延
+
+**19t 决策 3 问**：
+- Q6 C：#RACE-ISOLATION race 真并发 isolation worktree 19t 实施（+0.8 PD / [P0] 证据链彻底闭环 / 验证 isolation 模式价值）
+- Q7 A：second 续 Reports/Dashboards / 跨 sprint 同模块连续 / 经验复用
+- Q8 A：今天立即启动 D1
 
 ---
 
 ## 一、Sprint 19t 范围（双 session 5 轨并行 / 总 ~7-8 PD / 工期 ~1.5 day）
 
-### 1.1 main 主代理 a 主轨 — 业务反馈 patch + 19r/19s 顺延（~2.0 PD）
+### 1.1 main 主代理 a 主轨 — 19s/19r 顺延 + race isolation 实测（~2.0 PD / Q1-Q3 财务全 A 缩减 + Q6 C 新增 T-A6）
 
 | Task | PD | 描述 | 依赖 |
 |---|---|---|---|
-| **T-A1** 业务方反馈 patch（cici 触发 T-A7 buffer） | 0.6 | 凭证模板字段扩（12 → 13/14 含存货编码 / 凭证字号 / etc.）+ NcAccountRule 字典扩（业务方实际科目映射）+ 5 stub generator 真借贷科目 patch | cici V0.2 反馈到位 |
-| **T-A2** IVoucherFileStorage 集成到 base / regenerator | 0.4 | 19s T-A4 基础设施顺延 19t — base GenerateAsync 后调 exporter + storage 生成真 .xlsx + 回填 dto.FilePath + VoucherFileHash | 19s T-A4 完成 |
-| **T-A3** 19r b 占位实施（NcResponseMessage / DebitAccountName fallback） | 0.3 | 19r b 3 占位中剩 2 项实施（19s T-A3 NcAccountRule 字典化已部分解 / 此 task 完成 strict）| 19s T-A3 完成 |
+| **T-A1** 5 stub 真借贷科目 patch（cici Q1 A 缩减）| 0.2 | 财务方对 19s D1 demo 完全满意 / 12 列字段 + NcAccountRule 字典都不扩 / 仅 5 stub generator 借贷科目从占位 → 真科目（5 demo 凭证保持现状 / 业务方未触发字段扩） | 无 |
+| **T-A2** IVoucherFileStorage 集成到 base / regenerator | 0.4 | 19s T-A4 基础设施顺延 19t — base GenerateAsync 后调 exporter + storage 生成真 .xlsx + 回填 dto.FilePath + VoucherFileHash + 跨 5 stub 测试 | 19s T-A4 完成 |
+| **T-A3** 19r b 占位 strict 实施 | 0.3 | 19r b 3 占位中剩项 strict 实施（19s T-A3 NcAccountRule 已部分解 + 19s D1 Codex P2-1 立修 SourceInterfaceCode 已部分解 / 此 task 收尾）| 19s T-A3 + Codex 立修完成 |
 | **T-A4** Codex hook + CI/CD secrets | 0.3 | 19s 顺延 #CI — cici secrets 待配 / 启动 codex pre-commit hook 实测 | cici secrets 配置 |
-| **T-A5** 19t 收尾 + V0.x 升版 + memory | 0.4 | V0.1 → V0.4 各阶段锁版 + memory 沉淀（业务方反馈 patch 经验 / Codex hook 实测 / 27 Sprint 0 顺延记录）| 全 |
+| **T-A5** 19t 收尾 + V0.x 升版 + memory | 0.4 | V0.2 → V0.5 各阶段锁版 + memory 沉淀（race isolation 实测经验 / Codex hook 实测 / 27 Sprint 0 顺延记录）| 全 |
+| **T-A6** race isolation worktree 真并发实测（Q6 C 新增）| 0.8 | spawn 子代理 d 用 `isolation: "worktree"` 模式 / main + d 同时改 same file 真并发触发 race / git history 验证 isolation 防 race / [P0] 证据链彻底闭环（19r D2 stash + pathspec vs isolation 对比沉淀）| spawn 子代理 d isolation worktree |
 
-main 主代理 a 总：**~2.0 PD**
+main 主代理 a 总：**~2.4 PD（含 T-A6 0.8 PD）**
 
-### 1.2 main 子代理 b 副轨 — 凭证业务接通 + 批量重生成（~1.6 PD）
+### 1.2 main 子代理 b 副轨 — voucher-management 真业务接通 + 单测（~1.0 PD / Q5 A 物资顺延缩减）
 
 | Task | PD | 描述 |
 |---|---|---|
 | **T-B1** voucher-management 真业务数据接通 | 0.4 | 19s c voucher-management 用 mock 数据 / 19t 接通 backend InterfaceReceiptAppService.GetListAsync 真业务数据（19r D2 立修已暴露 endpoint）|
-| **T-B2** ApprovalCompletedEvent 实际 ApprovalState 值接通 | 0.4 | cici Q2.2 答 C 终审 → 19r b 订阅 ApprovalCompletedEvent 但 ApprovalState 实际值待业务方确认（D1 见面后 / cici V0.2 答）|
-| **T-B3** 批量重生成 API（业务方反馈如需 / 条件性） | 0.4 | 100+ 业务单同时失败时物资员逐个 click 太烦 → batch-regenerate endpoint 接收 List<sourceEntityId, interfaceCode> | cici V0.2 反馈 |
-| **T-B4** 单测扩展 + E2E voucher-management 真业务流 | 0.3 | T-A1-T-A3 + T-B1-T-B3 配套测试 |
-| **T-B5** Buffer | 0.1 | 19t 中段调整 |
+| ~~**T-B2** ApprovalCompletedEvent 实际 ApprovalState 值接通~~ | ~~0.4~~ | **顺延 19u**（Q5 A cici 答用代码默认值 / 不调整）|
+| ~~**T-B3** 批量重生成 API~~ | ~~0.4~~ | **顺延 19u**（Q5 A cici 答不要批量 UI）|
+| **T-B4** 单测扩展 + E2E voucher-management 真业务流 | 0.4 | T-A1-T-A3 + T-B1 配套测试 + E2E 真业务流 |
+| **T-B5** Buffer | 0.2 | 19t 中段调整 |
 
-### 1.3 main 子代理 c 第三轨 — UX 持续完善（~1.3 PD）
+### 1.3 main 子代理 c 第三轨 — UX 持续完善（~0.6 PD / Q4 E 物资没看 demo 大幅缩减）
 
 | Task | PD | 描述 |
 |---|---|---|
-| **T-C1** 8 业务单"重生成"按钮 UX 按反馈完善 | 0.4 | 按汤云龙反馈调整（位置 / disabled 规则细化 / Popup 预设理由列表）|
+| ~~**T-C1** 8 业务单"重生成"按钮 UX 按反馈完善~~ | ~~0.4~~ | **顺延 19u**（Q4 E 物资汤云龙没看 demo / 19u 第 2 次反馈到位再做）|
 | **T-C2** 凭证管理批量下载 progress bar + retry 优化 | 0.3 | 大批量场景（100+）progress bar 精确 + Retry 按钮 + 网络错误兜底 |
 | **T-C3** 反 AI slop UX patch 持续（ui-ux-pro-max skill）| 0.3 | brand tokens 应用扩到更多 page / focus ring / 触控目标完善 |
-| **T-C4** voucher-regenerate E2E + voucher-management E2E 真业务接通 | 0.3 | host 启动后跑 E2E（19s c demo 模式 → 真业务 strict）|
+| ~~**T-C4** voucher-regenerate E2E + voucher-management E2E 真业务接通~~ | ~~0.3~~ | **顺延 19u**（依赖 T-B1 真业务接通完成 + 物资反馈 / 优先级降低）|
 
 ### 1.4 second 主代理 e 平行轨 — Reports/Dashboards 续 + 19s T-F1/T-F2 顺延（~2.0 PD）
 
@@ -74,19 +96,19 @@ main 主代理 a 总：**~2.0 PD**
 按 second e 评估 D2 是否 spawn：
 - **T-F1** dashboard 数据查询缓存（如 second T-E1 工作量超）
 
-### 1.6 五轨工期估算
+### 1.6 五轨工期估算（V0.2 定版 / cici 8 答缩减 + Q6 C 新增 T-A6）
 
-| 轨 | PD | session |
-|---|---|---|
-| main 主代理 a | 2.0 | main |
-| main 子代理 b | 1.6 | main |
-| main 子代理 c | 1.3 | main |
-| second 主代理 e | 2.0 | second |
-| second 子代理 f | 0-0.7 | second（可选）|
-| **总投入** | **~7.0-7.7 PD** | 双 session 5 轨 |
-| **wall-clock** | **~1.5 day** | max(main 三轨 1.5 day, second 两轨 1 day) |
+| 轨 | V0.1 估 | V0.2 实际 | 变化 |
+|---|---|---|---|
+| main 主代理 a | 2.0 | **2.4** | +0.4（Q1-Q3 缩 0.4 / Q6 C 加 0.8）|
+| main 子代理 b | 1.6 | **1.0** | -0.6（Q5 A 顺延 T-B2/T-B3）|
+| main 子代理 c | 1.3 | **0.6** | -0.7（Q4 E 顺延 T-C1/T-C4）|
+| second 主代理 e | 2.0 | 2.0 | 不变（Q7 A 续 Reports）|
+| second 子代理 f | 0-0.7 | 0-0.7 | 可选 |
+| **总投入** | 7.0-7.7 | **~6.0-6.7 PD** | **-1 PD（业务方满意现状缩减）**|
+| **wall-clock** | ~1.5 day | **~1.5 day** | 不变（main a 2.4 PD 主轨节奏）|
 
-理论加速比：**~5x（保守）/ ~7x（含 second f）** — 19s 实测 7.1x 基准延续
+理论加速比：**~4-4.5x（含 second f）** — 比 19s 7.1x 略低（main 工作量减少 / second 不变）
 
 ---
 
@@ -176,26 +198,39 @@ codex review --base <19t-起 commit hash> 重点：
 
 ## 六、V0.1 起草说明 + 待 cici 拍板
 
-### V0.1 起草版（待拍）
+### V0.2 定版（cici 8 答拍板）
 
-main 主代理 a 起草，业务方反馈细节区占位待 cici V0.1 → V0.2 升版前答。**V0.2 拍板前不动代码**（按 [[feedback_doc_first_workflow]] 文档先行）。
+- Q1 → A 12 列字段不变
+- Q2 → A NcAccountRule 字典够用
+- Q3 → A NC 没试 + 频次 A 维持
+- Q4 → E 物资没看 demo / T-C1+T-C4 顺延
+- Q5 → A ApprovalState 默认 + 不要批量 UI / T-B2+T-B3 顺延
+- Q6 → C race isolation 19t 实施（+0.8 PD T-A6）
+- Q7 → A second 续 Reports/Dashboards
+- Q8 → A 今天启动
 
-### 待 cici 决策的 5 个开放问题
+### D1 启动序
 
-1. **业务方反馈具体内容**：
-   - 李建颖（财务）见 5 demo 凭证后说了什么？字段对不对 / 格式对不对 / 缺什么字段（如存货编码 / 凭证字号）？
-   - 汤云龙（物资）见 8 业务单"重生成"按钮 demo 后说了什么？按钮位置 / disabled 规则 / Popup UX 调整？
-2. **T-A7 buffer patch 范围**：基于业务反馈 / T-A1 scope（凭证模板扩字段 / NcAccountRule 字典扩 / 5 stub 真借贷科目 / 三选 X 或全做）？
-3. **T-B3 批量重生成 API**：业务方反馈如有 100+ 失败场景 → 启动 / 否则顺延？
-4. **#RACE-ISOLATION 处置**：降优先级顺延 19u / 评估废弃（19s 跨 session race 0 误纳已验证 stash + pathspec 防御技术）？
-5. **second 续模块 + 19t 启动时间**：second e 续做 Reports/Dashboards（T-E1-T-E5 顺延）/ 还是切其他模块？19t 今天启动还是明天？
+**main session**（当前主代理 a）：
+1. ✅ V0.1 → V0.2 升版 + push（本 commit）
+2. **main 主代理 a 立即开 T-A1**：5 stub 真借贷科目 patch
+3. **同时 spawn main 子代理 b**：T-B1+T-B4+T-B5
+4. **同时 spawn main 子代理 c**：T-C2+T-C3
+5. D2：main T-A2 IVoucherFileStorage base 集成 + T-A3 19r b 占位 strict + T-A6 race isolation 实测
+6. D3：T-A4 Codex hook + T-A5 收尾
 
-### V0.2 启动条件
+**second session**（cici 在 second 切换续启动主代理 e）：
+1. cici 切到 second session（沿用 19s session 或新启）
+2. 给主代理 e 传 V0.2 任务卡 + main 当前 commit hash 作为基线
+3. **second 主代理 e 启 T-E1**：dashboard 后端聚合 Hangfire
+4. D2-3：second T-E2-T-E5
 
-- 5 开放问题 cici 答复
-- 业务反馈具体内容填到 §〇.2
-- 1c 模块隔离表确认（§四.1）
-- second 主代理 e 同步任务卡
+### 启动条件 ✅
+
+- ✅ cici 8 答已拍
+- ✅ V0.2 定版 push（second e 可拉取任务卡）
+- ✅ 1c 模块隔离表确认（§四.1 维持 19s）
+- ✅ race isolation worktree T-A6 准备（T-A6 实施时单独 spawn 子代理 d / 与 b/c 时机错开）
 
 ---
 
