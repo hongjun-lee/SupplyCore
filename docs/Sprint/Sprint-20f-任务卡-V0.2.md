@@ -1,9 +1,9 @@
-# Sprint 20f 任务卡 V0.1（second e 续吸收 + 业务方 F-3 持续验收 + NC 真接通下一步评估 / 33 Sprint 0 顺延目标）
+# Sprint 20f 任务卡 V0.2（cici 5 答全 A 拍板 · second e 主轨 + main 副轨化 / 33 Sprint 0 顺延目标 / 今天启动 D1）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（main a 起草 · 5 开放问题待 cici 答）
+**版本：** V0.2（cici 5 答全 A 拍板 · second e 主轨 + main 副轨化 / second e 续全 / NC 真接通顺延 / F-3 追踪 / 今天启动 D1）
 **日期：** 2026-05-17
-**文档性质：** 实施层 · Sprint 20f 提前规划任务卡（V0.1 起草框架 → cici 5 答 → V0.2 拍板启动 D1）
+**文档性质：** 实施层 · Sprint 20f 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答全 A 拍板 → 立即启动 D1 / second e 主轨 + main 副轨化）
 **配套：** [`Sprint-20e-任务卡-V0.4.md`](./Sprint-20e-任务卡-V0.4.md) + [`sprint-20a-20e-retrospective.md`](../../../SupplyCores/docs/internal/sprint-20a-20e-retrospective.md)
 
 ---
@@ -172,7 +172,46 @@ second 主代理 e 总：**~1.8 PD**
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-17 | main a 起草 · 提前规划框架 / 5 开放问题待 cici 答 |
+| V0.2 | 2026-05-17 | **cici 5 答全 A 拍板**（Q1A second 主轨 + main 副轨化 / Q2A second e 续全 T-E1~T-E5 / Q3A NC 真接通顺延 / Q4A 业务方 F-3 T-A1 追踪 / Q5A 今天启动 D1）· 启动 D1 |
 
 ---
 
-**main 主代理 a 签名**：2026-05-17 V0.1 起草（提前规划框架）· 等 cici 5 答 + 升 V0.2 启动
+## 八、V0.2 拍板启动 D1（cici 5 答全 A）
+
+| Q | 答 | 影响 |
+|---|---|---|
+| Q1 | A | 主题：second e 主轨 + main 副轨化 |
+| Q2 | A | second e 续全 T-E1~T-E5（~1.8 PD / 第 7 次连续 Reports/Dashboards）|
+| Q3 | A | NC 真接通顺延（业务方 G-12 后续未明确 / 0 PD）|
+| Q4 | A | 业务方 F-3 验收 T-A1 0.1 PD 追踪（与 cici 协调下次 demo 时段）|
+| Q5 | A | 今天启动 D1 / 32 Sprint 0 顺延动量延续 |
+
+### 8.1 main D1 启动顺序（副轨化）
+
+1. **T-A1 业务方 F-3 持续验收追踪**（0.1 PD / 首启）
+2. **T-A2 NC 真接通下一步评估** = 0 PD（Q3 A 顺延）
+3. **T-A3 Codex 20f 评审 + 立修**（0.2 PD / D2）
+4. **T-A4 V0.x 升版 + memory**（0.3 PD / D2-D3）
+
+main D1 实际：~0.6 PD（副轨化 / 让 second 主跑）
+
+### 8.2 second e D1 启动顺序（cici 切 second session 给 e 续 prompt）
+
+详 [`second-e-prompt-20f-raw.txt`](../../../SupplyCores/docs/internal/second-e-prompt-20f-raw.txt)：
+1. T-E1 dashboard aggregator 5 → 7+（0.5 PD）
+2. T-E2 Reports 模板扩 11 → 13+（0.4 PD）
+3. T-E3 dashboard E2E spec 加严（0.3 PD）
+4. T-E4 NcInterface 监控强化（0.3 PD）
+5. T-E5 收尾 + memory + race 检查（0.3 PD）
+
+### 8.3 启动条件全部满足
+
+- ✅ 5 开放问题 cici 全 A 答
+- ✅ 1c 模块隔离表确认（§四.1 / 与 20a-20e 同模式）
+- ✅ 20e V0.4 锁版完成（`41060df` / 32 Sprint 0 顺延 / 双里程碑达成）
+- ✅ second e prompt 已备料（`9b2f0b8` second-e-prompt-20f-raw.txt）
+- ⏳ cici 切 second session 给 e 续 prompt 启动 second 主轨
+
+---
+
+**main 主代理 a 签名**：2026-05-17 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → 立即启动 D1 / second e 主轨 + main 副轨化 / 33 Sprint 0 顺延目标
