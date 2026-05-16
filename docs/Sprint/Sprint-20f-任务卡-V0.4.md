@@ -1,9 +1,9 @@
-# Sprint 20f 任务卡 V0.2（cici 5 答全 A 拍板 · second e 主轨 + main 副轨化 / 33 Sprint 0 顺延目标 / 今天启动 D1）
+# Sprint 20f 任务卡 V0.4（Codex 立修完整闭环 · main 3 + second 4 commits / P2 立修 EF Core 并发 / 33 Sprint 0 顺延 / 连续 9 立修）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（cici 5 答全 A 拍板 · second e 主轨 + main 副轨化 / second e 续全 / NC 真接通顺延 / F-3 追踪 / 今天启动 D1）
+**版本：** V0.4（Codex 立修完整闭环 · main 3 commits + second e 4 commits / 防御性 P2-1 BusinessReportsController Permission `5cba2cd` + Codex P2 EF Core 并发立修 `3702ea3` / 33 Sprint 0 顺延达成 / 连续 9 Sprint 立修）
 **日期：** 2026-05-17
-**文档性质：** 实施层 · Sprint 20f 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答全 A 拍板 → 立即启动 D1 / second e 主轨 + main 副轨化）
+**文档性质：** 实施层 · Sprint 20f 收尾锁版任务卡（V0.2 拍板 → V0.4 Codex 立修完整闭环 / 33 Sprint 0 顺延达成 / 连续 9 Sprint 立修 / D1 wall-clock < 1 day / second e 第 7 次连续达成）
 **配套：** [`Sprint-20e-任务卡-V0.4.md`](./Sprint-20e-任务卡-V0.4.md) + [`sprint-20a-20e-retrospective.md`](../../../SupplyCores/docs/internal/sprint-20a-20e-retrospective.md)
 
 ---
@@ -173,6 +173,7 @@ second 主代理 e 总：**~1.8 PD**
 |---|---|---|
 | V0.1 | 2026-05-17 | main a 起草 · 提前规划框架 / 5 开放问题待 cici 答 |
 | V0.2 | 2026-05-17 | **cici 5 答全 A 拍板**（Q1A second 主轨 + main 副轨化 / Q2A second e 续全 T-E1~T-E5 / Q3A NC 真接通顺延 / Q4A 业务方 F-3 T-A1 追踪 / Q5A 今天启动 D1）· 启动 D1 |
+| V0.4 | 2026-05-17 | **D1 完成 + Codex 立修完整闭环**（跳 V0.3 / main 副轨化 D1 commit 少）· main 3 commits（`5cba2cd` P2-1 防御性立修 BusinessReportsController class 级 Permission + `3702ea3` Codex P2 立修 5 处 Task.WhenAll → 顺序 await）+ second e 4 commits（T-E1 dashboard 5→7 aggregator + EF Core async / T-E2 Reports 11→14 / T-E3 dashboard E2E spec 加严 / T-E4 NcInterface aria-live）+ memory 留痕 T-E5 / **33 Sprint 0 顺延达成 / 连续 9 Sprint 立修**（19q P1 / 19r 5 / 19s 5+0 / 19t 3 / 20a 2 / 20b 2 / 20c 2 / 20d 0 / 20e 1 / **20f 1 P2** = 22 finding 全立修 + 2 次 0 通过 / 2.85 PD 累计）|
 
 ---
 
@@ -214,4 +215,4 @@ main D1 实际：~0.6 PD（副轨化 / 让 second 主跑）
 
 ---
 
-**main 主代理 a 签名**：2026-05-17 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → 立即启动 D1 / second e 主轨 + main 副轨化 / 33 Sprint 0 顺延目标
+**main 主代理 a 签名**：2026-05-17 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → **V0.4 Codex 立修完整闭环**（main 3 commits 防御性 + Codex 立修 / second e 4 commits 第 7 次连续 / 总 ~2.7 PD / **33 Sprint 0 顺延 / 连续 9 Sprint 立修达成**）
