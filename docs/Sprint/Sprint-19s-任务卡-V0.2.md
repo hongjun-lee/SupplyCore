@@ -1,10 +1,17 @@
-# Sprint 19s 任务卡 V0.1（双 session main + second / 1c 模块隔离首次实测 · 起草版）
+# Sprint 19s 任务卡 V0.2（定版启动 D1 · 双 session main + second / 1c 模块隔离首次实测）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（起草 · main 主代理 a 2026-05-16 — 19r 收尾 + 双 session 升级 + 模块隔离首次实测）
+**版本：** V0.2（定版启动 · main 主代理 a 2026-05-16 — cici 5 决策拍板：1A Reports/2e 命名/3yes 业务方/4wwwroot/5 今天启动）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 19s 起草版任务卡（**待 cici 拍 second 候选模块** + 升 V0.2 启动）
+**文档性质：** 实施层 · Sprint 19s 定版启动任务卡（V0.2 拍板 → 立即启动 D1 / second 主代理 e 同步启动）
 **配套：** [`Sprint-19r-任务卡-V0.4.md`](./Sprint-19r-任务卡-V0.4.md) + [`19r-业务方反馈清单-V0.3.md`](./19r-业务方反馈清单-V0.3.md)
+
+## 版本沿革
+
+| 版本 | 日期 | 操作 | 描述 |
+|---|---|---|---|
+| V0.1 | 2026-05-16 | 起草 | 双 second 4 候选 + 5 开放问题待 cici 拍板 |
+| V0.2 | 2026-05-16 | 定版启动 | cici 5 决策拍板（1A Reports/Dashboards / 2e / 3yes 业务方 / 4wwwroot/vouchers/ / 5 今天启动）→ D1 启动 |
 
 ---
 
@@ -114,53 +121,56 @@ main 子代理 c 总：**~1.3 PD**
 
 second 主代理 e 总：**~2.0 PD（候选 A/B/C 推荐 / D 需评估 race）**
 
-### 1.5 second 子代理 f（可选 / cici 拍）
+### 1.5 second 子代理 f — dashboard-bigscreen 后端聚合查询优化（cici 1A 配套 / 可选 ~0.8 PD）
 
-如 second 有 spawn 子代理需要：
-- 候选 A 下：T-F1 dashboard-bigscreen 后端聚合查询优化（~0.8 PD）
-- 候选 B 下：T-F1 月度评分批量计算（~0.7 PD）
-- 候选 C 下：T-F1 库存调拨优化（~0.7 PD）
-- 候选 D 下：T-F1 ApprovalCompletedEvent 真业务 Guid 接通（main T-A2 协调 / 高 race 风险 / 不推荐 D）
-
-second 子代理 f 总：**~0.7-0.8 PD（如需要）**
-
-### 1.6 三 / 四轨工期估算
-
-| 轨 | PD | 备注 |
+| Task | PD | 描述 |
 |---|---|---|
-| main 主代理 a | 2.0 |  |
-| main 子代理 b | 1.6 | 80% × main a |
-| main 子代理 c | 1.3 | < main a（前端 task）|
-| second 主代理 e | 2.0 | 与 main a 同量 / 独立 session |
-| second 子代理 f | 0-0.8 | 可选 |
-| **总投入** | **~6.9-7.7 PD** | 双 session 4 主线轨 |
-| **wall-clock** | **~2.0 day** | max(main 三轨 1.5 day, second 两轨 1.0 day) |
+| **T-F1** dashboard-bigscreen 聚合查询优化 | 0.5 | Hangfire 预聚合 cron / SQL Server / Postgres 索引优化 / DTO 缓存 |
+| **T-F2** 大屏数据 mock-to-real 切换协议 | 0.3 | 19q 已 mock / 真业务数据 swap 协议 / 19o b OAuth2 接通备件复用 |
 
-理论加速比：**~3.5-4x**（待 19s 实测验证 [[feedback_team_naming_convention]] V0.2 推测 6-7x）
+second 子代理 f 总：**~0.8 PD（second 主代理 e 评估 D2 是否 spawn）**
+
+### 1.6 五轨工期估算（双 session 启动）
+
+| 轨 | PD | session | 备注 |
+|---|---|---|---|
+| main 主代理 a | 2.0 | main | Vouchers 续优化 |
+| main 子代理 b | 1.6 | main | 80% × main a |
+| main 子代理 c | 1.3 | main | 前端 + E2E |
+| second 主代理 e | 2.0 | second | Reports/Dashboards |
+| second 子代理 f | 0.8 | second | 后端聚合（如 spawn）|
+| **总投入** | **~7.7 PD** | 双 session 5 轨 |  |
+| **wall-clock** | **~2.0 day** | max(main 三轨 1.5 day, second 两轨 1.0 day) |  |
+
+理论加速比：**~3.85x**（vs [[feedback_team_naming_convention]] V0.2 推测 6-7x → 19s 首次双 session 实测验证）
 
 ---
 
 ## 二、cici 19s 外部行动项
 
-### 2.1 main 业务方验收（19r 顺延）
+### 2.1 main 业务方验收（D1 cici 已确认能安排 / 3yes ✓）
 
-- ⏸ 给李建颖样例凭证文件验收（19r D1 5 反馈到位后）
-- ⏸ 给汤云龙演示"重生成凭证"按钮（19r D1 4 反馈到位后）
-- ⏸ 反馈到位后 → main T-A7 buffer 启动（凭证模板 12 → 13/14 列扩 + 实际科目映射）
+- D1 给李建颖样例凭证验收（main T-A6 menu / Permission 落地后即可演示 voucher-management UI + 5 demo Excel）
+- D1 给汤云龙演示"重生成凭证"按钮（已上线 commit `c8785e6` / 8 业务单可点击触发）
+- 反馈到位 → main T-A7 buffer 启动（凭证模板 12 → 13/14 列扩 + 实际科目映射 + 8 stub generator 真科目 patch）
 
-### 2.2 second 启动条件
+### 2.2 second 启动条件 ✅（cici 已拍 / 1A + 2e + 5今天）
 
-- **必拍**：cici 拍 second 候选模块（A/B/C/D 4 选 1）
-- second 主代理 e 身份命名（建议 e / 区别于 main 主代理 a）
-- second session task 卡 同步：cici 在 second session 给主代理 e 传 19s V0.x 任务卡 + main 当前 commit hash 作为基线
+- ✅ cici 拍 1A Reports/Dashboards
+- ✅ second 主代理身份 = **e**
+- ✅ second session 今天启动
+- second session task 卡 同步路径：
+  1. cici 切到 second session
+  2. 给主代理 e 传：`docs/Sprint/Sprint-19s-任务卡-V0.2.md` + main 当前 commit hash（V0.2 push 后从 git log 取）
+  3. 主代理 e 按 §一 1.4 + 1.5 + §四 1c 模块隔离表执行 T-E1-T-E5 + 可选 T-F1-T-F2
 
 ### 2.3 反馈窗口 deadline
 
 | 时间节点 | 期望反馈 | 超期处置 |
 |---|---|---|
-| **D1（2026-05-17）** | cici 拍 second 候选 + 启动 second session | 红色警报 / second 进度归零 |
-| **D2（2026-05-18）** | 业务方样例验收（如反馈未到位） | main T-A7 buffer 不启动 / 顺延 19t |
-| **D3（2026-05-19）** | 双 session 中段同步 | 跨 session race 检查 |
+| **D1（2026-05-16 今天）** | second e 启动 + 业务方 D1 验收开始 | 红色警报 / second 进度归零 |
+| **D2（2026-05-17）** | 业务方样例反馈到位 + main T-A7 buffer 启动 | T-A7 顺延 19t |
+| **D3（2026-05-18）** | 双 session 中段同步 + 跨 session race 检查 | race [P0] 实测留痕 |
 
 ---
 
@@ -197,6 +207,17 @@ second 子代理 f 总：**~0.7-0.8 PD（如需要）**
 | `modules/.../Web/Pages/SupplyCores/VoucherManagement/` | （second 候选模块 Pages）|
 | `modules/.../frontend/src/pages/voucher-management/` | （second 候选模块 frontend pages）|
 | `modules/.../frontend/src/shared/RegenerateVoucherButton.tsx` | `modules/.../frontend/src/shared/`（**只能加新文件 / 不改 main 已有**）|
+
+**second 主代理 e 实际锁定模块（cici 1A）**：
+- frontend：`modules/.../frontend/src/pages/dashboard-bigscreen/` + `modules/.../frontend/src/pages/reports/`
+- frontend shared：可改 `modules/.../frontend/src/shared/theme.css`（brand tokens）+ 加 UX shared 组件（不改 main 已有 RegenerateVoucherButton.tsx）
+- backend：`modules/.../src/Nova.SupplyCores.Application/ReportAlerts/`（已 D4-2 ClosedXML 实施 / second e 复用）
+- backend Hangfire：`modules/.../src/Nova.SupplyCores.Application/Reports/`（如新建）
+- E2E：`modules/.../frontend/tests/e2e/dashboard-bigscreen.spec.ts`（second e 改 / main c 不碰）
+
+**main 主代理 a + 子代理 b/c 严禁触碰**（second e 已 stage / commit 范围）：
+- 任何 dashboard-bigscreen / reports / theme.css / 大屏聚合相关文件
+- second e 完成 push 后 main 拉取 origin/main 同步 / 不要修 second 已 commit 的文件
 
 ### 4.2 跨 session race [P0] 红线（19r D2 教训扩展）
 
@@ -241,27 +262,41 @@ codex review --base <19s-起 commit hash> 重点：
 
 ---
 
-## 六、V0.1 起草说明 + 待 cici 拍板
+## 六、V0.2 定版启动 D1
 
-### V0.1 起草版（待拍）
+### V0.2 定版（cici 5 决策已拍 ✓）
 
-main 主代理 a 起草，待 cici V0.1 → V0.2 拍板后启动 D1。**V0.2 拍板前不动代码**（按 [[feedback_doc_first_workflow]] 文档先行）。
+- ✅ Q1 → A Reports/Dashboards
+- ✅ Q2 → e（second 主代理身份命名）
+- ✅ Q3 → yes（业务方 D1 可安排）
+- ✅ Q4 → wwwroot/vouchers/（凭证文件存储路径）
+- ✅ Q5 → 今天（second session 启动时间）
 
-### 待 cici 决策的 5 个开放问题
+### D1 启动序
 
-1. **second 候选模块**：A. Reports/Dashboards（推荐）/ B. SupplierPerformance / C. Inventory/Stocktake / D. WorkflowTemplates（轻 race 风险）— 哪个？
-2. **second 主代理身份命名**：e（与 main a 区分）/ 其他？
-3. **业务方反馈进度**：李建颖 / 汤云龙样例验收是否能 D1 安排？影响 main T-A7 buffer 启动条件
-4. **main T-A4 凭证文件存储路径**：wwwroot/vouchers/（默认）/ 共享盘 / S3 / Azure Blob？
-5. **second session 启动时间**：今天晚上 / 明天 D1 / 等业务方反馈后？
+按 [[feedback_evaluate_parallel_subagent_default]] 默认评估并行 + [[feedback_team_naming_convention]] V0.2 双 session：
 
-### V0.2 启动条件
+**main session**（当前主代理 a）：
+1. ✅ V0.1 → V0.2 升版（git mv + 头部 + 沿革三动作同 commit）+ push
+2. **main 主代理 a 立即开 T-A1**：InterfaceReceipt SourceEntityId Wave 96
+3. **同时 spawn main 子代理 b**：T-B1-T-B5（Application 完善 + E2E + 单测）
+4. **同时 spawn main 子代理 c**：T-C1-T-C4（凭证管理 UI 完善 + E2E + Permission）
+5. D2-3：main T-A2-T-A6 + T-A7 buffer
 
-- 5 开放问题 cici 答复
-- main 范围最终拍板
-- second 候选模块拍板 + main / second 1c 模块隔离表确认（§四.1）
-- second session 主代理身份命名
+**second session**（cici 在 second 切换启动）：
+1. cici 切到 second session
+2. 给主代理 e 传 V0.2 任务卡 + main 当前 commit hash
+3. **second 主代理 e 启 T-E1**：dashboard-bigscreen 性能优化
+4. **同时（评估）spawn second 子代理 f**：T-F1-T-F2 后端聚合
+5. D2-3：second T-E2-T-E5
+
+### 启动条件 ✅
+
+- ✅ cici 5 决策已拍
+- ✅ V0.2 定版 push（second e 可拉取任务卡）
+- ✅ 1c 模块隔离表确认（§四.1 + main / second 严禁触碰清单）
+- ✅ Wave 编号扩展（main 96-97 / second e/f 67-68）
 
 ---
 
-**main 主代理 a 签名**：2026-05-16 V0.1 起草 · 等 cici 拍 second 候选 + 升 V0.2
+**main 主代理 a 签名**：2026-05-16 V0.2 定版启动 D1 · 等 second 主代理 e 同步启动
