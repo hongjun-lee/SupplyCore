@@ -1,9 +1,9 @@
-# Sprint 20b 任务卡 V0.2（cici 5 答全 A 拍板启动 D1 · 业务方 demo 反馈接通 / main 5-6 PD + second e 续 Reports 第 4 次 / 29 Sprint 0 顺延目标）
+# Sprint 20b 任务卡 V0.3（main D1 完成锁版 · 3 commits / T-A1 strict E2E + T-A3 demo checklist + T-A4 race 0 观察 / 待 Codex）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（cici 5 答全 A 拍板 · 业务方 demo 反馈接通主题 / NcAccountRule 跳过 / second e 续 / race 被动记录 / 今天启动 D1）
+**版本：** V0.3（main D1 完成锁版 · main 3 commits / T-A1 ea7e631 strict E2E + T-A3 9fd5a71 demo checklist + T-A4 race 0 实际 / second 待 cici 切 session 续 e / 待 Codex 评审）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 20b 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答全 A 拍板 → 立即启动 D1）
+**文档性质：** 实施层 · Sprint 20b D1 完成锁版任务卡（V0.2 拍板 → V0.3 D1 完成 → 待 Codex 立修 → V0.4 / 29 Sprint 0 顺延准备）
 **配套：** [`Sprint-20a-任务卡-V0.4.md`](./Sprint-20a-任务卡-V0.4.md) + 19r/19s/19t/20a 累计顺延债
 
 ---
@@ -193,6 +193,7 @@ second 主代理 e 总：**~2.0 PD**（与 19s+19t+20a 同节奏）
 |---|---|---|
 | V0.1 | 2026-05-16 | main a 起草 · 5 开放问题待 cici 答 |
 | V0.2 | 2026-05-16 | **cici 5 答全 A 拍板**（Q1A 业务方 demo 主题 / Q2A NcAccountRule 跳过 / Q3A second e 续 Reports/Dashboards / Q4A race 被动记录 / Q5A 今天启动 D1）· 启动 D1 |
+| V0.3 | 2026-05-16 | **main D1 完成锁版** · main 3 commits（T-A1 ea7e631 voucher-management strict E2E + 双号制 frontend 完整化 + T-A3 9fd5a71 demo checklist + T-A4 race 0 实际 5 Sprint 窗口第 2）/ second e 待续 / 待 Codex 评审 |
 
 ---
 
@@ -229,4 +230,39 @@ second 主代理 e 总：**~2.0 PD**（与 19s+19t+20a 同节奏）
 
 ---
 
-**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → 立即启动 D1
+## 九、main D1 实测数据（V0.3 锁版）
+
+### 9.1 main 主代理 a D1 完成清单
+
+| Task | 计划 PD | 实际 PD | commit | 状态 |
+|---|---|---|---|---|
+| T-A1 voucher-management strict E2E | 0.4 | ~0.4 | `ea7e631` | ✅ 完成（runbook + frontend SC- column + spec 加严 / 顺便发现双号制 frontend 完整化 bug） |
+| T-A2 NcAccountRule 字典扩 | 0 | 0 | - | ✅ Q2 A 跳过 |
+| T-A3 业务方 demo 准备 | 0.3 | ~0.25 | `9fd5a71` | ✅ 完成（财务 F-1~F-8 + 物资 M-1~M-6 + 30 min 演练脚本 + G-1~G-13 待验收）|
+| T-A4 race [P0] 观察记录 | 0.1 | ~0.05 | memory | ✅ 完成（5 Sprint 窗口第 2 / 0 race / 被动记录）|
+| T-A5 Codex 20b 评审 + 立修 | 0.3 | TBD | TBD | ⏳ Codex 后台跑（PID 44748）|
+| T-A6 V0.x 升版 + memory | 0.4 | TBD | TBD | ⏳ V0.3 锁版完成 / 待 V0.4 |
+
+main D1 实际：**~0.85 PD**（计划 1.5 / 早完 0.65 PD / T-A2 跳过 + T-A1 顺便发现 bug 加速）
+
+### 9.2 T-A1 顺便发现 + 立修（V0.3 留痕）
+
+**Bug**：20a backend 双号制完整（NcVoucherNo SC- + NcVoucherNumber NC）/ frontend DataGrid 仅暴露 NC 真号 column / **漏 SC- 业务号 column**
+
+**影响**：业务方 demo 准备阶段必修（否则财务侧验收看不到自动生成的 SC- 凭证号 / 双号制不完整）
+
+**修法**（commit `ea7e631`）：
+- App.tsx L620 前加 `<Column dataField="ncVoucherNo" caption="SC 业务号" width={160} />`
+- spec 场景 12 加严：firstRowText 必含 `SC-\d{4}-\d{2}-\d{6}` + `BIZ-[A-Z0-9-]+`
+
+**意义**：T-A1 "实测"路径在 spec 加严设计阶段就发现了 frontend bug — 印证 [[feedback_carryover_task_verify_first.md]] 顺延 task 启动前先验证现状原则
+
+### 9.3 second e 状态（待 cici 切 session）
+
+- 锁定模块：dashboard-bigscreen / reports / theme.css（与 main 1c 模块隔离表完全错开）
+- 计划任务：T-E1（8 aggregator 2→4+）+ T-E2（Reports 8→10+）+ T-E3（30s 轮询稳定）+ T-E4（menu 协调）+ T-E5（收尾）/ 总 ~2.0 PD
+- 第 4 次连续 Reports/Dashboards 同模块（19s + 19t + 20a + 20b）
+
+---
+
+**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → V0.3 D1 完成锁版（main 3 commits / ~0.85 PD / 早完 0.65 PD）→ 待 Codex 立修 → V0.4 / 29 Sprint 0 顺延准备
