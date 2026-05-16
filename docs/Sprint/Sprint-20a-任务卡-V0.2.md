@@ -1,9 +1,9 @@
-# Sprint 20a 任务卡 V0.1（Sprint 19 系列收尾 + 20 新主线 · 顺延债总收口 · 起草版）
+# Sprint 20a 任务卡 V0.2（定版启动 D1 · cici 5 答拍板 / 接口签名 long 完整重构 + Orchestrator regen 接通）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（起草 · main 主代理 a 2026-05-16 — Sprint 19 系列正式收尾 + 20a 起新主线"顺延债总收口"）
+**版本：** V0.2（定版启动 · cici 5 答拍板：1A 完整重构 / 2B regen 优先 / 3B 保留观察 / 4A 续 Reports / 5A 今天启动）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 20a 起草版任务卡（待 cici 5 开放问题 + 升 V0.2 启动）
+**文档性质：** 实施层 · Sprint 20a 定版启动任务卡（V0.2 拍板 → 立即启动 D1）
 **配套：** [`Sprint-19t-任务卡-V0.3.md`](./Sprint-19t-任务卡-V0.3.md) + 19r/19s/19t 顺延债清单
 
 ---
@@ -171,11 +171,13 @@ git stash pop                                # 恢复 0 丢失
 
 ---
 
-## 六、V0.1 起草说明 + 待 cici 拍板
+## 六、V0.2 定版启动 D1（cici 5 答拍板）
 
-### V0.1 起草版（待拍）
-
-main 主代理 a 起草 / 待 cici V0.1 → V0.2 拍板 / 升 V0.2 启动 D1。
+- Q1 → A 接口签名 long **完整重构**（T-A1 0.8 PD / 5 stub + dispatcher + subscriber + 5 contract test + regenerator test 全改）
+- Q2 → B NcVoucherFileOrchestrator 接通 **regenerator 优先**（重生成时生成凭证文件 / subscriber 接通顺延 20b）
+- Q3 → B race [P0] → [P1] **保留观察 5 Sprint 后降级**（19t 4 次闭环达成 / 20a-20f 继续观察 / 20f 评估）
+- Q4 → A second e 续 **Reports/Dashboards mock-to-real**（跨 sprint 同模块连续 / 19s + 19t + 20a = 3 次连续）
+- Q5 → A **今天启动 D1**
 
 ### 5 开放问题待 cici 答
 
