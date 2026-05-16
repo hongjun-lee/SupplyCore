@@ -1,9 +1,9 @@
-# Sprint 20e 任务卡 V0.2（cici 5 答 A/B/A/A/A 拍板启动 D1 · NC 真号回写前端 UI + race [P0] → [P1] 降级 + second e 续 / 32 Sprint 0 顺延目标）
+# Sprint 20e 任务卡 V0.3（main D1 完成锁版 · main 2 commits / T-A1 NC 真号回写前端 UI + T-A2 race [P0] → [P1] 降级达成 / 待 Codex）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（cici 5 答 A/B/A/A/A 拍板 · NC 真号回写前端 UI dialog + race [P0] → [P1] 降级 + second e 续 全 + 今天启动 D1）
+**版本：** V0.3（main D1 完成锁版 · main 2 commits / 1956dc6 race [P0] → [P1] 正式降级 + 63a7ad7 NC 真号回写前端 UI dialog 接通 / T-A3+T-A4 验证 0 PD / 待 Codex 评审）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 20e 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答拍板 → 立即启动 D1 / 5 Sprint 窗口收尾里程碑 / race [P0] → [P1] 降级达成）
+**文档性质：** 实施层 · Sprint 20e D1 完成锁版任务卡（V0.2 拍板 → V0.3 main D1 完成 → 待 Codex 立修 → V0.4 / 32 Sprint 0 顺延准备 / 双号制全栈完成）
 **配套：** [`Sprint-20d-任务卡-V0.4.md`](./Sprint-20d-任务卡-V0.4.md) + 20d second 轨吸收 + race [P0] 5 Sprint 窗口收尾
 
 ---
@@ -177,6 +177,7 @@ second 主代理 e 总：**~1.8 PD**
 |---|---|---|
 | V0.1 | 2026-05-16 | main a 起草 · 5 开放问题待 cici 答 |
 | V0.2 | 2026-05-16 | **cici 5 答 A/B/A/A/A 拍板**（Q1A 综合主题 / Q2B dialog 设计 / **Q3A race [P0] → [P1] 正式降级** / Q4A second e 全吸收 / Q5A 今天启动 D1）· 启动 D1 |
+| V0.3 | 2026-05-17 | **main D1 完成锁版** · main 2 commits（`1956dc6` race [P0] → [P1] 正式降级 + AGENTS V1.7 → V1.8 + memory 升级 / `63a7ad7` NC 真号回写前端 UI dialog 接通 +129 行 / TypeScript 静默通过）/ T-A3+T-A4 验证 0 PD / 等 Codex 评审 |
 
 ---
 
@@ -233,4 +234,52 @@ second 主代理 e 总：**~1.8 PD**
 
 ---
 
-**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答 A/B/A/A/A 拍板 → 立即启动 D1 / race [P0] → [P1] 降级 / 32 Sprint 0 顺延目标
+## 九、main D1 实测数据（V0.3 锁版）
+
+### 9.1 main 主代理 a D1 完成清单
+
+| Task | 计划 PD | 实际 PD | commit | 状态 | 备注 |
+|---|---|---|---|---|---|
+| T-A1 NC 真号回写前端 UI 接通 | 0.4 | ~0.4 | `63a7ad7` | ✅ 完成 | dialog 设计 / button + Popup + TextBox + 提交 / +129 行 / aria-label + brand tokens / TypeScript 静默通过 |
+| T-A2 race [P0] → [P1] 正式降级 | 0.2 | ~0.2 | `1956dc6` | ✅ 完成 / **里程碑** | memory 升级 + AGENTS V1.7 → V1.8 / 维护降级理由 + 触发回升条件 |
+| T-A3 业务方持续反馈追踪 | 0.1 | **0** | - | ✅ 完成 | F-3 12 列 Excel 持续验收已在 demo checklist §五 / 节省 0.1 PD |
+| T-A4 race 观察记录最后 Sprint | 0.1 | 0.05 | memory | ✅ 完成 | 5 Sprint 窗口最后一 Sprint / 连续 5 Sprint 0 race / 窗口收尾里程碑 |
+| T-A5 Codex 20e 评审 + 立修 | 0.3 | TBD | TBD | ⏳ Codex 后台跑（PID 63759）| 评审 main 2 commits |
+| T-A6 V0.x 升版 + memory | 0.4 | TBD | TBD | ⏳ V0.3 锁版完成 / 待 V0.4 | 教训 13 模板第 10 次维持记录 |
+
+main D1 实际：**~0.65 PD**（计划 1.1 / 早完 0.45 PD / T-A3 验证 + T-A4 simple）
+
+### 9.2 5 Sprint 观察窗口收尾里程碑达成（V0.3 沉淀）
+
+**race [P0] → [P1] 正式降级**（cici Q3 A 拍板 / commit `1956dc6`）：
+- 窗口：20a → 20e 连续 5 Sprint
+- 累计 5 Sprint 0 race 实测（20a + 20b + 20c + 20d + 20e）
+- 累计教训 13 模板 9 次实测（5 次成熟稳定 + 4 次维持记录）
+- 累计 1c 模块隔离表稳定（second 第 7 次连续 0 文件交叉）
+- cici Q6 C 防御链证据 ≥ 4 次目标实现
+- AGENTS.md V1.7 → V1.8 升级标记
+
+### 9.3 双号制全栈完整链路达成（V0.3 沉淀）
+
+**G-12 B 业务方决策完整落地**（20d backend + 20e frontend）：
+
+- **20d backend**（commit `be849e5` / 4 文件 +105 行 / 23/23 测试全过）：
+  - PUT /api/supply-cores/interface-receipts/{id}/nc-voucher-number
+  - UpdateNcVoucherNumberDto（[Required] + StringLength(64, MinimumLength=1)）
+  - ABP 自动 LastModificationTime + LastModifierId 审计
+
+- **20e frontend**（commit `63a7ad7` / +129 行 / TypeScript 静默通过）：
+  - 操作列加 "回填 NC 真号" / "更正 NC 真号" button（每行 / 区分有无真号）
+  - Popup dialog 含双号制展示（SC 业务号 + 原 NC 真号 + 新 NC 真号输入）
+  - TextBox + 1-64 字符验证 + 提交 + 即时刷新表格
+  - aria-label + data-testid 完整 / brand tokens 一致
+
+### 9.4 second e 状态（cici 切 second 给 e 续 prompt）
+
+- 计划任务：T-E1 dashboard 5 → 7+ aggregator + T-E2 Reports 11 → 13+ + T-E3 E2E spec 加严 + T-E4 NcInterface 监控 + T-E5 收尾（总 ~1.8 PD）
+- 第 7 次连续 Reports/Dashboards 同模块（19s + 19t + 20a + 20b + 20c + 20d + 20e）
+- 1c 模块隔离表稳定 / race [P0] → [P1] 降级生效
+
+---
+
+**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答 A/B/A/A/A 拍板 → V0.3 main D1 完成锁版（main 2 commits / ~0.65 PD / 早完 0.45 PD / **race [P0] → [P1] 降级里程碑 + 双号制全栈完整**）→ 待 Codex 立修 → V0.4 / 32 Sprint 0 顺延准备
