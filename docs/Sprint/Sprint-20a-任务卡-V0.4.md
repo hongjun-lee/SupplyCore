@@ -1,9 +1,9 @@
-# Sprint 20a 任务卡 V0.3（main D1 完成锁版 · 7 commits / T-A1 long 重构 + T-A2 Orchestrator 接通 / second e mock-to-real 真业务）
+# Sprint 20a 任务卡 V0.4（Codex 立修完整闭环 · main 8 commits / 2 finding 全修 / 28 Sprint 0 顺延 / 连续 5 立修）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.3（main D1 完成锁版 · main 7 commits / T-A1 接口 long + T-A2 Orchestrator + T-A4 race [P0] 5 Sprint 观察 + T-A5 worktree cleanup / second e ff8f9e5 mock-to-real / 待 Codex）
+**版本：** V0.4（Codex 立修完整闭环 · main 8 commits / commit 8c8bdb6 P1 dashboard test + P2 spec listener 全修 / 28 Sprint 0 顺延达成 / 连续 5 Sprint 立修）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 20a 定版启动任务卡（V0.2 拍板 → 立即启动 D1）
+**文档性质：** 实施层 · Sprint 20a 收尾锁版任务卡（V0.3 main D1 完成 → V0.4 Codex 立修完整闭环 / D1 wall-clock < 1 day）
 **配套：** [`Sprint-19t-任务卡-V0.3.md`](./Sprint-19t-任务卡-V0.3.md) + 19r/19s/19t 顺延债清单
 
 ---
@@ -213,4 +213,43 @@ git stash pop                                # 恢复 0 丢失
 
 ---
 
-**main 主代理 a 签名**：2026-05-16 V0.1 起草 · 等 cici 5 答 + 升 V0.2 启动
+## 七、版本沿革
+
+| 版本 | 日期 | 变更 |
+|---|---|---|
+| V0.1 | 2026-05-16 | main a 起草 · 5 开放问题待 cici 答 |
+| V0.2 | 2026-05-16 | cici 5 答拍板（Q1A 接口 long 完整重构 / Q2B Regenerator→Orchestrator / Q3B race [P0] 5 Sprint 观察 / Q4A second 续 Reports / Q5A 今天启动 D1）· 启动 D1 |
+| V0.3 | 2026-05-16 | main D1 完成锁版 · main 7 commits（T-A1 long 重构 + T-A2 Orchestrator + T-A4 race 观察 + T-A5 worktree cleanup）/ second e ff8f9e5 mock-to-real 真业务 / 待 Codex 评审 |
+| V0.4 | 2026-05-16 | **Codex 评审 2 finding 立修完整闭环**（commit 8c8bdb6 / P1 DashboardBigscreenAppService_Tests UseMock=false → ReturnRealSnapshot + P2 voucher-management.spec.ts 场景 10 listener 移到 page.goto 前）· dotnet test 4/4 全过 · **28 Sprint 0 顺延达成 / 连续 5 Sprint 立修（19q P1 / 19r 5 / 19s 5 / 19t 3 / 20a 2 finding）** |
+
+---
+
+## 八、Sprint 20a 收尾沉淀（V0.4 锁版）
+
+### 8.1 D1 实施成本
+
+| 维度 | 计划 PD | 实际 PD | 偏差 |
+|---|---|---|---|
+| main 主代理 a 主轨（T-A1~T-A6）| 1.5-2.1 | ~2.0 | 在计划 |
+| main 子代理 b 副轨（T-B1~T-B4）| 1.0-1.3 | ~0.8 | 略低（T-B3 顺延 20b） |
+| main 子代理 c 第三轨（T-C1~T-C2）| 0.6 | ~0.5 | 略低 |
+| second 主代理 e（T-E1~T-E5）| 2.0 | ~1.8 | 在计划 |
+| Codex 评审 + 立修 | 0.2 | 0.15 | 略低（2 finding 简单立修） |
+| **总计** | **~5.3-6.2 PD** | **~5.25 PD** | **在计划** |
+
+### 8.2 28 Sprint 0 顺延记录持续
+
+- 12a-20a 共 28 Sprint Codex 0 顺延 P2+
+- **连续 5 Sprint 立修**（19q P1 → 19r 5 → 19s 5 → 19t 3 → 20a 2 finding）
+- 累计 16 finding 全部 D1/D2 立修完成 0 顺延 P2+
+- 20a 验证：P1 + P2 各 1 个 / 30 min 内修完 + push
+
+### 8.3 关键经验沉淀（memory 留痕清单）
+
+- [[feedback_codex_0_carryover_8_sprint_record]] 升级：27 Sprint → **28 Sprint / 连续 5 Sprint 立修**
+- [[feedback_dual_session_19t_continuous_validation]] 升级：19s+19t+20a = 3 次连续 second 同模块（Reports / Dashboards mock-to-real）
+- [[feedback_spawn_worktree_decision]] 升级：cici Q3 B 维持 race [P0] 观察 5 Sprint / 20a-20e 窗口
+
+---
+
+**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答启动 · V0.3 D1 完成 · V0.4 Codex 立修完整闭环 / 28 Sprint 0 顺延
