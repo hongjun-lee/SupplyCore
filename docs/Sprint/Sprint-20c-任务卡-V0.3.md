@@ -1,9 +1,9 @@
-# Sprint 20c 任务卡 V0.2（cici 5 答全 A 拍板启动 D1 · 业务方今天 demo + second e 续 / main 1.5-2.0 PD + second e 2.0 PD / 30 Sprint 0 顺延目标）
+# Sprint 20c 任务卡 V0.3（main + second D1 完成锁版 · main 2 commits + second e 4 commits / T-A1 demo 反馈接受度极高 / 节省 1.0 PD / 待 Codex）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（cici 5 答全 A 拍板 · 业务方今天 demo + second e 续 / NcAccountRule 跳过 / race 被动记录 / 今天启动 D1）
+**版本：** V0.3（main + second D1 完成锁版 · main 2 commits（601ae42 prompt + 6ef6e63 demo 反馈回填）+ second e 4 commits（T-E1 c7c673d aggregator 2→5 / T-E2 99175fe Reports 5→11 / T-E3 ebbb7b1 30s 轮询稳定 / T-E4 9ab3b39 menu 协调）/ T-A1 接受度极高节省 0.7 PD / 等 T-E5 + 待 Codex）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 20c 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答全 A 拍板 → 立即启动 D1 / 业务方今天 demo 后反馈吸收）
+**文档性质：** 实施层 · Sprint 20c D1 完成锁版任务卡（V0.2 拍板 → V0.3 main + second D1 完成 → 待 Codex 立修 → V0.4 / 30 Sprint 0 顺延 / 连续 7 Sprint 立修目标）
 **配套：** [`Sprint-20b-任务卡-V0.4.md`](./Sprint-20b-任务卡-V0.4.md) + 20b second 轨顺延 + 业务方 demo 反馈
 
 ---
@@ -181,6 +181,7 @@ second 主代理 e 总：**~2.0 PD**（与 19s+19t+20a+20b 同节奏 / 第 5 次
 |---|---|---|
 | V0.1 | 2026-05-16 | main a 起草 · 5 开放问题待 cici 答 |
 | V0.2 | 2026-05-16 | **cici 5 答全 A 拍板**（Q1A demo + second / **Q2A 业务方今天 demo** / Q3A NcAccountRule 跳过 / Q4A race 被动记录 / Q5A 今天启动 D1）· 启动 D1 |
+| V0.3 | 2026-05-16 | **main + second D1 完成锁版** · main 2 commits（second-e-prompt + demo 反馈回填）+ second e 4 commits（T-E1 dashboard 2→5 aggregator + T-E2 Reports 5→11 + T-E3 30s 轮询稳定 + T-E4 menu 协调）/ T-A1 实际 0.1 PD（计划 0.8 / 节省 0.7）/ T-A3 0 PD（4 项 UX 已存在 / 节省 0.3）/ T-A2 跳过 / **D1 节省 1.0 PD 总** / 等 second T-E5 + Codex 评审 |
 
 ---
 
@@ -227,4 +228,50 @@ second 主代理 e 总：**~2.0 PD**（与 19s+19t+20a+20b 同节奏 / 第 5 次
 
 ---
 
-**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → 立即启动 D1 / 业务方今天 demo（高紧迫）
+## 九、main + second D1 实测数据（V0.3 锁版）
+
+### 9.1 main 主代理 a D1 完成清单
+
+| Task | 计划 PD | 实际 PD | 状态 | 备注 |
+|---|---|---|---|---|
+| T-A1 业务方 demo 反馈吸收 | 0.8 | **0.1** | ✅ 完成 | demo 16 项反馈：13 ✅ + 1 ⏸ + 2 决策（G-12 B 后台 endpoint / G-13 A 顺延）/ 节省 0.7 PD |
+| T-A2 NcAccountRule 字典扩 | 0 | 0 | ✅ Q3 A 跳过 | 顺延 20e+ 业务方反馈触发 |
+| T-A3 voucher-management UX patch | 0.3 | **0** | ✅ 完成 | 顺延 task 验证现状：4 项 UX 19s+19t 已完整（aria-live / aria-label / icon a11y / brand tokens）/ 节省 0.3 PD |
+| T-A4 race [P0] 观察记录 | 0.1 | 0.05 | ✅ 完成 | memory 留痕（连续 3 Sprint 0 race / 5 Sprint 窗口第 3）|
+| T-A5 Codex 20c 评审 + 立修 | 0.3 | TBD | ⏳ Codex 后台跑（PID 55180）| 评审 main + second 5 commits / 等 T-E5 后整合不影响 |
+| T-A6 V0.x 升版 + memory | 0.4 | TBD | ⏳ V0.3 锁版完成 / 待 V0.4 | 教训 13 模板第 5 次实测窗口 |
+
+main D1 实际：**~0.2 PD**（计划 1.9 / 早完 1.7 PD / 业务方反馈接受度高 + 顺延 task 已实现）
+
+### 9.2 second 主代理 e D1 完成清单（4 commits 超目标）
+
+| Task | 计划 PD | 实际 PD | commit | 状态 |
+|---|---|---|---|---|
+| T-E1 dashboard aggregator 2 → 4+ | 0.6 | ~0.5 | `c7c673d` | ✅ 完成 / **超目标 2→5 真接通**（计划 4+）|
+| T-E2 Reports 模板扩 8 → 10+ | 0.5 | ~0.5 | `99175fe` | ✅ 完成 / **超目标 5→11**（+6 endpoint / 计划 10+）|
+| T-E3 30s 轮询稳定 + 切实例 spec | 0.3 | ~0.3 | `ebbb7b1` | ✅ 完成（dashboard 30s 轮询 + 慢响应 fallback spec）|
+| T-E4 NcInterface menu + voucher 协调 | 0.3 | ~0.3 | `9ab3b39` | ✅ 完成（breadcrumb + menu 协调）|
+| T-E5 收尾 + memory + race 检查 | 0.3 | TBD | TBD | ⏳ second session 进行中（cici 切回 second） |
+
+second e D1 实际：**~1.6 PD**（计划 2.0 / 略低 / T-E5 待补）/ **超目标完成** + **第 5 次连续同模块**
+
+### 9.3 D1 总体数据
+
+- main + second 合计 commits（主仓）：**5**（main 1 T-A1 + second e 4）
+- 跨仓 commits（SupplyCore）：1（V0.2 拍板 `f41219b`）
+- main + second 实际 PD：**~1.8 PD**（计划 3.5-4 / 节省 ~1.5-2 PD）
+- **效率超预期**：业务方反馈接受度高 + 顺延 task 已实现 + second 超目标
+
+### 9.4 5 月反模式根因 #2#3#4 完全解除实证（V0.3 沉淀）
+
+- **5 月反模式**（17a-19i NC 9 次顺延 5 月 + 19j 撤架）/ 根因（cici 单点 / PO 未介入 / 对接人未明确 / 无 deadline）
+- **20c demo 实测验证**：
+  - 业务方对接人明确（财务 = 李建颖 / 物资 = 汤云龙）
+  - PO 协调成功（2026-05-16 PO 决策 + 19r D1 9/9 反馈到位 + 20c demo 16 项反馈到位）
+  - demo 反馈接受度极高（13 ✅ + 1 ⏸ + 2 决策 / 0 ⚠️ 需修）
+  - 凭证导出主线 production-ready 双业务方验收通过
+- **根因 #2#3#4 完全解除** — 业务方协调失败模式 → 业务方协调成功模式（cici demo 协调 + 反馈窗口稳定）
+
+---
+
+**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → V0.3 main + second D1 完成锁版（main 2 + second e 4 commits / 总 ~1.8 PD / 节省 1.5-2 PD / 业务方接受度极高）→ 待 Codex 立修 → V0.4 / 30 Sprint 0 顺延准备
