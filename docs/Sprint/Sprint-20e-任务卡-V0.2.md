@@ -1,9 +1,9 @@
-# Sprint 20e 任务卡 V0.1（NC 真号回写前端 UI + race [P0] 5 Sprint 窗口降级评估 + second e 续 / 32 Sprint 0 顺延目标）
+# Sprint 20e 任务卡 V0.2（cici 5 答 A/B/A/A/A 拍板启动 D1 · NC 真号回写前端 UI + race [P0] → [P1] 降级 + second e 续 / 32 Sprint 0 顺延目标）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（main a 起草 · 5 开放问题待 cici 答）
+**版本：** V0.2（cici 5 答 A/B/A/A/A 拍板 · NC 真号回写前端 UI dialog + race [P0] → [P1] 降级 + second e 续 全 + 今天启动 D1）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 20e 起草任务卡（V0.1 待 cici 5 答 → V0.2 拍板启动 D1）
+**文档性质：** 实施层 · Sprint 20e 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答拍板 → 立即启动 D1 / 5 Sprint 窗口收尾里程碑 / race [P0] → [P1] 降级达成）
 **配套：** [`Sprint-20d-任务卡-V0.4.md`](./Sprint-20d-任务卡-V0.4.md) + 20d second 轨吸收 + race [P0] 5 Sprint 窗口收尾
 
 ---
@@ -46,8 +46,8 @@
 
 | Task | PD | 描述 | 触发 |
 |---|---|---|---|
-| **T-A1** NC 真号回写前端 UI 接通 | 0.4 | voucher-management 页加 "回填 NC 真号" 按钮 + dialog（输入 NcVoucherNumber + 字段验证 + 调 PUT endpoint）/ 表格 NcVoucherNumber 列即时更新 / aria-label + brand tokens | 20d T-A3 backend 已完成 |
-| **T-A2** race [P0] → [P1] 正式降级 | 0.2 | 5 Sprint 窗口（20a-20e）收尾 / 评估窗口数据 / [[feedback_spawn_worktree_decision]] 升级 [P0] → [P1] / memory 升级 + AGENTS V1.7+ 记录 | cici Q3 B 决策窗口 |
+| **T-A1** NC 真号回写前端 UI 接通（**Q2 B dialog 设计**）| **0.4** | voucher-management 页加 "回填 NC 真号" 按钮（每行 action）+ dialog 输入 NcVoucherNumber + 字段验证（required + 1-64 长度）+ 调 PUT /api/.../nc-voucher-number / 表格 NcVoucherNumber 列即时更新 / aria-label + brand tokens / **不动表格 inline edit** | 20d T-A3 backend 已完成 / Q2 B 选 dialog |
+| **T-A2** race [P0] → [P1] **正式降级**（**Q3 A 拍板**）| **0.2** | 5 Sprint 窗口（20a-20e）正式收尾 / 评估窗口数据（连续 4 Sprint 0 race + 教训 13 模板成熟）/ [[feedback_spawn_worktree_decision]] 升级 [P0] → [P1] + AGENTS.md V1.7+ 记录 / 维护降级理由 + 触发回升条件 | cici Q3 A 拍板 |
 | **T-A3** 业务方持续反馈追踪 | 0.1 | F-3 12 列 Excel 持续验收（顺延 20f）/ G-12 NC 真号回写前端 UI 给业务方反馈追踪 / 不主动追加业务方扰 | Q2 A 仅未闭环项续 |
 | **T-A4** race 观察记录（第 5 Sprint / 最后）| 0.1 | 5 Sprint 窗口最后一 Sprint / 被动记录 / memory 留痕窗口收尾 | cici Q3 B 决策延续 |
 | **T-A5** Codex 20e 评审 + 立修 | 0.3 | `codex review --base a48e54f`（20d 末 commit）/ 立修保 **32 Sprint 0 顺延** | 标准收尾 |
@@ -176,7 +176,61 @@ second 主代理 e 总：**~1.8 PD**
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-16 | main a 起草 · 5 开放问题待 cici 答 |
+| V0.2 | 2026-05-16 | **cici 5 答 A/B/A/A/A 拍板**（Q1A 综合主题 / Q2B dialog 设计 / **Q3A race [P0] → [P1] 正式降级** / Q4A second e 全吸收 / Q5A 今天启动 D1）· 启动 D1 |
 
 ---
 
-**main 主代理 a 签名**：2026-05-16 V0.1 起草 · 等 cici 5 答 + 升 V0.2 启动
+## 八、V0.2 拍板启动 D1（cici 5 答 A/B/A/A/A）
+
+| Q | 答 | 影响 |
+|---|---|---|
+| Q1 | A | 综合主题：NC 真号回写前端 UI + race 降级 + second e 续 / main + second 双轨 |
+| Q2 | B | NC 真号回写前端 UI dialog 设计（不动表格 inline edit / 简单稳定）|
+| Q3 | A | **race [P0] → [P1] 正式降级**（5 Sprint 窗口 20a-20e 收尾 / 证据链 ≥ 4 充分）|
+| Q4 | A | second e 续全 T-E1~T-E5（~1.8 PD / 第 7 次连续）|
+| Q5 | A | 今天启动 D1 / 31 Sprint 0 顺延动量延续 |
+
+### 8.1 main D1 启动顺序
+
+1. **T-A4 race 观察记录最后 Sprint**（0.1 PD / 首启 / 不依赖外部 / 5 Sprint 窗口收尾里程碑）
+2. **T-A2 race [P0] → [P1] 正式降级**（0.2 PD / memory + AGENTS 升级 / 不依赖代码）
+3. **T-A1 NC 真号回写前端 UI 接通**（0.4 PD / 主要工作 / dialog 设计 / 表格 + button + dialog + 调 PUT）
+4. **T-A3 业务方持续反馈追踪**（0.1 PD / 不主动追加）
+5. **T-A5 Codex 评审 + 立修**（D2 / 0.3 PD）
+6. **T-A6 V0.x 升版 + memory**（D2-D3 / 0.4 PD）
+
+### 8.2 second e D1 启动顺序（cici 切 second session 给 e 续 prompt）
+
+1. T-E1 dashboard aggregator 5 → 7+（0.5 PD / 续 20c 5 真接通 + 加 2 / 库存周转 / 在租设备月费 / 高敏感）
+2. T-E2 Reports 模板 11 → 13+（0.4 PD / 续 20c 11 个 + 加 2 / 月结对账 / 反结申请 / 暂估月报）
+3. T-E3 dashboard E2E spec 加严（0.3 PD / 真接通数据校验 + fallback case spec + 30s 轮询稳定）
+4. T-E4 NcInterface 监控强化（0.3 PD / NcVoucherNumber 填写后 status 显示真号）
+5. T-E5 收尾 + memory（0.3 PD）
+
+### 8.3 启动条件全部满足
+
+- ✅ 5 开放问题 cici A/B/A/A/A 答
+- ✅ 1c 模块隔离表确认（§四.1）
+- ✅ 20d V0.4 锁版完成（`a48e54f` / 31 Sprint 0 顺延达成）
+- ⏳ second 主代理 e 同步任务卡（cici 切 session 给 e 续 prompt 时同步）
+
+### 8.4 5 Sprint 观察窗口收尾里程碑（race [P0] → [P1] 降级）
+
+- **窗口**：20a → 20e（连续 5 Sprint）
+- **观察数据**（截至 20d）：
+  - 连续 4 Sprint 0 race（20a + 20b + 20c + 20d）
+  - 教训 13 模板 5 次实测成熟稳定（关闭跟踪）
+  - 1c 模块隔离表稳定 / second 第 6 次连续 0 文件交叉
+  - cici Q6 C 目标"防御链证据 ≥ 4 次"已实现
+- **20e T-A2 降级措施**：
+  - [[feedback_spawn_worktree_decision]] memory 升级 [P0] → [P1]
+  - AGENTS.md V1.7+ §race 防御 章节标记降级
+  - 维护降级理由 + 触发回升条件（如出现新 race case 升回 [P0]）
+- **降级后维护**：
+  - 不再强制每 Sprint 主动观察
+  - 仅记录失败 case 触发回升 [P0]
+  - 维持 1c 模块隔离表 + 教训 13 模板 + stash + pathspec 双重防御
+
+---
+
+**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答 A/B/A/A/A 拍板 → 立即启动 D1 / race [P0] → [P1] 降级 / 32 Sprint 0 顺延目标
