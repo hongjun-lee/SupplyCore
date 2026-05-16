@@ -1,9 +1,9 @@
-# Sprint 20c 任务卡 V0.1（second e 续吸收 + 业务方 demo 反馈接通 · main 1.5-2.0 PD + second e 2.0 PD / 30 Sprint 0 顺延目标）
+# Sprint 20c 任务卡 V0.2（cici 5 答全 A 拍板启动 D1 · 业务方今天 demo + second e 续 / main 1.5-2.0 PD + second e 2.0 PD / 30 Sprint 0 顺延目标）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（main a 起草 · 5 开放问题待 cici 答）
+**版本：** V0.2（cici 5 答全 A 拍板 · 业务方今天 demo + second e 续 / NcAccountRule 跳过 / race 被动记录 / 今天启动 D1）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 20c 起草任务卡（V0.1 待 cici 5 答 → V0.2 拍板启动 D1）
+**文档性质：** 实施层 · Sprint 20c 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答全 A 拍板 → 立即启动 D1 / 业务方今天 demo 后反馈吸收）
 **配套：** [`Sprint-20b-任务卡-V0.4.md`](./Sprint-20b-任务卡-V0.4.md) + 20b second 轨顺延 + 业务方 demo 反馈
 
 ---
@@ -42,14 +42,14 @@
 
 | Task | PD | 描述 | 来源 |
 |---|---|---|---|
-| **T-A1** 业务方 demo 反馈吸收（条件性 / 见 §六 Q1）| 0-0.8 | cici 协调 demo 后业务方反馈 G-1~G-13 + F-1~F-8 + M-1~M-6 patch / 否则跳过 | 20b T-A3 demo checklist 反馈窗口 |
-| **T-A2** NcAccountRule 字典扩（条件性 / 业务方反馈触发）| 0-0.4 | 业务方 G-13 反馈"借贷科目代码默认值不准"时启动 / 二级 / 项目专属字典扩 | 19r b 占位 / 20a + 20b T-A2 持续顺延 |
+| **T-A1** 业务方 demo 反馈吸收（**Q2 A 今天 demo / 锁定**）| **0.8** | cici 今天协调李建颖 + 汤云龙 demo / 反馈 G-1~G-13 + F-1~F-8 + M-1~M-6 patch / 等 cici 收集反馈回填后 patch | 20b T-A3 demo checklist 反馈窗口 |
+| **T-A2** NcAccountRule 字典扩（**Q3 A 跳过**）| **0** | cici Q3 A 决策：demo 反馈未明确"借贷科目代码默认值不准"前不动 / 顺延 20d+ 字典扩 | 19r b 占位 / 20a + 20b T-A2 持续顺延 / **20c 跳过** |
 | **T-A3** voucher-management UX patch（业务方 demo 反馈预备）| 0.3 | 批量下载进度条 / 批量 mark-downloaded 进度 / 错误重试按钮 / 表格列宽自适应 | 20b T-B2 顺延 |
 | **T-A4** race [P0] 观察记录（20c 第 3 Sprint）| 0.1 | 5 Sprint 窗口（20a-20e）/ 20c 是第 3 Sprint / 被动记录 / 0 race 期望 | cici Q3 B 决策延续 |
 | **T-A5** Codex 20c 评审 + 立修 | 0.3 | `codex review --base 39e4b09` 评审 20c 全 commits / 立修保 **30 Sprint 0 顺延 / 连续 7 Sprint 立修** | 标准收尾 |
 | **T-A6** Sprint 20c 收尾 + V0.x 升版 + memory | 0.4 | V0.1 → V0.4 各阶段锁版 + memory（业务方 demo 反馈吸收经验 / 第 5 次连续 second / 30 Sprint 0 顺延）| 主代理 a 标准收尾 |
 
-main 主代理 a 总：**~1.5-2.0 PD**（T-A1 + T-A2 条件性）
+main 主代理 a 总：**~1.9 PD**（T-A1 锁 0.8 / T-A2 跳过 / cici Q2 + Q3 拍板）
 
 ### 1.2 main 子代理 b 副轨 — voucher-management 强化 + spec strict 实测验收（~0.5-0.8 PD）
 
@@ -180,7 +180,51 @@ second 主代理 e 总：**~2.0 PD**（与 19s+19t+20a+20b 同节奏 / 第 5 次
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-16 | main a 起草 · 5 开放问题待 cici 答 |
+| V0.2 | 2026-05-16 | **cici 5 答全 A 拍板**（Q1A demo + second / **Q2A 业务方今天 demo** / Q3A NcAccountRule 跳过 / Q4A race 被动记录 / Q5A 今天启动 D1）· 启动 D1 |
 
 ---
 
-**main 主代理 a 签名**：2026-05-16 V0.1 起草 · 等 cici 5 答 + 升 V0.2 启动
+## 八、V0.2 拍板启动 D1（cici 5 答全 A）
+
+| Q | 答 | 影响 |
+|---|---|---|
+| Q1 | A | 主题确认：业务方 demo 反馈吸收 + second e 续 → main + second 双轨 |
+| Q2 | A | **业务方今天 demo / T-A1 锁 0.8 PD 准备吸收**（不再"条件性"）|
+| Q3 | A | NcAccountRule 字典扩跳过 / T-A2 0 PD（依赖 demo 反馈未明确）|
+| Q4 | A | race [P0] 被动记录 / T-A4 0.1 PD（20a-20e 窗口第 3 Sprint）|
+| Q5 | A | 今天启动 D1 / 29 Sprint 0 顺延动量延续 |
+
+### 8.1 main D1 启动顺序（cici 切 second 同步进行）
+
+1. **T-A4 race 观察记录**（0.1 PD / 首启 / 不依赖 demo）
+2. **T-A3 voucher-management UX patch**（0.3 PD / 反馈预备 / 不依赖 demo）
+3. **T-A1 业务方 demo 反馈吸收**（0.8 PD / **等 cici 今天 demo 收集反馈回填后启动**）
+4. T-A5 D2-D3 Codex 评审
+5. T-A6 V0.x 升版 + memory
+
+### 8.2 cici 今天行动项（高紧迫性）
+
+- [ ] 协调李建颖 + 汤云龙 demo 时段（推荐 30 min demo + 30 min 反馈）
+- [ ] demo 前按 [`voucher-management-strict-e2e-runbook.md`](../../internal/voucher-management-strict-e2e-runbook.md) §二 启动环境
+- [ ] demo 后按 [`voucher-demo-checklist-20b.md`](../../internal/voucher-demo-checklist-20b.md) §二 + §三 + §六 回填反馈
+- [ ] 反馈回填 → main 主代理 a 启动 T-A1 patch
+- [ ] 切 second session 给 e 续 prompt 启动 second e 平行轨
+
+### 8.3 second e D1 启动顺序（cici 切 session 给 e 续 prompt）
+
+1. T-E1 dashboard 8 aggregator 真接通 2 → 4+（0.6 PD）
+2. T-E2 Reports 模板扩 8 → 10+（0.5 PD）
+3. T-E3 30s 轮询稳定 + 切实例 spec（0.3 PD）
+4. T-E4 NcInterface menu + voucher-management 协调（0.3 PD）
+5. T-E5 收尾 + memory（0.3 PD）
+
+### 8.4 启动条件全部满足
+
+- ✅ 5 开放问题 cici 全 A 答
+- ✅ 1c 模块隔离表确认（§四.1 / 与 20a-20b 同模式）
+- ⏳ second 主代理 e 同步任务卡（cici 切 session 给 e 续 prompt 时同步）
+- ⏳ 业务方 demo 反馈回填（cici 今天 demo 后）
+
+---
+
+**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → 立即启动 D1 / 业务方今天 demo（高紧迫）
