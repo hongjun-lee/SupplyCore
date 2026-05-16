@@ -1,9 +1,9 @@
-# Sprint 20b 任务卡 V0.3（main D1 完成锁版 · 3 commits / T-A1 strict E2E + T-A3 demo checklist + T-A4 race 0 观察 / 待 Codex）
+# Sprint 20b 任务卡 V0.4（Codex 立修完整闭环 · main 4 commits / 2 finding 全修 / 29 Sprint 0 顺延 / 连续 6 立修）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.3（main D1 完成锁版 · main 3 commits / T-A1 ea7e631 strict E2E + T-A3 9fd5a71 demo checklist + T-A4 race 0 实际 / second 待 cici 切 session 续 e / 待 Codex 评审）
+**版本：** V0.4（Codex 立修完整闭环 · main 4 commits / commit 39e4b09 P2 spec BIZ 断言脆弱 + P2 runbook SQL 表名 / 29 Sprint 0 顺延达成 / 连续 6 Sprint 立修）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 20b D1 完成锁版任务卡（V0.2 拍板 → V0.3 D1 完成 → 待 Codex 立修 → V0.4 / 29 Sprint 0 顺延准备）
+**文档性质：** 实施层 · Sprint 20b 收尾锁版任务卡（V0.3 D1 完成 → V0.4 Codex 立修完整闭环 / 29 Sprint 0 顺延达成 / D1 wall-clock < 1 day）
 **配套：** [`Sprint-20a-任务卡-V0.4.md`](./Sprint-20a-任务卡-V0.4.md) + 19r/19s/19t/20a 累计顺延债
 
 ---
@@ -194,6 +194,7 @@ second 主代理 e 总：**~2.0 PD**（与 19s+19t+20a 同节奏）
 | V0.1 | 2026-05-16 | main a 起草 · 5 开放问题待 cici 答 |
 | V0.2 | 2026-05-16 | **cici 5 答全 A 拍板**（Q1A 业务方 demo 主题 / Q2A NcAccountRule 跳过 / Q3A second e 续 Reports/Dashboards / Q4A race 被动记录 / Q5A 今天启动 D1）· 启动 D1 |
 | V0.3 | 2026-05-16 | **main D1 完成锁版** · main 3 commits（T-A1 ea7e631 voucher-management strict E2E + 双号制 frontend 完整化 + T-A3 9fd5a71 demo checklist + T-A4 race 0 实际 5 Sprint 窗口第 2）/ second e 待续 / 待 Codex 评审 |
+| V0.4 | 2026-05-16 | **Codex 评审 2 P2 finding 立修完整闭环**（commit 39e4b09 / P2 spec BIZ-* 断言脆弱 改 dataRow.filter + P2 runbook SQL 表名单数 + ABP 必填列 4 项）· **29 Sprint 0 顺延达成 / 连续 6 Sprint 立修**（19q P1 / 19r 5 / 19s 5 / 19t 3 / 20a 2 / 20b 2 = 18 finding 全立修 / 2.4 PD 累计） |
 
 ---
 
@@ -240,10 +241,39 @@ second 主代理 e 总：**~2.0 PD**（与 19s+19t+20a 同节奏）
 | T-A2 NcAccountRule 字典扩 | 0 | 0 | - | ✅ Q2 A 跳过 |
 | T-A3 业务方 demo 准备 | 0.3 | ~0.25 | `9fd5a71` | ✅ 完成（财务 F-1~F-8 + 物资 M-1~M-6 + 30 min 演练脚本 + G-1~G-13 待验收）|
 | T-A4 race [P0] 观察记录 | 0.1 | ~0.05 | memory | ✅ 完成（5 Sprint 窗口第 2 / 0 race / 被动记录）|
-| T-A5 Codex 20b 评审 + 立修 | 0.3 | TBD | TBD | ⏳ Codex 后台跑（PID 44748）|
-| T-A6 V0.x 升版 + memory | 0.4 | TBD | TBD | ⏳ V0.3 锁版完成 / 待 V0.4 |
+| T-A5 Codex 20b 评审 + 立修 | 0.3 | ~0.15 | `39e4b09` | ✅ 完成（2 P2 全修 / spec BIZ 断言改 dataRow.filter + runbook SQL 表名修正）|
+| T-A6 V0.x 升版 + memory | 0.4 | ~0.3 | V0.4 锁版 commit | ✅ 完成（V0.3 → V0.4 跨仓 + memory 升级 28 → 29 Sprint / 连续 5 → 6 立修）|
 
-main D1 实际：**~0.85 PD**（计划 1.5 / 早完 0.65 PD / T-A2 跳过 + T-A1 顺便发现 bug 加速）
+main 总实际：**~1.3 PD**（计划 1.5 / 早完 0.2 PD / T-A2 跳过 + T-A5 P2 简单 + T-A6 流程熟练）
+
+### 9.4 D2 Codex 立修详情（V0.4 留痕）
+
+**Codex 20b 评审 finding 清单**（`codex review --base 8c8bdb6` / 后台 PID 44748 / ~10 min）：
+
+| finding | 优先级 | 文件 | 立修策略 |
+|---|---|---|---|
+| BIZ-* 断言脆弱 | P2 | `voucher-management.spec.ts:685-688` | firstRow → dataRow.filter({ hasText: /BIZ-/ }) / 至少 1 BIZ row + 该 row 含 SC- |
+| runbook SQL 表名 + 必填列 | P2 | `voucher-management-strict-e2e-runbook.md:67-71` | `interface_receipts` → `interface_receipt`（单数）/ 加 ABP 必填列（extra_properties / concurrency_stamp / creation_time / is_deleted）|
+
+立修结果：
+- 2 文件 / 27 insertions / 10 deletions
+- TypeScript check 静默通过
+- 立修工作量 ~0.15 PD（finding 简单 / line-level 改）
+- 跨仓 race 0 误纳（main D1 commits + push 完成后 / second 待启动）
+
+### 9.5 连续 6 Sprint 立修保 0 顺延记录（V0.4 沉淀）
+
+| Sprint | finding | commit | 工作量 |
+|---|---|---|---|
+| 19q | 1 P1（DbMigrator SeedTestUsers）| `1101c34` | 0.05 PD |
+| 19r | 5（2 P1 + 3 P2）| `c8785e6` | 0.65 PD |
+| 19s | 5（2 P1 + 3 P2）| `606d794` | 0.8 PD |
+| 19t | 3（1 P1 + 2 P2）| `b486dda` | 0.6 PD |
+| 20a | 2（1 P1 + 1 P2）| `8c8bdb6` | 0.15 PD |
+| **20b** | **2 P2** | **`39e4b09`** | **0.15 PD** |
+| **累计** | **18 finding** | **6 commit** | **2.4 PD** |
+
+**Sprint 29 0 顺延记录持续保持 ✅** — 12a-20b 共 29 Sprint / 18 完整 + 3 强绑定闭环 + 19i/19j 自闭环 + 连续 6 立修
 
 ### 9.2 T-A1 顺便发现 + 立修（V0.3 留痕）
 
@@ -265,4 +295,4 @@ main D1 实际：**~0.85 PD**（计划 1.5 / 早完 0.65 PD / T-A2 跳过 + T-A1
 
 ---
 
-**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → V0.3 D1 完成锁版（main 3 commits / ~0.85 PD / 早完 0.65 PD）→ 待 Codex 立修 → V0.4 / 29 Sprint 0 顺延准备
+**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → V0.3 D1 完成锁版（main 3 commits / ~0.85 PD）→ V0.4 Codex 立修完整闭环（main 4 commits / 总 ~1.3 PD / 29 Sprint 0 顺延 / 连续 6 立修达成）
