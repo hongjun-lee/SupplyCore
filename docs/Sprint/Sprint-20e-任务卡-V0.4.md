@@ -1,9 +1,9 @@
-# Sprint 20e 任务卡 V0.3（main D1 完成锁版 · main 2 commits / T-A1 NC 真号回写前端 UI + T-A2 race [P0] → [P1] 降级达成 / 待 Codex）
+# Sprint 20e 任务卡 V0.4（Codex 立修完整闭环 · main 3 commits / 1 P1 finding 立修 / 32 Sprint 0 顺延 / 连续 8 立修）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.3（main D1 完成锁版 · main 2 commits / 1956dc6 race [P0] → [P1] 正式降级 + 63a7ad7 NC 真号回写前端 UI dialog 接通 / T-A3+T-A4 验证 0 PD / 待 Codex 评审）
+**版本：** V0.4（Codex 立修完整闭环 · main 3 commits / commit 6d13d5c P1 PUT /nc-voucher-number Permission 缺失立修 / 32 Sprint 0 顺延达成 / 连续 8 Sprint 立修）
 **日期：** 2026-05-16
-**文档性质：** 实施层 · Sprint 20e D1 完成锁版任务卡（V0.2 拍板 → V0.3 main D1 完成 → 待 Codex 立修 → V0.4 / 32 Sprint 0 顺延准备 / 双号制全栈完成）
+**文档性质：** 实施层 · Sprint 20e 收尾锁版任务卡（V0.3 D1 完成 → V0.4 Codex 立修完整闭环 / 32 Sprint 0 顺延达成 / 连续 8 Sprint 立修 / D1 wall-clock < 1 day / 双号制全栈 + race 降级双里程碑）
 **配套：** [`Sprint-20d-任务卡-V0.4.md`](./Sprint-20d-任务卡-V0.4.md) + 20d second 轨吸收 + race [P0] 5 Sprint 窗口收尾
 
 ---
@@ -178,6 +178,7 @@ second 主代理 e 总：**~1.8 PD**
 | V0.1 | 2026-05-16 | main a 起草 · 5 开放问题待 cici 答 |
 | V0.2 | 2026-05-16 | **cici 5 答 A/B/A/A/A 拍板**（Q1A 综合主题 / Q2B dialog 设计 / **Q3A race [P0] → [P1] 正式降级** / Q4A second e 全吸收 / Q5A 今天启动 D1）· 启动 D1 |
 | V0.3 | 2026-05-17 | **main D1 完成锁版** · main 2 commits（`1956dc6` race [P0] → [P1] 正式降级 + AGENTS V1.7 → V1.8 + memory 升级 / `63a7ad7` NC 真号回写前端 UI dialog 接通 +129 行 / TypeScript 静默通过）/ T-A3+T-A4 验证 0 PD / 等 Codex 评审 |
+| V0.4 | 2026-05-17 | **Codex 评审 1 P1 finding 立修完整闭环**（commit `6d13d5c` / P1 PUT /nc-voucher-number Permission 缺失立修 — InterfaceReceiptsController + InterfaceReceiptAppService 双层加 [Authorize(SupplyCoresPermissions.VoucherManagement.Default)] / Build 0 errors / 23/23 测试全过）· **32 Sprint 0 顺延达成 / 连续 8 Sprint 立修**（19q P1 / 19r 5 / 19s 5+0 / 19t 3 / 20a 2 / 20b 2 / 20c 2 / 20d 0 / **20e 1 P1** = 21 finding 全立修 / 2.65 PD 累计）|
 
 ---
 
@@ -244,10 +245,47 @@ second 主代理 e 总：**~1.8 PD**
 | T-A2 race [P0] → [P1] 正式降级 | 0.2 | ~0.2 | `1956dc6` | ✅ 完成 / **里程碑** | memory 升级 + AGENTS V1.7 → V1.8 / 维护降级理由 + 触发回升条件 |
 | T-A3 业务方持续反馈追踪 | 0.1 | **0** | - | ✅ 完成 | F-3 12 列 Excel 持续验收已在 demo checklist §五 / 节省 0.1 PD |
 | T-A4 race 观察记录最后 Sprint | 0.1 | 0.05 | memory | ✅ 完成 | 5 Sprint 窗口最后一 Sprint / 连续 5 Sprint 0 race / 窗口收尾里程碑 |
-| T-A5 Codex 20e 评审 + 立修 | 0.3 | TBD | TBD | ⏳ Codex 后台跑（PID 63759）| 评审 main 2 commits |
-| T-A6 V0.x 升版 + memory | 0.4 | TBD | TBD | ⏳ V0.3 锁版完成 / 待 V0.4 | 教训 13 模板第 10 次维持记录 |
+| T-A5 Codex 20e 评审 + 立修 | 0.3 | ~0.15 | `6d13d5c` | ✅ 完成（1 P1 立修 / Controller + AppService 双层 Authorize）|
+| T-A6 V0.x 升版 + memory | 0.4 | ~0.3 | V0.4 锁版 commit | ✅ 完成（V0.3 → V0.4 跨仓 + memory 升级 31 → 32 Sprint / 连续 7 → 8 立修）|
 
-main D1 实际：**~0.65 PD**（计划 1.1 / 早完 0.45 PD / T-A3 验证 + T-A4 simple）
+main 总实际：**~1.1 PD**（计划 1.5 / 早完 0.4 PD / T-A3 验证 + T-A5 + T-A6 流程熟练）
+
+### 9.5 D2 Codex 立修详情（V0.4 留痕）
+
+**Codex 20e 评审 finding 清单**（`codex review --base a48e54f` / 后台 PID 63759 / ~10 min）：
+
+| finding | 优先级 | 文件 | 立修策略 |
+|---|---|---|---|
+| PUT /nc-voucher-number 缺 Permission | P1 | `InterfaceReceiptsController.cs:38-40` + `InterfaceReceiptAppService.cs` | Controller + AppService 双层加 [Authorize(SupplyCoresPermissions.VoucherManagement.Default)] / using Microsoft.AspNetCore.Authorization + Nova.SupplyCores.Permissions / method 级（不动 class 级）/ 与 voucher-management UI 页面权限一致 |
+
+立修结果：
+- 2 文件 / +10 / 0 deletions
+- build 0 errors（Application + HttpApi 全过）
+- dotnet test --filter InterfaceReceiptAppService = 23/23 全过 ✓
+- 立修工作量 ~0.15 PD（finding 简单 / method 级 attribute / 安全敏感修复）
+
+### 9.6 连续 8 Sprint 立修 + 2 次 0 finding 通过保 0 顺延（V0.4 沉淀）
+
+| Sprint | finding | commit | 工作量 |
+|---|---|---|---|
+| 19q | 1 P1（DbMigrator SeedTestUsers）| `1101c34` | 0.05 PD |
+| 19r | 5（2 P1 + 3 P2）| `c8785e6` | 0.65 PD |
+| 19s | 5（2 P1 + 3 P2）| `606d794` | 0.8 PD |
+| 19s（第 2 次）| 0 finding | - | 0 PD（通过）|
+| 19t | 3（1 P1 + 2 P2）| `b486dda` | 0.6 PD |
+| 20a | 2（1 P1 + 1 P2）| `8c8bdb6` | 0.15 PD |
+| 20b | 2 P2 | `39e4b09` | 0.15 PD |
+| 20c | 2 P2 | `dd40156` | 0.15 PD |
+| 20d | 0 finding | - | 0 PD（通过）|
+| **20e** | **1 P1** | **`6d13d5c`** | **0.15 PD** |
+| **累计** | **21 finding + 2 次 0** | **8 commit** | **2.7 PD** |
+
+**Sprint 32 0 顺延记录持续保持 ✅** — 12a-20e 共 32 Sprint / 18 完整 + 3 强绑定闭环 + 19i/19j 自闭环 + 连续 8 立修 + 2 次 0 finding 通过
+
+### 9.7 双里程碑达成（V0.4 沉淀）
+
+1. **race [P0] → [P1] 正式降级**（5 Sprint 窗口 20a-20e 收尾 / commit `1956dc6` / cici Q3 A 拍板 / 防御链 ≥ 4 次 / cici Q6 C 目标达成）
+2. **双号制全栈完整链路**（G-12 B 业务方决策落地 / 20d backend `be849e5` + 20e frontend `63a7ad7` / Permission 完整保护 `6d13d5c`）
 
 ### 9.2 5 Sprint 观察窗口收尾里程碑达成（V0.3 沉淀）
 
@@ -282,4 +320,4 @@ main D1 实际：**~0.65 PD**（计划 1.1 / 早完 0.45 PD / T-A3 验证 + T-A4
 
 ---
 
-**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答 A/B/A/A/A 拍板 → V0.3 main D1 完成锁版（main 2 commits / ~0.65 PD / 早完 0.45 PD / **race [P0] → [P1] 降级里程碑 + 双号制全栈完整**）→ 待 Codex 立修 → V0.4 / 32 Sprint 0 顺延准备
+**main 主代理 a 签名**：2026-05-16 V0.1 起草 · V0.2 cici 5 答 A/B/A/A/A 拍板 → V0.3 D1 完成锁版（main 2 commits）→ **V0.4 Codex 立修完整闭环**（main 3 commits / 总 ~1.1 PD / 节省 0.4 PD / **32 Sprint 0 顺延 / 连续 8 Sprint 立修 / race [P0] → [P1] 降级 + 双号制全栈双里程碑达成**）
