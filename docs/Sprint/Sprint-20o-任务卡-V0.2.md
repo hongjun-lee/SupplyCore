@@ -1,14 +1,15 @@
-# Sprint 20o 任务卡 V0.1（2026-05-17 起草 / 第 3 周期 20k-20o 收尾 + 第 3 批启动评估）
+# Sprint 20o 任务卡 V0.2（2026-05-17 cici 拍板 5 决策全 B / 第 3 周期 20k-20o 收尾 + 第 3 批启动评估）
 
 **Sprint**：20o（紧续 20n Wave 1 收口 → 第 3 周期 5 Sprint 闭环 + 第 3 批准入评估）
 **主题**：5 Sprint 周期（20k-20o）整体复盘 + 第 3 批（采购/合同/审批）启动评估 + production runbook V0.2 升级 + 20p+ roadmap 起草
 **节奏**：roadmap V0.3 第 2-3 阶段过渡 / **协调 + 评估 sprint**（依赖 Sprint 20n part 2 试点反馈 + 第 3 批准入条件判断 / wall-clock 估算 3-5 天 main 主轨 / part 2 反馈数据待业务方响应）
 **性质**：5 Sprint 周期收尾（类 Sprint 20e / 20j）+ 第 3 批准入评估（新元素 / 不同于 20j 纯收尾）+ 战略转向第 3 周期后段 production 准备 + 第 4 周期 roadmap 启动
-**V0.1 起草要点**：
+**V0.2 拍板要点**（cici 2026-05-17 同意 5 决策全 B 推荐答案）：
 - 按 roadmap V0.3 §2.5 已定 5 task（不增不删）：T-A1 复盘 / T-A2 第 3 批评估 / T-A3 runbook V0.2 / T-A4 20p+ roadmap / T-A5 Codex+V0.x
-- 总工作量 ~1.6 PD（main 主轨主推 / second 副轨条件性 / Sprint 20n part 2 反馈数据为关键输入）
+- 总工作量 ~1.6 PD（main 主轨主推 / second 副轨 ✅ B 暂停 / Sprint 20n part 2 反馈数据为关键输入）
 - 42 Sprint 0 顺延维持（part 2 试点反馈最终验收后达成 43 Sprint）
-- cici V0.1→V0.2 待拍板 5 决策点（详 §四）
+- **cici 5 决策全 B 拍板**：Q1 B 复盘 V0.1 起草 + part 2 反馈陆续补 / Q2 B 观察期 + cici 拍板 / Q3 B 核心升级 / Q4 B second 暂停 / Q5 B 明天启动（详 §四）
+- 启动时间：2026-05-18 Day 1（Q5 B 推荐 / 调整 + 等 Sprint 20n part 2 部分反馈）
 
 ---
 
@@ -98,22 +99,22 @@
 
 ---
 
-## 四、关键决策点（cici V0.1→V0.2 待拍板）
+## 四、关键决策点（cici V0.1→V0.2 已拍板 ✅）
 
-| # | 决策 | 选项 | 推荐 |
-|---|---|---|---|
-| **Q1** | T-A1 复盘文档完成度（part 2 反馈数据齐不齐）| A. 完整版（等 part 2 反馈数据齐 / 推迟到 part 2 收口）/ B. **V0.1 起草 + part 2 反馈陆续补**（推荐 / 不阻塞 Sprint 20o 主轨）/ C. 仅占位框架（最简）| **B**（推荐）|
-| **Q2** | T-A2 第 3 批准入触发条件量化标准 | A. 严格量化（库存 4 单据 ≥ 80% / SLA ≥ 90% / 培训 3 厂矿）/ B. **观察期 + cici 拍板**（推荐 / 业务方反馈定 / 灵活）/ C. 不量化（仅文字描述）| **B**（推荐 / 数据治理刚开始难量化）|
-| **Q3** | T-A3 runbook V0.2 升级深度 | A. 大幅升级（含数据治理完整章节 + 试点 SOP / 0.5 PD）/ B. **核心升级**（数据治理 + checklist 实战修正 / 0.3 PD / 推荐）/ C. 微调（仅修 V0.1 笔误 / 0.1 PD）| **B**（推荐）|
-| **Q4** | second 副轨范围 | A. 启动 T-E1 dashboard 样式 polish + T-E2 收尾（~0.5 PD / 第 12 次连续 / 但模块 8/8 已完整难再扩）/ B. **暂停 second**（推荐 / 周期收尾自然收敛 / 类 20j 模式但工作量更低）/ C. cici 评估时再决定（D2 答）| **B**（推荐）|
-| **Q5** | Sprint 20o 启动时间 | A. 今天升 V0.2 启动 D1（连续 / 42 Sprint 动量延续 / 但 main 已 Sprint 20n Wave 1 ~1.2 PD + 大量 Sprint 20m 后段工作）/ B. **明天启动**（推荐 / 调整 + 等 Sprint 20n part 2 部分反馈 / 至少 part 2 第一周数据）/ C. 等 part 2 完整反馈触发（保守 / 推迟 3-4 周）| **B**（推荐）|
+| # | 决策 | 选项 | 推荐 | **cici 拍板** |
+|---|---|---|---|---|
+| **Q1** | T-A1 复盘文档完成度（part 2 反馈数据齐不齐）| A. 完整版（等 part 2 反馈数据齐 / 推迟到 part 2 收口）/ B. **V0.1 起草 + part 2 反馈陆续补**（推荐 / 不阻塞 Sprint 20o 主轨）/ C. 仅占位框架（最简）| **B** | ✅ **B 拍板** |
+| **Q2** | T-A2 第 3 批准入触发条件量化标准 | A. 严格量化（库存 4 单据 ≥ 80% / SLA ≥ 90% / 培训 3 厂矿）/ B. **观察期 + cici 拍板**（推荐 / 业务方反馈定 / 灵活）/ C. 不量化（仅文字描述）| **B** | ✅ **B 拍板** |
+| **Q3** | T-A3 runbook V0.2 升级深度 | A. 大幅升级（含数据治理完整章节 + 试点 SOP / 0.5 PD）/ B. **核心升级**（数据治理 + checklist 实战修正 / 0.3 PD / 推荐）/ C. 微调（仅修 V0.1 笔误 / 0.1 PD）| **B** | ✅ **B 拍板** |
+| **Q4** | second 副轨范围 | A. 启动 T-E1 dashboard 样式 polish + T-E2 收尾（~0.5 PD / 第 12 次连续 / 但模块 8/8 已完整难再扩）/ B. **暂停 second**（推荐 / 周期收尾自然收敛 / 类 20j 模式但工作量更低）/ C. cici 评估时再决定（D2 答）| **B** | ✅ **B 拍板**（second e 第 11 次连续后暂停 / 模块 8/8 完整 / 类 20j 收尾模式）|
+| **Q5** | Sprint 20o 启动时间 | A. 今天升 V0.2 启动 D1（连续 / 42 Sprint 动量延续 / 但 main 已 Sprint 20n Wave 1 ~1.2 PD + 大量 Sprint 20m 后段工作）/ B. **明天启动**（推荐 / 调整 + 等 Sprint 20n part 2 部分反馈 / 至少 part 2 第一周数据）/ C. 等 part 2 完整反馈触发（保守 / 推迟 3-4 周）| **B** | ✅ **B 拍板**（2026-05-18 启动 Day 1）|
 
-### V0.2 拍板条件
+### V0.2 拍板条件 ✅ 全 done
 
-- 5 开放问题 cici 答
-- 1c 模块隔离表确认（§五 / Sprint 20o 主轨涉及 docs/internal/ + docs/部署/ / second 暂停）
-- Sprint 20n Wave 1 真正收口已达成（commit `f908cd6` push 确认）
-- 至少 part 2 第一周试点反馈数据初步入手（B 选项前提）
+- ✅ 5 开放问题 cici 答（全 B 推荐 / 2026-05-17 深夜同意）
+- ✅ 1c 模块隔离表确认（Sprint 20o 主轨涉及 docs/internal/ + docs/部署/ / second e 暂停 / 无 race 风险）
+- ✅ Sprint 20n Wave 1 真正收口已达成（commit `f908cd6` push 确认 / Round 14 0 finding 收敛）
+- ⏳ 至少 part 2 第一周试点反馈数据初步入手（Q1 B 选项前提 / 2026-05-18 启动 D1 时陆续到位）
 
 ---
 
@@ -152,11 +153,12 @@
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
-| V0.1 | 2026-05-17 深夜（紧续 Sprint 20n Wave 1 真正收口 / Round 14 0 finding 收敛 / 42 Sprint 0 顺延达成）| main a 起草 / Sprint 20o 任务卡 / 5 task 按 roadmap V0.3 §2.5 落地（T-A1 复盘 + T-A2 第 3 批评估 + T-A3 runbook V0.2 + T-A4 20p+ roadmap + T-A5 Codex+V0.x / 总 ~1.6 PD）/ 性质为 5 Sprint 周期收尾 + 第 3 批评估 sprint（vs Sprint 20j 纯收尾）/ 5 开放问题待 cici 答（Q1 复盘完成度 / Q2 第 3 批准入阈值 / Q3 runbook V0.2 深度 / Q4 second 副轨范围 / Q5 启动时间）|
+| V0.1 | 2026-05-17 深夜（紧续 Sprint 20n Wave 1 真正收口 / Round 14 0 finding 收敛 / 42 Sprint 0 顺延达成）| main a 起草 / Sprint 20o 任务卡 / 5 task 按 roadmap V0.3 §2.5 落地（T-A1 复盘 + T-A2 第 3 批评估 + T-A3 runbook V0.2 + T-A4 20p+ roadmap + T-A5 Codex+V0.x / 总 ~1.6 PD）/ 性质为 5 Sprint 周期收尾 + 第 3 批评估 sprint（vs Sprint 20j 纯收尾）/ 5 开放问题待 cici 答（Q1 复盘完成度 / Q2 第 3 批准入阈值 / Q3 runbook V0.2 深度 / Q4 second 副轨范围 / Q5 启动时间）/ [[main-orchestrator-default-spawn]] 新规则首次实测：spawn general-purpose 子代理起草 / wall-clock ~3 min / 加速 ~2x |
+| V0.2 | 2026-05-17 深夜（同 V0.1 当晚 / cici 拍板）| **cici 同意 5 决策全 B 推荐答案** ✅（Q1 复盘 V0.1 起草 + part 2 反馈陆续补 / Q2 观察期 + cici 拍板 / Q3 runbook V0.2 核心升级 / Q4 second 暂停 / Q5 2026-05-18 启动 Day 1）/ 决策表加 cici 拍板列 / V0.2 拍板条件全 done（除 part 2 第一周反馈陆续到位）/ V0.2 锁版 Day 1 启动 |
 
 ---
 
-**Created**: 2026-05-17 深夜 / Sprint 20n Wave 1 收口（`f908cd6` push 后）→ 20o 启动前置 / main 主代理 a
+**Created**: 2026-05-17 深夜 / Sprint 20n Wave 1 收口（`f908cd6` push 后）→ 20o V0.1 起草 → V0.2 cici 拍板 / 等 2026-05-18 Day 1 启动 / main 主代理 a
 
 **Related**:
 - [`Sprint-20n-任务卡-V0.4.md`](Sprint-20n-任务卡-V0.4.md)（同 cycle 前序 / V0.4 Wave 1 真正收口 / Round 14 0 finding 收敛）
