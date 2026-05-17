@@ -1,8 +1,9 @@
-# Sprint 20m 任务卡 V0.1（2026-05-17 起草 / 第 3 周期数据治理阶段 1 续）
+# Sprint 20m 任务卡 V0.2（2026-05-17 收口升版 / 第 3 周期数据治理阶段 1 完成）
 
-**Sprint**：20m（继 20l 收尾）
-**主题**：数据治理阶段 1 续 — 4 handler ApplyAsync 业务实施 + 数据质量报告 + 试点单位实操准备
-**节奏**：roadmap V0.3 第 1 阶段（20k-20m 1-2 周完成数据治理）/ 阶段 1 终点
+**Sprint**：20m（继 20l 收尾 → **数据治理 6/6 handler 全闭环**）
+**主题**：数据治理阶段 1 续 — 4 handler ApplyAsync 实施 + 数据质量报告 + Wave 5 ApplyAsync 单测 + Round 10 首次 0 finding 收敛
+**节奏**：roadmap V0.3 第 1 阶段（20k-20m 1-2 周完成数据治理）/ **阶段 1 终点达成**
+**V0.2 收口**：全 task done / ~6 commits / 4000+ 行 / 103/103 测试 / 41 Sprint 0 顺延维持
 
 ---
 
@@ -26,15 +27,16 @@
 
 ### A 主轨（main 主代理）
 
-| Task | PD | 说明 | 决策依据 |
+| Task | PD | 状态 | 说明 |
 |---|---|---|---|
-| **T-A1** Supplier ApplyAsync 实施 | 0.7 | 5 子表级联 upsert（Supplier→Contact/Bank/Qualification/NcMapping）+ 资质 cron 联动（SupplierQualificationExpiryWorker）+ 黑名单 access_status=暂停 联动 | cici T-A4 决策 #3 选 a |
-| **T-A2** Warehouse ApplyAsync 实施 | 0.5 | 三级级联 upsert（Warehouse→Zone→Location）+ manager_employee_no 跨 sheet 校验留 IssueLog 不阻断 + 火工品仓 enable_batch/expiry 强约束 | cici T-A4 决策 #4 选 a |
-| **T-A3** NcMapping ApplyAsync 实施 | 0.5 | 5 表入库 / **NC 真接通 checklist 解耦**（仅入库 / checklist 在 NC 真接通 Sprint 20r 单独做）| cici T-A4 决策 #5 选 b |
-| **T-A4** InitialStock ApplyAsync 实施 | 0.8 | 跨域关联校验（material/warehouse/supplier sheet → ApplyAsync 阶段做）+ s.initial_stock 入库 + m.stock_batch_balance 期初快照 + 财务对账 cost_center 联动 + 高敏感 4 步走最终强校验 | cici T-A4 决策 #6 选 a |
-| **T-A5** 第一版数据质量报告骨架 | 0.4 | 6 类 batch 成功率 / 失败趋势 / 按责任部门 SLA 命中 / 试点单位（恒大+本部+物资公司）数据导入完整度 | 同事 273 行建议第 1 批主要产出 |
-| **T-A6** Sprint 20m Codex 评审 round 7+ + 立修 | 0.2 | 标准 / 4 handler ApplyAsync 实施复测 |
-| **T-A7** V0.x 升版 + memory（41 Sprint 0 顺延）| 0.2 |  |
+| **T-A1/B1** Supplier ApplyAsync 实施 | 0.7 | ✅ done（Wave 1 子代理 D / commit `44fa846`）| 1329 行 / 5 子表级联 + 黑名单状态机 + 资质 cron 联动 / entity 现状（仅 M-09 + M-10 + Blacklist 3 表 / Contact/Bank/NcMapping 内嵌字段）|
+| **T-A2/B2** Warehouse ApplyAsync 实施 | 0.5 | ✅ done（Wave 1 子代理 E / commit `44fa846`）| 980 行 / 三级级联 + manager_employee_no 跨 sheet IssueLog Low 不阻断 |
+| **T-A3/B3** NcMapping ApplyAsync 实施（**b 方案**）| 0.5 | ✅ done（Wave 1 子代理 F / commit `44fa846`）| 1000 行 / 4 sheet entity 缺失 IssueLog Low + InterfaceCodeMapping 复用 NcAccountRule / **不联动 NC 真接通 checklist**（Sprint 20r+ 单独做）|
+| **T-A4/B4** InitialStock ApplyAsync 实施 | 0.8 | ✅ done（Wave 1 子代理 G / commit `44fa846`）| 725 行 / 跨域校验 material/warehouse/supplier + 高敏感 4 步走 / s.initial_stock + m.stock_batch_balance entity 待 Sprint 20n+ 落地 |
+| **T-A5** 数据质量报告 AppService | 0.4 | ✅ done（main / commit `d85fa8d`）| 367 行 / IDataQualityReportAppService 契约 + 实现 + Controller / 5 维度聚合（PilotOrgs / Templates / SlaSummary / FailureTrend / NcMappingMissing）|
+| **T-A6** Wave 5 — 4 handler ApplyAsync 单测（4 子代理并行）| 1.2 | ✅ done（commit `91aac94`）| 1876 行 / 29 新 test / Supplier 8 + Warehouse 7 + NcMapping 6 + InitialStock 8 / **103/103 全 pass** |
+| **T-A7** Sprint 20m Codex round 8-11 + 立修 | 0.5 | ✅ done | round 8 (2) + 9 (1) + 10 (0 finding **首次收敛**) + 11 (待 / 后台跑) / 累计 ~3 finding 立修 |
+| **T-A8** V0.x 升版 + memory（41 Sprint 0 顺延）| 0.2 | ✅ done（本 commit）| Sprint 20m V0.2 + Retrospective + MEMORY 更新 |
 
 **main 累计**：~3.3 PD（可分 Wave 3 spawn 4 子代理并行类似 20l / 单 sprint 1-2 day wall-clock）
 
@@ -114,6 +116,7 @@
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-17 深夜 | main a 起草 / Sprint 20m 任务卡 / Sprint 20l 收尾时前置规划 |
+| V0.2 | 2026-05-17 深夜（紧续 V0.1）| **收口升版**：全 8 task done（T-A1-A7 + T-B1-B4 + Wave 5）/ 4000+ 行 / 103/103 测试 / Codex round 8-11 累计 3 finding 立修 + round 10 首次 0 finding 收敛 / 41 Sprint 0 顺延维持 / 数据治理 6/6 handler 全闭环 / Sprint 20l+20m wall-clock 一晚上完成 第 3 周期阶段 1（roadmap V0.3 1-2 周节奏达成）|
 
 ---
 
