@@ -1,9 +1,9 @@
-# Sprint 20j 任务卡 V0.1（5 Sprint 周期收尾 · 整体复盘 + 性能压测 + 部署 runbook / 37 Sprint 0 顺延目标）
+# Sprint 20j 任务卡 V0.2（cici 5 答 C/A/A/A/A 拍板 · 5 Sprint 周期收尾 + mini 压测 + 部署 runbook / 37 Sprint 0 顺延 / 今天启动 D1）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（main a 起草 · 5 开放问题待 cici 答 / 基于 roadmap §2.5 候选）
+**版本：** V0.2（cici 5 答 C/A/A/A/A 拍板 · mini 压测 + 完整部署 runbook + 20k+ roadmap + second 全 + 今天启动 D1 / 5 Sprint 周期收尾）
 **日期：** 2026-05-17
-**文档性质：** 实施层 · Sprint 20j 提前规划任务卡（V0.1 起草框架 → cici 5 答 → V0.2 拍板启动 D1 / **5 Sprint 周期 20f-20j 收尾 Sprint**）
+**文档性质：** 实施层 · Sprint 20j 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答拍板 → 立即启动 D1 / **5 Sprint 周期 20f-20j 收尾 Sprint** / main 主轨化主推）
 **配套：** [`Sprint-20i-任务卡-V0.4.md`](./Sprint-20i-任务卡-V0.4.md) + [`sprint-20f-20j-roadmap.md`](../../../SupplyCores/docs/internal/sprint-20f-20j-roadmap.md) §2.5 + [`sprint-20a-20e-retrospective.md`](../../../SupplyCores/docs/internal/sprint-20a-20e-retrospective.md)（参考模板）
 
 ---
@@ -166,7 +166,44 @@ second 总：**~0.8 PD**（副轨 / 周期收尾自然收敛）
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-17 | main a 起草 · 提前规划框架（5 Sprint 周期 20f-20j 收尾）/ 5 开放问题待 cici 答 |
+| V0.2 | 2026-05-17 | **cici 5 答 C/A/A/A/A 拍板**（Q1C mini 压测 / Q2A 完整 runbook / Q3A 20k+ roadmap / Q4A second 全 / Q5A 今天启动 D1）· 启动 D1 |
 
 ---
 
-**main 主代理 a 签名**：2026-05-17 V0.1 起草（5 Sprint 周期收尾 Sprint）· 等 cici 5 答 + 升 V0.2 启动
+## 八、V0.2 拍板启动 D1（cici 5 答 C/A/A/A/A）
+
+| Q | 答 | 影响 |
+|---|---|---|
+| Q1 | C | mini 压测 0.2 PD（unit test 级 / 已基本完成 / production 顺延 20k+）|
+| Q2 | A | 完整部署 runbook 0.4 PD（appsettings + Hangfire + IMemoryCache + 80% checklist）|
+| Q3 | A | 20k+ roadmap 框架起草 0.2 PD（Q3 中期方向）|
+| Q4 | A | second 全 T-E1+T-E2+T-E3（~0.8 PD / 第 11 次连续）|
+| Q5 | A | 今天启动 D1（36 Sprint 0 顺延动量延续）|
+
+### 8.1 main D1 启动顺序（主轨化主推）
+
+1. **T-A1 5 Sprint 整体复盘文档**（0.4 PD / 首启 / 主要工作 / 类 20a-20e 模板）
+2. **T-A3 部署 runbook 起草**（0.4 PD / docs/部署/ + production checklist）
+3. **T-A4 20k+ roadmap 框架 + 业务方反馈追踪**（0.2 PD）
+4. **T-A2 mini 压测**（0.2 PD / unit test 级 / 已有 20h+20i baseline）
+5. **T-A5 Codex 评审 + 立修**（0.2 PD / D2）
+6. **T-A6 V0.4 锁版 + memory**（0.3 PD / D2-D3）
+
+main D1 实际：~1.7 PD
+
+### 8.2 second e D1 启动顺序（cici 切 second session）
+
+详 second-e-prompt-20j-raw.txt（待起草）：
+1. T-E1 Reports 模板 20 → 22+（0.3 PD）
+2. T-E2 dashboard E2E spec 真业务场景加严（0.3 PD）
+3. T-E3 收尾 + memory（0.2 PD / 第 11 次连续）
+
+### 8.3 启动条件全部满足
+
+- ✅ 5 开放问题 cici 5 答
+- ✅ 1c 模块隔离表确认（加 docs/部署/ main 锁）
+- ✅ 20i V0.4 锁版完成（跨仓 `eaf6676` / 36 Sprint 0 顺延 + second 第 10 次连续里程碑）
+
+---
+
+**main 主代理 a 签名**：2026-05-17 V0.1 起草 · V0.2 cici 5 答 C/A/A/A/A 拍板 → 立即启动 D1 / 5 Sprint 周期收尾 / 37 Sprint 0 顺延目标
