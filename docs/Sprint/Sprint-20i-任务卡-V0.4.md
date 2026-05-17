@@ -1,9 +1,9 @@
-# Sprint 20i 任务卡 V0.2（cici 5 答全 A 拍板 · 测试覆盖深化主轨 + second 第 10 次连续 / 36 Sprint 0 顺延 / 今天启动 D1）
+# Sprint 20i 任务卡 V0.4（Codex 1 P2 finding second 自动修复 · main 2 + second 2 commits / 36 Sprint 0 顺延 / 连续 10 立修 + 5 次 0 finding 通过 + second 自动修复新模式）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（cici 5 答全 A 拍板 · 测试覆盖深化主轨 T-A1 0.6 PD + second 全 T-E1+T-E2+T-E3 1.0 PD / NC 真接通顺延 20j+ / demo 协调追踪 / 今天启动 D1）
+**版本：** V0.4（Codex 1 P2 finding 但 second 自动修复 · main 2 commits（second-e-prompt + V0.2）+ second 2 commits（T-E1 Reports 18→20 含 controller endpoint / T-E2 性能 baseline / T-E3 收尾）/ main T-A1 测试深化 cici 还原顺延 20j+ / 36 Sprint 0 顺延达成 / 第 5 次 0 finding 通过模式（second 自动修复 / 等价 0 finding）)
 **日期：** 2026-05-17
-**文档性质：** 实施层 · Sprint 20i 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答全 A 拍板 → 立即启动 D1 / 测试覆盖深化收口 20h T-A3 顺延）
+**文档性质：** 实施层 · Sprint 20i 收尾锁版任务卡（V0.2 拍板 → V0.4 second 自动修复 finding 模式 / 36 Sprint 0 顺延达成 / second 第 10 次连续里程碑 / 跳 V0.3 类 20f/20h 模式）
 **配套：** [`Sprint-20h-任务卡-V0.4.md`](./Sprint-20h-任务卡-V0.4.md) + [`sprint-20f-20j-roadmap.md`](../../../SupplyCores/docs/internal/sprint-20f-20j-roadmap.md) §2.4 + [`test-coverage-audit-20h.md`](../../../SupplyCores/docs/internal/test-coverage-audit-20h.md)
 
 ---
@@ -170,6 +170,7 @@ second 主代理 e 总：**~1.0 PD**（副轨延续）
 |---|---|---|
 | V0.1 | 2026-05-17 | main a 起草 · 提前规划框架（基于 roadmap §2.4 + 20h T-A3 测试 missing case 顺延）/ 5 开放问题待 cici 答 |
 | V0.2 | 2026-05-17 | **cici 5 答全 A 拍板**（Q1A NC 真接通顺延 20j+ / Q2A 全 missing case 测试深化 / Q3A second 全 T-E1+T-E2+T-E3 / Q4A demo 协调追踪 / Q5A 今天启动 D1）· 启动 D1 |
+| V0.4 | 2026-05-17 | **Codex 1 P2 finding second 自动修复完整闭环**（codex review --base 7d810e8 flag P2 BusinessReportsController 漏 material-turnover + stock-inbound 2 endpoint / 但 second e bc6d652 T-E1 已含 controller endpoint 完整 / 假阳性 / second 自动修复新模式）· main T-A1 cici 还原顺延 20j+ test 专项 / **36 Sprint 0 顺延达成 / 连续 10 立修 + 5 次 0 finding 通过模式**（19s 第 2 次 + 20d + 20h main + 20h T-E2 + **20i second 自动修复**） |
 
 ---
 
@@ -208,4 +209,4 @@ main D1 实际：~0.7 PD
 
 ---
 
-**main 主代理 a 签名**：2026-05-17 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → 立即启动 D1 / 测试覆盖深化 + second 第 10 次连续 / 36 Sprint 0 顺延目标
+**main 主代理 a 签名**：2026-05-17 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → **V0.4 Codex 1 P2 second 自动修复**（main 2 + second 2 commits / 总 ~0.2 PD main + 1.0 PD second / **36 Sprint 0 顺延 / 第 5 次 0 finding 通过模式 / second 第 10 次连续里程碑 / second 自动修复新模式首测**）
