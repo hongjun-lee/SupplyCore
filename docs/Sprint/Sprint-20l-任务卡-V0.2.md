@@ -1,8 +1,9 @@
-# Sprint 20l 任务卡 V0.1（2026-05-17 起草 / 第 3 周期数据治理阶段 1）
+# Sprint 20l 任务卡 V0.2（2026-05-17 收口升版 / 第 3 周期数据治理阶段 1 完成）
 
 **Sprint**：20l（继 20k 收尾）
-**主题**：数据治理阶段 1 — 6 类 handler 真实现 + 试导入 + 数据质量报告骨架
-**节奏**：roadmap V0.3 第 1 阶段（20k-20m 1-2 周完成数据治理）/ 当前位于阶段中段
+**主题**：数据治理阶段 1 — 6 类 handler 真实现 + 试导入 + 数据质量报告骨架 + Codex 7 轮立修 + Wave 4 单测
+**节奏**：roadmap V0.3 第 1 阶段（20k-20m 1-2 周完成数据治理）/ **Sprint 20l 收口 → Sprint 20m 衔接**
+**V0.2 收口升版**：本 Sprint 全 task done / 累计 ~12 commits / 8000+ 行 / 7 轮 Codex 立修 / 40 Sprint 0 顺延维持
 
 ---
 
@@ -27,13 +28,15 @@
 
 | Task | PD | 状态 | 说明 |
 |---|---|---|---|
-| **T-A1b** OrgUser handler Parse+Validate 真实现 | 0.4 | ✅ 本 wave done（子代理 B）| 392 行 / 5 类 issue（excel_read_error / sheet_missing / required_field_missing / phone_format_invalid / email_format_invalid / issue_type_enum_invalid）/ ApplyAsync 业务侧扩展点 NotImpl 待 cici 拍板（A→ReportAlert / B→IT 通知 / C→Nova 推送）|
-| **T-A1c** Material handler Parse+Validate 真实现 | 0.5 | ✅ 本 wave done（子代理 C）| 665 行 / 14 类 issue（含 category_8_main_incomplete / material_no_nc_mapping / high_sensitive_mismatch 等业务校验）/ ApplyAsync 业务侧扩展点 NotImpl |
-| **T-A2** 端到端试导入测试 + small-sample Excel | 0.3 | ⚠️ pending | 用 DataImportTemplateGenerator 生成 6 类 .xlsx 范本 → orchestrator UploadAndValidate → 验证 batch 状态 + IssueLog 落地正确 |
-| **T-A3** Codex round 4 复测（验证 1b1bb25）| 0.1 | ⚠️ pending | base bd43f1a^ 验证 cici 复查 round 3 立修 0 finding |
-| **T-A4** OrgUser + Material ApplyAsync 业务侧拍板 + 实施 | 0.6 | ⚠️ pending | 待 cici 决策：A 业务联系人 ReportAlert? / B 数据责任人 IT 通知? / C Nova 异常推送? / Material 入库时机 + NC 映射缺失 IssueLog 联动 |
-| **T-A5** Sprint 20l Codex 评审 + 立修 | 0.2 | ⚠️ pending | 标准 |
-| **T-A6** V0.x 升版 + memory（39 Sprint 0 顺延）| 0.2 | ⚠️ pending |  |
+| **T-A1b** OrgUser handler Parse+Validate 真实现 | 0.4 | ✅ done（Wave 1 子代理 B / commit `4d8847c`）| 392 行 / 5 类 issue |
+| **T-A1c** Material handler Parse+Validate 真实现 | 0.5 | ✅ done（Wave 1 子代理 C / commit `4d8847c`）| 665 行 / 14 类 issue |
+| **T-A1d** Supplier/Warehouse/NcMapping/InitialStock Parse+Validate（Wave 3 提前实施）| 2.0 | ✅ done（Wave 3 子代理 D/E/F/G / commit `e4633df`）| 2635 行 / 4 子代理并行 wall-clock 30 min / 5x 加速 |
+| **T-A2** 端到端试导入测试 + small-sample Excel | 0.3 | ✅ done（commit `fd4c22c`）| 153 行 test / 14/14 pass / catch 出 Generator 列名 * + Material unit/category 2 真 bug 立修 |
+| **T-A3** Codex round 4 复测（验证 1b1bb25）| 0.1 | ✅ done | 5 finding 立修 commit `502ae35`（3 main + 2 second）|
+| **T-A4** OrgUser + Material ApplyAsync 业务侧拍板 + 实施 | 0.8 | ✅ done（cici 8 决策点拍板 a/a / commit `fb5a018`）| OrgUser ReportAlert R-10 聚合 + IssueLog Low / Material 3 表 upsert + A-06 隔离 + 冲突 IssueLog / 双构造模式（无参兼容单测 + DI 注入） |
+| **T-A5** Sprint 20l Codex 7 轮评审 + 立修 | 0.4 | ✅ done | round 1 (3) + round 2 (3) + round 3 (2) + round 4 (5) + round 5 (2) + round 6 (4) + round 7 (1) = **20 finding 全立修** / Round 5+7 都 0 P1（收敛）|
+| **T-A6** Wave 4 — 4 handler 单测补齐（4 子代理并行）| 0.5 | ✅ done（commit `7b3c261`）| 1752 行 / 59 新 test / **73/73 全 pass** / Supplier 16 + Warehouse 17 + NcMapping 14 + InitialStock 12 |
+| **T-A7** V0.x 升版 + memory（40 Sprint 0 顺延）| 0.2 | ✅ done（本 commit V0.2 + MEMORY 升级）| 累计 Sprint 20l ~12 commits / 8000+ 行 / 40 Sprint 0 顺延维持 |
 
 **main 累计**：~2.3 PD（前 wave 子代理 0.9 PD + 主代理 1.4 PD）
 
@@ -110,6 +113,7 @@
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-17 晚 | main a 起草 / Sprint 20l 任务卡 / Wave 1 并行 4 task 子代理交付后立刻收口起草 |
+| V0.2 | 2026-05-17 深夜 | **收口升版**：全 7 task done（T-A1b/c/d + T-A2/A3/A4/A5/A6/A7）/ Codex 7 轮 20 finding 立修 / Wave 4 73 测试全 pass / 40 Sprint 0 顺延维持 / 10 子代理累计实施（6 handler + 4 单测）/ wall-clock ~一晚上完成 1 sprint |
 
 ---
 
