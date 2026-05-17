@@ -1,4 +1,4 @@
-# Sprint 20p 任务卡 V0.1（2026-05-17 深夜 / 紧续 Sprint 20o 真正收口 / 第 4 周期第 1 阶段开局 / 协调 + 试点验证 + UI 完善 sprint）
+# Sprint 20p 任务卡 V0.2（2026-05-17 深夜 cici 拍板 5 决策全默认 / 第 4 周期开局协调 + 试点验证 sprint / 明天 2026-05-18 启动 Day 1）
 
 **Sprint**：20p（紧续 20o 真正收口 → 第 4 周期 5 Sprint 第 1 阶段开局）
 **主题**：ProcurementDocument 试点验证 + Tender↔Contract↔Approval 关联完整性 grep + UI polish + 试点扩大白音华煤矿 + 试点 demo
@@ -114,8 +114,8 @@
 
 ## 四、关键决策点（cici V0.1→V0.2 待拍板）
 
-| # | 决策 | 选项 | 推荐 |
-|---|---|---|---|
+| # | 决策 | 选项 | 推荐 | **cici 拍板** |
+|---|---|---|---|---|
 | **Q1** | Sprint 20p 启动时间 | A. 今天启动（连续 43 Sprint 动量延续）/ B. 明天启动（调整）/ C. 等 Sprint 20n part 2 第一周反馈 | **B 默认**（启动节奏调整 / 给 cici 半天 part 2 反馈消化）|
 | **Q2** | second e 副轨范围 | A. 启动 T-E1+T-E2+T-E3（3 task / 0.7 PD）/ B. 仅 T-E1 polish（0.3 PD / 简化）/ C. 暂停（类 20o）| **A 默认**（采购 UI polish 真正影响试点验证 / second e 第 12 次连续 / 模块切到采购）|
 | **Q3** | T-A3 试点扩大白音华煤矿协调 | A. Sprint 20p 同期推（cici Day 1 启动协调）/ B. 顺延 Sprint 20q（等 ProcurementDocument 验证 done 再扩）/ C. Sprint 20p 不做 / 顺延 20n part 2 后再评估 | **A 默认**（cici 协调与代码验证并行 / 不阻塞主轨）|
@@ -165,7 +165,7 @@
 
 ---
 
-**Created**: 2026-05-17 深夜 / Sprint 20o 真正收口（`3b0b250` push 后）→ 20p 启动前置 / main 主代理 a
+**Created**: 2026-05-17 深夜 / Sprint 20o 真正收口（`3b0b250` push 后）→ 20p V0.1 起草 → V0.2 cici 拍板 / **等 2026-05-18 Day 1 启动** / main 主代理 a
 
 **Related**:
 - [`Sprint-20o-任务卡-V0.4.md`](Sprint-20o-任务卡-V0.4.md)（同 cycle 前序 / V0.4 真正收口 / Codex round 5 = 0 finding 收敛 / 43 Sprint 0 顺延达成）
