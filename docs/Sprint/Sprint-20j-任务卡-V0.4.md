@@ -1,9 +1,9 @@
-# Sprint 20j 任务卡 V0.2（cici 5 答 C/A/A/A/A 拍板 · 5 Sprint 周期收尾 + mini 压测 + 部署 runbook / 37 Sprint 0 顺延 / 今天启动 D1）
+# Sprint 20j 任务卡 V0.4（Codex 3 finding 全立修完整闭环 · 5 Sprint 周期 20f-20j 目标达成 / 37 Sprint 0 顺延 / 连续 11 立修）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.2（cici 5 答 C/A/A/A/A 拍板 · mini 压测 + 完整部署 runbook + 20k+ roadmap + second 全 + 今天启动 D1 / 5 Sprint 周期收尾）
+**版本：** V0.4（Codex 3 finding 全立修闭环 · main 5 commits（复盘 + 部署 runbook + roadmap + perf baseline + Codex 立修）+ second 全（如启）/ commit 91fa02f P1 OpenIddict + P2 Hangfire + P2 NcInterface 配置 key 立修 / **37 Sprint 0 顺延达成 / 连续 11 立修 / 5 Sprint 周期目标实现**）
 **日期：** 2026-05-17
-**文档性质：** 实施层 · Sprint 20j 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答拍板 → 立即启动 D1 / **5 Sprint 周期 20f-20j 收尾 Sprint** / main 主轨化主推）
+**文档性质：** 实施层 · Sprint 20j 收尾锁版任务卡（V0.2 拍板 → V0.4 Codex 立修完整闭环 / **5 Sprint 周期 20f-20j 目标达成** / 37 Sprint 0 顺延 / 连续 11 Sprint 立修 / 跳 V0.3 类 20f/20h/20i 模式）
 **配套：** [`Sprint-20i-任务卡-V0.4.md`](./Sprint-20i-任务卡-V0.4.md) + [`sprint-20f-20j-roadmap.md`](../../../SupplyCores/docs/internal/sprint-20f-20j-roadmap.md) §2.5 + [`sprint-20a-20e-retrospective.md`](../../../SupplyCores/docs/internal/sprint-20a-20e-retrospective.md)（参考模板）
 
 ---
@@ -167,6 +167,7 @@ second 总：**~0.8 PD**（副轨 / 周期收尾自然收敛）
 |---|---|---|
 | V0.1 | 2026-05-17 | main a 起草 · 提前规划框架（5 Sprint 周期 20f-20j 收尾）/ 5 开放问题待 cici 答 |
 | V0.2 | 2026-05-17 | **cici 5 答 C/A/A/A/A 拍板**（Q1C mini 压测 / Q2A 完整 runbook / Q3A 20k+ roadmap / Q4A second 全 / Q5A 今天启动 D1）· 启动 D1 |
+| V0.4 | 2026-05-17 | **Codex 评审 3 finding 全立修完整闭环**（commit `91fa02f` / P1 OpenIddict client secret + P2 Hangfire 配错 key + P2 NcInterface section 名错 / runbook 配置 key 全修正）· main 4 docs commits 完成（a80d1c5 复盘 + 21e04fe runbook + 0cf37ae roadmap + 172dafc perf baseline）+ Codex 立修 1 commit / **37 Sprint 0 顺延达成 / 连续 11 立修 + 5 次 0 finding 通过**（19q-20j 累计 26 finding + 5 次 0 通过 / 3.0+ PD 累计 / **5 Sprint 周期 20f-20j 目标实现 ✨**）|
 
 ---
 
@@ -206,4 +207,4 @@ main D1 实际：~1.7 PD
 
 ---
 
-**main 主代理 a 签名**：2026-05-17 V0.1 起草 · V0.2 cici 5 答 C/A/A/A/A 拍板 → 立即启动 D1 / 5 Sprint 周期收尾 / 37 Sprint 0 顺延目标
+**main 主代理 a 签名**：2026-05-17 V0.1 起草 · V0.2 cici 5 答 C/A/A/A/A 拍板 → **V0.4 Codex 立修完整闭环**（main 5 commits / 总 ~1.5 PD / **37 Sprint 0 顺延 / 连续 11 立修 / 5 Sprint 周期 20f-20j 目标达成 / production runbook 修正 production-ready**）
