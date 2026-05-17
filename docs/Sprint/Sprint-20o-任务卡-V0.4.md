@@ -1,4 +1,4 @@
-# Sprint 20o 任务卡 V0.3（2026-05-17 深夜 cici 改 Q5 B → A / 今天启动 Day 1 / 第 3 周期 20k-20o 收尾 + 第 3 批启动评估）
+# Sprint 20o 任务卡 V0.4（2026-05-17 深夜 Sprint 20o 真正收口 / Codex round 5 = 0 finding 收敛 ✅ / 43 Sprint 0 顺延达成 / 第 3 周期 20k-20o 完整闭环）
 
 **Sprint**：20o（紧续 20n Wave 1 收口 → 第 3 周期 5 Sprint 闭环 + 第 3 批准入评估）
 **主题**：5 Sprint 周期（20k-20o）整体复盘 + 第 3 批（采购/合同/审批）启动评估 + production runbook V0.2 升级 + 20p+ roadmap 起草
@@ -10,6 +10,7 @@
 - 42 Sprint 0 顺延维持（part 2 试点反馈最终验收后达成 43 Sprint）
 - **cici 5 决策全 B 拍板**：Q1 B 复盘 V0.1 起草 + part 2 反馈陆续补 / Q2 B 观察期 + cici 拍板 / Q3 B 核心升级 / Q4 B second 暂停 / Q5 B 明天启动（详 §四）
 - **启动时间：2026-05-17 深夜 Day 1**（Q5 改 B → A / cici 决定今天启动 / 不等明天 / 连续 42 Sprint 0 顺延动量延续）
+- **完成时间：2026-05-17 深夜 Sprint 20o 真正收口 ✅**（5 task 全 done / Codex round 5 = 0 finding 收敛 / **43 Sprint 0 顺延达成 / 第 3 周期 20k-20o 完整闭环**）
 
 ---
 
@@ -55,7 +56,7 @@
 | **T-A2** 第 3 批（采购/合同/审批）启动评估 | 0.3 | P0 | main 主代理 a + cici 协调 | 前置条件检查清单：① 物料 / 供应商 / 仓库 / 人员权限基础数据是否到位（grep 试点单位实际数据填报情况）② 试点单位扩大评估（恒大+本部+物资公司 → 是否加入白音华煤矿 / 5 维度评分立项）③ 第 3 批准入触发条件（库存试点 4 单据流程跑通 ≥ X% / IssueLog SLA 命中率 ≥ Y% / 业务方培训完成 ≥ Z 厂矿）④ 启动 deadline 与负责人 / 输出到 `docs/internal/sprint-20o-batch3-readiness-assessment.md` | T-A1 复盘数据（数据治理完成度）+ Sprint 20n part 2 试点反馈（库存试点跑通情况）| 评估文档 ≥ 100 行 / 含准入清单 + 试点扩大候选 + 风险评估 + cici 拍板项 |
 | **T-A3** production runbook V0.2 升级 | 0.3 | P0 | main 主代理 a | 在 Sprint 20j V0.1 基础（`docs/部署/runbook-V0.1.md`）升级到 V0.2：① 20k-20o 反馈补强（数据治理流程 + 数据问题台账 + 数据质量报告 + 试点单位导入演练 SOP）② 上线 checklist 实战修正（试点单位实测反馈 / 部署步骤验证 / 回退方案 / 备份恢复实测）③ 数据治理 production-ready checklist（6 类模板下发流程 / IssueLog 闭环 SLA / 质量报告周月报） | T-A1 复盘 + Sprint 20n part 2 试点反馈（实战修正项）| runbook V0.2 ≥ V0.1 + 30% 内容 / 含数据治理章节 + checklist 实战修正项 |
 | **T-A4** 20p+ roadmap 起草（第 4 周期 / 采购+合同+审批）| 0.2 | P1 | main 主代理 a | 类 `sprint-20k-20o-roadmap.md` V0.3 模板 / 写到 `docs/internal/sprint-20p-20t-roadmap.md` / 涵盖：① 战略定位（按 roadmap V0.3 §四 第 3-4 阶段 / 5-7 周 wall-clock）② 5 Sprint 任务规划（20p-20q 采购+合同 / 20r-20s 审批 / 20t 第 4 周期收尾 + Q3 末 production deployment）③ 4 条工作线分工延续（A 数据治理 / B 系统上线 / C 业务流程 / D NC/财务 → 第 4 周期升级到 NC 真联调）④ 立即动作清单 + 风险评估 + 关键里程碑 | T-A1 复盘 + T-A2 评估结果（第 3 批准入条件）| roadmap V0.1 ≥ 200 行 / 含 5 Sprint 详细规划 + 阶段时间口径分层 |
-| **T-A5** Codex 20o 评审 + 立修 + V0.x 升版 + memory | 0.4 | P0 | main 主代理 a | 标准收尾：① `codex review --base <Sprint 20n 末 commit>` 5-15 min（手动模式延续 / 32 Sprint 手动 0 顺延稳定）② 立修保 43 Sprint 0 顺延 ③ V0.1 → V0.4 升版（教训 13 模板第 N 次）④ memory 升级（43 Sprint 0 顺延 + 5 Sprint 复盘 + 第 3 批评估 + 第 3 周期完整闭环里程碑） | Sprint 20o T-A1-A4 全 commit 完成 | Codex 0 顺延 / V0.4 锁版 / memory commit |
+| **T-A5** Codex 20o 评审 + 立修 + V0.x 升版 + memory | 0.4 | P0 | main 主代理 a | ✅ **done** / Codex 5 轮 12 finding 全立修（R1v2 5 / R2 4 / R3 2 / R4 1 / **R5 0 收敛 ✅**）/ V0.3 → V0.4 升版（教训 13 模板第 11 次）/ memory 升级（43 Sprint 0 顺延 + 第 3 周期完整闭环 + Sprint 20o spawn 子代理 ~2x 加速 3 次实测） | Sprint 20o T-A1-A4 全 commit 完成 | **43 Sprint 0 顺延达成 ✅** / V0.4 锁版 / memory commit |
 
 **main 总：~1.6 PD**（vs Sprint 20j 1.7 PD / 略低 / 20o 性质类似但带评估增量）
 
@@ -156,10 +157,11 @@
 | V0.1 | 2026-05-17 深夜（紧续 Sprint 20n Wave 1 真正收口 / Round 14 0 finding 收敛 / 42 Sprint 0 顺延达成）| main a 起草 / Sprint 20o 任务卡 / 5 task 按 roadmap V0.3 §2.5 落地（T-A1 复盘 + T-A2 第 3 批评估 + T-A3 runbook V0.2 + T-A4 20p+ roadmap + T-A5 Codex+V0.x / 总 ~1.6 PD）/ 性质为 5 Sprint 周期收尾 + 第 3 批评估 sprint（vs Sprint 20j 纯收尾）/ 5 开放问题待 cici 答（Q1 复盘完成度 / Q2 第 3 批准入阈值 / Q3 runbook V0.2 深度 / Q4 second 副轨范围 / Q5 启动时间）/ [[main-orchestrator-default-spawn]] 新规则首次实测：spawn general-purpose 子代理起草 / wall-clock ~3 min / 加速 ~2x |
 | V0.2 | 2026-05-17 深夜（同 V0.1 当晚 / cici 拍板）| **cici 同意 5 决策全 B 推荐答案** ✅（Q1 复盘 V0.1 起草 + part 2 反馈陆续补 / Q2 观察期 + cici 拍板 / Q3 runbook V0.2 核心升级 / Q4 second 暂停 / Q5 2026-05-18 启动 Day 1）/ 决策表加 cici 拍板列 / V0.2 拍板条件全 done（除 part 2 第一周反馈陆续到位）/ V0.2 锁版 Day 1 启动 |
 | V0.3 | 2026-05-17 深夜（V0.2 后 ~10 min / cici 改 Q5 拍板）| **cici 改 Q5 B → A**（"今天启动"/ 连续 42 Sprint 动量延续 / 不等明天）/ Day 1 立即启动（main spawn 2 子代理：T-A1 5 Sprint 复盘起草 + T-A3 runbook V0.2 升级 / 按 [[main-orchestrator-default-spawn]] 并行 ~5 min wall-clock）/ T-A2 + T-A4 顺延 Day 2-3 / V0.3 锁版 Day 1 启动状态 |
+| V0.4 | 2026-05-17 深夜（Sprint 20o 真正收口）| **Sprint 20o 全 5 task done ✅** / Codex 5 轮 12 finding 全立修（R1v2 5 / R2 4 / R3 2 / R4 1 / **R5 = 0 finding 收敛 ✅** codex 原话 "No actionable regressions were found"）/ **43 Sprint 0 顺延达成 ✅ / 第 3 周期 20k-20o 完整闭环 ✅** / [[main-orchestrator-default-spawn]] 新规则 ~2x 加速 3 次连续实测 / 累计 19 轮 codex / 39 finding 全立修 / 6 次 0 finding 收敛（R5/R7/R10/R11/R14 + Sprint 20o R5）|
 
 ---
 
-**Created**: 2026-05-17 深夜 / Sprint 20n Wave 1 收口（`f908cd6` push 后）→ 20o V0.1 起草 → V0.2 cici 拍板 → V0.3 cici 改 Q5 / **2026-05-17 深夜 Day 1 启动** / main 主代理 a
+**Created**: 2026-05-17 深夜 / Sprint 20n Wave 1 收口（`f908cd6` push 后）→ 20o V0.1 起草 → V0.2 cici 拍板 → V0.3 cici 改 Q5 → **V0.4 Sprint 20o 真正收口 ✅ Codex round 5 = 0 finding 收敛 / 43 Sprint 0 顺延达成 / 第 3 周期 20k-20o 完整闭环** / main 主代理 a
 
 **Related**:
 - [`Sprint-20n-任务卡-V0.4.md`](Sprint-20n-任务卡-V0.4.md)（同 cycle 前序 / V0.4 Wave 1 真正收口 / Round 14 0 finding 收敛）
