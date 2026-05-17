@@ -1,12 +1,12 @@
-# Sprint 20n 任务卡 V0.3（2026-05-17 Wave 1 收口预备 / 第 3 周期第 2 阶段 / 库存查询 + 基础单据试点）
+# Sprint 20n 任务卡 V0.4（2026-05-17 Wave 1 真正收口 / Round 14 0 finding / 第 3 周期第 2 阶段 / 库存查询 + 基础单据试点）
 
 **Sprint**：20n（紧续 20m 收尾 → 第 3 周期第 2 阶段开局）
 **主题**：低风险高价值 库存查询 + 基础流转 / 试点 1-2 厂矿（恒大煤矿 + 本部）
 **节奏**：roadmap V0.3 第 2 阶段（**3-4 周 wall-clock** / 与 Sprint 20l-20m 一晚上节奏不同）
-**V0.3 收口预备要点**：
-- **Wave 1 main + second 全交付**（main T-A1+A2 endpoint 验证 + cici 2 决策实施 + Round 12 P2 立修；second e T-E1+T-E2+T-E3+T-E4 全 done）
-- **Codex 累计 12 轮 / 24 finding 全立修**（Round 12 = 1 P2）
-- **41 → 42 Sprint 0 顺延维持**（待试点反馈最终验收）
+**V0.4 收口要点**（Wave 1 codex 真正收敛）：
+- **Wave 1 main + second 全交付**（main T-A1+A2 endpoint 验证 + cici 2 决策实施 + Round 12+13 P2 立修；second e T-E1+T-E2+T-E3+T-E4 全 done）
+- **Codex 累计 14 轮 / 27 finding 全立修**（Round 12 = 1 P2 / Round 13 = 2 P2 + 1 P3 / **Round 14 = 0 finding 收敛 ✅**）
+- **42 Sprint 0 顺延维持**（Wave 1 真正收口 / 待 part 2 试点反馈最终验收）
 - 剩余 **T-B1-B5 协调试点 part 2** 等 cici + 业务方（wall-clock 3-4 周）+ Sprint 20n Retrospective 待补完整
 **性质**：协调 + 试点验证 sprint（代码 ~1.2 PD done / 协调工作量 3-4 周 / 依赖试点单位响应）
 
@@ -36,7 +36,7 @@
 | **T-A1** 库存查询 endpoint 试点验证 | 0.2 | P0 | ✅ done（commit `56fa89f`）| 5 controller grep + 实测 checklist done / A-06 隔离查询端测试方案备好 |
 | **T-A2** 4 基础单据 endpoint 试点验证 | 0.3 | P0 | ✅ done（commit `56fa89f`）| 5 controller 完整状态机 grep：submit/approve/reject/void/reverse/ship/receive/confirm-return/issue/mark-printed |
 | ~~T-A3~~ ~~StockOutbound 实施~~ | ~~0.3-0.5~~ | - | **删除** | V0.2 拍板 / grep MaterialIssuance 已存在 |
-| **T-A4** Sprint 20n Codex round 12+ + 立修 | 0.3 | P0 | ✅ done（Round 12 1 P2 立修 commit `412cc39` / Round 13 后台跑中）| 累计 12 轮 codex / 24 finding 全立修 |
+| **T-A4** Sprint 20n Codex round 12+ + 立修 | 0.3 | P0 | ✅ done（Round 12 1 P2 立修 `412cc39` / Round 13 2 P2 + 1 P3 立修 `d8f4587` / **Round 14 0 finding 收敛 ✅**）| 累计 14 轮 codex / 27 finding 全立修 / Round 14 收敛 |
 | **T-A5** cici 2 决策实施（Permission seed + ExportXlsxAsync）| 0.4 | P0 | ✅ done（commit `412cc39`）| 1. seed AllDefaultPermissions 加 SupplyCore.DataGovernance（second e P2#1 彻底修）/ 2. server 端 ExportXlsxAsync ClosedXML 6 sheet（POST /export）|
 | **T-A6** V0.x 升版 + memory（42 Sprint 0 顺延）| 0.2 | ✅ done | 本 V0.3 + Sprint 20n Wave 1 完整闭环 memory + MEMORY 升级 |
 
@@ -134,6 +134,7 @@
 | V0.1 | 2026-05-17 深夜（紧续 Sprint 20m）| main a 起草 / Sprint 20n 任务卡 / 第 3 周期第 2 阶段开局规划 / 性质为协调试点 sprint（vs 20l-20m 一晚上开发节奏不同）|
 | V0.2 | 2026-05-17 深夜（紧续 V0.1）| **cici 拍板**：T-A3 StockOutbound 删除（grep 确认 MaterialIssuance 已存在 / 业务出库）/ T-B1 试点协调 Day 1 立即启动（不等）/ main 工作量降到 ~0.9 PD / 启动 Wave 1（main T-A1+A2 + cici T-B1 + second e T-E1+T-E4 并行）|
 | V0.3 | 2026-05-17 深夜（Wave 1 收口预备）| **Wave 1 main + second 全交付**（main 7 commits T-A1-A6 + second e 4 commits T-E1-E4）/ Codex 12 轮累计 24 finding 全立修 / 41 Sprint 0 顺延维持 / 实际 main 1.2 PD done / 剩 T-B1-B5 协调试点 part 2 等 cici + 业务方（3-4 周 wall-clock）/ Retrospective 待补完整 |
+| V0.4 | 2026-05-17 深夜（Wave 1 真正收口 / Round 14 收敛）| Round 13 = 2 P2 + 1 P3 立修（`d8f4587` / templateType filter + export GET + 覆盖模板数）/ **Round 14 = 0 finding 收敛 ✅** codex 原话 "no breaking regressions were found in the changed lines" / 累计 14 轮 codex 27 finding 全立修 / 42 Sprint 0 顺延 Wave 1 真正达成 / [[main-orchestrator-default-spawn]] 新规则记下（cici 反馈 main 不要独占主线程 / ≥ 0.2 PD 默认 spawn 子代理或 second）|
 
 ---
 
