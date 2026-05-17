@@ -1,14 +1,14 @@
-# Sprint 20n 任务卡 V0.2（2026-05-17 拍板版 / 第 3 周期第 2 阶段 / 库存查询 + 基础单据试点）
+# Sprint 20n 任务卡 V0.3（2026-05-17 Wave 1 收口预备 / 第 3 周期第 2 阶段 / 库存查询 + 基础单据试点）
 
 **Sprint**：20n（紧续 20m 收尾 → 第 3 周期第 2 阶段开局）
 **主题**：低风险高价值 库存查询 + 基础流转 / 试点 1-2 厂矿（恒大煤矿 + 本部）
 **节奏**：roadmap V0.3 第 2 阶段（**3-4 周 wall-clock** / 与 Sprint 20l-20m 一晚上节奏不同）
-**V0.2 拍板要点**（基于 V0.1 + cici 4 决策）：
-- **重大发现**：grep 确认**全 6 个 stock 业务 entity 已存在**（StockInbound + MaterialIssuance 领料=业务出库 + StockTransfer + StockReturn + StockBalance + StocktakeSheet 全有 AppService + Controller）
-- **T-A3 StockOutbound 删除**（MaterialIssuance 替代 / Sprint 20n 主代码量降到 ~0.9 PD）
-- T-B1 试点单位协调：Day 1 立即启动（main T-A1-A4 + cici 协调 + second e T-E1+T-E4 同时推 / 不等）
-- 启动 Wave 1：cici 拍板 V0.2 后
-**性质**：**协调 + 试点验证 sprint**（代码量小 ~1 PD / 协调工作量大 / 依赖试点单位响应）
+**V0.3 收口预备要点**：
+- **Wave 1 main + second 全交付**（main T-A1+A2 endpoint 验证 + cici 2 决策实施 + Round 12 P2 立修；second e T-E1+T-E2+T-E3+T-E4 全 done）
+- **Codex 累计 12 轮 / 24 finding 全立修**（Round 12 = 1 P2）
+- **41 → 42 Sprint 0 顺延维持**（待试点反馈最终验收）
+- 剩余 **T-B1-B5 协调试点 part 2** 等 cici + 业务方（wall-clock 3-4 周）+ Sprint 20n Retrospective 待补完整
+**性质**：协调 + 试点验证 sprint（代码 ~1.2 PD done / 协调工作量 3-4 周 / 依赖试点单位响应）
 
 ---
 
@@ -29,17 +29,18 @@
 
 ## 二、Sprint 20n Task 清单（性质：协调试点 + 验证）
 
-### A 主轨（main 主代理 / V0.2 调整后 ~0.9 PD）
+### A 主轨（main 主代理 / V0.3 全 done ~1.2 PD）
 
 | Task | PD | 优先级 | 状态 | 说明 |
 |---|---|---|---|---|
-| **T-A1** 库存查询 endpoint 试点验证 | 0.2 | P0 | pending | GET /api/supply-cores/stock-balances + stock-batch-balances 现有 endpoint / 试点单位（恒大 001.007.002 + 本部 001.007.001）数据可见性 / A-06 隔离查询端测试 |
-| **T-A2** 4 基础单据 endpoint 试点验证 | 0.3 | P0 | pending | 4 业务单据：StockInbound（入库）+ MaterialIssuance（领料=业务出库）+ StockTransfer（调拨）+ StockReturn（退料）— **全在仓 / Route 验证**。试点单位创建 → 审核 → 完成流程跑通 |
-| ~~T-A3~~ ~~StockOutbound 实施~~ | ~~0.3-0.5~~ | - | **删除** | **V0.2 拍板**：grep 确认 MaterialIssuance（领料）= 业务上的出库 / 完整 entity + Controller 已存在 / Route `/api/supply-cores/material-issuances` / 不需要再实施 StockOutbound |
-| **T-A4** Sprint 20n Codex round 12+ + 立修 | 0.2 | P0 | pending | 标准 / 任务卡 + V0.2 + Wave 1 实施 commits 覆盖 |
-| **T-A5** V0.x 升版 + memory（42 Sprint 0 顺延）| 0.2 | P0 | pending | Sprint 20n V0.3 + Retrospective + 第 2 阶段开局 memory |
+| **T-A1** 库存查询 endpoint 试点验证 | 0.2 | P0 | ✅ done（commit `56fa89f`）| 5 controller grep + 实测 checklist done / A-06 隔离查询端测试方案备好 |
+| **T-A2** 4 基础单据 endpoint 试点验证 | 0.3 | P0 | ✅ done（commit `56fa89f`）| 5 controller 完整状态机 grep：submit/approve/reject/void/reverse/ship/receive/confirm-return/issue/mark-printed |
+| ~~T-A3~~ ~~StockOutbound 实施~~ | ~~0.3-0.5~~ | - | **删除** | V0.2 拍板 / grep MaterialIssuance 已存在 |
+| **T-A4** Sprint 20n Codex round 12+ + 立修 | 0.3 | P0 | ✅ done（Round 12 1 P2 立修 commit `412cc39` / Round 13 后台跑中）| 累计 12 轮 codex / 24 finding 全立修 |
+| **T-A5** cici 2 决策实施（Permission seed + ExportXlsxAsync）| 0.4 | P0 | ✅ done（commit `412cc39`）| 1. seed AllDefaultPermissions 加 SupplyCore.DataGovernance（second e P2#1 彻底修）/ 2. server 端 ExportXlsxAsync ClosedXML 6 sheet（POST /export）|
+| **T-A6** V0.x 升版 + memory（42 Sprint 0 顺延）| 0.2 | ✅ done | 本 V0.3 + Sprint 20n Wave 1 完整闭环 memory + MEMORY 升级 |
 
-**main 总：~0.9 PD**（vs V0.1 估算 1.0-1.4 PD / 删 T-A3 后更轻 / 体现"全 6 stock entity 在仓"前置就绪）
+**main 总：~1.2 PD done**（vs V0.2 估算 0.9 PD / 实际多了 cici 2 决策 +  Round 12 立修 + V0.x 升版）
 
 ### B 协调轨（cici 协调 / 周期长）
 
@@ -51,18 +52,17 @@
 | **T-B4** 库存查询试运行（试点 1-2 仓库）| 2 周 | cici + 恒大煤矿仓储主任 + 本部仓库管理员 | 系统记录 + 线下复核并行 / 暂不强行替代原有流程 / 每周汇总问题清单 |
 | **T-B5** 基础单据试运行（4 单据 / 试点）| 2-3 周 | cici + 试点单位仓储 | 入库 / 出库 / 调拨 / 退料 4 类 / 试点单位实际使用验证 |
 
-### E 副轨（second 主代理 e / 已 V0.2 prompt 备料）
+### E 副轨（second 主代理 e）
 
-详 `docs/internal/second-e-prompt-20m-V0.2-raw.txt`：
-
-| Task | PD | 优先级 |
-|---|---|---|
-| **T-E1** 数据质量看板 dashboard | 0.5 | P0 |
-| **T-E4** 试点单位 demo walk-through page（业务方实操关键）| 0.8 | **P0 重点** |
-| T-E5 数据质量报告 Excel 导出 + 大屏样式 | 0.3 | P1 |
-| T-E6 dashboard 样式 polish | 0.3 | P2 |
-| T-E2 试点单位反馈处理 page | 0.4 | P1 |
-| T-E3 e2e 测试补 | 0.3 | P2 |
+| Task | PD | 状态 | 说明 |
+|---|---|---|---|
+| **T-E1** 数据质量看板 dashboard 6 卡片 | 0.5 | ✅ done（commit `cb02754`）| 接 main T-A5 真接口 / DevExtreme 6 卡片大屏 |
+| **T-E2** 试点单位反馈处理 page mock | 0.4 | ✅ done（commit `d114953`）| BusinessFeedback mock / DataGrid + Dialog |
+| **T-E3** e2e 测试补 | 0.3 | ✅ done（commit `c22354c`）| data-issue-log + data-quality-dashboard e2e spec 补 |
+| **T-E4** 试点 demo walk-through page | 0.8 | ✅ done（pilot-demo / build 产物含）| 业务方实操关键 / 6 步引导 / 联系人区 |
+| **second e Codex 立修** | 0.1 | ✅ done（commit `c84c488`）| 2 P2 立修：E2E graceful skip + disable export button（cici 后 main 412cc39 彻底修 Permission seed）|
+| T-E5 ExportXlsx 客户端 | - | **撤销** | cici 拍板 server 端实施 / main 412cc39 done |
+| T-E6 dashboard 样式 polish | 0.3 | pending | 顺延 Sprint 20o |
 
 ---
 
@@ -133,6 +133,7 @@
 |---|---|---|
 | V0.1 | 2026-05-17 深夜（紧续 Sprint 20m）| main a 起草 / Sprint 20n 任务卡 / 第 3 周期第 2 阶段开局规划 / 性质为协调试点 sprint（vs 20l-20m 一晚上开发节奏不同）|
 | V0.2 | 2026-05-17 深夜（紧续 V0.1）| **cici 拍板**：T-A3 StockOutbound 删除（grep 确认 MaterialIssuance 已存在 / 业务出库）/ T-B1 试点协调 Day 1 立即启动（不等）/ main 工作量降到 ~0.9 PD / 启动 Wave 1（main T-A1+A2 + cici T-B1 + second e T-E1+T-E4 并行）|
+| V0.3 | 2026-05-17 深夜（Wave 1 收口预备）| **Wave 1 main + second 全交付**（main 7 commits T-A1-A6 + second e 4 commits T-E1-E4）/ Codex 12 轮累计 24 finding 全立修 / 41 Sprint 0 顺延维持 / 实际 main 1.2 PD done / 剩 T-B1-B5 协调试点 part 2 等 cici + 业务方（3-4 周 wall-clock）/ Retrospective 待补完整 |
 
 ---
 
