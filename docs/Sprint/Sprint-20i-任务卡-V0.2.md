@@ -1,9 +1,9 @@
-# Sprint 20i 任务卡 V0.1（NC 真接通条件性 + 测试覆盖率深化 + second 第 10 次连续 / 36 Sprint 0 顺延目标）
+# Sprint 20i 任务卡 V0.2（cici 5 答全 A 拍板 · 测试覆盖深化主轨 + second 第 10 次连续 / 36 Sprint 0 顺延 / 今天启动 D1）
 
 **项目：** 阜矿物资供应管理系统 / SupplyCore
-**版本：** V0.1（main a 起草 · 5 开放问题待 cici 答 / 基于 roadmap §2.4 + 20h T-A3 顺延）
+**版本：** V0.2（cici 5 答全 A 拍板 · 测试覆盖深化主轨 T-A1 0.6 PD + second 全 T-E1+T-E2+T-E3 1.0 PD / NC 真接通顺延 20j+ / demo 协调追踪 / 今天启动 D1）
 **日期：** 2026-05-17
-**文档性质：** 实施层 · Sprint 20i 提前规划任务卡（V0.1 起草框架 → cici 5 答 → V0.2 拍板启动 D1）
+**文档性质：** 实施层 · Sprint 20i 定版启动任务卡（V0.1 起草 → V0.2 cici 5 答全 A 拍板 → 立即启动 D1 / 测试覆盖深化收口 20h T-A3 顺延）
 **配套：** [`Sprint-20h-任务卡-V0.4.md`](./Sprint-20h-任务卡-V0.4.md) + [`sprint-20f-20j-roadmap.md`](../../../SupplyCores/docs/internal/sprint-20f-20j-roadmap.md) §2.4 + [`test-coverage-audit-20h.md`](../../../SupplyCores/docs/internal/test-coverage-audit-20h.md)
 
 ---
@@ -169,7 +169,43 @@ second 主代理 e 总：**~1.0 PD**（副轨延续）
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | V0.1 | 2026-05-17 | main a 起草 · 提前规划框架（基于 roadmap §2.4 + 20h T-A3 测试 missing case 顺延）/ 5 开放问题待 cici 答 |
+| V0.2 | 2026-05-17 | **cici 5 答全 A 拍板**（Q1A NC 真接通顺延 20j+ / Q2A 全 missing case 测试深化 / Q3A second 全 T-E1+T-E2+T-E3 / Q4A demo 协调追踪 / Q5A 今天启动 D1）· 启动 D1 |
 
 ---
 
-**main 主代理 a 签名**：2026-05-17 V0.1 起草（基于 roadmap §2.4 候选 + 20h 顺延吸收）· 等 cici 5 答 + 升 V0.2 启动
+## 八、V0.2 拍板启动 D1（cici 5 答全 A）
+
+| Q | 答 | 影响 |
+|---|---|---|
+| Q1 | A | NC 真接通顺延 20j+（业务方 G-12 未触发 / 0 PD）|
+| Q2 | A | 全 missing case 测试深化 T-A1 0.6 PD（HighSensitive + dashboard real + Permission integration + Regenerator edge）|
+| Q3 | A | second e 全 T-E1+T-E2+T-E3（~1.0 PD / 第 10 次连续）|
+| Q4 | A | 业务方第 2 次 demo 协调追踪 T-A2 0.1 PD（5 月下推荐）|
+| Q5 | A | 今天启动 D1（35 Sprint 0 顺延动量延续）|
+
+### 8.1 main D1 启动顺序（主轨化延续）
+
+1. **T-A2 业务方 demo 协调追踪**（0.1 PD / 首启 / 不依赖外部）
+2. **T-A1 测试覆盖深化**（0.6 PD / 主轨 / 4 missing case）
+3. **T-A3 NC 真接通** = 0 PD（Q1 A 顺延）
+4. **T-A4 Codex 评审 + 立修**（D2 / 0.2 PD）
+5. **T-A5 V0.x 升版 + memory**（D2-D3 / 0.3 PD）
+
+main D1 实际：~0.7 PD
+
+### 8.2 second e D1 启动顺序（cici 切 second session）
+
+详 [`second-e-prompt-20i-raw.txt`](../../../SupplyCores/docs/internal/second-e-prompt-20i-raw.txt)：
+1. T-E1 Reports 18 → 20+（0.4 PD / 物料周转月报 / 入库时效周报 / 暂估调差季报）
+2. T-E2 dashboard 真实环境压测 baseline 实测（0.3 PD / 真 5100 host serve 实测 vs spec 阈值）
+3. T-E3 收尾 + memory + race 检查（0.3 PD / 第 10 次连续）
+
+### 8.3 启动条件全部满足
+
+- ✅ 5 开放问题 cici 全 A 答
+- ✅ 1c 模块隔离表确认（注意 T-A1 测试涉及 BusinessReports/Dashboard test 项目跨 session）
+- ✅ 20h V0.4 锁版完成（跨仓 `e2bce08` / 35 Sprint 0 顺延 + 4 次 0 finding 通过）
+
+---
+
+**main 主代理 a 签名**：2026-05-17 V0.1 起草 · V0.2 cici 5 答全 A 拍板 → 立即启动 D1 / 测试覆盖深化 + second 第 10 次连续 / 36 Sprint 0 顺延目标
