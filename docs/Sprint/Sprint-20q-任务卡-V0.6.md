@@ -1,4 +1,4 @@
-# Sprint 20q 任务卡 V0.5（2026-05-19 06:00 cici 早晨拍板后升 / Day 1 today 启动 + T-A1 + T-A2 done + 第 6 批 V0.2 cici 拍板 ✅ + 2 设备缺口 Sprint 20w 立修 + ContractClauses 顺延详设 V1.3+）
+# Sprint 20q 任务卡 V0.6（2026-05-19 早晨 cici 4 拍板回填 ✅ / §1.1+§1.2 Sprint 20p 收口数据全填 + 第 6 批评分顺序分配 + Sprint 20u-20y V0.2 批量 + Q5 重拍 Q1 next year + D2 today 启动）
 
 **Sprint**：20q（**Day 1 提前 2026-05-19 启动**（cici Q1 B 拍板应用 / 跳过间隔 1-2 天 / Sprint 20p 收口后立即续）→ 第 4 周期 5 Sprint 第 2 阶段 / 合同模块协调试点 + 设备管理 Sprint 20w 预 audit）
 **主题**：Contracts 试点验证 + Contract ↔ ProcurementDocument ↔ Tender ↔ Approval 关联完整性 grep + Contract ↔ NC 凭证关联预留 + 第 3 批 4 模块 production-ready **中间点验证**（数据治理 + 库存 + 采购 + 合同）+ UI 完善 + **设备管理预 audit**（Sprint 20w 第 6 批主推前置 / cici 拍板 6 第 6 批主推 A 设备管理）+ **微信小程序 candidate 探查**（long-term Q5 拍板 / 移动端入口）
@@ -13,24 +13,44 @@
 
 ## 一、Sprint 20p 收尾（前置事实 / commits 链 / 待 Sprint 20p 真正收口后回填）
 
-### 1.1 Sprint 20p 5 task 全 done（待 Sprint 20p V0.x 真正收口后回填）
+### 1.1 Sprint 20p 5 task 全 done ✅（V0.6 cici 2026-05-19 早晨拍板回填 / 来源 audit V0.9 final）
 
-| Task | 主要交付 | 状态 |
-|---|---|---|
-| T-A1 | ProcurementDocument 完整流程 grep + 试点验证报告 | ⏳ pending（Sprint 20p Day 1）|
-| T-A2 | ProcurementDocument↔Tender↔Contract↔Approval 关联完整性 grep | ⏳ pending（Sprint 20p Day 1）|
-| T-A3 | 试点单位扩大白音华煤矿协调 + OrgCode | ⏳ pending（cici 协调 / wall-clock 3-4 周）|
-| T-A4 | 试点 demo prep + UI polish（main + second e）| ⏳ pending（Sprint 20p Day 2）|
-| T-A5 | Codex + V0.x 升版 + memory + **roadmap V0.x §2.1+§2.2 修正** | ⏳ pending（Sprint 20p Day 2）|
+| Task | 主要交付 | 状态 | commit |
+|---|---|---|---|
+| T-A1 | ProcurementDocument 完整流程 grep + 试点验证报告 | ✅ done | Sprint 20p Day 1 完整闭环 |
+| T-A2 | ProcurementDocument↔Tender↔Contract↔Approval 关联完整性 grep | ✅ done | Sprint 20p Day 1 完整闭环 |
+| T-A3 | 试点单位扩大白音华煤矿协调 + OrgCode | ✅ done | cici 协调启动包 `2effdfa` |
+| T-A4 | 试点 demo prep + UI polish（main + second e）| ✅ done | second Wave A-E 全 done |
+| T-A5 | Codex + V0.x 升版 + memory + roadmap §2.1+§2.2 修正 | ✅ done | Codex 17 轮 79 finding 12 次 0 收敛 / 8 V0.x 升版 |
 
-### 1.2 Sprint 20p 真正收口数字（待 Sprint 20p 收口后回填）
+**D-4 联合补 ✅**（3 模块鉴权 P0）：
+- Sprint 20p ProcurementDocument: commit `fbf4927` (+36-1) / 新增 SupplyCore.Procurement Permission
+- Sprint 20q Contract: commit `fd5b421` (+87-7 / +2 endpoint bonus) / SupplyCore.Contract Permission 已存在
+- Sprint 20r Approvals: commit `c74f3af` (+15) / SupplyCore.ApprovalCenter Permission 已存在
 
-| 维度 | 目标 / 状态 |
+### 1.2 Sprint 20p 真正收口数字 ✅（来源 audit V0.9 final / 2026-05-19 早晨回填）
+
+| 维度 | 实际达成 |
 |---|---|
-| main 主代理 commits | 目标 ~7+ |
-| Codex 评审 | 目标 ≥ 2 轮 / 0 finding 收敛保留 |
-| **44 Sprint 0 顺延** | **目标维持 ✅**（待 Sprint 20p 收口达成）|
-| 关键 commit | 待 Sprint 20p V0.x push 后回填 |
+| main 主代理 commits | **~10**（02:50 ~ 05:10 / 11+ pushed） |
+| 整夜跨日 wall-clock | **~32 hr** |
+| 加速比 vs 单线程 | **~10x** |
+| 总 commits（SupplyCores + SupplyCore） | **~130+** |
+| Codex 评审 | **17 轮 79 finding / 12 次 0 收敛 ✅** + Round 18 0 finding 收敛（today Sprint 20q D1 base 2de0aef） |
+| **44 Sprint 0 顺延** | **✅ 达成 / 等 Sprint 20q Day 1 启动达 45** |
+| AI SOP | **5+1 全 ready / 3565 行** |
+| AI 角色目录 | V0.3 / 6 现有 + 6 计划 / 3 Wave 引入 |
+| AI prompts | V0.4 / 6 拍板 ✅ + 5+1 SOP ready + decision-template V0.1 引用 |
+| Roadmap | Cycle6-10 V0.4 / 5 周期 / 100+ 顺延目标 / Q5 Q1 next year 重拍 |
+| Long-term prompt 矩阵 | **73.5 PD / 222+ task / 跨 32 sprint** |
+| cici 累计拍板 | **42+** / 100% A default + 局部例外 |
+| Sprint 任务卡 | 20q V0.6 + 20r/20s/20t/20u V0.1 + 第 6 批 5 sprint V0.2 (Sprint 20u-20y 子代理批量起草中) |
+| 第 6 批 5 入选 cici 拍板 ✅ | CMS-01 22 → CMS-05 22 → LIFE-CYCLE 21 → CMS-02 20 → WARN-V2 19 / 评分顺序分配 |
+| 微信小程序 candidate | V0.2 / Q5 重拍 Q1 next year / Sprint 20aa+ 启动（提前 6 月 vs Q3 2027）|
+
+**关键 commit 链**（整夜 main 自做 + 早晨 D1）：
+- 整夜：`00be444` / `23e9274` / `5fb1aa2` / `1311e76` / `81b9629` / `0e8767d` / `fc5a205` / `c31b10f` / `f7d147f` / `2de0aef`
+- 早晨 D1：`6d66ebc` (第 6 批 V0.2) / `feecad8` (20q V0.5 / 跨仓) / `23e8400` (D1 5 报告 1198 行) / `48085f3` (candidate V0.2) / `aacc8bd` (roadmap V0.4)
 
 ### 1.3 Contracts entity grep 重大发现（来源 Sprint 20q V0.1 起草实测）
 
@@ -259,6 +279,7 @@
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
+| **V0.6** | **2026-05-19 早晨 cici 4 拍板回填** | **§1.1+§1.2 Sprint 20p 收口数据全填 ✅ + 第 6 批评分顺序分配 + Q5 重拍 Q1 next year + D2 today 续启动**：① §1.1 5 task 全 done 状态填 + D-4 联合补 3 commit hash + Permission 表 ② §1.2 Sprint 20p 真正收口数字全填（10 commits / 32 hr / 130+ total / 加速 10x / Codex 17→18 轮 79 finding 13 次 0 收敛 / 5+1 AI SOP / Long-term prompt 73.5 PD / cici 42+ 拍板 / 第 6 批 5 入选 / 微信小程序 V0.2）③ **第 6 批 5 入选评分顺序分配**：Sprint 20u → CMS-01 22 / 20v → CMS-05 22 / 20w → LIFE-CYCLE 21 / 20x → CMS-02 20 / 20y → WARN-V2 19（cici A 拍板 / 子代理 afbcba 批量起草 V0.2）④ **第 2 批试点 cici A 拍板**（等白音华第 1 周反馈满后担 / Sprint 20r+ 启动）⑤ **D2 today 续启动**（cici A 拍板 / D2 T-A5 收尾启动 / Codex Round 18 0 finding 收敛 ✅）⑥ **Q5 微信小程序重拍**（V0.2 candidate Q3 2027 → Q1 next year / Sprint 20aa+ / roadmap V0.4 同步应用）/ 关键 commit 链 整夜 10 + 早晨 D1 5 commit 全列 |
 | **V0.5** | **2026-05-19 06:00 cici 早晨拍板后升** | **cici "1今天 2ok 3启动" + 2 设备拍板 A + ContractClauses A 顺延 全应用**：① **Day 1 today 启动**（cici "1 今天" / 提前 1 天 vs 2026-05-20 推荐 / Sprint 20q D1 in_progress）② **T-A1 done ✅**（Contracts validation 219 行 / 设备 pre-audit 183 行 / 子代理 a82bf 报告）③ **T-A2 done ✅**（cross-aggregate 402 行 / 22/25 评分 88% HIGH / 远超 Sprint 20p ProcurementDocument 18/25 / 子代理 ab31c 报告 / 6 缺口 4 闭 + 2 顺延 G-B4/G-B6 等 NC 真接入）④ **第 6 批 V0.2 cici 拍板 ✅**（"2 ok" / 5 入选 CMS-01 22 + CMS-05 22 + LIFE-CYCLE 21 + CMS-02 20 + WARN-V2 19 / 总 7.5 PD 跨 Sprint 20u-20y）⑤ **2 设备缺口 cici A 拍板 Sprint 20w 立修**（EquipmentsController [Authorize] + EquipmentDepreciations Controller 补 / Sprint 20w P0 同日立修 / 不增 Sprint 20q PD）⑥ **ContractClauses cici A 顺延**（全栈缺失 / 详设 V1.3+ 留位 / Sprint 20q 不动 / 主题协调 + 试点验证 / 不混入条款库实施）⑦ **Codex Round 18 启动**（"3 启动" / PID 55174 后台 / base 2de0aef / 5-15 min / 等结果）⑧ **T-A6 微信小程序 candidate 子代理 a053cc 跑中**（0 PD 计提 / framework 评估 + 复用度 + 场景）⑨ **T-A3 main self grep + 起草**（4 模块中间点验证 / 数据治理+库存+采购+合同 demo 串联 / 0.3 PD）/ T-A4 等 cici 协调第 2 批试点 / T-A5 收尾 |
 | **V0.4** | **2026-05-19 凌晨~早晨**（main 整夜跑跨日续） | **D2-D5 细化 task + Sprint 20p Day 1 收尾完整数据 link + Codex Round 17 0 收敛通过 link + 第 4 周期 5 sprint V0.1 ready link**：① §3.2 wall-clock 估算扩展为 D1-D5 5 天细化 task（main + second e 各日 task 列表清晰）② §3.2.1 新增 Sprint 20p Day 1 收尾完整数据 link（[`sprint-20p-day1-final-audit-V0.6.md`](../../SupplyCores/docs/internal/sprint-20p-day1-final-audit-V0.6.md) / 跨 2 晚 30 hr / 125 commits / 加速 ~10x / long-term prompt 矩阵 63.5 PD 189+ task 26 sprint）③ §3.2.2 新增 Codex Round 17 0 收敛通过 link（agentId `a46a3755` / xhigh / Codex 链彻底收敛 / 45 Sprint 0 顺延维持）④ §3.2.3 新增第 4 周期 5 sprint V0.1 ready link（20p V0.3 + 20q V0.4 + 20r V0.1 152 行 + 20s V0.1 227 行 + 20t V0.1 110 行）/ T-A1-A6 task 不变 / 主要工作量 1.4 PD 维持 |
 | **V0.3** | **2026-05-19** | **cici 长期 7 战略 + AI 团队 6 + Sprint 20q 7 共 20 拍板应用**：① **V0.2 5 决策应用状态确认**（Q1 B 提前 2026-05-19 实际仅 1 天 / Q2 B grep+2模块demo 应用 / Q3 A 第 2 批 Sprint 20r+ 应用 / Q4 跳过 §2.2 修正 应用 / Q5 A second e T-E1+T-E2+T-E3 全启动 应用）② **long-term roadmap V0.1 7 战略拍板**（L-Q1 B 跨集团 / L-Q2 C 不做海外 / L-Q3 C 不做 Web3 / L-Q4 A 30+ 单位 / L-Q5 微信小程序 / L-Q6 C 国产 AI / L-Q7 B 上下游适度）③ **AI 团队 6 拍板**（T-Q1-Q6 加 PM / 1.2-1.4 PD / 6 并行 / Codex ≥ 2 轮 / memory 每 sprint / 双 session）④ **Sprint 20q V0.3 新增 7 拍板**（N-Q1 启动提前 2026-05-19 / N-Q2 第 6 批 A 设备管理 / N-Q3 Sprint 20s Q3 自动回退草稿 / N-Q4 NC C 仅 G-12 后启 / N-Q5 微信小程序 candidate / N-Q6 设备预 audit / N-Q7 工作量 +0.1 = 1.4 PD）⑤ **任务清单变更**：T-A1 0.2 → 0.3 PD（含设备 audit）+ 新增 T-A6 微信小程序 candidate 0 PD / T-A5 不再单修 roadmap §2.2 / main 总 1.3 → 1.4 PD（净省 0.7 PD vs roadmap 估）/ Day 1 提前 2026-05-19 自启 / cici 已睡 / 主代理 a 独立推进 |
