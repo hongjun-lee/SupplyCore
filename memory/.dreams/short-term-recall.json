@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-14T10:23:34.689Z",
+  "updatedAt": "2026-05-18T13:53:55.925Z",
   "entries": {
     "memory:memory/2026-05-01.md:3:4": {
       "key": "memory:memory/2026-05-01.md:3:4",
@@ -9,18 +9,29 @@
       "endLine": 4,
       "source": "memory",
       "snippet": "- 2026-05-01 完成 04 待确认清单状态同步：在 `04-待确认事项清单.md` 新增节九\"确认结论承接位置映射\"，对全部 39 项已确认事项逐条标注下游承接文档。审计结论：39 / 39 全部有承接，0 项孤儿。映射前置高频承接：详细规则/物资管理与财务接口规范、02-业务流程、06-模块功能。 - 2026-05-01 完成 04 节四重号修复：原 24-28 在 P1 主段与 P2/扩展补录段重复使用，本轮把后到补录段（行 91-95）重号为 33-37，全表 39 项编号唯一。同步更新节九 9.1 / 9.2 / 9.3 描述与映射表编号列；README 中\"32项\"改为\"39项\"。表内行序未做重排（保留历史增补轨迹），后续如需严格递增对外归档可再单独处理。",
-      "recallCount": 1,
+      "recallCount": 9,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 9,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-01T19:04:07.268Z",
-      "lastRecalledAt": "2026-05-01T19:04:07.268Z",
+      "lastRecalledAt": "2026-05-18T11:56:12.144Z",
       "queryHashes": [
-        "a88c114be70c"
+        "a88c114be70c",
+        "64ed93541917",
+        "81cecc90073c",
+        "c417ce2c724e",
+        "201ec174b9bd",
+        "44b40b20eb4e",
+        "e265e8037fef",
+        "1382f23e9a73",
+        "60d7731de657"
       ],
       "recallDays": [
-        "2026-05-02"
+        "2026-05-02",
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "04-待确认事项清单.md",
@@ -105,21 +116,32 @@
       "startLine": 4,
       "endLine": 5,
       "source": "memory",
-      "snippet": "- 2026-05-01 完成 04 节四重号修复：原 24-28 在 P1 主段与 P2/扩展补录段重复使用，本轮把后到补录段（行 91-95）重号为 33-37，全表 39 项编号唯一。同步更新节九 9.1 / 9.2 / 9.3 描述与映射表编号列；README 中\"32项\"改为\"39项\"。表内行序未做重排（保留历史增补轨迹），后续如需严格递增对外归档可再单独处理。 - 2026-05-01 启动详细设计层：新建 `docs/详细设计/` 目录与 `00-详细设计阶段规划-v0.1.md` 元文档，固化详设输入清单、拆分原则、12 篇分卷目录、深度边界（必须固化 vs 留到原型/实施配置/环境准备）、业务确认未回执的占位策略（统一用 `[待业务确认]` `[待 NC 落地]` 格式便于回填）、退出条件。同步把项目文档分层模型从五层升级为六层（集团统筹 → 项目主文档 → 招标正文 → 概要设计 → 详细设计 → 专项附件），更新 README 节四的层级图、文档分层小节，以及 `00-文档分层与引用关系说明` 的层级清单、引用关系第 4-5 条（新增详设承接概要设计的约束）、优先级规则六层版，和 `01-项目目标与范围说明` 的优先级规则六层版。",
-      "recallCount": 2,
+      "snippet": "- 2026-05-01 完成 04 节四重号修复：原 24-28 在 P1 主段与 P2/扩展补录段重复使用，本轮把后到补录段（行 91-95）重号为 33-37，全表 39 项编号唯一。同步更新节九 9.1 / 9.2 / 9.3 描述与映射表编号列；README 中\"32项\"改为\"39项\"。表内行序未做重排（保留历史增补轨迹），后续如需严格递增对外归档可再单独处理。 - 2026-05-01 启动详细设计层：新建 `docs/详细设计/` 目录与详设阶段规划元文档（后续文件名为 `00-详细设计阶段规划-v0.2.md`），固化详设输入清单、拆分原则、12 篇分卷目录、深度边界（必须固化 vs 留到原型/实施配置/环境准备）、业务确认未回执的占位策略（统一用 `[待业务确认]` `[待 NC 落地]` 格式便于回填）、退出条件。同步把项目文档分层模型从五层升级为六层（集团统筹 → 项目主文档 → 招标正文 → 概要设计 → 详细设计 → 专项附件），更新 README 节四的层级图、文档分层小节，以及 `00-文档分层与引用关系说明` 的层级清单、引用关系第 4-5 条（新增详设承接概要设计的约束）、优先级规则六层版，和 `01-项目目标与范围说明` 的优先级规则六层版。",
+      "recallCount": 10,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 2,
+      "totalScore": 10,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-01T19:04:07.268Z",
-      "lastRecalledAt": "2026-05-07T10:41:00.382Z",
+      "lastRecalledAt": "2026-05-18T11:56:12.144Z",
       "queryHashes": [
         "a88c114be70c",
-        "a592298b73d1"
+        "a592298b73d1",
+        "64ed93541917",
+        "81cecc90073c",
+        "c417ce2c724e",
+        "201ec174b9bd",
+        "44b40b20eb4e",
+        "e265e8037fef",
+        "1382f23e9a73",
+        "60d7731de657"
       ],
       "recallDays": [
         "2026-05-02",
-        "2026-05-07"
+        "2026-05-07",
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "24-28",
@@ -139,18 +161,20 @@
       "endLine": 10,
       "source": "memory",
       "snippet": "- 2026-05-01 起草并收口 `docs/详细设计/开发实施引用索引-v0.1.md`，明确未来代码仓库应独立于当前文档仓库，当前仓库作为上游设计依据库；文档规定开发参考优先级、详细设计完成前后的直接参考材料、模块级开工条件、代码仓库建议结构、需求变更回写机制和冲突处理规则。 - 2026-05-01 完成 `开发实施引用索引` V0.1 → V0.2 4 项补充（用户在另一会话中起草后我评估发现 1 必补 + 2 建议补 + 1 可选）：节三加\"排序语义说明\"区分\"开发实施场景的参考强度\"vs\"00 文档分层的编制收敛优先级\"两套语义；节六新增 6.1 多技术栈 / 多仓布局适配（含 contracts/ 接口契约目录预留）和 6.2 AI Tool 调用的开发约束（明文不得直连数据库 + A-16 留痕）；节七扩展为 7 个子节（文档先行 / 变更发起方 / 6 步评审流程 / 紧急变更特例 / 强制回写事项 / 不必回写事项 / 变更日志规范）；节八新增 8.1 冲突上报路径（按影响范围分级 4 类）+ 8.2 留痕方式 + 8.3 时效要求。补充完成后内容版本升至 V0.2，新增节十一\"版本与变更日志\"小节，原节十一改为节十二一句话结论。开发同事随后把文件名也从 v0.1 重命名为 v0.2，并同步更新 01 数据库逻辑模型 节二设计输入和 README 节五的引用，无残留 v0.1 引用。",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-01T19:04:07.268Z",
-      "lastRecalledAt": "2026-05-01T19:04:07.268Z",
+      "lastRecalledAt": "2026-05-18T11:40:18.873Z",
       "queryHashes": [
-        "a88c114be70c"
+        "a88c114be70c",
+        "38a7a5cee9a5"
       ],
       "recallDays": [
-        "2026-05-02"
+        "2026-05-02",
+        "2026-05-18"
       ],
       "conceptTags": [
         "docs/详细设计/开发实施引用索引-v0.1.md",
@@ -205,16 +229,14 @@
       "endLine": 5,
       "source": "memory",
       "snippet": "- 2026-03-20 12:53 CST Spencer 在群里明确：当前工作目录聚焦‘物资供应系统’的设计。 - 2026-03-20 13:00 CST 已完成对 SupplyCore 仓库首轮扫描：当前仓库以“物资供应系统”方案文档为主，尚无业务代码；核心是《物资编码规范文档》V1.6 与《物资管理与财务接口规范》V1.1，项目处于需求/规则定稿阶段。 - 2026-03-20 13:16 CST Spencer 明确要求当前阶段不进入编码，优先梳理“物资供应系统”需求；已在群里给出《项目目标与范围说明（初稿）》，下一步继续输出《业务流程与单据清单（初稿）》。 - 2026-03-20 13:23 CST 用户补充长期工作原则：其身份为网信办主任；当前撰写 SupplyCore 相关内容，主要用于与管理人员/业务人员沟通、明确功能边界、支撑招标，以及后续指导开发与实施。 - 2026-03-20 13:34 CST 用户确认：后续围绕 SupplyCore 的输出默认按“需求沟通 + 招标基础 + 开发指导”口径推进，不偏向直接编码实现。",
-      "recallCount": 21,
+      "recallCount": 34,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 21,
+      "totalScore": 34,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-02T00:53:34.849Z",
-      "lastRecalledAt": "2026-05-13T22:34:10.071Z",
+      "lastRecalledAt": "2026-05-17T08:13:24.494Z",
       "queryHashes": [
-        "24dfe088e4a7",
-        "5ab4aeca48c9",
         "c2e0f1b90e25",
         "4fb74c49e367",
         "73248527670b",
@@ -233,7 +255,20 @@
         "5393f8169aea",
         "102e82271c6f",
         "20e4be86662c",
-        "623bc0f2523d"
+        "623bc0f2523d",
+        "c4967b15ab5d",
+        "3164fef3d080",
+        "686a292e8b83",
+        "d4a10203ff99",
+        "003ce0ccf552",
+        "9a994514e23a",
+        "2b2d7bac888f",
+        "3c498356c039",
+        "0ef17dc508b4",
+        "ec6d232b0bae",
+        "29d22209bf68",
+        "91d2d83c8dd0",
+        "24df87ecfc9d"
       ],
       "recallDays": [
         "2026-05-02",
@@ -242,7 +277,9 @@
         "2026-05-07",
         "2026-05-08",
         "2026-05-11",
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-17"
       ],
       "conceptTags": [
         "v1.6",
@@ -295,16 +332,14 @@
       "endLine": 9,
       "source": "memory",
       "snippet": "- 2026-03-21 Spencer 在 Cursor 中开启新会话，要求了解 SupplyCore 项目全貌。 - 2026-03-21 项目整理：将根目录下两份详细规则文档（物资编码规范文档.md、物资管理与财务接口规范.md）移至 docs/详细规则/，更新 README 和 00 文档中的路径引用，完成本地提交 0eb197e。 - 2026-03-21 Spencer 提供关键组织架构信息：物资公司服务阜新矿业（二级集团），上位系统 Nova Platform 组织层级从辽宁能源集团开始（5 级：集团→二级集团→厂矿→部门→班组）。 - 2026-03-21 已阅读 Nova Platform 三份核心设计文档（基础数据模块 v3.0、权限总纲 v2.6、ORG_ROLE 审批人 v3.0），提取关键信息写入 USER.md：集团全称、组织层级、数据隔离边界、Nova 技术栈和权限体系、对 SupplyCore 的对接影响。 - 2026-03-21 经讨论确定关键架构决策： 1. 技术栈：.NET（C#），不开放给其他语言 2. 数据库：独立部署，采用 PG 兼容的国产信创数据库（瀚高/金仓等），不与 Nova 共用数据库 3. Nova 作为上位平台，与业务系统保持低耦合：通过 API 提供组织/人员/权限/SSO 服务 4. 物资系统本地同步组织/人员数据副本，但权威源在平台侧；物料编码由物资系统自身作为权威源",
-      "recallCount": 22,
+      "recallCount": 34,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 22,
+      "totalScore": 34,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-02T00:53:34.849Z",
-      "lastRecalledAt": "2026-05-13T22:34:10.071Z",
+      "lastRecalledAt": "2026-05-17T08:13:24.494Z",
       "queryHashes": [
-        "24dfe088e4a7",
-        "5ab4aeca48c9",
         "01c01482ffd7",
         "c2e0f1b90e25",
         "4fb74c49e367",
@@ -324,7 +359,19 @@
         "5393f8169aea",
         "102e82271c6f",
         "20e4be86662c",
-        "623bc0f2523d"
+        "623bc0f2523d",
+        "c4967b15ab5d",
+        "686a292e8b83",
+        "d4a10203ff99",
+        "003ce0ccf552",
+        "9a994514e23a",
+        "2b2d7bac888f",
+        "3c498356c039",
+        "0ef17dc508b4",
+        "ec6d232b0bae",
+        "29d22209bf68",
+        "91d2d83c8dd0",
+        "24df87ecfc9d"
       ],
       "recallDays": [
         "2026-05-02",
@@ -333,7 +380,9 @@
         "2026-05-07",
         "2026-05-08",
         "2026-05-11",
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-17"
       ],
       "conceptTags": [
         "物资编码规范文档.md",
@@ -512,13 +561,13 @@
       "endLine": 4,
       "source": "memory",
       "snippet": "- Spencer 提醒已上传《报审-物管系统开发项目功能及需求报告.docx》（2026-03-21，阜矿集团物资公司整理）。 - 文档内容：14条总体要求 + 8大板块功能清单（库存、计划、招投标、合同、物资信息库、数据统计分析、供应商、设备资产）。 - 初步判断：偏使用单位业务诉求汇总，适合作为需求输入材料；后续需按“范围、流程、角色权限、接口、数据标准、验收”结构化纳入现有 SupplyCore 文档体系。 - 已对照上传 `docx` 与当前仓库文档进行复核，确认大部分板块需求已被吸收，但仍存在 4 类需补齐问题：1）顶层仍有“9模块/合同轻量版”旧口径，未完全反映合同管理和供应商管理一期独立模块化；2）缺少“新旧系统并行运行、比对、回退”刚性要求；3）缺少“数据导出权限、导出留痕、水印/追踪”等数据安全细化要求；4）二期招投标/能源集团电子商务平台对接缺少“按标包生成采购文件并上传平台”等具体动作描述。",
-      "recallCount": 22,
+      "recallCount": 28,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 22,
+      "totalScore": 28,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-02T01:01:11.428Z",
-      "lastRecalledAt": "2026-05-13T22:34:10.071Z",
+      "lastRecalledAt": "2026-05-17T04:55:50.112Z",
       "queryHashes": [
         "0292c077f030",
         "97f01d65f0f0",
@@ -541,7 +590,13 @@
         "5393f8169aea",
         "102e82271c6f",
         "20e4be86662c",
-        "623bc0f2523d"
+        "623bc0f2523d",
+        "c4967b15ab5d",
+        "686a292e8b83",
+        "d4a10203ff99",
+        "0ef17dc508b4",
+        "ec6d232b0bae",
+        "91d2d83c8dd0"
       ],
       "recallDays": [
         "2026-05-02",
@@ -550,7 +605,9 @@
         "2026-05-07",
         "2026-05-08",
         "2026-05-11",
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-17"
       ],
       "conceptTags": [
         "报审-物管系统开发项目功能及需求报告.docx",
@@ -570,21 +627,14 @@
       "endLine": 8,
       "source": "memory",
       "snippet": "- 2026-03-20 13:23 CST 用户补充长期工作原则：其身份为网信办主任；当前撰写 SupplyCore 相关内容，主要用于与管理人员/业务人员沟通、明确功能边界、支撑招标，以及后续指导开发与实施。 - 2026-03-20 13:34 CST 用户确认：后续围绕 SupplyCore 的输出默认按“需求沟通 + 招标基础 + 开发指导”口径推进，不偏向直接编码实现。 - 2026-03-20 13:41 CST 已将需求沟通成果正式落盘到仓库文档：新增 README 与 docs/需求梳理 下 3 份初稿文档（项目目标与范围、业务流程与单据、主数据与编码规则），并完成本地 git 提交：e997e3e（docs: 初始化物资供应系统需求梳理资料）。 - 2026-03-20 13:50 CST 继续补齐需求文档：新增《待确认事项清单（初稿）》与《财务与NC接口需求说明（初稿）》，同步更新 README 文档索引，并完成第二次本地 git 提交：2117672（docs: 补充待确认事项与NC接口需求）。 - 2026-03-20 14:12 CST 已继续补齐面向管理沟通/招标的文档：新增《模块功能清单（招标沟通版）》与《角色权限与审批矩阵（初稿）》，并完成第三次本地 git 提交：b7cd023（docs: 补充模块功能与权限审批矩阵）。",
-      "recallCount": 21,
+      "recallCount": 39,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 21,
+      "totalScore": 39,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-02T03:15:18.856Z",
-      "lastRecalledAt": "2026-05-13T22:34:10.071Z",
+      "lastRecalledAt": "2026-05-18T13:53:55.925Z",
       "queryHashes": [
-        "92e8f7bd30d4",
-        "5ab4aeca48c9",
-        "c2e0f1b90e25",
-        "4fb74c49e367",
-        "73248527670b",
-        "e9247b696c1b",
-        "833cbefa53ea",
         "9ed37aeac501",
         "ae9f73fc94fb",
         "08d9beac0fc2",
@@ -598,7 +648,25 @@
         "5393f8169aea",
         "102e82271c6f",
         "20e4be86662c",
-        "623bc0f2523d"
+        "623bc0f2523d",
+        "c4967b15ab5d",
+        "3164fef3d080",
+        "686a292e8b83",
+        "d4a10203ff99",
+        "003ce0ccf552",
+        "9a994514e23a",
+        "1c9be024cf38",
+        "2b2d7bac888f",
+        "3c498356c039",
+        "0ef17dc508b4",
+        "ec6d232b0bae",
+        "29d22209bf68",
+        "91d2d83c8dd0",
+        "24df87ecfc9d",
+        "60d7731de657",
+        "1d76cd5859e8",
+        "9e6fdac6771a",
+        "d3932933acdd"
       ],
       "recallDays": [
         "2026-05-02",
@@ -607,7 +675,10 @@
         "2026-05-07",
         "2026-05-08",
         "2026-05-11",
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "主要用于与管理人员/业务人员沟通",
@@ -729,23 +800,33 @@
       "endLine": 22,
       "source": "memory",
       "snippet": "- 资产升级：styles.css 加入 tabs / chat-panel / lifecycle / report-thumb 组件；chrome.js 侧栏激活全部原占位项并按\"工作/业务流转/合同与资金/基础数据/决策 AI/运维集成\"6 大组重排；data.js 扩展合同/报表/AI/物料/组织/仓库/供应商/盘点/废旧/审计 mock - 全 17 页 HTML 标签平衡通过；README 升级到 v0.2，列明 v0.3 候选（质检详情、付款申请、报表穿透、响应式、真实后端、C 档升级） - 2026-05-03 按 Spencer \"继续\" 完成 SupplyCore 原型 v0.3，落地 v0.2 全部候选项（C 档升级除外，仍保留作为后续选项）。共 21 页 HTML： - 新增 4 页：`quality-check.html`(06 S-04 质检详情，含 6 项检验项目实测结果与判定 + 完整 timeline + 附件区) / `payment-request.html`(05 C-06 付款申请，含三单匹配三态 + 未到货提前付款高敏感提示 + 资金占用回写) / `funding-plan.html`(05 月度资金计划，5 周分组 + 执行率进度条 + 与合同详情联动) / `report-detail.html`(09 R-INV-001 库存报表穿透演示，数据条横向占比 + 三种穿透按钮 + 导出审计水印说明)",
-      "recallCount": 6,
+      "recallCount": 13,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 6,
+      "totalScore": 13,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-05T05:21:20.804Z",
-      "lastRecalledAt": "2026-05-05T12:33:12.140Z",
+      "lastRecalledAt": "2026-05-18T13:53:55.925Z",
       "queryHashes": [
         "5ab4aeca48c9",
         "01c01482ffd7",
         "c2e0f1b90e25",
         "4fb74c49e367",
         "73248527670b",
-        "ae9f73fc94fb"
+        "ae9f73fc94fb",
+        "b500b1bdf193",
+        "1c9be024cf38",
+        "12b7eb579ac8",
+        "e8a4680804ca",
+        "60d7731de657",
+        "9e6fdac6771a",
+        "d3932933acdd"
       ],
       "recallDays": [
-        "2026-05-05"
+        "2026-05-05",
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "styles.css",
@@ -765,19 +846,26 @@
       "endLine": 18,
       "source": "memory",
       "snippet": "- 2026-05-03 按 Spencer \"继续\" 完成 SupplyCore 原型 v0.2，新增 8 个页面（共 17 页），覆盖到 v0.1 列出的全部\"未覆盖项\"： - 合同与资金：`contract-list.html`(对齐 05 · C-01 8 状态机) + `contract-detail.html`(C-04 付款节点 + C-08 三单匹配 + 完整会签 timeline) - 报表 + AI：`reports.html`(09 — 21 报表节选 9 张 + 12 预警 + 8 AI Tool + 内嵌 chat 演示，含 Tool 标记与引用单据) - 物料主数据：`material-master.html`(03 — 7 状态机一字排开 + 编码 V1.7 + NC 三阶段过渡) - 基础档案：`base-archive.html`(02 — 3 tab：组织(Nova 同步)/仓库(火工品双人双锁标记)/供应商 M-10) - 盘点 + 废旧：`stocktake.html`(06 — S-15~S-18 + 差异详情含\"建议处理\") + `scrap-disposal.html`(06 — S-19/S-20 + 高敏感审计护栏) - 系统管理：`system-admin.html`(4 tab：用户(Nova SSO 同步)/角色矩阵 11 角色/审计日志/非功能 11) - 资产升级：styles.css 加入 tabs / chat-panel / lifecycle / report-thumb 组件；ch",
-      "recallCount": 2,
+      "recallCount": 7,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 2,
+      "totalScore": 7,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-05T05:21:20.804Z",
-      "lastRecalledAt": "2026-05-05T05:21:39.622Z",
+      "lastRecalledAt": "2026-05-18T13:48:02.936Z",
       "queryHashes": [
         "5ab4aeca48c9",
-        "01c01482ffd7"
+        "01c01482ffd7",
+        "b500b1bdf193",
+        "12b7eb579ac8",
+        "e8a4680804ca",
+        "60d7731de657",
+        "9e6fdac6771a"
       ],
       "recallDays": [
-        "2026-05-05"
+        "2026-05-05",
+        "2026-05-15",
+        "2026-05-18"
       ],
       "conceptTags": [
         "v0.2",
@@ -797,19 +885,23 @@
       "endLine": 14,
       "source": "memory",
       "snippet": "- 2026-05-01 完成 01 文件重命名 v0.1 → v0.2（沿用引用索引 v0.1→v0.2 的处理路径）：用 `git mv` 把 `01-数据库逻辑模型-v0.1.md` 重命名为 `01-数据库逻辑模型-v0.2.md`（保留 git 历史）；同步更新 `开发实施引用索引-v0.2.md` 节 6.2 中\"暂按 ... 命名\"的注脚为正式引用；README 节五补加 01 条目。 - 2026-05-01 开发同事独立完成 01 V0.2 → V0.3 升级（135 实体、10 域、9 ERD），含 5 项关键扩展：(1) 节 4.1 主键策略升级为\"技术主键 + 业务单号唯一索引\"双字段模式，规避业务编号变更影响历史关联；(2) 节 4.10 新增主表/明细表建模原则 + 13 个明细实体（P-06、T-07、C-11、S-22~S-31）落实一单多行；(3) S-21 编号重新分配给 inventory_transaction 库存事务流水，支撑追溯/移动平均/FIFO/对账（原 V0.1 的 S-21 receipt_attachment 在 V0.2 已废弃，编号重用合规）；(4) A-20 approval_instance 审批实例区分流程定义与单据运行态；(5) F-14 interface_definition 管理 29 项 NC 接口/Nova/招采/AI Tool 接口元数据。周边一致性已同步：节八状态汇编新增 line_state/interface_status/instance_state；节九索引补 S-21/F-14/A-20",
-      "recallCount": 2,
+      "recallCount": 4,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 2,
+      "totalScore": 4,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-05T05:21:20.804Z",
-      "lastRecalledAt": "2026-05-05T15:31:41.657Z",
+      "lastRecalledAt": "2026-05-17T20:17:27.591Z",
       "queryHashes": [
         "5ab4aeca48c9",
-        "6b3d46506d1e"
+        "6b3d46506d1e",
+        "81cecc90073c",
+        "e265e8037fef"
       ],
       "recallDays": [
-        "2026-05-05"
+        "2026-05-05",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "v0.1",
@@ -829,18 +921,22 @@
       "endLine": 15,
       "source": "memory",
       "snippet": "- 2026-05-01 开发同事独立完成 01 V0.2 → V0.3 升级（135 实体、10 域、9 ERD），含 5 项关键扩展：(1) 节 4.1 主键策略升级为\"技术主键 + 业务单号唯一索引\"双字段模式，规避业务编号变更影响历史关联；(2) 节 4.10 新增主表/明细表建模原则 + 13 个明细实体（P-06、T-07、C-11、S-22~S-31）落实一单多行；(3) S-21 编号重新分配给 inventory_transaction 库存事务流水，支撑追溯/移动平均/FIFO/对账（原 V0.1 的 S-21 receipt_attachment 在 V0.2 已废弃，编号重用合规）；(4) A-20 approval_instance 审批实例区分流程定义与单据运行态；(5) F-14 interface_definition 管理 29 项 NC 接口/Nova/招采/AI Tool 接口元数据。周边一致性已同步：节八状态汇编新增 line_state/interface_status/instance_state；节九索引补 S-21/F-14/A-20 复合索引；7.5/7.6/7.8 ERD 同步；节十二新增 12.6/12.7/12.8 三项职责分离冲突处理；节十三 V0.3 变更日志清晰。同步更新 README 节五描述（135 实体 + 9 ERD + 主明细原则）和引用索引 6.2 中 v0.2 → v0.3 引用。 - 2026-05-01 完成 01 V0.3 → V0.4 评审收尾（用户选 A 路径全做评审 6 项）：文件重命名为",
-      "recallCount": 1,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 3,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-05T05:21:20.804Z",
-      "lastRecalledAt": "2026-05-05T05:21:20.804Z",
+      "lastRecalledAt": "2026-05-17T20:17:27.591Z",
       "queryHashes": [
-        "5ab4aeca48c9"
+        "5ab4aeca48c9",
+        "81cecc90073c",
+        "e265e8037fef"
       ],
       "recallDays": [
-        "2026-05-05"
+        "2026-05-05",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "v0.2",
@@ -860,13 +956,13 @@
       "endLine": 6,
       "source": "memory",
       "snippet": "- 2026-04-24 启动 SupplyCore 概要设计分卷编写，已形成 `docs/概要设计/00-05`。 - 2026-04-24 依据 `00-概要设计总览-v0.1.md` 的拆分顺序，确认下一篇应为 `06-报表预警与AI能力概要设计-v0.1.md`，不是先写 `07`。 - 2026-04-24 已新增 `docs/概要设计/06-报表预警与AI能力概要设计-v0.1.md`，统一收敛报表清单、查询穿透、预警对象模型、8 类最低 AI Tool 能力、导出控制和审计边界。 - 2026-04-24 已同步更新 `README.md` 的概要设计目录，使目录与实际分卷进度一致；当前下一篇待写为 `07-非功能与实施约束概要设计-v0.1.md`。 - 2026-04-24 已新增 `docs/概要设计/07-非功能与实施约束概要设计-v0.1.md`，收敛私有化与信创、安全与导出控制、性能可用性、数据迁移、并行运行、分批实施、上线切换、回退、验收和运维交接约束。 - 2026-04-24 已同步更新 `README.md`，当前 `docs/概要设计/00-07` 八个分卷已按总览规划补齐，后续可转向详细设计前保留事项梳理、Word/PDF 交付整理或继续补实施模板类附件。",
-      "recallCount": 15,
+      "recallCount": 17,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 15,
+      "totalScore": 17,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-05T05:21:20.804Z",
-      "lastRecalledAt": "2026-05-08T03:58:14.588Z",
+      "lastRecalledAt": "2026-05-17T02:33:21.018Z",
       "queryHashes": [
         "5ab4aeca48c9",
         "c2e0f1b90e25",
@@ -882,13 +978,17 @@
         "45c5c7c1b7e7",
         "7e3e0dc39b0d",
         "e05ae2640fe1",
-        "9e2b4be062dd"
+        "9e2b4be062dd",
+        "c4967b15ab5d",
+        "0ef17dc508b4"
       ],
       "recallDays": [
         "2026-05-05",
         "2026-05-06",
         "2026-05-07",
-        "2026-05-08"
+        "2026-05-08",
+        "2026-05-15",
+        "2026-05-17"
       ],
       "conceptTags": [
         "docs/概要设计/00-05",
@@ -908,13 +1008,13 @@
       "endLine": 30,
       "source": "memory",
       "snippet": "- 新增组件：bar(数据条) / week-block(资金计划周块) / menu-toggle(移动端) ；侧栏新增\"质检/付款申请/资金计划\"3 项 - 全 21 页 HTML 标签平衡通过；README 升级到 v0.3；v0.4 候选保留：设备生命周期 timeline、招投标流程详情、AI 助理可输入互动、数据看板大屏版、C 档升级 - 2026-05-03 按 Spencer \"继续\" 完成 SupplyCore 原型 v0.4，落地 v0.3 候选除 C 档外的全部 4 项。共 25 页 HTML： - `equipment-lifecycle.html`(07 — 采煤机 EQ-CM-00112 完整生命周期 11 事件垂直 timeline：合同→到货→建档→权属→投用→保养x3→运行→续租评估→退场 + 维修历史子表 + 4 类关联单据 + 设备/库存/合同边界说明) - `tender.html`(04 + 一期边界 — 4 招标项目列表 + 单项目详情含 6 节点流转条 + 5 家投标评标排名(推荐/备选标记) + 招标流程垂直 timeline + 文件附件；明确\"开评标在能源集团招采平台执行，本系统只做编排与回传归档\")",
-      "recallCount": 10,
+      "recallCount": 11,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 10,
+      "totalScore": 11,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-05T05:21:20.804Z",
-      "lastRecalledAt": "2026-05-05T16:38:18.965Z",
+      "lastRecalledAt": "2026-05-17T19:45:27.660Z",
       "queryHashes": [
         "5ab4aeca48c9",
         "c2e0f1b90e25",
@@ -925,11 +1025,13 @@
         "113fb766d870",
         "9ba2c1a26377",
         "d8a232f453b6",
-        "277238d5f5a7"
+        "277238d5f5a7",
+        "12b7eb579ac8"
       ],
       "recallDays": [
         "2026-05-05",
-        "2026-05-06"
+        "2026-05-06",
+        "2026-05-18"
       ],
       "conceptTags": [
         "week-block",
@@ -1014,18 +1116,21 @@
       "endLine": 9,
       "source": "memory",
       "snippet": "- 2026-05-04 → 05-05 凌晨 V0.4 后两轮 10 项待决项：第一轮 5 项 L2 决议：① L2-提案-01 走岔路 2（详设 10 V1.1 改 user_id 为 Guid，删除适配层 #1 + 风险 #7） ② L2-提案-02 走岔路 2（A-07 一期不实施，详设 V1.1 标注） ③ L2-提案-03 走岔路 1（A-06 拆两表，迁入已合一项） ④ Catio 团队提问清单由我整理 ⑤ Workflow 走 Catio Workflow。第二轮 5 项决议：⑥ OAuth client mode 连集团 Nova ⑦ 11 角色矩阵由我起草初稿 Spencer 评审 ⑧ Token 按详设 11 默认（access 2h / idle 30min）⑨ 冷归档上线前再谈 ⑩ V0.5 等 Catio 发函后再出。 - 2026-05-04 → 05-05 凌晨 已交付两份独立产出：① `docs/详细设计/10A-给Catio团队的字段缺口提问清单-V1.0.md`（9 节 21 个 ✓/✗ 勾选项，覆盖 A-02 索引/A-03 字段/A-08 三字段/A-10/A-14 字段/A-12 保留期/A-20 索引+快照/A-09 JSON 节点 schema/Catio 实际部署 schema，T+5 SLA + 签字栏） ② `docs/详细设计/10A-角色权限矩阵-V0.1.md`（11 角色×32 权限按 6 模块分块，标 ✓/❌/§范围/!审批/※互斥/⚠争议；含 5 项详设 V1.1 建议补充 + 6 项争议提交评审）。",
-      "recallCount": 1,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 3,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-05T05:21:39.622Z",
-      "lastRecalledAt": "2026-05-05T05:21:39.622Z",
+      "lastRecalledAt": "2026-05-18T13:53:55.925Z",
       "queryHashes": [
-        "01c01482ffd7"
+        "01c01482ffd7",
+        "9e6fdac6771a",
+        "d3932933acdd"
       ],
       "recallDays": [
-        "2026-05-05"
+        "2026-05-05",
+        "2026-05-18"
       ],
       "conceptTags": [
         "05-05",
@@ -1171,21 +1276,24 @@
       "endLine": 7,
       "source": "memory",
       "snippet": "- 2026-05-04 → 05-05 凌晨 Spencer 让我从评审视角看 10A V0.3，列出了 8 条必改（A1-A8）+ 12 条建议（B1-B12）+ 6 条商榷（C1-C6）。Spencer 三点关键决策：① A-07/A-06 都按 L2 提案补登记 ② tenant_id 不预留（与详设 01 §4.8 显式偏差） ③ 节七 SQL schema 改 `public.` 并加占位\"待 Catio 仓库部署确认\"。落 V0.4：`docs/详细设计/10A-权限审计域整合方案-V0.4.md`（587 行，删除 V0.3，更新开发实施引用索引）。Catio 概念锚点澄清：节三术语表 \"Catio 仓库目录\" 行加注 \"= Nova 项目代码仓库的目录名，历史代号，不是另一套系统\"，保留 Catio 作消歧词。 - 2026-05-04 → 05-05 凌晨 V0.4 后两轮 10 项待决项：第一轮 5 项 L2 决议：① L2-提案-01 走岔路 2（详设 10 V1.1 改 user_id 为 Guid，删除适配层 #1 + 风险 #7） ② L2-提案-02 走岔路 2（A-07 一期不实施，详设 V1.1 标注） ③ L2-提案-03 走岔路 1（A-06 拆两表，迁入已合一项） ④ Catio 团队提问清单由我整理 ⑤ Workflow 走 Catio Workflow。第二轮 5 项决议：⑥ OAuth client mode 连集团 Nova ⑦ 11 角色矩阵由我起草初稿 Spencer 评审 ⑧ Token 按详设 11 默认（access",
-      "recallCount": 4,
+      "recallCount": 6,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 4,
+      "totalScore": 6,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-05T05:21:39.622Z",
-      "lastRecalledAt": "2026-05-05T15:31:41.657Z",
+      "lastRecalledAt": "2026-05-18T13:53:55.925Z",
       "queryHashes": [
         "01c01482ffd7",
         "acc7bfbe0075",
         "113fb766d870",
-        "6b3d46506d1e"
+        "6b3d46506d1e",
+        "9e6fdac6771a",
+        "d3932933acdd"
       ],
       "recallDays": [
-        "2026-05-05"
+        "2026-05-05",
+        "2026-05-18"
       ],
       "conceptTags": [
         "05-05",
@@ -1298,22 +1406,24 @@
       "endLine": 12,
       "source": "memory",
       "snippet": "- 演示亮点：右上角角色切换(9 角色，`localStorage` 持久)、二级集团+厂矿下拉(阜矿/艾友/五龙/东梁/新邱)、订单业务状态与 NC 推送状态分层双列、需求详情含完整审批 timeline、库存批次状态颜色化、NC 监控含失败重推与三段式策略提示 - 安全护栏：所有页面顶部固定显示「原型演示·非真实数据·对齐文档 V1.0」横幅，底部页脚再次声明，避免被误读为成品 - 刻意未覆盖（v0.2 候选）：合同与资金(05) / 报表与 AI 助理(09) / 盘点与废旧处置(06 后段) / 基础档案与物料主数据(02/03) / 系统管理(10 后段/11) / AI 入口接入演示 - 升级路径：若后续要\"原型即雏形\"，可整体平移到 `../SupplyCores/modules/nova.supplycores/frontend` 的 Vite/React 工程，但目前 SupplyCores 仓有未提交改动，需先确认不冲突 - `prototype/README.md` 已写覆盖范围、对齐章节、未覆盖项、文件结构、设计约定与 v0.2 建议 - 2026-05-03 按 Spencer \"继续\" 完成 SupplyCore 原型 v0.2，新增 8 个页面（共 17 页），覆盖到 v0.1 列出的全部\"未覆盖项\"： - 合同与资金：`contract-list.html`(对齐 05 · C-01 8 状态机) + `contract-detail.html`(C-04 付款节点 + C-08 三单匹配 + 完整会签 timeline",
-      "recallCount": 5,
+      "recallCount": 6,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 5,
+      "totalScore": 6,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-05T05:21:39.622Z",
-      "lastRecalledAt": "2026-05-05T12:33:12.140Z",
+      "lastRecalledAt": "2026-05-17T19:45:27.660Z",
       "queryHashes": [
         "01c01482ffd7",
         "c2e0f1b90e25",
         "4fb74c49e367",
         "73248527670b",
-        "ae9f73fc94fb"
+        "ae9f73fc94fb",
+        "12b7eb579ac8"
       ],
       "recallDays": [
-        "2026-05-05"
+        "2026-05-05",
+        "2026-05-18"
       ],
       "conceptTags": [
         "阜矿/艾友/五龙/东梁/新邱",
@@ -1401,18 +1511,20 @@
       "endLine": 40,
       "source": "memory",
       "snippet": "- 资产升级：styles.css 新增 timeline-vert(垂直时间轴 done/current/warn 三态)/ai-suggest(建议问题 chip)/.bigscreen 完整暗色主题(hero/mid/bars/donut/list/table/pulse)；chrome.js 侧栏新增\"设备生命周期/招投标/AI 助理独立/大屏看板\"4 项；index.html 顶部 actions 加 2 个快捷入口 - 全 25 页 HTML 标签平衡通过；README v0.4；v0.5 候选保留：设备维修工单详情、移动端盘点扫码录入、AI 写操作完整链路、信创兼容性矩阵、C 档升级 - 2026-05-03 Spencer 提示出现并行的 prototype2/（单 SPA + UI 设计说明）。当时决定并行保留；后经 Spencer 确认不再采纳，已从仓库删除 `prototype2/`，仅保留 `prototype/`。 - 2026-05-03 按 Spencer \"继续\" 完成 SupplyCore 原型 v0.5，落地 v0.4 候选除 C 档外的全部 4 项。共 29 页 HTML： - `maintenance-order.html`(07 E-04 — 5 单工单列表 + 掘进机 EBZ200 故障维修详情：6 节点流转 + 故障描述/诊断分色卡 + 备件领用子表(联动 S-22) + 关单后回写说明 + 现场照片) - `mobile-stocktake.html`(06 — 360×720 手机外框预览：状态栏/应用栏/扫",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-05T05:21:39.622Z",
-      "lastRecalledAt": "2026-05-05T05:21:39.622Z",
+      "lastRecalledAt": "2026-05-17T19:45:27.660Z",
       "queryHashes": [
-        "01c01482ffd7"
+        "01c01482ffd7",
+        "12b7eb579ac8"
       ],
       "recallDays": [
-        "2026-05-05"
+        "2026-05-05",
+        "2026-05-18"
       ],
       "conceptTags": [
         "styles.css",
@@ -1527,21 +1639,25 @@
       "endLine": 9,
       "source": "memory",
       "snippet": "- 已新增《11-报审需求来源对照表（初稿）》，将报审报告中的 14 条总体要求与 8 大板块需求逐项映射为“已纳入一期 / 已纳入二期 / 已纳入通用要求 / 后续细化”，便于管理层沟通、招标答疑和后续需求追踪。 - 已补充“轻量双层口径”说明：管理层沟通和报审对照继续使用“8大业务板块”，招标、实施、报价和验收继续使用“14个实施模块”，两者定义为“总分关系”，不是两套独立范围。 - 落地方式保持轻量：项目主文档补原则说明，报审来源对照表新增“8大业务板块 -> 14个实施模块 -> 贯穿性专题”映射表，招标正文仅增加一句口径说明，不改正文主结构，避免招标文件显乱。",
-      "recallCount": 3,
+      "recallCount": 6,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 3,
+      "totalScore": 6,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-05T10:35:29.969Z",
-      "lastRecalledAt": "2026-05-05T16:44:42.771Z",
+      "lastRecalledAt": "2026-05-18T13:53:55.925Z",
       "queryHashes": [
         "9ed37aeac501",
         "e7e568de749d",
-        "923c4b621988"
+        "923c4b621988",
+        "60d7731de657",
+        "9e6fdac6771a",
+        "d3932933acdd"
       ],
       "recallDays": [
         "2026-05-05",
-        "2026-05-06"
+        "2026-05-06",
+        "2026-05-18"
       ],
       "conceptTags": [
         "11-报审需求来源对照表",
@@ -1924,22 +2040,28 @@
       "endLine": 2,
       "source": "memory",
       "snippet": "- 2026-05-08 13:55 CST Spencer 要求补齐 SupplyCore 原型。已将原型从 v0.5 升级到 v0.6，新增 4 个静态 HTML 页面：`prototype/inventory-flow.html`（库存流转：领料/退料/调拨）、`prototype/supplier-performance.html`（供应商履约画像）、`prototype/tender-archive.html`（招投标过程归档）、`prototype/alert-rules.html`（预警规则配置/报表订阅）。同步更新 `prototype/assets/chrome.js` 导航、`prototype/README.md`、`docs/原型设计/01-原型页面盘点与补齐清单-V0.1.md`。本地检查确认 prototype 下共 33 个 HTML，导航 href 无缺失。",
-      "recallCount": 4,
+      "recallCount": 8,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 4,
+      "totalScore": 8,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-10T18:35:06.437Z",
-      "lastRecalledAt": "2026-05-13T22:34:10.071Z",
+      "lastRecalledAt": "2026-05-17T03:14:49.025Z",
       "queryHashes": [
         "5393f8169aea",
         "102e82271c6f",
         "20e4be86662c",
-        "623bc0f2523d"
+        "623bc0f2523d",
+        "c4967b15ab5d",
+        "686a292e8b83",
+        "0ef17dc508b4",
+        "ec6d232b0bae"
       ],
       "recallDays": [
         "2026-05-11",
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-17"
       ],
       "conceptTags": [
         "v0.5",
@@ -1959,20 +2081,28 @@
       "endLine": 21,
       "source": "memory",
       "snippet": "astChannel 跨页验证）。`node --check` 4 个 JS 文件全部通过。**Week 1 天 4-5 pending**：`mock-nc.js`（1-2 秒延迟 + 5% 失败率 + 重推）、`chrome.js` 升级 + `roles.js`（6 角色：采购员/计划员/物资主管/财务/IT/集团委员会）+ `ui-helper.js`（确认对话框/Toast）。原型升 v0.10 = v0.9 + 引擎层。 - 2026-05-10 CST 推进原型 v0.9 P1 收口（Spencer 拍板\"A 合同变更 + 设备租赁两项一起做\"），不新增页面，4 页深化：**(1) 合同变更与履约节点**（contract-detail 加顶部冻结 banner + 履约节点表 C-04 履约视角 + C-05 变更记录 2 例（数量变更已审 + 付款条件变更待审）+ 履约预警对齐 09 V1.2 §六 ALR-CON-* + 变更冻结控制 KV；contract-list 加变更列含 changeCount + 待审角标；payment-request 加变更冻结提示卡。data.js contractDetail 加 milestones / changes / paymentLockState / complianceAlerts 4 个字段；contracts 列表加 changeCount +",
-      "recallCount": 2,
+      "recallCount": 7,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 2,
+      "totalScore": 7,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-10T22:28:07.759Z",
-      "lastRecalledAt": "2026-05-14T10:23:34.689Z",
+      "lastRecalledAt": "2026-05-18T11:37:10.876Z",
       "queryHashes": [
         "9290b74051ac",
-        "3632473fc3fe"
+        "3632473fc3fe",
+        "b500b1bdf193",
+        "3164fef3d080",
+        "a98e6666b739",
+        "1c9be024cf38",
+        "e8a4680804ca"
       ],
       "recallDays": [
         "2026-05-11",
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "4-5",
@@ -1992,18 +2122,20 @@
       "endLine": 15,
       "source": "memory",
       "snippet": "送失败 / 招标流标 / 审批超时）+ 单条预警标记已确认 → 已处理流转。(3) **`linkage.js` 扩展 3 个自动预警 + 1 个 mock 触发器**：emit 函数封装 SC.store.create('R-05')；T-03:流标 → ALR-PUR-002 重要级 / F-01:推送失败 → ALR-INT-001（一般 vs 紧急 by retry_count ≥ 2）/ S-13 update or create → quantity < 50 触发 ALR-INV-001 低储 / > 1500 触发 ALR-INV-002 超储；mockTriggerWFTimeout 给所有 P-01/P-02 待审单据创建 ALR-WF-001（替代时间穿越）。(4) **`chrome.js` v0.14 动态徽标**：SC.updateBadges 函数在 SC.b indRoleSwitch 末尾 setTimeout 200ms 调用；从 SC.roles.badgeCounts() 取 todo/alert 计数；动态更新 sidebar 中\"审批中心\"和\"预警规则\"链接的 .badge 红点；引擎未加载时静默不影响静态徽标。chrome.js header logo + footer 升 v0.14；README 加 Week 5 章节 + 端到端演示路径。**Week 5 完成 100%**。Week 6（核心报表 E3 + 整体验收）pending。",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-10T22:28:07.759Z",
-      "lastRecalledAt": "2026-05-10T22:28:07.759Z",
+      "lastRecalledAt": "2026-05-18T12:19:20.080Z",
       "queryHashes": [
-        "9290b74051ac"
+        "9290b74051ac",
+        "1d76cd5859e8"
       ],
       "recallDays": [
-        "2026-05-11"
+        "2026-05-11",
+        "2026-05-18"
       ],
       "conceptTags": [
         "linkage.js",
@@ -2023,18 +2155,20 @@
       "endLine": 16,
       "source": "memory",
       "snippet": "indRoleSwitch 末尾 setTimeout 200ms 调用；从 SC.roles.badgeCounts() 取 todo/alert 计数；动态更新 sidebar 中\"审批中心\"和\"预警规则\"链接的 .badge 红点；引擎未加载时静默不影响静态徽标。chrome.js header logo + footer 升 v0.14；README 加 Week 5 章节 + 端到端演示路径。**Week 5 完成 100%**。Week 6（核心报表 E3 + 整体验收）pending。 - 2026-05-10 CST 续做档 A 一期 **Week 4 核心联动 + NC mock**（档 A 一期演示亮点，按 02 V0.4 §八 第 4 周路线图）：(1) **新建 `prototype/purchase-receipt.html`**（02 V0.4 附录 A 决策的独立采购入库页，区别于到货验收）— S-05 入库审核 + 实时观察原子事务效应；点\"+ 创建 S-05 草稿\"自动带 3 行 mock S-25（锚杆 200/雷管 1000/截齿 80）；点\"审核通过\"触发 SC.sm.transition('S-05', id, '审核通过') → linkage `S-05:已审` 在 SC.store.transaction 包裹下原子完成：每行 S-21 流水 + S-13 余额（移动平均 unit_cost = (旧总额 + 入库金额) / (旧数量 +",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 2,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-10T22:28:07.759Z",
-      "lastRecalledAt": "2026-05-10T22:28:07.759Z",
+      "lastRecalledAt": "2026-05-18T12:19:20.080Z",
       "queryHashes": [
-        "9290b74051ac"
+        "9290b74051ac",
+        "1d76cd5859e8"
       ],
       "recallDays": [
-        "2026-05-11"
+        "2026-05-11",
+        "2026-05-18"
       ],
       "conceptTags": [
         "sc.roles.badgecounts",
@@ -2054,20 +2188,29 @@
       "endLine": 20,
       "source": "memory",
       "snippet": "次 + F-01 NC 接口任务，事务包裹保证原子性）、`F-01:推送失败`→30 秒后自动重推（≤3 次，超 3 升 F-08）；(4) **`assets/seed-data.js`** 主数据预填 — M-01 组织(6) + M-02 仓库(6 含火工品专管) + M-05 物料(10) + M-09 供应商(5 含 role_tags) + M-12 成本中心(4) + F-13 NC 开关(4，BIZ-001 默认开，002/005/013 关移二期) + 业务种子（P-01 ×2、P-02 ×1、P-03 ×2）；(5) **`prototype/_engine-test.html`** 烟雾测试页 — 6 个验证卡（Seed 状态/P-01 CRUD+状态迁移/P-02 审批→linkage 自动生成 P-05+分解路径分流/状态机调试/linkage 调试/Broadc astChannel 跨页验证）。`node --check` 4 个 JS 文件全部通过。**Week 1 天 4-5 pending**：`mock-nc.js`（1-2 秒延迟 + 5% 失败率 + 重推）、`chrome.js` 升级 + `roles.js`（6 角色：采购员/计划员/物资主管/财务/IT/集团委员会）+ `ui-helper.js`（确认对话框/Toast）。原型升 v0.10 = v0.9 + 引擎层。",
-      "recallCount": 3,
+      "recallCount": 13,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 3,
+      "totalScore": 13,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-10T22:28:07.759Z",
-      "lastRecalledAt": "2026-05-14T10:23:34.689Z",
+      "lastRecalledAt": "2026-05-18T11:37:10.876Z",
       "queryHashes": [
         "9290b74051ac",
-        "3632473fc3fe"
+        "3632473fc3fe",
+        "b500b1bdf193",
+        "3164fef3d080",
+        "a98e6666b739",
+        "1c9be024cf38",
+        "12b7eb579ac8",
+        "e8a4680804ca"
       ],
       "recallDays": [
         "2026-05-11",
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "f-01",
@@ -2087,20 +2230,31 @@
       "endLine": 19,
       "source": "memory",
       "snippet": "- 2026-05-10 CST 续做档 A 一期 Week 1 天 4-5，**Week 1 框架层完整收口**：(1) **`assets/mock-nc.js`** NC 推送 mock — `SC.nc.push(taskId)` 1-2 秒延迟 + 5% 失败率（可配 setConfig）；成功创建 F-03 凭证回执（NC + YYYYMMDD + 4 位序号）+ 更新 F-01 task_state=推送成功 + finance_state=已记账；失败 emit `F-01:推送失败` 触发 linkage 自动重推（≤3 次，超 3 升 F-08）；3 种 mock 错误码（NC-MOCK-001 接口超时/002 供应商编码不存在/003 科目映射缺失）；调试用 `simulateSuccess/simulateFailure` 强制结果。(2) **`assets/r oles.js`** 6 角色定义 — buyer/planner/storage_mgr/finance/it/group_committee；每角色含 menus（按需可见菜单 ID 列表）+ dataScope（GROUP/OWN_MINE/OWN_DEPT 三档）+ defaultLanding + description；API：current/currentInfo/set/list/canSee(menu)/dataFilter(entity)/badgeCounts；`set()` 触发 BroadcastChannel `{type:'role-change'}` 跨页广播",
-      "recallCount": 2,
+      "recallCount": 10,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 2,
+      "totalScore": 10,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-10T22:28:07.759Z",
-      "lastRecalledAt": "2026-05-14T10:23:34.689Z",
+      "lastRecalledAt": "2026-05-18T12:19:20.080Z",
       "queryHashes": [
         "9290b74051ac",
-        "3632473fc3fe"
+        "3632473fc3fe",
+        "b500b1bdf193",
+        "3164fef3d080",
+        "a98e6666b739",
+        "1c9be024cf38",
+        "81cecc90073c",
+        "e265e8037fef",
+        "e8a4680804ca",
+        "1d76cd5859e8"
       ],
       "recallDays": [
         "2026-05-11",
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "4-5",
@@ -2120,19 +2274,23 @@
       "endLine": 67,
       "source": "memory",
       "snippet": "- `dotnet build modules/nova.supplycores/src/Nova.SupplyCores.Application/Nova.SupplyCores.Application.csproj --no-restore` → `APP_BUILD:0`, log `/tmp/sc-review-app-build.log`. - `dotnet build modules/nova.supplycores/src/Nova.SupplyCores.HttpApi/Nova.SupplyCores.HttpApi.csproj --no-restore` → `HTTP_BUILD:0`, log `/tmp/sc-review-http-build.log`. - `dotnet test modules/nova.supplycores/test/Nova.SupplyCores.Domain.Tests/Nova.SupplyCores.Domain.Tests.csproj --no-restore --filter \"FullyQualifiedName~PaymentPlan|FullyQualifiedName~LeaseContract|FullyQualifiedName~LeaseBilling|FullyQualifiedName~EquipmentEntry|FullyQualifiedName~EquipmentExit\"` → `DOMAIN_TEST:0`, log `/tmp/sc-review-domain-",
-      "recallCount": 2,
+      "recallCount": 5,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 2,
+      "totalScore": 5,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-14T04:46:27.715Z",
-      "lastRecalledAt": "2026-05-14T05:10:43.653Z",
+      "lastRecalledAt": "2026-05-15T12:06:06.253Z",
       "queryHashes": [
         "c8ecf4cafd7d",
-        "f93420601cba"
+        "f93420601cba",
+        "355d4bc47447",
+        "d6b94c9772b6",
+        "7d2468e1d8d0"
       ],
       "recallDays": [
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15"
       ],
       "conceptTags": [
         "no-restore",
@@ -2152,19 +2310,23 @@
       "endLine": 72,
       "source": "memory",
       "snippet": "- Latest preserved user-facing task: `/review` in implementation repo `/Users/lihongjun/aizhetech/SupplyCores`; default behavior is review only, not code changes, unless Spencer explicitly asks to fix. - Recent completed review conclusion already sent to chat for uncommitted SupplyCores work: 1 `critical` + 2 `major`; recommendation was do not merge yet. - Critical finding to preserve exactly: EF model mismatch for Wave 45 entities. `LeaseContract` / `EquipmentEntry` / `LeaseBilling` / `EquipmentExit` have migration/table work but no `DbSet<>` in `modules/nova.supplycores/src/Nova.SupplyCores.EntityFrameworkCore/SupplyCoresDbContext.cs:167-186` and no `builder.Entity<...>` mapping in `module",
-      "recallCount": 2,
+      "recallCount": 5,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 2,
+      "totalScore": 5,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-14T04:46:27.715Z",
-      "lastRecalledAt": "2026-05-14T05:10:43.653Z",
+      "lastRecalledAt": "2026-05-15T12:06:06.253Z",
       "queryHashes": [
         "c8ecf4cafd7d",
-        "f93420601cba"
+        "f93420601cba",
+        "355d4bc47447",
+        "d6b94c9772b6",
+        "7d2468e1d8d0"
       ],
       "recallDays": [
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15"
       ],
       "conceptTags": [
         "user-facing",
@@ -2184,19 +2346,23 @@
       "endLine": 15,
       "source": "memory",
       "snippet": "- 2026-05-02 Spencer 提醒：`../SupplyCores` 已创建程序框架，依据 `../Catio/docs/Nova_Architecture_独立可插拔模块架构_v1.0_20260502.md`（Satellite Module Pattern）搭建。已确认当前结构为 ABP + Nova Platform 的独立可插拔模块框架：`src/SupplyCores.Web` 与 `src/SupplyCores.DbMigrator` 是薄主机/迁移脚手架，核心业务资产在 `modules/nova.supplycores/`；本地通过 `Directory.Build.props` 自动检测并引用并列 `../Catio`，CI/生产应切到 NuGet 包。后续开发原则：业务代码放模块内，`src/` 只做主机配置；数据库独立，业务表显式 schema；前端按 `modules/nova.supplycores/frontend` 的 Vite/React 模式推进；注意当前 `SupplyCores` 工作区存在一批未提交的重命名/迁移改动，后续不得覆盖。",
-      "recallCount": 2,
+      "recallCount": 5,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 2,
+      "totalScore": 5,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-14T04:46:27.715Z",
-      "lastRecalledAt": "2026-05-14T05:10:43.653Z",
+      "lastRecalledAt": "2026-05-15T12:06:06.253Z",
       "queryHashes": [
         "c8ecf4cafd7d",
-        "f93420601cba"
+        "f93420601cba",
+        "355d4bc47447",
+        "d6b94c9772b6",
+        "7d2468e1d8d0"
       ],
       "recallDays": [
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15"
       ],
       "conceptTags": [
         "src/supplycores.web",
@@ -2216,19 +2382,23 @@
       "endLine": 46,
       "source": "memory",
       "snippet": "- Important process preference from today: when reviewing in active multi-track work, avoid mixing uncommitted changes from other tracks; state the exact commit reviewed and exclusions clearly. ## 2026-05-13 16:26 Pre-compaction flush - Current task: Spencer asked “你直接修复吧” after Codex review context around SupplyCores Sprint 5a / T-08 BidResponse + T-09 EvaluationResult fixes. - Work in progress in `/Users/lihongjun/aizhetech/SupplyCores` (not yet verified after edits): - Added XML doc summaries for T-08 DTOs in `modules/nova.supplycores/src/Nova.SupplyCores.Application.Contracts/BidResponses/BidResponseDto.cs` and `CreateBidResponseDto.cs`. - Updated `modules/nova.supplycores/src/Nova",
-      "recallCount": 2,
+      "recallCount": 5,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 2,
+      "totalScore": 5,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-14T04:46:27.715Z",
-      "lastRecalledAt": "2026-05-14T05:10:43.653Z",
+      "lastRecalledAt": "2026-05-15T12:06:06.253Z",
       "queryHashes": [
         "c8ecf4cafd7d",
-        "f93420601cba"
+        "f93420601cba",
+        "355d4bc47447",
+        "d6b94c9772b6",
+        "7d2468e1d8d0"
       ],
       "recallDays": [
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15"
       ],
       "conceptTags": [
         "multi-track",
@@ -2248,19 +2418,21 @@
       "endLine": 61,
       "source": "memory",
       "snippet": "- Review scope called out in the compacted context: Sprint 6b/Wave 45-49 style additions around C-07 `PaymentPlan`, E-09 `LeaseContract`, E-10 `EquipmentEntry`, E-11 `LeaseBilling`, E-12 `EquipmentExit`, and the linkage in `ContractPaymentNodeAppService`. - Important exact state from prior review attempt: - Repo path: `/Users/lihongjun/aizhetech/SupplyCores`. - HEAD at that time: `38e6be7 (HEAD -> main, origin/main, origin/HEAD) Sprint 6b Day 5: E-03 Manufacturer + E-04 InstallationLocation 设备字典扩展（Wave 43/44）`. - Modified tracked files included `modules/nova.supplycores/src/Nova.SupplyCores.Application/ContractPaymentNodes/ContractPaymentNodeAppService.cs`, EF DbContext/model snapshot",
-      "recallCount": 2,
+      "recallCount": 3,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 2,
+      "totalScore": 3,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-14T04:46:27.715Z",
-      "lastRecalledAt": "2026-05-14T05:10:43.653Z",
+      "lastRecalledAt": "2026-05-15T09:52:45.386Z",
       "queryHashes": [
         "c8ecf4cafd7d",
-        "f93420601cba"
+        "f93420601cba",
+        "355d4bc47447"
       ],
       "recallDays": [
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15"
       ],
       "conceptTags": [
         "6b/wave",
@@ -2280,18 +2452,28 @@
       "endLine": 22,
       "source": "memory",
       "snippet": "hasPendingChange）。**(2) 设备租赁计费**（equipment-rent 整页升级：flow-strip 6 → 7 步、租赁详情面板（合同/计费/读数）、月度费用 E-13 三月 mock + 月末批处理 + 推付款联动、付款节点 C-04 五节点（含退租结算+质保金退还）、三笔保证金独立核算（押金 5 万 + 履约保证金 §8.6 5.16 万 10% + 租赁质保金 §8.10 政策 02 第四十一条 2.58 万 5% 仅现金）、续/停/退租演示动作、全生命周期 timeline；equipmentLeases 加 paymentMode 字段 + 1 个 ONE_TIME 一次性收费案例（应急排水泵 ZL-2026-0216 / 1.8 万 / 3 天）；新增 rentalDetail 数据块 ZL-2026-0211 采煤机示例）。版本升 v0.9，REA DME 写\"P1 收口\"明确（仍 39 页，不增不减）；盘点清单同步 P1 剩余 → 已完成；`node --check` 通过。触动文件：contract-detail.html（+143）、contract-list.html（+4）、payment-request.html（+11）、equipment-rent.html 整页重写（+282）、assets/data.js（+142）、README、盘点清单、本 memory。",
-      "recallCount": 1,
+      "recallCount": 8,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 8,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-14T10:23:34.689Z",
-      "lastRecalledAt": "2026-05-14T10:23:34.689Z",
+      "lastRecalledAt": "2026-05-18T12:19:20.080Z",
       "queryHashes": [
-        "3632473fc3fe"
+        "3632473fc3fe",
+        "b500b1bdf193",
+        "3164fef3d080",
+        "a98e6666b739",
+        "1c9be024cf38",
+        "12b7eb579ac8",
+        "e8a4680804ca",
+        "1d76cd5859e8"
       ],
       "recallDays": [
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "equipment-rent",
@@ -2311,18 +2493,26 @@
       "endLine": 19,
       "source": "memory",
       "snippet": "雾测试路径**：P-01 → P-02 → P-05 → T-01 → T-03 → T-05 → C-01 全程 SC.store 联动 + LocalStorage 持久化 + BroadcastChannel 跨页同步 + SC.ui.toast 反馈。每个页面引擎面板叠加在原静态 UI 之上不破坏原演示。chrome.js 版本 v0.10 → v0.11；README v0.11 加 Week 2 章节。**Week 2 完成 100%**。下一步 Week 3（合同→订单→验收→质检）pending。 - 2026-05-10 CST 续做档 A 一期 Week 1 天 4-5，**Week 1 框架层完整收口**：(1) **`assets/mock-nc.js`** NC 推送 mock — `SC.nc.push(taskId)` 1-2 秒延迟 + 5% 失败率（可配 setConfig）；成功创建 F-03 凭证回执（NC + YYYYMMDD + 4 位序号）+ 更新 F-01 task_state=推送成功 + finance_state=已记账；失败 emit `F-01:推送失败` 触发 linkage 自动重推（≤3 次，超 3 升 F-08）；3 种 mock 错误码（NC-MOCK-001 接口超时/002 供应商编码不存在/003 科目映射缺失）；调试用 `simulateSuccess/simulateFailure` 强制结果。(2) **`assets/r",
-      "recallCount": 1,
+      "recallCount": 6,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 6,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-14T10:23:34.689Z",
-      "lastRecalledAt": "2026-05-14T10:23:34.689Z",
+      "lastRecalledAt": "2026-05-18T11:37:10.876Z",
       "queryHashes": [
-        "3632473fc3fe"
+        "3632473fc3fe",
+        "b500b1bdf193",
+        "3164fef3d080",
+        "a98e6666b739",
+        "1c9be024cf38",
+        "e8a4680804ca"
       ],
       "recallDays": [
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "p-01",
@@ -2342,18 +2532,28 @@
       "endLine": 21,
       "source": "memory",
       "snippet": "- 2026-05-10 CST 推进原型 v0.9 P1 收口（Spencer 拍板\"A 合同变更 + 设备租赁两项一起做\"），不新增页面，4 页深化：**(1) 合同变更与履约节点**（contract-detail 加顶部冻结 banner + 履约节点表 C-04 履约视角 + C-05 变更记录 2 例（数量变更已审 + 付款条件变更待审）+ 履约预警对齐 09 V1.2 §六 ALR-CON-* + 变更冻结控制 KV；contract-list 加变更列含 changeCount + 待审角标；payment-request 加变更冻结提示卡。data.js contractDetail 加 milestones / changes / paymentLockState / complianceAlerts 4 个字段；contracts 列表加 changeCount + hasPendingChange）。**(2) 设备租赁计费**（equipment-rent 整页升级：flow-strip 6 → 7 步、租赁详情面板（合同/计费/读数）、月度费用 E-13 三月 mock + 月末批处理 + 推付款联动、付款节点 C-04 五节点（含退租结算+质保金退还）、三笔保证金独立核算（押金 5 万 + 履约保证金 §8.6 5.16 万 10% + 租赁质保金 §8.10 政策 02 第四十一条 2.58 万 5% 仅现金）、续/停/退租演示动作、全生命周期 timeline；equipmentLeases 加 paymentMode 字段 + 1 个 ON",
-      "recallCount": 1,
+      "recallCount": 8,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 8,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-14T10:23:34.689Z",
-      "lastRecalledAt": "2026-05-14T10:23:34.689Z",
+      "lastRecalledAt": "2026-05-18T12:19:20.080Z",
       "queryHashes": [
-        "3632473fc3fe"
+        "3632473fc3fe",
+        "b500b1bdf193",
+        "3164fef3d080",
+        "a98e6666b739",
+        "1c9be024cf38",
+        "12b7eb579ac8",
+        "e8a4680804ca",
+        "1d76cd5859e8"
       ],
       "recallDays": [
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "v0.9",
@@ -2373,18 +2573,31 @@
       "endLine": 20,
       "source": "memory",
       "snippet": "helper.js`** UI 组件 — toast（4 类型：info/success/warning/error，3 秒自动消失，右上角堆叠，CSS 注入）+ alert/confirm/prompt 全 Promise 化（替代 window.alert/confirm/prompt）+ loading 全屏遮罩+spinner；样式自动注入，不依赖 styles.css。(4) **chrome.js** 版本号同步升 v0.8 → v0.10（header logo + footer）。(5) **`_engine-test.html`** 升 9 个验证卡：原 6 卡 + 卡 ⑦ NC mock（S-05:已审 → 库存原子事务 + F-01 推送 + 强制成功/强制失败演示）+ 卡 ⑧ 6 角色切换（按钮 + 能力面板 + badgeCounts）+ 卡 ⑨ UI 组件演示（ toast/alert/confirm/prompt/loading）+ 顶部角色 banner + 切换按钮。`node --check` 8 个 JS 文件全部通过。**Week 1 完成 100%**，原型升 v0.10。下一步 Week 2 业务前段（需求→计划→任务→招采）pending。 - 2026-05-10 CST Spencer 拍板\"启动档 A 一期实施\"。按 02 V0.4 §八 路线图开 Week 1 框架层（5 天），本次完成天 1-3 产出：(1) **`assets/store.js`** LocalStorage 数据层 — CRUD（list/get/cr",
-      "recallCount": 1,
+      "recallCount": 11,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 1,
+      "totalScore": 11,
       "maxScore": 1,
       "firstRecalledAt": "2026-05-14T10:23:34.689Z",
-      "lastRecalledAt": "2026-05-14T10:23:34.689Z",
+      "lastRecalledAt": "2026-05-18T11:37:10.876Z",
       "queryHashes": [
-        "3632473fc3fe"
+        "3632473fc3fe",
+        "b500b1bdf193",
+        "3164fef3d080",
+        "64ed93541917",
+        "1c9be024cf38",
+        "81cecc90073c",
+        "c417ce2c724e",
+        "201ec174b9bd",
+        "44b40b20eb4e",
+        "e265e8037fef",
+        "e8a4680804ca"
       ],
       "recallDays": [
-        "2026-05-14"
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
       ],
       "conceptTags": [
         "helper.js",
@@ -2426,6 +2639,915 @@
         "alr-plan-001/002",
         "8.2.2",
         "rpt/alr-pur-emergency"
+      ]
+    },
+    "memory:memory/2026-05-13.md:76:79": {
+      "key": "memory:memory/2026-05-13.md:76:79",
+      "path": "memory/2026-05-13.md",
+      "startLine": 76,
+      "endLine": 79,
+      "source": "memory",
+      "snippet": "- C-09 review anchors: detailed design `/Users/lihongjun/aizhetech/SupplyCore/docs/详细设计/05-合同与资金详细设计-V1.3.md` §4.9; files include `MonthlyPrepaymentSummaries` App.Contracts/App/Domain/HttpApi tests, migration `20260513090301_Add_PaymentPlan_C07.cs`; key requirements: no manual create, unique `(org_id, supplier_id, summary_month)`, immutable `summary_amount` / `included_requests` once generated, states `待汇总/已汇总/已推付款/已回写实付/已作废`, interface states `待推送/推送中/推送成功/推送失败/已重推/已关闭`, batch windows around `02:30`, `03:00`, `22:00`, and proper `sub_group_id`/idempotency/interface push handling. - R-05 review anchors: detailed design `/Users/lihongjun/aizhetech/SupplyCore/docs/详细设计/09-报表预警详细设计-V0.1.md`; in",
+      "recallCount": 12,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 12,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-14T23:10:17.107Z",
+      "lastRecalledAt": "2026-05-17T08:13:24.494Z",
+      "queryHashes": [
+        "c4967b15ab5d",
+        "686a292e8b83",
+        "d4a10203ff99",
+        "003ce0ccf552",
+        "9a994514e23a",
+        "2b2d7bac888f",
+        "3c498356c039",
+        "0ef17dc508b4",
+        "ec6d232b0bae",
+        "29d22209bf68",
+        "91d2d83c8dd0",
+        "24df87ecfc9d"
+      ],
+      "recallDays": [
+        "2026-05-15",
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "c-09",
+        "4.9",
+        "app.contracts/app/domain/httpapi",
+        "org-id",
+        "supplier-id",
+        "summary-month",
+        "summary-amount",
+        "included-requests"
+      ]
+    },
+    "memory:memory/2026-05-13.md:1:10": {
+      "key": "memory:memory/2026-05-13.md:1:10",
+      "path": "memory/2026-05-13.md",
+      "startLine": 1,
+      "endLine": 10,
+      "source": "memory",
+      "snippet": "# 2026-05-13 ## Pre-compaction memory flush - Workspace/project: SupplyCore docs repo at `/Users/lihongjun/aizhetech/SupplyCore`; implementation repo often referenced at `/Users/lihongjun/aizhetech/SupplyCores/modules/nova.supplycores/`. - User Spencer is coordinating multi-track Sprint 5 work for SupplyCores. Current emphasis: requirements/design-first discipline, strict Codex review checklist, and cross-track EF/migration conflict avoidance. - Earlier today completed Sprint 5 D1-D2 T-06/T-07 hardening in SupplyCores: - `966561c fix(s5-tender): harden T06 and T07 validation` — hardened T-06 TenderPlatformLog and T-07 TenderPackageLine validation; tests passed: Domain 233, EF 10, Applica",
+      "recallCount": 14,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 14,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-14T23:10:17.107Z",
+      "lastRecalledAt": "2026-05-17T06:17:22.311Z",
+      "queryHashes": [
+        "c4967b15ab5d",
+        "686a292e8b83",
+        "d4a10203ff99",
+        "003ce0ccf552",
+        "9a994514e23a",
+        "2b2d7bac888f",
+        "3c498356c039",
+        "0ef17dc508b4",
+        "ec6d232b0bae",
+        "29d22209bf68",
+        "91d2d83c8dd0",
+        "a25dc20a7f23",
+        "022b65d02881",
+        "b632640d91c3"
+      ],
+      "recallDays": [
+        "2026-05-15",
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "pre-compaction",
+        "workspace/project",
+        "multi-track",
+        "requirements/design-first",
+        "cross-track",
+        "ef/migration",
+        "d1-d2",
+        "t-06/t-07"
+      ]
+    },
+    "memory:memory/2026-05-13.md:23:33": {
+      "key": "memory:memory/2026-05-13.md:23:33",
+      "path": "memory/2026-05-13.md",
+      "startLine": 23,
+      "endLine": 33,
+      "source": "memory",
+      "snippet": "- Important caveat: after writes, inspection showed some files may have been overwritten by another concurrent process or earlier version. `TenderEvaluationAggregator.cs` currently appears to contain sync `.ToList()` comments/implementation rather than the AsyncExecuter version that was just written; `TenderPackageAppService.cs` similarly shows sync `.Count()` for test compatibility. Next agent should re-open files and run `git diff` before continuing. - Pending: run build/tests for `modules/nova.supplycores` and fix compile errors; likely also inspect `IBidResponseAppService`, `BidResponsesController`, and Swagger/API surface to ensure public MarkEvaluated endpoint is removed if that was th",
+      "recallCount": 4,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 4,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-14T23:10:17.107Z",
+      "lastRecalledAt": "2026-05-17T03:14:49.025Z",
+      "queryHashes": [
+        "c4967b15ab5d",
+        "686a292e8b83",
+        "0ef17dc508b4",
+        "ec6d232b0bae"
+      ],
+      "recallDays": [
+        "2026-05-15",
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "tenderevaluationaggregator.cs",
+        "comments/implementation",
+        "tenderpackageappservice.cs",
+        "re-open",
+        "build/tests",
+        "modules/nova.supplycores",
+        "swagger/api",
+        "important"
+      ]
+    },
+    "memory:memory/2026-05-14.md:1:16": {
+      "key": "memory:memory/2026-05-14.md:1:16",
+      "path": "memory/2026-05-14.md",
+      "startLine": 1,
+      "endLine": 16,
+      "source": "memory",
+      "snippet": "# 2026-05-14 - Checked both repos for Spencer’s “今天都做了什么” question. - SupplyCore docs repo (`/Users/lihongjun/aizhetech/SupplyCore`) today had 24 commits touching mainly `docs/Sprint/*`; focus was planning/design/demo-script documents. Business docs were committed; worktree only had runtime memory changes before this note. - SupplyCores implementation repo (`/Users/lihongjun/aizhetech/SupplyCores`) today had 41 commits. Current implementation worktree still has 25 uncommitted changes, mostly Sprint 14a follow-up edits/tests around interface monitor, approvals, AI token dashboard, LLM config tool, interface contributors, and contributor payload helper. ## Docs repo timeline - 00:56 — Sprin",
+      "recallCount": 6,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 6,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-14T23:10:17.107Z",
+      "lastRecalledAt": "2026-05-17T06:17:22.311Z",
+      "queryHashes": [
+        "c4967b15ab5d",
+        "0ef17dc508b4",
+        "a25dc20a7f23",
+        "022b65d02881",
+        "f8c18fc3815e",
+        "b632640d91c3"
+      ],
+      "recallDays": [
+        "2026-05-15",
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "docs/sprint",
+        "planning/design/demo-script",
+        "follow-up",
+        "edits/tests",
+        "checked",
+        "both",
+        "repos",
+        "spencer’s"
+      ]
+    },
+    "memory:memory/2026-05-13.md:35:42": {
+      "key": "memory:memory/2026-05-13.md:35:42",
+      "path": "memory/2026-05-13.md",
+      "startLine": 35,
+      "endLine": 42,
+      "source": "memory",
+      "snippet": "- Spencer requested Codex checklist review for SupplyCores commit `c1818a1`, scope Sprint 5a D1-D2 T-08 BidResponse entity + Manager + AppService + Controller, against detailed design `04 V1.2 §4.13a`. Review focus: 16-field alignment, 4-state state machine, 6 business rules, Supplier qualified + T-03 qualified_supplier_ids, sub_group_id hook, `(PackageId, SupplierId)` unique, error codes, Domain/App tests, AppService time checks, §4.13a/§4.13b references. I read `.codex/review-checklist.md` and relevant design section, reviewed code/tests, and sent the review to the Telegram group. - Spencer later sent `/review`; I noted SupplyCores latest submitted commit was `062db78 fix(Sprint 5a): Codex",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-15T00:12:25.067Z",
+      "lastRecalledAt": "2026-05-18T13:53:55.925Z",
+      "queryHashes": [
+        "831edd41f962",
+        "d3932933acdd"
+      ],
+      "recallDays": [
+        "2026-05-15",
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "d1-d2",
+        "t-08",
+        "v1.2",
+        "4.13a",
+        "16-field",
+        "4-state",
+        "t-03",
+        "qualified-supplier-ids"
+      ]
+    },
+    "memory:memory/2026-03-21.md:16:21": {
+      "key": "memory:memory/2026-03-21.md:16:21",
+      "path": "memory/2026-03-21.md",
+      "startLine": 16,
+      "endLine": 21,
+      "source": "memory",
+      "snippet": "- 8.2→8.3 集团平台对接要求（SSO/组织人员/数据权限/审批）整节新增，原 8.3 改为 8.4 - 10.2 信创数据库：改为\"PG 兼容国产信创数据库（瀚高/金仓等），独立部署\" - 10.7 技术栈与平台集成：新增节 - 16.5 供应商响应：增加平台对接方案要求 - 2026-03-21 已统一补强项目总述口径：项目核心目标表述为“把物资业务从分散处理变成统一标准、流程闭环、业财协同、集团可视”，并明确系统可理解为“以库存实物流转为主线、以财务接口为落点、以权限审批和报表预警为支撑的物资业务平台”；已回写 README、01 项目主文档和招标正文。 - 2026-03-21 已将“与辽宁能源未来统一编码体系的扩展对接能力”从原先二期/P2 口径调整为一期明确要求：一期必须预留字段、映射关系和接口扩展能力，用于约束开发商和提前说明边界；但在上位标准未正式发布前，不要求一期直接启用集团统一编码，也不得据此要求重编阜矿现有物料编码。相关口径已同步回写 01/03/04/06、招标正文及《物资编码规范文档》第十四章。",
+      "recallCount": 8,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 8,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-15T02:20:51.857Z",
+      "lastRecalledAt": "2026-05-18T11:56:12.144Z",
+      "queryHashes": [
+        "64ed93541917",
+        "81cecc90073c",
+        "c417ce2c724e",
+        "201ec174b9bd",
+        "44b40b20eb4e",
+        "e265e8037fef",
+        "1382f23e9a73",
+        "60d7731de657"
+      ],
+      "recallDays": [
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "8.2",
+        "8.3",
+        "sso/组织人员/数据权限/审批",
+        "8.4",
+        "10.2",
+        "瀚高/金仓等",
+        "10.7",
+        "16.5"
+      ]
+    },
+    "memory:memory/2026-03-21.md:12:19": {
+      "key": "memory:memory/2026-03-21.md:12:19",
+      "path": "memory/2026-03-21.md",
+      "startLine": 12,
+      "endLine": 19,
+      "source": "memory",
+      "snippet": "- 2026-03-21 后续讨论：移除\"须支持 JSONB 数据类型\"的不必要约束（USER.md、01-项目目标与范围、08-招标技术要求目录）；开发语言从强制 .NET 改为不做强制限定（用 .NET 可直接引用平台模块，用其他语言须通过 API 对接）。 - 2026-03-21 审查招标正文（物资供应管理系统招标技术要求初稿），发现缺少 Nova Platform 对接要求，数据库要求误含达梦（Oracle 兼容，不符 PG 兼容原则），SSO 仅为\"预留\"。已补充更新： - 2.2 总体原则：增加\"独立部署，与集团平台低耦合\" - 3.3 系统关系表：新增集团统一平台行，修正人资系统说明 - 8.2→8.3 集团平台对接要求（SSO/组织人员/数据权限/审批）整节新增，原 8.3 改为 8.4 - 10.2 信创数据库：改为\"PG 兼容国产信创数据库（瀚高/金仓等），独立部署\" - 10.7 技术栈与平台集成：新增节 - 16.5 供应商响应：增加平台对接方案要求",
+      "recallCount": 8,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 8,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-15T02:20:51.857Z",
+      "lastRecalledAt": "2026-05-18T11:56:12.144Z",
+      "queryHashes": [
+        "64ed93541917",
+        "81cecc90073c",
+        "c417ce2c724e",
+        "201ec174b9bd",
+        "44b40b20eb4e",
+        "e265e8037fef",
+        "1382f23e9a73",
+        "60d7731de657"
+      ],
+      "recallDays": [
+        "2026-05-15",
+        "2026-05-17",
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "user.md",
+        "01-项目目标与范围",
+        "08-招标技术要求目录",
+        "2.2",
+        "3.3",
+        "8.2",
+        "8.3",
+        "sso/组织人员/数据权限/审批"
+      ]
+    },
+    "memory:memory/2026-05-02.md:12:14": {
+      "key": "memory:memory/2026-05-02.md:12:14",
+      "path": "memory/2026-05-02.md",
+      "startLine": 12,
+      "endLine": 14,
+      "source": "memory",
+      "snippet": "- 2026-05-02 按 Spencer 要求完成一轮详细设计 01~11 交叉评审，并新增 `docs/详细设计/详细设计交叉评审记录-v0.1.md`。本轮发现并修正：README 详设索引旧版引用；10 缺 A-20 approval_instance；05 仍用 `nc_push_state` 与 01/08 冲突，已升至 `05-合同与资金详细设计-v0.2.md` 并统一为 `interface_push_state`；C-09 `summary_state` 与接口状态混用，已分层；01 中 E-01/E-07/E-13 状态口径已按 07-v0.2 回写。自动检查确认 00~11 code fence 成对、C/E/F/R/A 域实体覆盖通过、有效旧版引用为 0。 - 2026-05-02 Spencer 提醒：`../SupplyCores` 已创建程序框架，依据 `../Catio/docs/Nova_Architecture_独立可插拔模块架构_v1.0_20260502.md`（Satellite Module Pattern）搭建。已确认当前结构为 ABP + Nova Platform 的独立可插拔模块框架：`src/SupplyCores.Web` 与 `src/SupplyCores.DbMigrator` 是薄主机/迁移脚手架，核心业务资产在 `modules/nova.supplycores/`；本地通过 `Directory.Build.props` 自动检测并引用并列 `../Catio`，CI/生产应切到 NuGet 包。后续开发",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-15T09:52:45.386Z",
+      "lastRecalledAt": "2026-05-15T09:52:45.386Z",
+      "queryHashes": [
+        "355d4bc47447"
+      ],
+      "recallDays": [
+        "2026-05-15"
+      ],
+      "conceptTags": [
+        "docs/详细设计/详细设计交叉评审记录-v0.1.md",
+        "a-20",
+        "approval-instance",
+        "nc-push-state",
+        "01/08",
+        "05-合同与资金详细设计-v0.2.md",
+        "interface-push-state",
+        "c-09"
+      ]
+    },
+    "memory:memory/2026-05-15.md:39:57": {
+      "key": "memory:memory/2026-05-15.md:39:57",
+      "path": "memory/2026-05-15.md",
+      "startLine": 39,
+      "endLine": 57,
+      "source": "memory",
+      "snippet": "- `dotnet build src/SupplyCores.Web/SupplyCores.Web.csproj --no-restore -v:minimal` had been run and showed many projects compiling, but a previous output was truncated; confirm final exit code when needed. ### Files / identifiers to preserve - Repo: `/Users/lihongjun/aizhetech/SupplyCores` - Frontend: `/Users/lihongjun/aizhetech/SupplyCores/modules/nova.supplycores/frontend` - Web Host: `/Users/lihongjun/aizhetech/SupplyCores/src/SupplyCores.Web` - Module Web: `/Users/lihongjun/aizhetech/SupplyCores/modules/nova.supplycores/src/Nova.SupplyCores.Web` - Vite config: `modules/nova.supplycores/frontend/vite.config.ts` - Playwright config: `modules/nova.supplycores/frontend/playwright.config.ts",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-15T10:55:44.654Z",
+      "lastRecalledAt": "2026-05-15T12:06:06.253Z",
+      "queryHashes": [
+        "d6b94c9772b6",
+        "7d2468e1d8d0"
+      ],
+      "recallDays": [
+        "2026-05-15"
+      ],
+      "conceptTags": [
+        "no-restore",
+        "dotnet",
+        "src",
+        "supplycores.web",
+        "supplycores.web.csproj",
+        "restore",
+        "v:minimal",
+        "had"
+      ]
+    },
+    "memory:memory/2026-05-14.md:12:22": {
+      "key": "memory:memory/2026-05-14.md:12:22",
+      "path": "memory/2026-05-14.md",
+      "startLine": 12,
+      "endLine": 22,
+      "source": "memory",
+      "snippet": "- 12:19-13:12 — Sprint 13a: Codex 12a review appendix 13/13 + tech-debt update, task-card V0.2 lock, Day1-3 A permission-approval design V0.1→V0.2 cici lock, Demo-13a + Sprint-14a draft. - 13:43-17:48 — Sprint 14a: Codex 13a appendix 3/3 + tech-debt update, task-card V0.2 lock, Day1 X-A NC interface integration design V0.1→V0.2 cici lock with 5 improvements, Demo-14a + Sprint-15a task-card draft. ## Implementation repo highlights - 00:09-00:51 — Sprint 10a finished 国产 LLM Advisor / SY-02 SystemConfig / LlmAdvisor fallback + dynamic threshold E2E. - 06:06-07:02 — Sprint 11a completed P1/P2 fixes, ToolRegistry/ListReportAlertsTool, AdvisorOrchestrator/SystemPromptBuilder, AiCallLog + AI tool",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 3,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-17T05:14:46.362Z",
+      "lastRecalledAt": "2026-05-17T06:17:22.311Z",
+      "queryHashes": [
+        "a25dc20a7f23",
+        "022b65d02881",
+        "b632640d91c3"
+      ],
+      "recallDays": [
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "19-13",
+        "13/13",
+        "tech-debt",
+        "task-card",
+        "v0.2",
+        "day1-3",
+        "permission-approval",
+        "v0.1"
+      ]
+    },
+    "memory:memory/2026-05-13.md:9:12": {
+      "key": "memory:memory/2026-05-13.md:9:12",
+      "path": "memory/2026-05-13.md",
+      "startLine": 9,
+      "endLine": 12,
+      "source": "memory",
+      "snippet": "- `cbeab2a docs(Sprint-5): correct T06 tender platform log scope` — corrected Sprint 5 task card: T-06 is TenderPlatformLog / platform log, not EvaluationCommittee. - Spencer then asked to start Sprint 5β after creating two sprints. We responded: β started and B1 documentation versioning/upgrade submitted; backend B2 should wait for α EF changes to land to avoid conflicting `DbContext` / ModelSnapshot edits. - Spencer requested Codex checklist review for SupplyCores commit `c1818a1`, scope Sprint 5a D1-D2 T-08 BidResponse entity + Manager + AppService + Controller, against detailed design `04 V1.2 §4.13a`. Review focus: 16-field alignment, 4-state state machine, 6 business rules, Supplier",
+      "recallCount": 5,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 5,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-17T05:14:46.362Z",
+      "lastRecalledAt": "2026-05-18T13:53:55.925Z",
+      "queryHashes": [
+        "a25dc20a7f23",
+        "022b65d02881",
+        "b632640d91c3",
+        "9e6fdac6771a",
+        "d3932933acdd"
+      ],
+      "recallDays": [
+        "2026-05-17",
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "sprint-5",
+        "t-06",
+        "versioning/upgrade",
+        "d1-d2",
+        "t-08",
+        "v1.2",
+        "4.13a",
+        "16-field"
+      ]
+    },
+    "memory:memory/2026-05-13.md:32:35": {
+      "key": "memory:memory/2026-05-13.md:32:35",
+      "path": "memory/2026-05-13.md",
+      "startLine": 32,
+      "endLine": 35,
+      "source": "memory",
+      "snippet": "- `966561c fix(s5-tender): harden T06 and T07 validation` — hardened T-06 TenderPlatformLog and T-07 TenderPackageLine validation; tests passed: Domain 233, EF 10, Application 127. - `cbeab2a docs(Sprint-5): correct T06 tender platform log scope` — corrected Sprint 5 task card: T-06 is TenderPlatformLog / platform log, not EvaluationCommittee. - Spencer then asked to start Sprint 5β after creating two sprints. We responded: β started and B1 documentation versioning/upgrade submitted; backend B2 should wait for α EF changes to land to avoid conflicting `DbContext` / ModelSnapshot edits. - Spencer requested Codex checklist review for SupplyCores commit `c1818a1`, scope Sprint 5a D1-D2 T-08",
+      "recallCount": 3,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 3,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-17T05:14:46.362Z",
+      "lastRecalledAt": "2026-05-17T06:17:22.311Z",
+      "queryHashes": [
+        "a25dc20a7f23",
+        "022b65d02881",
+        "b632640d91c3"
+      ],
+      "recallDays": [
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "s5-tender",
+        "t-06",
+        "t-07",
+        "sprint-5",
+        "versioning/upgrade",
+        "d1-d2",
+        "t-08",
+        "966561c"
+      ]
+    },
+    "memory:memory/2026-05-17.md:15:23": {
+      "key": "memory:memory/2026-05-17.md:15:23",
+      "path": "memory/2026-05-17.md",
+      "startLine": 15,
+      "endLine": 23,
+      "source": "memory",
+      "snippet": "- `DataImportAppService.DownloadTemplateAsync` calls `DataImportTemplateGenerator.Generate` and `GetFileName` to generate `.xlsx` on demand; templates are not persisted under `wwwroot`. - Data governance AppServices currently use `[Authorize(SupplyCoresPermissions.DataGovernance.Default)]` rather than fine-grained permissions. - `DataImportAppService` is a thin wrapper around `DataImportOrchestrator` for upload/validate, confirm/apply, and template download. - `DataImportTemplateGenerator` is C# code-based on-demand template generation. - Review still needed / unresolved TODOs: - Finish final focused review finding list with severity, exact file path, issue, and recommended fix.",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-17T05:41:37.960Z",
+      "lastRecalledAt": "2026-05-17T06:17:25.088Z",
+      "queryHashes": [
+        "f8c18fc3815e",
+        "41200d709213"
+      ],
+      "recallDays": [
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "fine-grained",
+        "upload/validate",
+        "confirm/apply",
+        "code-based",
+        "on-demand",
+        "calls",
+        "getfilename",
+        "generate"
+      ]
+    },
+    "memory:memory/2026-05-17.md:34:43": {
+      "key": "memory:memory/2026-05-17.md:34:43",
+      "path": "memory/2026-05-17.md",
+      "startLine": 34,
+      "endLine": 43,
+      "source": "memory",
+      "snippet": "- Do not forget quality-check identifiers called out by prior feedback: `/api/supply-cores/data-import/warehouse`, `/api/supply-cores/data-import/nc-mapping`, `000123`, `/Ignore/Reject`, `DemandRequestManager.cs:42`, `/F-11/F-12`, `/Nova.SupplyCores.Application.Contracts/Nova.SupplyCores.Application.Contracts.csproj.lscache`. - Important exact files for continuation: - `/Users/lihongjun/aizhetech/SupplyCores/modules/nova.supplycores/src/Nova.SupplyCores.Application/DataGovernance/DataImportOrchestrator.cs` - `/Users/lihongjun/aizhetech/SupplyCores/modules/nova.supplycores/src/Nova.SupplyCores.Application/DataGovernance/DataImportExcelParser.cs` - `/Users/lihongjun/aizhetech/SupplyCor",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-17T05:41:37.960Z",
+      "lastRecalledAt": "2026-05-17T06:17:25.088Z",
+      "queryHashes": [
+        "f8c18fc3815e",
+        "41200d709213"
+      ],
+      "recallDays": [
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "quality-check",
+        "ignore/reject",
+        "demandrequestmanager.cs",
+        "f-11/f-12",
+        "not",
+        "forget",
+        "quality",
+        "check"
+      ]
+    },
+    "memory:memory/2026-05-17.md:22:28": {
+      "key": "memory:memory/2026-05-17.md:22:28",
+      "path": "memory/2026-05-17.md",
+      "startLine": 22,
+      "endLine": 28,
+      "source": "memory",
+      "snippet": "- Re-check `frontend/src/pages/data-import-template/App.tsx` for any stale V0.1 wording, old designDoc links, old API comments, old `/api/supply-cores/data-import-template/{type}.xlsx` path, or mismatched field counts; expected API is `GET /api/supply-cores/data-import/templates/{type}`. - Inspect `DataImportOrchestrator.UploadAndValidateAsync` / `ConfirmAndApplyAsync` for handler routing, stream usage, batch status transitions, issue log persistence, and suspicious defaults such as `orgId = 0`. - Inspect six `IDataImportHandler` implementations to see whether placeholders return/throw `NotImplemented`, whether they count as failed rows, and whether that forces batch state `ValidationF",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-17T05:41:37.960Z",
+      "lastRecalledAt": "2026-05-17T05:41:37.960Z",
+      "queryHashes": [
+        "f8c18fc3815e"
+      ],
+      "recallDays": [
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "re-check",
+        "v0.1",
+        "return/throw",
+        "check",
+        "frontend",
+        "src",
+        "pages",
+        "data"
+      ]
+    },
+    "memory:memory/2026-05-17.md:1:16": {
+      "key": "memory:memory/2026-05-17.md:1:16",
+      "path": "memory/2026-05-17.md",
+      "startLine": 1,
+      "endLine": 16,
+      "source": "memory",
+      "snippet": "# 2026-05-17 ## Pre-compaction memory flush — Sprint 20k V0.2 focused review state - Context: Spencer asked for a re-check of Sprint 20k V0.2 revisions for SupplyCores / SupplyCore, especially the 9 commits spanning data governance import code and V0.2 onboarding/data collection docs. This turn was review/audit, not a request to continue large implementation changes. - Repositories/paths in play: - Implementation: `/Users/lihongjun/aizhetech/SupplyCores/modules/nova.supplycores` - Docs: `/Users/lihongjun/aizhetech/SupplyCore` - Internal roadmap: `/Users/lihongjun/aizhetech/SupplyCores/docs/internal/sprint-20k-20o-roadmap.md` - Quality gates already observed: - Frontend `npm run bui",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-17T05:41:37.960Z",
+      "lastRecalledAt": "2026-05-17T06:17:25.088Z",
+      "queryHashes": [
+        "f8c18fc3815e",
+        "41200d709213"
+      ],
+      "recallDays": [
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "pre-compaction",
+        "v0.2",
+        "re-check",
+        "onboarding/data",
+        "review/audit",
+        "repositories/paths",
+        "pre",
+        "compaction"
+      ]
+    },
+    "memory:memory/2026-05-17.md:49:61": {
+      "key": "memory:memory/2026-05-17.md:49:61",
+      "path": "memory/2026-05-17.md",
+      "startLine": 49,
+      "endLine": 61,
+      "source": "memory",
+      "snippet": "- `/Users/lihongjun/aizhetech/SupplyCores/modules/nova.supplycores/frontend/src/pages/data-import-template/App.tsx` - `/Users/lihongjun/aizhetech/SupplyCore/docs/上线/分批上线与基础数据采集计划-V0.2.md` - `/Users/lihongjun/aizhetech/SupplyCore/docs/上线/数据采集模板/00-数据采集总览-V0.2.md` - `/Users/lihongjun/aizhetech/SupplyCore/docs/上线/数据采集模板/01-组织与人员模板-V0.2.md` - `/Users/lihongjun/aizhetech/SupplyCore/docs/上线/数据采集模板/02-物资主数据模板-V0.2.md` - `/Users/lihongjun/aizhetech/SupplyCore/docs/上线/数据采集模板/03-供应商档案模板-V0.2.md` - `/Users/lihongjun/aizhetech/SupplyCore/docs/上线/数据采集模板/04-仓储基础数据模板-V0.2.md` - `/Users/lihongjun/aizhetech/SupplyCore/docs/上线/数据采集模板/05-财务与NC映射模板-V0.2.md` - `/Users/lihongjun/aizhetech/Supply",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-17T08:13:24.494Z",
+      "lastRecalledAt": "2026-05-17T08:13:24.494Z",
+      "queryHashes": [
+        "24df87ecfc9d"
+      ],
+      "recallDays": [
+        "2026-05-17"
+      ],
+      "conceptTags": [
+        "users/lihongjun/aizhetech/supply",
+        "users",
+        "lihongjun",
+        "aizhetech",
+        "supplycores",
+        "modules",
+        "nova.supplycores",
+        "frontend"
+      ]
+    },
+    "memory:memory/2026-05-17.md:142:156": {
+      "key": "memory:memory/2026-05-17.md:142:156",
+      "path": "memory/2026-05-17.md",
+      "startLine": 142,
+      "endLine": 156,
+      "source": "memory",
+      "snippet": "- Especially verify `material_code`, `legacy_code`, `original_category_code`, V1.8 coding rules, legacy category mapping, and whether old system values are preserved. - Interim migration judgment: - Some existing docs look stale or internally inconsistent: phrases like `material_code = legacy_code`, `M-XX-XX-NNNN`, 8 大类, `M-01-01-0001`, `M-02-01-0001` need further verification/update. - Current preferred migration approach: old-system engineer SQL outputs only `legacy_code` + `original_category_code`; SupplyCore uses business-provided “原→新 分类编码映射 Excel” plus V1.8 rules to automatically generate `material_code = XX-XX-XXXXXX`. - Migration review open TODOs: - Continue checking migrati",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-17T20:17:27.591Z",
+      "lastRecalledAt": "2026-05-17T22:47:30.358Z",
+      "queryHashes": [
+        "e265e8037fef",
+        "1382f23e9a73"
+      ],
+      "recallDays": [
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "material-code",
+        "legacy-code",
+        "original-category-code",
+        "v1.8",
+        "m-xx-xx-nnnn",
+        "m-01-01-0001",
+        "m-02-01-0001",
+        "verification/update"
+      ]
+    },
+    "memory:memory/2026-05-10.md:6:6": {
+      "key": "memory:memory/2026-05-10.md:6:6",
+      "path": "memory/2026-05-10.md",
+      "startLine": 6,
+      "endLine": 6,
+      "source": "memory",
+      "snippet": "te，价审驳回阻断流转）+ 09 ALR-PUR-PRICE-AUDIT-001 + RPT-PUR-PRICE-AUDIT；(D3) 03 M-05 加 `is_direct_eligible` + `direct_catalog_category` 直达分类标签（《可直达物资目录》集团物资管理部维护）。**F 类**：A1-A4 V0.1 → V0.2 git mv 重命名（路径 A） + 文档头标 V0.2 收口状态 + 4 项用户拍板复选框翻牌为已落结果（A1 6 个月 + D-90/D-30 / A2 全口径移动加权 / A3 月度集体决议名单制 / A4 集团并行会签）；同步更新业务方答复-3项冲突 V0.1 中的 V0.1 引用为 V0.2。**保留待业务方**：D2 能源集团目录非建设项目判断规则、D5 直达材料 vs 直达设备凭证差异（详设 08 BIZ 模板差异化）。第 四批触动文件：03/04/05/09/11 各加 V1.x{c} 或 V1.0b changelog 行；新增 RPT-INV-RECON / RPT-PUR-PRICE-AUDIT 共 2 张报表 + ALR-INV-RECON-001 / ALR-PUR-PRICE-AUDIT-001 共 2 条预警。",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-17T20:17:27.591Z",
+      "lastRecalledAt": "2026-05-18T11:40:18.873Z",
+      "queryHashes": [
+        "e265e8037fef",
+        "38a7a5cee9a5"
+      ],
+      "recallDays": [
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "alr-pur-price-audit-001",
+        "rpt-pur-price-audit",
+        "m-05",
+        "is-direct-eligible",
+        "direct-catalog-category",
+        "a1-a4",
+        "v0.1",
+        "v0.2"
+      ]
+    },
+    "memory:memory/2026-05-05.md:2:3": {
+      "key": "memory:memory/2026-05-05.md:2:3",
+      "path": "memory/2026-05-05.md",
+      "startLine": 2,
+      "endLine": 3,
+      "source": "memory",
+      "snippet": "- 2026-05-05 14:26 Spencer 指示将 A10/10A 确认文档放入评审留痕。已新建 `docs/详细设计/评审留痕/`，把 `10A-详设10V1.1修订建议清单-V1.1.md` 移入该目录，新增目录 README，并更新 10、10A、角色矩阵、开发实施引用索引和 README 中的引用；该清单定位为“已被主文档吸收的评审确认材料”，不再作为当前实施入口。 - 2026-05-05 15:33 Spencer 对 16 项待确认事项逐项答复：1A 继续等 Platform/Catio 回复；2A OAuth 凭据由集团 Nova 运维颁发；3A A-10/A-14 一期不建投影表；4A 冷归档上线前运维交接再定；5A 低库存/超储按物料档案 safety_stock/max_stock 各矿维护；6A 采购基准价用 standard_price；7A 看板最小主题采用库存/采购/合同付款/供应商/预警/设备租赁 6 类；8A 模板实施配置、消息平台落地后联调；9A 审批金额阈值按现行制度实施配置不写死；10B 只提醒不自动升级；11A 一期不加签用 Delegate/转办；12A token 2h/idle 30m/refresh 7d；13A RPO≤1h/RTO≤4h；14A 税率预置 13/9/6/0 财务实施确认；15A 并行运行不写固定天数按退出门；16A 数据库只写 PG 兼容国产信创原则不定品牌。已据此回写 09/10/10A/11 和交叉评审记录，并新增 `docs/详细设计/待外部确认事项汇总-V1.0.md`。",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-18T11:40:18.873Z",
+      "lastRecalledAt": "2026-05-18T11:40:18.873Z",
+      "queryHashes": [
+        "38a7a5cee9a5"
+      ],
+      "recallDays": [
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "a10/10a",
+        "docs/详细设计/评审留痕",
+        "10a-详设10v1.1修订建议清单-v1.1.md",
+        "platform/catio",
+        "a-10/a-14",
+        "低库存/超储按物料档案",
+        "safety-stock/max-stock",
+        "standard-price"
+      ]
+    },
+    "memory:memory/2026-05-05.md:5:6": {
+      "key": "memory:memory/2026-05-05.md:5:6",
+      "path": "memory/2026-05-05.md",
+      "startLine": 5,
+      "endLine": 6,
+      "source": "memory",
+      "snippet": "- 2026-05-05 14:26 Spencer 指示将 A10/10A 确认文档放入评审留痕。已新建 `docs/详细设计/评审留痕/`，把 `10A-详设10V1.1修订建议清单-V1.1.md` 移入该目录，新增目录 README，并更新 10、10A、角色矩阵、开发实施引用索引和 README 中的引用；该清单定位为“已被主文档吸收的评审确认材料”，不再作为当前实施入口。 - 2026-05-05 15:33 Spencer 对 16 项待确认事项逐项答复：1A 继续等 Platform/Catio 回复；2A OAuth 凭据由集团 Nova 运维颁发；3A A-10/A-14 一期不建投影表；4A 冷归档上线前运维交接再定；5A 低库存/超储按物料档案 safety_stock/max_stock 各矿维护；6A 采购基准价用 standard_price；7A 看板最小主题采用库存/采购/合同付款/供应商/预警/设备租赁 6 类；8A 模板实施配置、消息平台落地后联调；9A 审批金额阈值按现行制度实施配置不写死；10B 只提醒不自动升级；11A 一期不加签用 Delegate/转办；12A token 2h/idle 30m/refresh 7d；13A RPO≤1h/RTO≤4h；14A 税率预置 13/9/6/0 财务实施确认；15A 并行运行不写固定天数按退出门；16A 数据库只写 PG 兼容国产信创原则不定品牌。已据此回写 09/10/10A/11 和交叉评审记录，并新增 `docs/详细设计/待外部确认事项汇总-V1.0.md`。",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-18T11:40:18.873Z",
+      "lastRecalledAt": "2026-05-18T11:40:18.873Z",
+      "queryHashes": [
+        "38a7a5cee9a5"
+      ],
+      "recallDays": [
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "a10/10a",
+        "docs/详细设计/评审留痕",
+        "10a-详设10v1.1修订建议清单-v1.1.md",
+        "platform/catio",
+        "a-10/a-14",
+        "低库存/超储按物料档案",
+        "safety-stock/max-stock",
+        "standard-price"
+      ]
+    },
+    "memory:memory/2026-05-05.md:12:13": {
+      "key": "memory:memory/2026-05-05.md:12:13",
+      "path": "memory/2026-05-05.md",
+      "startLine": 12,
+      "endLine": 13,
+      "source": "memory",
+      "snippet": "- 2026-05-05 14:26 Spencer 指示将 A10/10A 确认文档放入评审留痕。已新建 `docs/详细设计/评审留痕/`，把 `10A-详设10V1.1修订建议清单-V1.1.md` 移入该目录，新增目录 README，并更新 10、10A、角色矩阵、开发实施引用索引和 README 中的引用；该清单定位为“已被主文档吸收的评审确认材料”，不再作为当前实施入口。 - 2026-05-05 15:33 Spencer 对 16 项待确认事项逐项答复：1A 继续等 Platform/Catio 回复；2A OAuth 凭据由集团 Nova 运维颁发；3A A-10/A-14 一期不建投影表；4A 冷归档上线前运维交接再定；5A 低库存/超储按物料档案 safety_stock/max_stock 各矿维护；6A 采购基准价用 standard_price；7A 看板最小主题采用库存/采购/合同付款/供应商/预警/设备租赁 6 类；8A 模板实施配置、消息平台落地后联调；9A 审批金额阈值按现行制度实施配置不写死；10B 只提醒不自动升级；11A 一期不加签用 Delegate/转办；12A token 2h/idle 30m/refresh 7d；13A RPO≤1h/RTO≤4h；14A 税率预置 13/9/6/0 财务实施确认；15A 并行运行不写固定天数按退出门；16A 数据库只写 PG 兼容国产信创原则不定品牌。已据此回写 09/10/10A/11 和交叉评审记录，并新增 `docs/详细设计/待外部确认事项汇总-V1.0.md`。",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-18T11:40:18.873Z",
+      "lastRecalledAt": "2026-05-18T11:40:18.873Z",
+      "queryHashes": [
+        "38a7a5cee9a5"
+      ],
+      "recallDays": [
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "a10/10a",
+        "docs/详细设计/评审留痕",
+        "10a-详设10v1.1修订建议清单-v1.1.md",
+        "platform/catio",
+        "a-10/a-14",
+        "低库存/超储按物料档案",
+        "safety-stock/max-stock",
+        "standard-price"
+      ]
+    },
+    "memory:memory/2026-05-18.md:1:1": {
+      "key": "memory:memory/2026-05-18.md:1:1",
+      "path": "memory/2026-05-18.md",
+      "startLine": 1,
+      "endLine": 1,
+      "source": "memory",
+      "snippet": "- 2026-05-18 重新评审原系统迁移工作：复核 docs/上线迁移方案、02/06 对照清单、02/06 数据采集模板、03 详设、编码规范，以及实现仓库 MaterialImportHandler / InitialStockImportHandler / EF migration。结论：主链路已成立（02 原系统 SQL 输出 legacy_code + original_category_code；M-18 映射到 V1.8 二级分类；MaterialCodeGenerator 生成无横杠新 material_code；06 期初库存按 material_code 字段兼容新编码或旧 legacy_code 反查）。发现并修复一个硬不一致：06 工程师对照清单仍要求 legacy_material_code，而模板和代码使用 material_code 双路径反查；已统一为字段名 material_code、字段值可用旧码。另修正文档中残留 material_code=legacy_code / 8大类/35二类/M-XX 旧口径，代码注释中高敏感物料前缀说明更新为 M-05 IsSafetySpecial + HG 新编码前缀 + M-02- 旧模板兜底。验证：`dotnet test test/Nova.SupplyCores.Application.Tests/Nova.SupplyCores.Application.Tests.csproj --no-build --filter \"FullyQualifiedName~DataImport\"` 通过 14",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-18T11:56:12.144Z",
+      "lastRecalledAt": "2026-05-18T11:56:12.144Z",
+      "queryHashes": [
+        "60d7731de657"
+      ],
+      "recallDays": [
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "docs/上线迁移方案",
+        "02/06",
+        "legacy-code",
+        "original-category-code",
+        "m-18",
+        "v1.8",
+        "material-code",
+        "legacy-material-code"
+      ]
+    },
+    "memory:memory/2026-05-18.md:1:2": {
+      "key": "memory:memory/2026-05-18.md:1:2",
+      "path": "memory/2026-05-18.md",
+      "startLine": 1,
+      "endLine": 2,
+      "source": "memory",
+      "snippet": "- 2026-05-18 重新评审原系统迁移工作：复核 docs/上线迁移方案、02/06 对照清单、02/06 数据采集模板、03 详设、编码规范，以及实现仓库 MaterialImportHandler / InitialStockImportHandler / EF migration。结论：主链路已成立（02 原系统 SQL 输出 legacy_code + original_category_code；M-18 映射到 V1.8 二级分类；MaterialCodeGenerator 生成无横杠新 material_code；06 期初库存按 material_code 字段兼容新编码或旧 legacy_code 反查）。发现并修复一个硬不一致：06 工程师对照清单仍要求 legacy_material_code，而模板和代码使用 material_code 双路径反查；已统一为字段名 material_code、字段值可用旧码。另修正文档中残留 material_code=legacy_code / 8大类/35二类/M-XX 旧口径，代码注释中高敏感物料前缀说明更新为 M-05 IsSafetySpecial + HG 新编码前缀 + M-02- 旧模板兜底。验证：`dotnet test test/Nova.SupplyCores.Application.Tests/Nova.SupplyCores.Application.Tests.csproj --no-build --filter \"FullyQualifiedName~DataImport\"` 通过 14",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-18T11:56:12.144Z",
+      "lastRecalledAt": "2026-05-18T11:56:12.144Z",
+      "queryHashes": [
+        "60d7731de657"
+      ],
+      "recallDays": [
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "docs/上线迁移方案",
+        "02/06",
+        "legacy-code",
+        "original-category-code",
+        "m-18",
+        "v1.8",
+        "material-code",
+        "legacy-material-code"
+      ]
+    },
+    "memory:memory/2026-05-10.md:9:10": {
+      "key": "memory:memory/2026-05-10.md:9:10",
+      "path": "memory/2026-05-10.md",
+      "startLine": 9,
+      "endLine": 10,
+      "source": "memory",
+      "snippet": "- 2026-05-10 CST Spencer 进一步指出原型仍不能完整演示全流程，尤其缺“分解采购任务”。已新增 `prototype/purchase-task-decomposition.html`，把 P-03 计划行合并/拆分为 P-05 采购任务的操作层补出来，并展示招采、直采、合同采购三类路径如何分别生成 T-01/T-03 或 S-01/S-02；同步导航、Mock 数据、README 和原型盘点清单，原型页数升为 39 页。 - 2026-05-10 CST Spencer 评审同事第一版 task-decomposition 后判断\"不如 B 方案\"，要求补到真 B。完成 5 项深化：(1) **mergeGroup 颜色组联动**：6 计划行 ↔ 5 任务用 A-E 五色绑定，左 4px border + 行内色块 + hover 同组联动高亮（含案例卡参与联动）；(2) **5-step flow 改\"全流程 Step 3 放大视图\"标注**：子步号改 3.1-3.5，header 加全流程 7 步导航 + \"返回 7 步\"按钮；(3) **P-05 任务表 7 → 12 列实例化**：补业务流向（外购入库/直达设备/外委检修/外购代储 各带 badge）+ 计划交付 + 紧急度（紧急/高/普通）+ 供应商或合同范围；(4) **合并案例 + 拆分案例两张高亮卡片**：合并案例 PT-001（综采+掘进备件 2 → 1）+ 拆分案例 PT-005（外委检修按管控独立），鼠标悬停案例卡联动同组行；(5) **演示动作可点击**：checkbox 解锁，5",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-18T12:19:20.080Z",
+      "lastRecalledAt": "2026-05-18T12:19:20.080Z",
+      "queryHashes": [
+        "1d76cd5859e8"
+      ],
+      "recallDays": [
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "p-03",
+        "计划行合并/拆分为",
+        "p-05",
+        "t-01/t-03",
+        "s-01/s-02",
+        "task-decomposition",
+        "a-e",
+        "5-step"
+      ]
+    },
+    "memory:memory/2026-05-10.md:10:11": {
+      "key": "memory:memory/2026-05-10.md:10:11",
+      "path": "memory/2026-05-10.md",
+      "startLine": 10,
+      "endLine": 11,
+      "source": "memory",
+      "snippet": "- 2026-05-10 CST Spencer 评审同事第一版 task-decomposition 后判断\"不如 B 方案\"，要求补到真 B。完成 5 项深化：(1) **mergeGroup 颜色组联动**：6 计划行 ↔ 5 任务用 A-E 五色绑定，左 4px border + 行内色块 + hover 同组联动高亮（含案例卡参与联动）；(2) **5-step flow 改\"全流程 Step 3 放大视图\"标注**：子步号改 3.1-3.5，header 加全流程 7 步导航 + \"返回 7 步\"按钮；(3) **P-05 任务表 7 → 12 列实例化**：补业务流向（外购入库/直达设备/外委检修/外购代储 各带 badge）+ 计划交付 + 紧急度（紧急/高/普通）+ 供应商或合同范围；(4) **合并案例 + 拆分案例两张高亮卡片**：合并案例 PT-001（综采+掘进备件 2 → 1）+ 拆分案例 PT-005（外委检修按管控独立），鼠标悬停案例卡联动同组行；(5) **演示动作可点击**：checkbox 解锁，5 个按钮（合并/拆分/重新预分解/确认 P-05/批量生成）均加 onclick alert 提示\"演示模式\"。数据调整：planLines 5 → 6 条（PP-01a + PP-01b 演示真实合并），加 `cases` 字段。`node --check` 通过。触动文件：assets/data.js（+102）、purchase-task-decomposition.html 整页重写、README v0.8 第 3 节描述扩到 8 条标注",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-18T12:19:20.080Z",
+      "lastRecalledAt": "2026-05-18T12:19:20.080Z",
+      "queryHashes": [
+        "1d76cd5859e8"
+      ],
+      "recallDays": [
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "task-decomposition",
+        "a-e",
+        "5-step",
+        "3.1-3.5",
+        "p-05",
+        "外购入库/直达设备/外委检修/外购代储",
+        "紧急/高/普通",
+        "pt-001"
+      ]
+    },
+    "memory:memory/2026-05-13.md:12:20": {
+      "key": "memory:memory/2026-05-13.md:12:20",
+      "path": "memory/2026-05-13.md",
+      "startLine": 12,
+      "endLine": 20,
+      "source": "memory",
+      "snippet": "- Spencer later sent `/review`; I noted SupplyCores latest submitted commit was `062db78 fix(Sprint 5a): Codex 评审...` and that the worktree also had uncommitted T-09 changes. To avoid mixed review, I reviewed only committed `062db78` (T-08 review-fix scope) and explicitly excluded uncommitted T-09 work. I checked `NovaSupplyCoresHttpApiModule.cs` and `SupplyCoresWebModule.cs` around controller registration/Swagger setup, then sent the复核 result to the group. - Important process preference from today: when reviewing in active multi-track work, avoid mixing uncommitted changes from other tracks; state the exact commit reviewed and exclusions clearly. ## 2026-05-13 16:26 Pre-compaction flush -",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 2,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-05-18T13:48:02.936Z",
+      "lastRecalledAt": "2026-05-18T13:53:55.925Z",
+      "queryHashes": [
+        "9e6fdac6771a",
+        "d3932933acdd"
+      ],
+      "recallDays": [
+        "2026-05-18"
+      ],
+      "conceptTags": [
+        "t-09",
+        "t-08",
+        "review-fix",
+        "novasupplycoreshttpapimodule.cs",
+        "supplycoreswebmodule.cs",
+        "registration/swagger",
+        "multi-track",
+        "pre-compaction"
       ]
     }
   }
