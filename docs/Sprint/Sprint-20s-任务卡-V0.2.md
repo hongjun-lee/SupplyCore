@@ -1,139 +1,141 @@
-# Sprint 20s 任务卡 V0.2（2026-05-18 cici 5 决策全 default 拍板 / Q3 标 cici Day 2 答保留 / NC 真联调主推 sprint / 待 Sprint 20r NC 启动后回填前置事实）
+# Sprint 20s 任务卡 V0.1（2026-05-19 main 整夜跑预先起草 / 占位 / 第 4 周期第 4 个 sprint / 第 6 批业务闭环 + NC 凭证导出 P0 真上线 + cici 决策 A 第二步触发 / 待 Sprint 20q D5 + Sprint 20r D3 满后启动 Day 1）
 
-**Sprint**：20s（紧续 20r NC 真联调启动 → 第 4 周期 5 Sprint 第 4 阶段 / NC 主推高峰）
-**主题**：NC 真联调 5 接口实测（BIZ-MR / RED / 007 / PAY / PAY-BATCH 全 / 真 NC 推送 + 真号回写 + 错误码 + Polly 重试实战 + Hangfire 监控）+ 审批闭环（驳回 / 撤销 / 审批历史）+ production runbook V0.2 → V0.3（试点单位实战修正）
-**节奏**：roadmap V0.1 §2.4 / NC 主推 sprint / 工作量 ~2.1 PD（vs 协调 sprint 20p+20q 1.2 PD 高 ~75% / 第 4 周期高峰）
-**性质**：**NC 真联调主推（第 4 周期高峰）+ 审批闭环 + runbook 实战升级 sprint**（vs 协调 sprint 20p/20q / vs NC 启动 sprint 20r / vs 收尾 sprint 20t）
-**V0.1 起草要点**（待 Sprint 20r 真正收口 + cici 拍板 5 决策）：
-- **NC 5 接口 grep 重大发现**：`Vouchers/Stubs/` 5 个 NC stub generator 全在仓（BizMrMaterialReturnStubGenerator / BizRedPurchaseReturnStubGenerator / Biz007CrossOrgTransferStubGenerator / BizPayPaymentStubGenerator / BizPayBatchPrepaymentStubGenerator）+ 14+ InterfaceCode Contributor（Biz002/003/004/005A/007/014/015/018/019/Chk001 等）+ NcInterfaceHttpClient + NcInterfaceMockClient + OAuth2 + Polly 全在 / **真接通基础完全 production-ready / 仅缺业务方 G-12 + NC 侧联调环境（Sprint 20r 触发条件）**
-- **审批闭环 grep 发现**：`ApprovalAppService.RejectAsync` + `ApprovalInstanceManager.RejectAsync` + `ApprovalInstanceStates.Rejected = "已退回"` 已实现 / **驳回基础完全在仓**；Cancel / Withdraw / 历史时间线 / 业务单回退通知 待补 / **闭环范围 = 撤销 + 历史 + 业务单回退集成**
-- **runbook V0.2 §十一+§十二 占位章节待 V0.3 实战补完**：V0.2 §十一 = Sprint 20n part 2 试点反馈修正占位 / §十二 = NC/财务接口准备占位 / V0.3 升版触发条件已明（§11.3 + §12.4）/ **Sprint 20s T-A3 把双占位章节升 V0.3 实战版**
-- roadmap V0.1 §2.4 维持（无撤销 / 工作量 2.1 PD 沿用 / Sprint 20s = NC 主推不是协调 sprint）
+**Sprint**：20s（第 4 周期第 4 个 sprint / 第 2 阶段延续 / 紧续 20p 采购协调 + 20q 合同协调 + 20r 审批 + NC 升级三 sprint）
+**主题**：**第 6 批模块业务闭环 + NC 凭证导出 P0 真上线（cici 决策 A）**
+**节奏**：业务闭环 sprint + NC 真上线 sprint 双重性质（vs Sprint 20p/20q 纯协调 / 20r 协调 + NC 升级双重）/ 工作量 ~1.0 PD 主线 + 0.6 PD second（wall-clock 2-3 天）
+**性质**：**业务闭环 + NC P0 真上线双重 sprint**（第 6 批模块业务闭环 + cici 决策 A 第二步触发 / 凭证导出 P0 实际操作 ≥ 1 次 / 财务=李建颖 + 物资=汤云龙双业务方）
+
+**V0.1 起草要点**（待 Sprint 20q D5 + Sprint 20r D3 满后 cici 拍板 V0.2）：
+
+- **触发条件（缺一不可 / 严格触发）**：
+  * **条件 1**：Sprint 20r D3 满（审批接入 + NC 真联调激活完整 / 46 Sprint 0 顺延维持）
+  * **条件 2**：cici NC 真上线决策（决策 A 第二步触发 / 凭证导出 P0 实际操作 / 业务方 G-12 推进）
+  * **条件 3**：第 6 批 backend done（main V0.2 Wave I/J part 进度 + Sprint 20p/20q/20r 累积闭环）
+- **NC 凭证导出 P0 真上线（cici 决策 A 第二步触发）**：
+  * 第一步（已 done）：Sprint 19r 凭证导出 + 接口预留双轨架构 / IVoucherFileStorage + wwwroot/{type}/ 月分桶 / SHA256 hash / sanitize 防 path traversal
+  * 第二步（本 sprint）：财务=李建颖 + 物资=汤云龙实际操作 ≥ 1 次 / 反馈窗口 ≥ 5 项收集
+- **第 6 批模块业务闭环**：
+  * 与 Sprint 20r T-A2 配对 / Apply 全 + 单测
+  * main V0.2 Wave I/J 起草 8 候选 + 17+ Permission 立修（库存 9 + NC 7 + VoucherManagement 1）作为前置基础
 
 ---
 
-## 一、Sprint 20r 收尾（前置事实 / 待 Sprint 20r 真正收口后回填 / 占位章节）
+## 一、前置事实（待 Sprint 20q D5 + Sprint 20r D3 满后回填）
 
-### 1.1 Sprint 20r 5 task 状态（占位待回填）
+### 1.1 Sprint 20q + 20r 待收口
 
-| Task | 主要交付 | 状态 |
-|---|---|---|
-| T-A1 | NC OAuth2 真接通 + 5 InterfaceCode UseMock=false 切换 + Hangfire 真路由 | ⏳ 待回填 |
-| T-A2 | 审批工作流引擎选型评估实施（自研 vs Workflow Core vs Elsa）| ⏳ 待回填 |
-| T-A3 | NC 真联调启动验收 + 业务方 G-12 协同 + 失败回退方案 | ⏳ 待回填 |
-| T-A4 | 第 4 批模块准入评估（NC 真接通 + 5 模块 production-ready 中间点）| ⏳ 待回填 |
-| T-A5 | Codex 20r 评审 + V0.x 升版 + memory + roadmap V0.3 修正 | ⏳ 待回填 |
+| Sprint | Task | 主要交付 | 状态 |
+|---|---|---|---|
+| Sprint 20q | T-A1-A5 | 合同协调 + 关联完整性 + 试点 demo + roadmap V0.2 §2.2 修正 / Codex 收敛 | ⏳ 待 D5 满 |
+| Sprint 20r | T-A1-A5 | 审批引擎 grep + 3 业务接入 + NC 真联调激活 + 双业务方 demo + Codex 收敛 | ⏳ 待 D3 满 |
 
-### 1.2 Sprint 20r 真正收口数字（占位待回填）
+### 1.2 Sprint 20q + 20r 真正收口数字（待回填）
 
 | 维度 | 数字 / 状态 |
 |---|---|
-| main 主代理 commits | ⏳ 待回填 |
-| Codex 评审 | ⏳ 待回填（目标 R5 = 0 finding 收敛）|
-| **46 Sprint 0 顺延** | ⏳ 待 Sprint 20r 真正收口确认（Sprint 20s 目标 = 47 Sprint）|
-| 关键 commit | ⏳ 待回填 |
+| Sprint 20q main 主代理 commits | TBD（Sprint 20q D5 满后）|
+| Sprint 20r main 主代理 commits | TBD（Sprint 20r D3 满后）|
+| Codex 评审累计轮 | TBD / 目标连续 0 finding 收敛 |
+| **47 Sprint 0 顺延** | **目标维持**（20p done = 44 / 20q done = 45 / 20r done = 46 / 20s done = 47）|
+| 关键 commit | TBD |
 
-### 1.3 NC 5 接口现状 grep 重大发现（来源 Sprint 20s V0.1 起草 / `modules/nova.supplycores/src/`）
+### 1.3 NC 凭证导出 P0 真上线前提 grep 实证（来源 Sprint 19r 实施 + Sprint 20r T-A3 激活）
 
-**NC 真接通基础已 production-ready / 仅缺业务方 G-12 + NC 侧联调环境**：
+**凭证导出 + 接口预留双轨架构 production-ready**（[[voucher-storage-pattern]] / Sprint 19r D1）：
 
-| InterfaceCode | Stub Generator（仓内路径）| 状态 |
+| 模块 | 实体清单 | 状态 |
 |---|---|---|
-| BIZ-MR（物料退库）| `Vouchers/Stubs/BizMrMaterialReturnStubGenerator.cs` | ✅ 在仓 |
-| RED（红字采购退货）| `Vouchers/Stubs/BizRedPurchaseReturnStubGenerator.cs` | ✅ 在仓 |
-| 007（跨组织调拨）| `Vouchers/Stubs/Biz007CrossOrgTransferStubGenerator.cs` | ✅ 在仓 |
-| PAY（付款）| `Vouchers/Stubs/BizPayPaymentStubGenerator.cs` | ✅ 在仓 |
-| PAY-BATCH（批量预付）| `Vouchers/Stubs/BizPayBatchPrepaymentStubGenerator.cs` | ✅ 在仓 |
+| IVoucherFileStorage | wwwroot/{type}/ 月分桶 / SHA256 hash / sanitize 防 path traversal | ✅ 19r D1 在仓 |
+| VoucherManagement | 双号制 / 12 列模板 / 重生成 API / 8 业务单按钮 | ✅ 19r D2 三轨并行 patch |
+| NC 单边架构 | OAuth2 + Polly + WireMock chaos + Health snapshot extended | ✅ 17a-19q 累积 production-ready |
+| Sprint 20r T-A3 | NC 真联调激活（UseMock=false / 凭证导出 + 凭证查询 2 接口先切）| ⏳ 待 Sprint 20r D2 实施 |
 
-**基础设施 production-ready**：
-- `NcInterfaceHttpClient` + `NcInterfaceMockClient`（双模式 UseMock 切换）
-- `NcOAuth2TokenService` + `NcOAuth2CachedToken`（[[oauth2-client-credentials-pattern]] 5 要点）
-- 14+ `InterfaceCode` Contributor（Biz002/003/004/005A/007/014/015/018/019/Chk001 等 / 全 InvokeAsync 通用模式）
-- `InterfaceHealthCheckService` + `InterfaceMonitorAppService`（监控基础）
-- `PeriodReverseAppService`（月结反结）
+**结论**：Sprint 20s 凭证导出 P0 真上线 = ① Sprint 20r T-A3 激活 done + ② 财务（李建颖）+ 物资（汤云龙）实际操作 ≥ 1 次 + ③ ≥ 5 项反馈收集 / 失败回退路径 = Sprint 20r Q3 A cici 拍板 UseMock=true 一键回退兜底。
 
-**结论**：NC 真联调基础完全 production-ready / **Sprint 20s 主要为业务方 G-12 触发后真 NC 推送 + 真号回写 + 错误码处理 + chaos 实战 / 不需重新开发基础**。
+### 1.4 第 6 批模块业务闭环前提 grep 实证（来源 Sprint 20p+20q+20r 累积 + main V0.2 Wave I/J）
 
-### 1.4 审批闭环现状 grep 发现（来源 Sprint 20s V0.1 起草 / `modules/nova.supplycores/src/`）
+**第 6 批 8 候选评分（main V0.2 起草 / 待 cici 拍板）**：
 
-**审批驳回基础已 production-ready / 撤销 + 历史 + 业务单回退集成待补**：
+| 候选 | 评分 | 性质 | 备注 |
+|---|---|---|---|
+| TBD-候选-1 | TBD | TBD | 待 Sprint 20q+20r D5 满后回填 + cici V0.2 拍板 |
+| TBD-候选-2 ~ 8 | TBD | TBD | 同上 |
 
-| 能力 | 仓内位置 | 状态 |
-|---|---|---|
-| `RejectAsync`（驳回 API）| `Application/Approvals/ApprovalAppService.cs:129` | ✅ 在仓 |
-| `ApprovalInstanceManager.RejectAsync` | `Domain/Approvals/ApprovalInstanceManager.cs:295` | ✅ 在仓 |
-| `ApprovalInstanceStates.Rejected = "已退回"` | `Domain/Approvals/ApprovalInstanceStates.cs:23` | ✅ 在仓 |
-| 第 1 节点退回 → 终态 Rejected（发起方需重新发起）| `Domain/Approvals/ApprovalInstanceManager.cs:314-316` | ✅ 在仓 |
-| `CancelAsync` / `WithdrawAsync`（撤销 API）| **缺失** | ⏳ Sprint 20s T-A2 新增 |
-| 审批历史时间线 endpoint | **缺失** | ⏳ Sprint 20s T-A2 新增 |
-| 驳回 → 业务单状态回退（自动 / 手动）| **决策待 cici Q3** | ⏳ Sprint 20s T-A2 实施 |
-| 多角色权限校验（驳回 / 撤销）| **待补充** | ⏳ Sprint 20s T-A2 实施 |
+**结论**：Sprint 20s T-A1 业务闭环范围 = ① cici V0.2 拍板第 6 批准入清单（≥ 1 模块）+ ② 与 Sprint 20r T-A2 配对 / Apply 全 + 单测 / 累积 [[feedback_sprint20m_full_loop_complete]] 模式（6 handler Apply 全 + 单测覆盖）。
 
-**结论**：审批基础 RejectAsync 完全在仓 / **Sprint 20s 闭环范围 = 撤销 API + 审批历史时间线 + 业务单回退集成 + 多角色权限校验 / 工作量 0.5 PD**。
+### 1.5 NC 接口 cici 决策 A 第二步触发前提（来源 [[po-meeting-2026-05-16-nc-voucher-export]]）
+
+**第一步（Sprint 19r 已 done）**：凭证导出 + 接口预留双轨 / NC 暂不上线 / 凭证文件交财务手动导入
+
+**第二步（Sprint 20s 触发）**：物资公司单边架构再次启停 / 业务方反馈 ≥ 10/9 触发 / cici 决策 A 第二步
+
+- **触发条件**：业务方反馈累计 ≥ 10 项（vs Sprint 19r 9/9 反馈到位的 1 项门槛）
+- **启停范围**：物资公司单边架构（NcInterfaceMockClient + NcInterfaceHttpClient + 8+ 实体）
+- **启停模式**：UseMock=true/false 切换（Sprint 20r Q3 A 一键回退兜底基础上）
+- **G-12 业务方推进**：业务方 G-12 持续推进 / NC 侧联调环境双触发
 
 ---
 
-## 二、Sprint 20s Task 清单（A 主轨 5 task / 总 ~2.1 PD / NC 主推 / 工作量略高 75%）
+## 二、Sprint 20s Task 清单（A 主轨 4 task / 1.0 PD + E 副轨 2 task / 0.6 PD / 总 1.6 PD）
 
-### A 主轨（main 主代理 a / NC 真联调主推 + 审批闭环 + runbook 实战 / 共 5 task / 2.1 PD）
+### A 主轨（main 主代理 / 业务闭环 + NC 真上线双重 sprint / 共 4 task / 1.0 PD）
 
 | Task | PD | 优先级 | 责任方 | 描述 | 前置依赖 | 验收口径 |
 |---|---|---|---|---|---|---|
-| **T-A1** NC 真联调 5 接口实测（BIZ-MR / RED / 007 / PAY / PAY-BATCH）| 0.6 | P0 | main 主代理 a + IT | ① 真 NC 推送（5 InterfaceCode 全跑通 / payload 实测）② 真号回写（NcVoucherNo 字段 8+ 实体 / webhook 或 poll）③ 错误码处理表（5xx / 业务错误码 / 部分成功）④ Polly 三层重试实战（retry / circuit breaker / timeout / chaos 5 场景）⑤ Hangfire 任务监控（每接口成功率 + 重试次数 + 失败原因 / 写到 `docs/internal/sprint-20s-nc-5-interface-validation.md`）| Sprint 20r T-A1 NC OAuth2 切换 done + NC 联调环境就绪 | 验证报告 ≥ 120 行 / 含 5 接口 grep + 错误码表 + chaos 实测 + Hangfire 监控截图 |
-| **T-A2** 审批闭环（驳回 / 撤销 / 审批历史 / 业务单回退）| 0.5 | P0 | main 主代理 a | ① 撤销 API（`ApprovalAppService.CancelAsync` + Manager / 已提交未审批可撤）② 审批历史时间线 endpoint（`GET /api/.../approval-instances/{id}/timeline`）③ 业务单回退集成（驳回 → 业务单 OnRejected 事件 + 通知发起人）④ 多角色权限校验（驳回 / 撤销 / 历史查询 / RBAC 集成）⑤ cici Q3 决策驳回后业务单状态机（自动回退草稿 vs 保留 + 提示）| Sprint 20r T-A2 审批引擎选型 done | RejectAsync 路径回归 + 新增 3 endpoint 测试 ≥ 90% / cici Q3 拍板入 V0.2 |
-| **T-A3** production runbook V0.2 → V0.3 实战修正项陆续到位 | 0.4 | P0 | main 主代理 a + cici 协调 | ① §十一占位 → V0.3 实战版（部署步骤验证 + 回退方案实测 + 备份恢复实测 + 试点单位反馈优化项）② §十二 NC/财务接口准备 → V0.3 NC 真接通启动后补完整（基于 T-A1 5 接口实测 + chaos 实战）③ §二 checklist + §四 部署步骤 + §五 验收 checklist + §七 故障排查 全 NC 真联调实战项补完 / Sprint 20n part 2 试点反馈数据吸收 | Sprint 20n part 2 试点反馈 ≥ 2 周 + T-A1 NC 5 接口实测 done | runbook V0.3 ≥ 700 行（vs V0.2 624 行 / 增 ~76 行）/ 双占位章节补完 |
-| **T-A4** NC 真联调 demo 业务方验收（cici 协调财务+物资+IT）| 0.2 | P0 | cici + 财务（李建颖）+ 物资（汤云龙）+ IT | ① cici 协调三方 demo（财务凭证导入 → 物资业务单 → IT 真接通监控）② 真接通验收清单（5 InterfaceCode 真号回写 ✅ / Polly chaos ✅ / 错误码处理 ✅ / Hangfire 监控 ✅）③ 反馈窗口（类 19r D1 9/9 模式）④ 反馈写到 `docs/internal/sprint-20s-nc-demo-feedback.md` | T-A1 + T-A2 done | 三方反馈 ≥ 5 项 / cici 拍板验收通过 |
-| **T-A5** Codex + V0.x 升版 + memory + **roadmap V0.2 §2.4 修正** | 0.4 | P0 | main 主代理 a | 标准收尾 + **roadmap V0.2 → V0.3 §2.4 修正**：① 基于 Sprint 20s T-A1 5 接口实测结果调整 Sprint 20t 第 4 周期收尾范围 ② 审批闭环 T-A2 实际工作量回填（0.5 PD vs 估算）③ runbook V0.3 升版实战章节补完工作量回填 ④ 47 Sprint 0 顺延达成（Sprint 20o 43 + 20p+20q+20r+20s = 47 Sprint）/ memory 升级 | Sprint 20s T-A1-A4 全 commit 完成 | Codex 0 顺延（Round 5 收敛目标）/ V0.x 锁版 / roadmap V0.3 §2.4 修正 done / memory commit |
+| **T-A1** 第 6 批模块业务闭环（与 Sprint 20r T-A2 配对 / Apply 全 + 单测）| 0.3 | P0 | main 主代理 a | ① 与 Sprint 20r T-A2 3 业务接入配对（采购+合同+出库 ApplyAsync 全闭环）② 第 6 批 cici V0.2 拍板模块 ApplyAsync 实施（[[feedback_sprint20m_full_loop_complete]] 6 handler Apply 全模式复用）③ 单测覆盖（每 handler ≥ 10 test / 累积 [[feedback_sprint20l_full_loop_complete]] 4 子代理 73 测试模板）④ DataSeedContributor 补全（sed 批量 [[feedback_sed_batch_contributor_template]] 加速）⑤ 写到 `docs/internal/sprint-20s-batch6-business-closure.md` | Sprint 20q+20r 收口 + main V0.2 Wave I/J cici 拍板 | 业务闭环报告 ≥ 100 行 / handler Apply 全闭环 + 单测覆盖率 ≥ 80% + DataSeed 覆盖 |
+| **T-A2** NC 凭证导出 P0 真上线（cici 决策 A / 财务+物资双业务方实际操作 ≥ 1 次）| 0.3 | P0 | main 主代理 a + cici 协调 | ① cici 协调财务（李建颖）实际操作凭证导出 ≥ 1 次（生成 → 下载 → 手动导入 NC 财务系统）② cici 协调物资（汤云龙）实际操作出库 / 入库凭证 ≥ 1 次 ③ 反馈窗口 ≥ 5 项收集（操作流畅度 / 凭证格式正确性 / NC 导入兼容性 / 错误处理 / 优化建议）④ 失败回退路径（Sprint 20r Q3 A UseMock=true 一键回退 / 凭证文件交付不受 NC 真联调影响 / 双轨架构隔离保证）⑤ 写到 `docs/internal/sprint-20s-nc-voucher-export-p0-go-live.md` | Sprint 20r T-A3+T-A4 done + cici Q1 决策（财务+物资先后顺序 vs 同步操作）| P0 真上线报告 ≥ 120 行 / 双业务方各 ≥ 1 次操作 + ≥ 5 项反馈 + 失败回退验证 |
+| **T-A3** NC 接口 cici 决策 A 第二步触发（物资公司单边架构再次启停 / 业务方反馈 ≥ 10/9）| 0.2 | P0 | main 主代理 a + cici 协调 | ① 业务方反馈累计盘点（Sprint 19r G-1~G-11 + Sprint 20p/20q/20r 试点反馈 + Sprint 20s T-A2 凭证导出反馈 ≥ 10/9 触发判断）② cici 决策 A 第二步触发条件评估（业务方反馈 ≥ 10 项 + cici 协调 NC 侧联调环境 + G-12 业务方推进）③ 启停范围确认（物资公司单边架构 UseMock=true → false 二次切换 / Sprint 20r 凭证导出 + 凭证查询 2 接口基础上扩展科目映射 / 反结 / 月结 3 接口）④ 触发回退条件（业务方反馈 < 10 项 / NC 联调环境延误 / G-12 推进失败 → Sprint 20t 主推或 Q3 末顺延）⑤ 写到 `docs/internal/sprint-20s-nc-interface-decision-a-step2.md` | T-A1+T-A2 done + cici Q2 决策（触发条件 ≥ 10/9 vs ≥ 15/9 严格阈值）| 决策报告 ≥ 80 行 / 业务方反馈盘点 + 触发条件评估 + 启停范围确认 + 回退路径 |
+| **T-A4** Codex Round 18 立修 + 复测 + V0.x 升版 + memory | 0.2 | P0 | main 主代理 a | 标准收尾 + Codex Round 18 立修 + 复测 + 0 finding 收敛目标（接续 Sprint 20o Round 5 / Sprint 20p Round 12 / Sprint 20q+20r Round 13-17 累计 0 收敛连续）/ Sprint 20s 任务卡 V0.x 升版 / memory 升级（47 Sprint 0 顺延 + Sprint 20s 业务闭环 + NC P0 真上线双重完整闭环）/ roadmap V0.2 → V0.3 §2.4 修正（如需）| Sprint 20s T-A1-A3 全 commit 完成 | Codex 0 顺延 / V0.x 锁版 / memory commit / roadmap V0.3 §2.4 修正 done（如需）|
 
-**main 总：~2.1 PD**（NC 主推 / 工作量略高于协调 sprint 75% / 第 4 周期高峰）
+**main 总：~1.0 PD**（vs Sprint 20r 1.3 PD / 第 6 批准入清单收敛 + Sprint 20r 累积闭环基础 / 省 0.3 PD）
 
-### E 副轨（second 主代理 e / 条件性 / cici Q5 拍板后启动 / 共 ~0.6 PD）
+### E 副轨（second 主代理 e / 条件性 / cici Q3 拍板后启动 / 共 2 task / 0.6 PD）
 
 | Task | PD | 状态 | 说明 |
 |---|---|---|---|
-| **T-E1** NC 真联调监控 dashboard 完整化 | 0.3 | pending | Token 刷新状态 + Polly chaos 实时 + 5 接口调用统计 + 真号回写成功率 + InterfaceHealthCheckService 集成 |
-| **T-E2** 审批闭环 UI polish | 0.2 | pending | 驳回 modal + 撤销 modal + 审批历史时间线组件 + 业务单状态回退提示 |
-| **T-E3** e2e spec 补 | 0.1 | pending | `nc-interface.spec.ts`（5 接口）+ `approval-cycle.spec.ts`（驳回 / 撤销 / 历史 / 业务单回退）|
+| **T-E1** 第 6 批前端业务闭环（second 配对）| 0.3 | pending | 与 main T-A1 第 6 批模块配对 / DevExtreme 列表 + 表单 + Excel 导入导出 / [[reference_team_tech_stack]] DevExtreme + ExcelJS / ClosedXML 模式复用 / 单测覆盖 |
+| **T-E2** 物资全景看板 P0 backend + 前端（cici 第 6 批拍板）| 0.3 | pending | 物资全景看板 P0：① backend AppService + Reports/Dashboards 集成（[[reference_voucher_storage_pattern]] 模式复用）② 前端 DevExtreme dashboard + Reports（[[feedback_dual_session_19t_continuous_validation.md]] Reports/Dashboards 累积 14+ 次）③ 累积第 6 批 cici 拍板优先级 P0 |
 
 ### D 顺延说明
 
-- ~~D 线 NC/财务接口顺延~~：**Sprint 20r 已激活 / Sprint 20s 正式真联调 / D 线高峰**
-- T-B1-B5 Sprint 20n part 2 协调试点：**与 Sprint 20s 并行 / 不阻塞 / 试点反馈 ≥ 2 周供 T-A3 runbook V0.3 升版**
+- ~~第 6 批模块完整业务闭环（全 8 候选）~~：**Sprint 20t 主推**（20s 仅 cici 拍板优先级 P0 模块 / ≥ 1 模块）
+- ~~NC 真联调 5 接口全切真~~：**Sprint 20t 主推**（20s 仅扩展科目映射 / 反结 / 月结 3 接口判断）
 
 ---
 
 ## 三、关键节奏
 
-### 3.1 Sprint 20s 性质（NC 主推 sprint / vs Sprint 20r NC 启动对比）
+### 3.1 Sprint 20s 性质（业务闭环 + NC P0 真上线双重 / vs Sprint 20p/20q/20r 对比）
 
-| 维度 | Sprint 20r（NC 启动）| **Sprint 20s（NC 主推）** |
-|---|---|---|
-| NC 状态 | UseMock=false 切换 + OAuth2 真接通 | **5 InterfaceCode 真联调 + chaos 实战 + 真号回写自动化** |
-| Main PD | ~1.3 | **~2.1（NC 主推 / 工作量高 50-75%）** |
-| 主轨任务数 | 5（A1-A5）| 5（A1-A5）|
-| 风险 | NC 启动失败回退方案 | **真号回写错误 + 业务方验收风险 + Polly chaos 不完整** |
-| 业务方协调 | G-12 推进（cici）| **三方 demo（财务+物资+IT / cici 协调高负载）** |
-| 子代理 | 1-2 spawn | **2-3 spawn（T-A1 5 接口 grep + T-A2 撤销 API + runbook V0.3）** |
+| 维度 | Sprint 20p/20q（纯协调）| Sprint 20r（协调 + NC 升级双重）| **Sprint 20s（业务闭环 + NC P0 真上线双重）** |
+|---|---|---|---|
+| 主轨任务数 | 5（A1-A5）| 5（A1-A5）| 4（A1-A4）|
+| 主轨总 PD | ~1.2 | ~1.3 | ~1.0 |
+| 验证范围 | 1 模块 | 审批 + NC（4 业务 + 5 接口）| **第 6 批 ≥ 1 模块 + NC 凭证导出 P0 双业务方实操** |
+| NC 状态 | 顺延 | 真联调激活（D 线升级 / 2 接口切真）| **P0 真上线（凭证导出 + 决策 A 第二步触发评估）** |
+| cici 协调强度 | 试点扩大 | NC 侧联调环境 + G-12 双触发 | **财务+物资双业务方实操 + 决策 A 第二步触发** |
+| 业务方协调依赖 | 高（试点反馈）| 高（NC demo 双业务方 + 网络）| **极高（双业务方实操 + 反馈 ≥ 5 项 + 决策 A 触发评估）** |
+| 主轴战略 | 采购 / 合同试点 | 审批接入 + D 线激活第一步 | **第 6 批业务闭环 + NC P0 真上线 + D 线第二步评估** |
+| 子代理 | 1-2 | 1-2 | 2-3（business closure handler + Apply 全 spawn）|
 
 ### 3.2 wall-clock 估算
 
-- main 主轨：3-4 天（NC 5 接口实测 +1 天 / vs Sprint 20r 2 天）
-  * Day 1：T-A1（0.3 PD / 5 接口 grep + payload 实测前 2 接口）
-  * Day 2：T-A1（0.3 PD / 5 接口 chaos 实战 + Hangfire 监控）+ T-A2（0.3 PD / 撤销 API + 审批历史）
-  * Day 3：T-A2（0.2 PD / 业务单回退 + RBAC）+ T-A3（0.4 PD / runbook V0.3 升版）
-  * Day 4：T-A4（0.2 PD / cici demo 协调）+ T-A5（0.4 PD / Codex + V0.x + roadmap V0.3 §2.4）
-- 业务方验收：cici 协调多方 / 不确定（多 demo 反馈窗口）
-- part 2 协调：3-4 周持续（与 Sprint 20s 并行 / 不阻塞）
+- main 主轨：2-3 天
+  * Day 1：T-A1（0.3 PD / 第 6 批模块业务闭环 / 2 子代理 spawn）
+  * Day 2：T-A2（0.3 PD / NC 凭证导出 P0 双业务方实操 / cici 协调）
+  * Day 3：T-A3（0.2 PD / NC 决策 A 第二步触发评估）+ T-A4（0.2 PD / Codex Round 18 立修 + V0.x 升版 + memory）
+- 触发条件等待：Sprint 20q D5 + Sprint 20r D3 满 + cici NC 真上线决策 + main V0.2 Wave I/J 第 6 批拍板（不确定 / 取决于业务方协调）
+- second 副轨：与 main 并行 / 0.6 PD / 2-3 天
 
-### 3.3 第 4 周期 5 Sprint 节奏（V0.1 起草时状态）
+### 3.3 第 4 周期第 2 阶段延续节奏
 
 | Sprint | 性质 | 工作量 | 备注 |
 |---|---|---|---|
-| Sprint 20p | 协调 + 试点验证 + UI 完善 | 1.2 PD | ✅ done（V0.2 cici 拍板）|
-| Sprint 20q | 合同模块 协调 sprint（推测 / 待回填）| 1.2 PD（推测）| ⏳ 待回填 / 类 20p 协调模式 |
-| Sprint 20r | NC 真联调启动 | 1.3 PD | ⏳ 待 NC 启动 / Sprint 20s 前置 |
-| **Sprint 20s（本）** | **NC 主推 + 审批闭环 + runbook V0.3** | **2.1 PD** | **第 4 周期高峰** |
-| Sprint 20t | 第 4 周期收尾 + Q3 末 production deployment | 2.2 PD | 硬截止 deadline |
+| Sprint 20p（已 done）| 采购协调 | 1.2 PD | 44 Sprint 0 顺延 |
+| Sprint 20q（待 done）| 合同协调 | 待 V0.2 | 45 Sprint 0 顺延（目标）|
+| Sprint 20r（待 done）| 审批协调 + NC 升级双重 | 1.3 PD | 46 Sprint 0 顺延（目标）/ D 线激活第一步 |
+| **Sprint 20s（本）** | **第 6 批业务闭环 + NC P0 真上线双重** | **1.0 PD 主线 + 0.6 PD second** | **47 Sprint 0 顺延（目标）/ D 线 P0 真上线 / 决策 A 第二步评估** |
+| Sprint 20t | 第 4 周期收尾 + 第 6 批完整闭环 + NC 5 接口全切真 + Q3 末 production deployment | ~2.2 PD | 硬截止 deadline |
 
 ---
 
@@ -141,11 +143,11 @@
 
 | # | 决策 | 选项 | 推荐 | **cici 拍板** |
 |---|---|---|---|---|
-| **Q1** | T-A1 5 接口实测顺序 | A. 全 5 接口并行（最快 / 风险高）/ B. 按业务优先级 BIZ-MR → PAY → PAY-BATCH → 007 → RED（业务方关心顺序）/ C. 按风险升序 BIZ-MR（最易）→ PAY → 007 → RED → PAY-BATCH（最难） | **B 默认**（业务方优先级高 / 财务+物资 demo 同期推进 / cici 决策窗口对齐）| ✅ **B 拍板**（cici 2026-05-18 / 业务优先级 BIZ-MR → PAY → PAY-BATCH → 007 → RED / 业务方关心顺序 / 财务+物资 demo 同期推进）|
-| **Q2** | T-A3 runbook V0.3 升级深度 | A. 大幅（V0.2 → V0.3 完整重构 / 增 ~200 行 / 0.6 PD）/ B. 核心实战修正（§十一+§十二 双占位补完 + §二/四/五/七 实战项补 / 增 ~76 行 / 0.4 PD）/ C. 微调（仅 §十二 NC 真接通补完 / 增 ~30 行 / 0.2 PD）| **B 默认**（双占位章节 V0.3 升版触发条件已明 / 试点反馈 + NC 真联调实战必须吸收 / 0.4 PD 合理）| ✅ **B 拍板**（cici 2026-05-18 / core 升级 / §十一+§十二 双占位补完 + §二/四/五/七 实战项补 / 增 ~76 行 / 0.4 PD）|
-| **Q3** | 审批闭环驳回后业务单状态机 | A. 自动回退到草稿状态（用户体验好 / 业务单状态机重新设计）/ B. 保留待审批状态 + 提示用户重新发起（最简 / 兼容现 Rejected 终态模式）/ C. cici Day 2 答（基于 T-A2 撤销 API 实施情况）| **C 默认**（Day 2 撤销 API 实施情况影响业务单状态机设计 / 不预先拍板防返工）| ✅ **C 拍板 / cici Day 2 答**（cici 2026-05-18 / 状态保留 / 基于 Sprint 20s T-A2 撤销 API 实施情况 cici Day 2 拍板 / 防返工）|
-| **Q4** | NC demo 业务方验收范围 | A. 财务（李建颖）+ 物资（汤云龙）+ IT 三方（最完整 / cici 协调高负载）/ B. 仅财务（李建颖凭证导入验收 / 最聚焦）/ C. 仅 cici demo（cici 验收后再扩展 / 最低风险）| **A 默认**（NC 真接通涉及三方协同 / 19r D1 9/9 反馈模式成熟 / cici 协调负载可控）| ✅ **A 拍板**（cici 2026-05-18 / 财务李建颖 + 物资汤云龙 + IT 三方 demo 验收 / 19r D1 9/9 反馈模式复用）|
-| **Q5** | second e 副轨范围 | A. T-E1+T-E2+T-E3 全（NC 监控 + 审批 UI + e2e / 0.6 PD）/ B. 仅 T-E1 NC dashboard（0.3 PD / 简化）/ C. 暂停（类 20o）| **A 默认**（NC 真联调需 dashboard 监控真数据 / 审批闭环 UI 必须同步 / second 第 13+ 次连续 / 模块切换至 NC + 审批）| ✅ **A 拍板**（cici 2026-05-18 / second e T-E1+T-E2+T-E3 全启动 0.6 PD / NC dashboard + 审批 UI + e2e / 模块切到 NC + 审批）|
+| **Q1** | T-A2 NC 凭证导出 P0 双业务方实操顺序 | A. 财务（李建颖）+ 物资（汤云龙）同步操作（demo 反馈窗口稳定 / Sprint 20r Q4 A 模式延续）/ B. 财务先 + 物资后（分阶段降风险）/ C. 物资先 + 财务后（出库凭证频次高优先验证）| **A 默认**（Sprint 20r Q4 A cici 已拍板双业务方同步 demo / [[po-meeting-2026-05-16-nc-voucher-export]] 2 业务方对接人已明确 / demo 反馈窗口稳定 / 节省 cici 协调成本）| ⏳ **待 Sprint 20q+20r 收口后 V0.2 拍板** |
+| **Q2** | T-A3 NC 决策 A 第二步触发条件阈值 | A. 业务方反馈累计 ≥ 10/9（宽松阈值 / 接续 19r 9/9 反馈模式 / 自然递增 1 项）/ B. ≥ 15/9（严格阈值 / 保证反馈质量）/ C. 不设阈值 / 仅 cici 主观决策 | **A 默认**（Sprint 19r 已实证 9/9 反馈到位模式 / Sprint 20p+20q+20r 累积反馈自然递增 / 阈值 ≥ 10 项触发评估合理 / B 阈值过高可能延误 D 线第二步）| ⏳ **待 Sprint 20q+20r 收口后 V0.2 拍板** |
+| **Q3** | second e 副轨范围 | A. T-E1+T-E2 全（0.6 PD / 14 次连续 / 第 6 批前端 + 物资看板 P0）/ B. 仅 T-E1（0.3 PD / 简化）/ C. 暂停（类 Sprint 20o）| **A 默认**（second e 第 14 次连续 / 第 6 批前端配对 + 物资看板 P0 真正影响业务闭环 / 模块切换成本可接受 / 累积 [[feedback_dual_session_19t_continuous_validation]] 14+ 次模板）| ⏳ **待 Sprint 20q+20r 收口后 V0.2 拍板** |
+| **Q4** | T-A2 凭证导出反馈失败回退策略 | A. UseMock=true 一键回退（Sprint 20r Q3 A 模式延续）/ B. 仅凭证导出回退 / NC 接口保持真联调 / C. 双轨架构隔离保证 / 反馈失败不影响凭证文件交付路径 | **C 默认**（[[voucher-storage-pattern]] 双轨架构 IVoucherFileStorage + NC 真联调路径独立 / 反馈失败不影响凭证文件交付 / Sprint 19r 已实证双轨架构隔离 / A 作为最坏情况兜底）| ⏳ **待 Sprint 20q+20r 收口后 V0.2 拍板** |
+| **Q5** | T-A1 第 6 批模块准入优先级 P0 | A. main V0.2 Wave I/J 第 6 批 8 候选评分前 1 模块（cici 拍板）/ B. 前 2 模块（保险范围）/ C. 全 8 候选（贪心 / 风险高）| **A 默认**（[[main_orchestrator_default_spawn]] 不做范围外扩展 / Sprint 20s 主线 1.0 PD 范围内 ≥ 1 模块业务闭环 + 单测覆盖更稳健 / 全 8 候选 Sprint 20t 主推）| ⏳ **待 Sprint 20q+20r 收口后 V0.2 拍板** |
 
 ---
 
@@ -153,39 +155,41 @@
 
 ### 5.1 高风险
 
-- **NC 真联调 5 接口实测错误码 / 真号回写 / chaos 实战不完整**：NC 侧错误码协议可能与 NCC OpenAPI 公开资料不完全一致 / 真号回写 webhook vs poll 模式 cici Q1 拍板待 Sprint 20r 启动后定 / Polly chaos 5 场景 WireMock 实测 vs 真 NC 环境差异
-  * **缓解**：T-A1 验证报告 ≥ 120 行 / 错误码表完整 / Polly chaos 5 场景实测留痕 / 失败回退方案文档化 / Sprint 20r T-A3 失败回退方案前置
-- **业务方验收不通过（cici 协调失败 5 月反模式 #1 cici 单点）**：NC demo 三方协同 / cici 协调负载显著 / 反馈窗口不稳定风险
-  * **缓解**：T-A4 反馈窗口模式参考 [[feedback_business_party_coordination_failure]] / cici demo 前 1 天准备反馈表 / 19r D1 9/9 反馈模式复用
+- **NC P0 真上线双业务方实操延误（cici 单点）**：财务（李建颖）+ 物资（汤云龙）双业务方协调持续依赖 cici / 5 月反模式根因 #1 cici 单点保留
+  * **缓解**：T-A2 文档 ≥ 120 行明确实操流程 + 反馈窗口模板 / Q4 C 双轨架构隔离保证 / 凭证文件交付不受 NC 真联调影响 / Sprint 20t 主推可顺延
+- **NC 决策 A 第二步触发条件不满足（业务方反馈 < 10/9）**：业务方反馈累计未达阈值
+  * **缓解**：Q2 A 阈值 ≥ 10/9 宽松设计 / Sprint 20p+20q+20r+20s 自然递增 / 不强求 20s 触发 / Sprint 20t 主推
+- **第 6 批模块准入清单延误（main V0.2 Wave I/J 待 cici 拍板）**：cici V0.2 拍板进度依赖
+  * **缓解**：Q5 A 优先级 P0 ≥ 1 模块即可 / Sprint 20t 全 8 候选主推 / [[main_orchestrator_default_spawn]] 不做范围外扩展
 
 ### 5.2 中风险
 
-- **审批闭环驳回业务单状态机重新设计 / cici Q3 Day 2 答风险**：驳回 → 业务单 OnRejected 事件 + 通知发起人 / 状态机回退路径复杂
-  * **缓解**：T-A2 Day 2 撤销 API 实施后 cici Q3 拍板入 V0.2 / 状态机回退路径单测覆盖 ≥ 90%
-- **runbook V0.3 实战修正项不足（试点反馈 ≥ 2 周条件未达）**：Sprint 20n part 2 试点反馈累积速度可能 < 2 周
-  * **缓解**：T-A3 优先吸收 NC 真联调 chaos 实战 / 试点反馈不足时 §十一占位章节 V0.3 部分补完 / 剩余 Sprint 20t T-A3 续推
+- **NC 真联调激活失败回退（Sprint 20r Q3 A 兜底）**：UseMock=true 一键回退 / 影响 T-A2 凭证导出 P0 真上线路径
+  * **缓解**：Q4 C 双轨架构隔离保证 / 凭证文件交付独立 / Sprint 20r T-A3 切真验证后再 P0 实操
+- **第 6 批模块业务闭环 Apply 复杂度（业务侧）**：handler ApplyAsync 全闭环改动面可能扩散
+  * **缓解**：T-A1 优先 1 模块（Q5 A）pilot 实施 / [[feedback_sprint20m_full_loop_complete]] 6 handler Apply 全模式复用 / 单测覆盖率 ≥ 80% 保证
 
 ### 5.3 低风险
 
-- **OAuth2 + Polly + WireMock chaos 已实测**（[[oauth2-client-credentials-pattern]] 5 要点 Sprint 17a 验证）
-- **NC 单边架构基础成熟**（17a-19q 单边架构 + 凭证导出 production-ready）
-- **NC 5 接口 Stub Generator 全在仓**（`Vouchers/Stubs/` 5 文件确认）
-- **审批 RejectAsync 基础完全在仓**（[[carryover-task-verify-first]] / Sprint 20s grep 模式延续）
-- **NC 真联调 chaos 防御链**（Polly 三层 + WireMock 5 场景 + Hangfire 监控 + dashboard NcSuccessRate）
+- **凭证导出双轨架构在仓**（Sprint 19r D1+D2 已实证 / [[voucher-storage-pattern]]）
+- **NC 单边架构 + OAuth2 + Polly + chaos 已实测**（17a-19q 累积 + Sprint 20r T-A3 激活验证）
+- **第 6 批 17+ Permission 立修已 done**（main V0.2 Wave F+G+H+I+J / 库存 9 + NC 7 + VoucherManagement 1）
+- **second e 第 14 次连续模块切换模式成熟**（[[feedback_dual_session_19t_continuous_validation]]）
 
 ### 5.4 主要依赖
 
-- Sprint 20r NC 真联调启动 done（前置 / Sprint 20s T-A1 触发）
-- Sprint 20n part 2 试点反馈累积 ≥ 2 周（Sprint 20s T-A3 runbook V0.3 升版触发）
+- Sprint 20q D5 完整收口（前置）
+- Sprint 20r D3 完整收口 / NC 真联调激活 done（前置 / 缺一不可）
+- main V0.2 Wave I/J 第 6 批准入清单 cici 拍板（前置 / Q5 A）
 - cici 拍板 5 决策点（Q1-Q5）
-- 业务方 G-12 NC OAuth2 凭证 + NC 侧联调环境维持稳定（Sprint 20r 触发后 Sprint 20s 持续）
-- cici 协调财务+物资+IT 三方 demo 窗口（T-A4）
+- cici 协调财务（李建颖）+ 物资（汤云龙）双业务方实操（T-A2 / Q1）
+- cici NC 真上线决策（决策 A 第二步触发条件 ≥ 10/9 / Q2）
 
 ---
 
 ## 六、对外汇报口径
 
-> Sprint 20s 第 4 周期第 4 阶段 NC 真联调主推：NC 5 接口实测（BIZ-MR / RED / 007 / PAY / PAY-BATCH 全真接通 + 真号回写 + chaos 实战 + Hangfire 监控）+ 审批闭环（驳回 + 撤销 + 历史 + 业务单回退 + RBAC）+ production runbook V0.2 → V0.3（双占位章节实战补完）+ 三方业务方 demo 验收（财务+物资+IT）/ 目标 47 Sprint 0 顺延达成（Sprint 20o 43 + 20p+20q+20r+20s = 47）。NC 单边架构 17a-19q 累积转为真联调 production-ready / 第 4 周期高峰 sprint。
+> Sprint 20s 第 4 周期第 4 个 sprint / 第 2 阶段延续 / 业务闭环 + NC P0 真上线双重性质：第 6 批模块业务闭环（与 Sprint 20r T-A2 配对 / Apply 全 + 单测）+ **NC 凭证导出 P0 真上线（cici 决策 A 第二步触发 / 财务（李建颖）+ 物资（汤云龙）双业务方实际操作 ≥ 1 次 / 反馈 ≥ 5 项）** + NC 接口决策 A 第二步触发评估（业务方反馈 ≥ 10/9）/ 47 Sprint 0 顺延维持目标。凭证导出双轨架构 production-ready（Sprint 19r D1+D2）+ NC 真联调激活完整（Sprint 20r T-A3）+ 第 6 批 17+ Permission 立修在仓（main V0.2 Wave F+G+H+I+J）/ Sprint 20q D5 + Sprint 20r D3 满 + cici NC 真上线决策三触发条件后启动 Day 1。
 
 ---
 
@@ -193,30 +197,31 @@
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
-| V0.2 | 2026-05-18 | **cici 5 决策全 default 拍板**：Q1 B（业务优先级 BIZ-MR → PAY → PAY-BATCH → 007 → RED）/ Q2 B（core 升级 / §十一+§十二 双占位补完 + §二/四/五/七 实战项补 / 增 ~76 行 / 0.4 PD）/ **Q3 C 拍板 / cici Day 2 答保留**（基于 T-A2 撤销 API 实施情况 cici Day 2 拍板）/ Q4 A（财务李建颖 + 物资汤云龙 + IT 三方 demo 验收 / 19r D1 9/9 反馈模式复用）/ Q5 A（second e T-E1+T-E2+T-E3 全启动 0.6 PD / NC dashboard + 审批 UI + e2e / 第 13+ 次连续）/ 主要工作维持 V0.1 5 task 2.1 PD（NC 主推 sprint）|
-| V0.1 | 2026-05-17（待 Sprint 20r NC 启动后 cici 拍板升 V0.2 / 预计 2026-05-20+）| main 主代理 a 起草 / NC 主推 sprint / 5 task ~2.1 PD（vs 协调 sprint 20p 1.2 PD 高 75%）/ NC 5 接口 grep 重大发现（5 Stub Generator + 14+ Contributor 全在仓）/ 审批闭环 grep 发现（RejectAsync 完全在仓 / Cancel + 历史 + 业务单回退集成待补 / 工作量 0.5 PD）/ runbook V0.2 §十一+§十二 占位章节升 V0.3 实战版触发条件已明 / 5 决策待 cici V0.2 答（Q1 5 接口实测顺序 / Q2 runbook V0.3 升级深度 / Q3 驳回后业务单状态机 cici Day 2 答 / Q4 三方 demo 验收范围 / Q5 second e 副轨范围）/ T-A5 含 roadmap V0.2 → V0.3 §2.4 修正提示 |
+| V0.1 | 2026-05-19（main 整夜跑预先起草 / 占位 / 待 Sprint 20q D5 + Sprint 20r D3 满 + cici NC 真上线决策三触发后启动 Day 1）| main a 起草 / 业务闭环 + NC P0 真上线双重性质 / 4 主轨 task ~1.0 PD + 2 副轨 task 0.6 PD / 5 开放问题待 Sprint 20q+20r 收口后 cici V0.2 答（Q1 双业务方实操顺序 / Q2 触发阈值 / Q3 second 副轨范围 / Q4 反馈失败回退 / Q5 第 6 批准入优先级）/ 触发条件：① Sprint 20r D3 满 ② cici NC 真上线决策 ③ 第 6 批 backend done |
 
 ---
 
-**Created**: 2026-05-17 / Sprint 20p 第 4 周期开局 V0.2 后 + 第 3 周期数据治理收尾 → Sprint 20s V0.1 起草 / 待 Sprint 20r NC 启动后回填前置事实 + cici 拍板 5 决策 / **预计 2026-05-25+ 启动 Day 1** / main 主代理 a
+**Created**: 2026-05-19 / Sprint 20p Day 1 done + Sprint 20q D5 + Sprint 20r D3 待收口 → 20s V0.1 起草（提前占位 / main 整夜跑预先起草 / 待 Sprint 20q D5 + Sprint 20r D3 满 + cici NC 真上线决策三触发后启动 Day 1）/ main 主代理 a
 
 **Related**:
-- [`Sprint-20p-任务卡-V0.2.md`](Sprint-20p-任务卡-V0.2.md)（同 cycle 协调 sprint 模板 / 5 task 1.2 PD / cici 5 决策全默认拍板）
-- [`Sprint-20n-任务卡-V0.4.md`](Sprint-20n-任务卡-V0.4.md)（协调 sprint Wave 1 完整闭环参考 / Round 14 0 finding 收敛）
-- [`Sprint-20m-任务卡-V0.2.md`](Sprint-20m-任务卡-V0.2.md)（开发 sprint 完整闭环参考 / Round 10 首次 0 finding 收敛）
-- [`../../SupplyCores/docs/internal/sprint-20p-20t-roadmap.md`](../../SupplyCores/docs/internal/sprint-20p-20t-roadmap.md) V0.1（第 4 周期 roadmap / §2.4 Sprint 20s NC 真联调主推 + 审批闭环 / 待 T-A5 修正 V0.3）
-- [`../../SupplyCores/docs/部署/production-deployment-runbook-V0.2.md`](../../SupplyCores/docs/部署/production-deployment-runbook-V0.2.md)（V0.2 → V0.3 实战升级 / T-A3 主轨 / §十一+§十二 双占位章节）
-- [`../../SupplyCores/docs/internal/sprint-20k-20o-retrospective.md`](../../SupplyCores/docs/internal/sprint-20k-20o-retrospective.md) V0.1（第 3 周期复盘）
-- [[feedback_codex_0_carryover_8_sprint_record]]（43 Sprint 0 顺延记录 / Sprint 20s 目标 47 Sprint）
-- [[feedback_oauth2_client_credentials_pattern]]（OAuth2 5 要点 Sprint 17a 实测 / T-A1 NC 真联调直接复用）
-- [[feedback_nc_interface_unilateral_json_strategy]]（17a-19q 单边架构 / T-A1 真联调升级基础）
-- [[feedback_nc_interface_sprint_pattern]]（NC 域 3 Sprint 完整闭环节奏 / Sprint 20r 启动 + 20s 主推 + 20t 收尾对齐）
-- [[reference_nc_ncc_openapi_format]]（NCC OpenAPI 公开资料参考 / T-A1 真接通错误码 / state 1or2 响应）
-- [[project_po_meeting_2026_05_16_nc_voucher_export]]（PO 决策 NC 凭证导出 / 第 4 周期 D 线激活触发条件 / Sprint 20r 触发后 Sprint 20s 主推）
+- [`Sprint-20p-任务卡-V0.3.md`](Sprint-20p-任务卡-V0.3.md)（同 cycle 前序 / 协调 sprint 模板 / 44 Sprint 0 顺延 done）
+- [`Sprint-20q-任务卡-V0.3.md`](Sprint-20q-任务卡-V0.3.md)（同 cycle 前序 / 合同协调 sprint / 待 D5 满）
+- [`Sprint-20r-任务卡-V0.2.md`](Sprint-20r-任务卡-V0.2.md)（同 cycle 前序 / 审批协调 + NC 升级双重 / 待 D3 满 / Q3 A UseMock=true 一键回退兜底）
+- [`../../SupplyCores/docs/internal/sprint-20p-20t-roadmap.md`](../../SupplyCores/docs/internal/sprint-20p-20t-roadmap.md) V0.2（待 Sprint 20s T-A4 修正 V0.3 §2.4 如需）
+- [[voucher-storage-pattern]]（凭证导出双轨架构 / Sprint 19r D1+D2 实施 / Sprint 20s T-A2 P0 真上线基础）
+- [[po-meeting-2026-05-16-nc-voucher-export]]（PO 决策 NC 顺延 / 财务=李建颖 + 物资=汤云龙双业务方对接人明确 / Sprint 20s T-A2 双业务方实操触发）
+- [[nc-interface-unilateral-json-strategy]]（NC 单边架构 17a-19q 累积 / Sprint 20s T-A3 决策 A 第二步触发评估前提）
+- [[oauth2-client-credentials-pattern]]（NC OAuth2 5 要点模式 / Sprint 20s T-A3 第二步触发后复用）
+- [[feedback_codex_0_carryover_8_sprint_record]]（46 Sprint 0 顺延记录 / Sprint 20s 目标 47 Sprint）
 - [[main_orchestrator_default_spawn]]（main 编排者新规则 / Sprint 20s 子代理 2-3 spawn）
-- [[carryover_task_verify_first]]（顺延 task D1 必先 grep / curl / 实测 / Sprint 20s T-A1 NC 5 接口 + T-A2 审批闭环 grep 验证模式）
-- [[feedback_dual_session_19t_continuous_validation]]（second e 第 13+ 次连续 / NC + 审批模块切换）
-- [[feedback_business_party_coordination_failure]]（5 月反模式根因 #1 cici 单点 / T-A4 三方 demo 协调监测）
-- [[feedback_sprint20l_4_5x_subagent_parallel_pattern]]（子代理并行模式 / T-A1 + T-A2 + T-A3 三轨并行评估）
-- [[reference_voucher_storage_pattern]]（凭证文件存储模式 / NC 凭证导出 production-ready 基础）
-- [[project_strategic_pivot_cycle3_data_governance]]（第 3 周期战略转向延续 / 第 4 周期业务模块扩大）
+- [[carryover_task_verify_first]]（顺延 task D1 必先 grep / curl / 实测 / Sprint 20s T-A1+T-A3 grep 验证模式）
+- [[feedback_business_party_coordination_failure]]（5 月反模式根因 #1 cici 单点仍保留 / 第 4 周期第 2 阶段延续监测 / NC P0 真上线前置 cici 协调）
+- [[project_strategic_pivot_cycle3_data_governance]]（第 3 周期战略转向延续 + 第 4 周期业务模块扩大 + 第 6 批准入）
+- [[feedback_sprint20n_wave1_complete]]（协调 sprint 模板参考 / 业务方 walk-through 模式）
+- [[feedback_sprint20m_full_loop_complete]]（6 handler Apply 全模式 / Sprint 20s T-A1 业务闭环复用）
+- [[feedback_sprint20l_full_loop_complete]]（4 子代理 73 测试模板 / Sprint 20s T-A1 单测覆盖复用）
+- [[feedback_dual_session_19t_continuous_validation]]（second e 14+ 次连续模块切换模板 / Sprint 20s T-E1+T-E2 第 14 次连续）
+- [[reference_team_tech_stack]]（前端 DevExtreme + ExcelJS 默认 + ClosedXML 复杂场景 / Sprint 20s T-E1 前端业务闭环复用）
+- [[reference_voucher_storage_pattern]]（凭证存储模式 / Sprint 20s T-A2 P0 真上线 + T-E2 物资看板 P0 backend 复用）
+- [[feedback_main_v02_wave_fghij_complete]]（main V0.2 Wave I/J 第 6 批 8 候选评分 + 17+ Permission 立修 / Sprint 20s T-A1 准入清单依据）
+- [[feedback_main_overnight_validation_pattern]]（main 整夜跑模式 / Sprint 20s V0.1 起草 2026-05-19 main 整夜跑预先起草占位）
