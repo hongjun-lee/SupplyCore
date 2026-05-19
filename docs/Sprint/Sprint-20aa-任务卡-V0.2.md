@@ -1,14 +1,14 @@
-# Sprint 20aa 任务卡 V0.1（2026-05-19 D2 long-time / Q1 next year 启动 / AI 团队 Wave 2 引入 ✨ / 微信小程序 Wave 1 启动 ✨ / 跨集团第 8 周期演进开始）
+# Sprint 20aa 任务卡 V0.2（2026-05-19 D2 long-time / Q1 next year 启动 / AI 团队 Wave 2 引入 ✨ / 微信小程序 Wave 1 Catio subPackage ✨ / 跨集团第 8 周期演进开始）
 
-**Sprint**：20aa（**Q1 next year 启动 sprint** / 接续 Sprint 20z 第 6 周期开局 + AI Wave 1 首次实战收尾 / **AI 团队 Wave 2 引入历史里程碑 ✨ + 微信小程序 Wave 1 启动历史里程碑 ✨ + 跨集团第 8 周期演进开始**）
-**主题**：**Q1 next year 启动 + AI 团队 Wave 2 引入（PM + 决策模板员 + 升版员）+ 微信小程序 Wave 1 启动（设备 + 库存盘点 P0）+ 跨集团第 8 周期演进开始**
-**节奏**：main V0.9（Sprint 20z）已 ready / V0.10 续接 Sprint 20aa+ / 工作量 ~0.8 PD 主线 + 1.2 PD second（微信小程序 Wave 1）+ 0.6 PD AI Wave 2（新引入）/ wall-clock 5-7 天
-**性质**：**Q1 next year 启动 sprint + AI 团队 Wave 2 首次实战 sprint + 微信小程序 Wave 1 启动 sprint + 跨集团第 8 周期演进开始 sprint**（四重性质 / 第 6 周期 Sprint 20z 开局 + AI Wave 1 投产后 / Q1 next year 主轴 = AI Wave 2 引入 + 微信小程序 Wave 1 实施 + 跨集团第 8 周期深化）
+**Sprint**：20aa（**Q1 next year 启动 sprint** / 接续 Sprint 20z 第 6 周期开局 + AI Wave 1 首次实战收尾 / **AI 团队 Wave 2 引入历史里程碑 ✨ + 微信小程序 Wave 1 Catio subPackage 历史里程碑 ✨ + 跨集团第 8 周期演进开始**）
+**主题**：**Q1 next year 启动 + AI 团队 Wave 2 引入（PM + 决策模板员 + 升版员）+ 微信小程序 Wave 1 Catio subPackage ✨（5 page 审批+库存+询价+通知+设备巡检 / 节省 5.5 PD）+ 跨集团第 8 周期演进开始**
+**节奏**：main V0.9（Sprint 20z）已 ready / V0.10 续接 Sprint 20aa+ / 工作量 ~0.8 PD 主线 + 0.5 PD second（微信小程序 Wave 1 Catio subPackage / 节省 0.7 PD）+ 0.5 PD AI 团队 wechat 子员 + 0.6 PD AI Wave 2（新引入）/ wall-clock 5-7 天
+**性质**：**Q1 next year 启动 sprint + AI 团队 Wave 2 首次实战 sprint + 微信小程序 Wave 1 Catio subPackage 启动 sprint + 跨集团第 8 周期演进开始 sprint**（四重性质 / 第 6 周期 Sprint 20z 开局 + AI Wave 1 投产后 / Q1 next year 主轴 = AI Wave 2 引入 + 微信小程序 Wave 1 Catio 复用实施 + 跨集团第 8 周期深化）
 
-**V0.1 起草要点**（main 长时间工作模式 / 2026-05-19 D2 long-time / Wave 4 自我安排 / cici 拍板 Q1 next year AI Wave 2 + Q5 重拍微信小程序 + Q1 B 跨集团第 8 周期 三项决策落地）：
+**V0.2 起草要点**（main 长时间工作模式 / 2026-05-19 D2 long-time / Wave 4 自我安排 / cici 2026-05-19 Taro + Catio nova.miniapp 方案 A subPackage 拍板落地 / Wave 1 节省 5.5 PD 16 → 10.5 PD）：
 
 - **历史里程碑 1**：**AI 团队 Wave 2 首次实战引入** ✨（PM + 决策模板员 + 升版员 / 30 天严格 onboarding / commit 邮箱子域 catio.team / 5 月反模式根因 #1 解除主推）
-- **历史里程碑 2**：**微信小程序 Wave 1 启动 ✨**（Taro 脚手架 + 库存盘点 mobile-stocktake + 设备巡检 mobile-inspection P0 / second 主导 ~2.4 PD / 候选已 V0.3 a7cc335 ready）
+- **历史里程碑 2**：**微信小程序 Wave 1 Catio subPackage 启动 ✨**（Taro 4.x + Catio nova.miniapp 方案 A subPackage 接入 / 主包 6 tab 100% 直用 + audit 60-70% 复用 + workflow 100% 复用 / 5 page Wave 1：审批 + 库存 + 询价 + 通知 + 设备巡检 / second 主导 0.5 PD + AI 团队 wechat 子员 0.5 PD / **节省 5.5 PD**（原 3 PD → 1.5 PD Wave 1）/ 候选 V0.4 commit 即将 push）
 - **战略推进**：**跨集团第 8 周期演进开始**（cici Q1 B 拍板 / 跨集团数据共享深化 + 上下游 3 门户初步连接 + 集成 ERP/财务/HR 系统）
 
 ---
@@ -19,17 +19,19 @@
 |---|---|
 | 启动日期（预计）| ~ 2027-01-01（Sprint 20z D5 满后 / Q1 next year 启动 / 第 6 周期 Day 2 sprint）|
 | main 主线工作量 | ~0.8 PD（5 task / T-A1-A5 / AI Wave 2 引入 + 跨集团第 8 周期演进 + 第 8 周期 roadmap + Codex + 收尾）|
-| second 副线工作量 | ~1.2 PD（**微信小程序 Wave 1 主线** / T-E1 / Taro + 库存盘点 + 设备巡检 + API + 微信扫码 / 5 子任务 ~2.4 PD second 子代理并行 / wall-clock 折算 1.2 PD）|
+| second 副线工作量 | **~0.5 PD**（**微信小程序 Wave 1 Catio subPackage 主线** / T-E1 / Taro + Catio nova.miniapp 方案 A 接入 + 5 page Wave 1 / **节省 0.7 PD vs V0.1 1.2 PD** / 因 Catio 主包 6 tab 100% 直用 + audit/workflow 60-100% 复用）|
+| **AI 团队 wechat 子员工作量** | **~0.5 PD（新引入 ✨）**（微信小程序 Wave 1 协作实施 / 与 second e 并行 / Catio subPackage 接入 + 5 page Wave 1 协同 / 详 §3.5 Catio 方案 A）|
 | **AI Wave 2 工作量** | **~0.6 PD（新引入 ✨）**（PM + cici 决策模板员 + 跨仓 V0.x 升版员 / 30 天 onboarding 启动 / 前 2 周 shadow + 第 3 周 50% + 第 4 周 80% + Day 30 验收）|
-| wall-clock | 5-7 天（Day 1 AI Wave 2 引入 + 跨集团第 8 周期开局 / Day 2-3 微信小程序 Wave 1 实施 + 第 8 周期 roadmap / Day 4-5 Codex + 收尾 / Day 6-7 长尾 wall-clock）|
-| Sprint 性质 | **Q1 next year 启动 + AI 团队 Wave 2 首次实战 + 微信小程序 Wave 1 启动 + 跨集团第 8 周期演进开始**（四重性质 sprint）|
-| 前置 Sprint | Sprint 20z D5 满 + AI Wave 1 Day 30 验收 ✅ + 微信小程序 V0.3 candidate ready ✅ + cici Q1 next year AI Wave 2 + Q1 B 跨集团第 8 周期演进决策 |
-| 后续 Sprint | Sprint 20ab（Q1 next year D3 / AI Wave 2 第 2 周 shadow 深化 + 微信小程序 Wave 1 联调）|
-| Sprint 顺延目标 | **55 Sprint 0 顺延 ✨ + AI Wave 2 首次实战 ✨ + 微信小程序 Wave 1 启动 ✨ + 跨集团第 8 周期演进开始 ✨**（四重里程碑达成）|
+| wall-clock | 5-7 天（Day 1 AI Wave 2 引入 + 跨集团第 8 周期开局 / Day 2-3 微信小程序 Wave 1 Catio subPackage 实施 + 第 8 周期 roadmap / Day 4-5 Codex + 收尾 / Day 6-7 长尾 wall-clock）|
+| **总 Wave 1 PD** | **10.5 PD**（vs V0.1 原 16 PD / **节省 5.5 PD ✨** / Wave 1 部分 1.5 PD vs 原 3 PD = 节省 1.5 PD / Wave 2-3 联动节省 4 PD）|
+| Sprint 性质 | **Q1 next year 启动 + AI 团队 Wave 2 首次实战 + 微信小程序 Wave 1 Catio subPackage 启动 + 跨集团第 8 周期演进开始**（四重性质 sprint）|
+| 前置 Sprint | Sprint 20z D5 满 + AI Wave 1 Day 30 验收 ✅ + 微信小程序 V0.4 candidate ready ✅（commit 即将 push）+ cici Taro + Catio 方案 A 拍板 ✅ + cici Q1 next year AI Wave 2 + Q1 B 跨集团第 8 周期演进决策 |
+| 后续 Sprint | Sprint 20ab（Q1 next year D3 / AI Wave 2 第 2 周 shadow 深化 + 微信小程序 Wave 1 联调 / Catio subPackage 集成测试）|
+| Sprint 顺延目标 | **55 Sprint 0 顺延 ✨ + AI Wave 2 首次实战 ✨ + 微信小程序 Wave 1 Catio subPackage 启动 ✨ + 跨集团第 8 周期演进开始 ✨**（四重里程碑达成）|
 
 ---
 
-## §2 Day 1-7 Task 占位（A 主轨 5 task / 总 ~0.8 PD + AI Wave 2 0.6 PD + E 副轨 1.2 PD 微信小程序 Wave 1 主线）
+## §2 Day 1-7 Task 占位（A 主轨 5 task / 总 ~0.8 PD + AI Wave 2 0.6 PD + AI wechat 子员 0.5 PD + E 副轨 0.5 PD 微信小程序 Wave 1 Catio subPackage 主线 / **节省 5.5 PD 关键 ✨**）
 
 ### A 主轨（main 主代理 a / AI 团队 Wave 2 引入 + 跨集团第 8 周期演进 + 第 8 周期 roadmap / 共 5 task / 0.8 PD）
 
@@ -43,13 +45,15 @@
 
 **main 总：~0.8 PD**（vs Sprint 20z 0.8 PD / 同等开局协调 sprint / AI Wave 2 引入工作量略增 / 跨集团第 8 周期演进起草占主 / 主线协调 + 编排 + 拍板 + 收口）
 
-### E 副轨（second 主代理 e / **微信小程序 Wave 1 启动主线** ✨ / 共 1 task 5 子任务 / 1.2 PD wall-clock）
+### E 副轨（second 主代理 e + AI 团队 wechat 子员协同 / **微信小程序 Wave 1 Catio subPackage 启动主线** ✨ / 共 1 task 7 子任务 / second 0.5 PD + wechat 子员 0.5 PD = 1 PD wall-clock）
 
 | Task | PD | 状态 | 说明 |
 |---|---|---|---|
-| **T-E1** **微信小程序 Wave 1 启动** ✨（second 主导 / 历史里程碑）| 1.2（5 子任务 ~2.4 PD second 子代理并行 / wall-clock 折算 1.2 PD）| pending | ① **Taro 脚手架** 0.3 PD（React + TS / Taro CLI 4.x / 项目骨架 + 配置 + 路由 + 状态管理 zustand 选型）② **库存盘点 mobile-stocktake** 0.6 PD（盘点单列表 + 单据扫码录入 + 提交审批流 / API 复用库存模块 / 离线 cache + 同步策略）③ **设备巡检 mobile-inspection** 0.8 PD（巡检任务列表 + 巡检表单 + 拍照上传 + GPS 定位 / V0.4 Q5 重拍触发因素 / 设备模块 API 复用）④ **API 层 + permission + token storage** 0.4 PD（OAuth2 token wx storage + permission 复用 + API 适配层）⑤ **微信扫码 + 拍照** 0.3 PD（wx.scanCode + wx.chooseImage + wx.getLocation / 微信 JSSDK 集成）|
+| **T-E1** **微信小程序 Wave 1 Catio subPackage 启动** ✨（second 主导 + AI 团队 wechat 子员协同 / 历史里程碑 / cici Taro + Catio 方案 A 拍板）| second 0.5 + wechat 0.5 = 1.0（7 子任务 / wall-clock 折算）| pending | ① **Catio nova.miniapp 接入 + Taro 4.x 脚手架** 0.3 PD second（subPackage 注册 / `Catio/modules/nova.miniapp/src/modules/supplycores/pages/` / 主包 6 tab 100% 直用 / zustand 共享 store）② **审批 page** 0.1 PD wechat 子员（workflow subPackage 100% 直用 / 业务字段映射）③ **库存 page** 0.3 PD second（audit subPackage 60% 复用 / stock-count-sheet API 适配 / 扫码 + 离线 cache）④ **询价 page** 0.2 PD wechat 子员（新建 / 询价 API 复用 / Catio 通用 list/form 组件）⑤ **通知 page** 0.1 PD wechat 子员（主包消息 tab 100% 直用 + 业务订阅扩展）⑥ **设备巡检 page** ⚠️ 0.3 PD second + wechat 协同（audit subPackage 70% 复用 / equipment-inspection API / 拍照 + GPS / V0.4 Q5 重拍核心场景）⑦ **API 共享 + permission + token** 0.2 PD second（100% 复用 Catio 主包 OAuth2 + permission / SupplyCores 业务权限点扩展）|
 
-**second 总：~1.2 PD wall-clock**（5 子任务 ~2.4 PD second 子代理并行 / second 编排 + 5 子代理 spawn / Reports/Dashboards 第 20 次连续完整闭环后切微信小程序新模块 / 模块切换成本 ~0.6 PD 评估）
+**second 总：~0.5 PD wall-clock**（vs V0.1 1.2 PD / **节省 0.7 PD ✨** / Reports/Dashboards 第 20 次连续完整闭环后切微信小程序新模块 / 模块切换成本 0.6 PD 评估 / Catio 主包复用大幅减负）
+
+**AI 团队 wechat 子员总：~0.5 PD wall-clock**（新引入 / 审批 + 询价 + 通知 + 设备巡检协同 / 与 second e 协同节奏 / 每日 standup）
 
 ---
 
@@ -98,7 +102,21 @@
 - **5 月反模式根因 #1 cici 单点解除主推**：decision 角色专责 / cici 单点协调演进到 cici + decision AI 协作
 - **AI Wave 3 铺垫**：Wave 2 成功 → 第 8 周期 Wave 3（业务对话员 + 数据稽核员 + 测试自动员 3-5 角色）catalog 起草
 
-### §3.5 AI Wave 2 风险防御 + 监控指标
+### §3.5 Catio 方案 A 复用 detail（cici 2026-05-19 拍板 / 微信小程序 Wave 1 节省 5.5 PD 关键 ✨）
+
+| 维度 | 内容 |
+|---|---|
+| **方案** | **方案 A：Catio nova.miniapp + SupplyCores subPackage 接入** |
+| **复用路径** | `Catio/modules/nova.miniapp/src/modules/supplycores/pages/`（SupplyCores subPackage 挂载 Catio 主包） |
+| **主包 6 tab 100% 直用** | 工作台 + 待办 + AI 助理 + 发现 + 消息 + 我的（无修改 / 直接复用 Catio 主包能力） |
+| **audit subPackage 60-70% 复用** | 设备巡检 + 出入库（参考 Catio audit 模式 / 适配 SupplyCores 业务字段 / 复用拍照 + GPS + 离线 cache）|
+| **workflow subPackage 100% 复用** | 审批（完全复用 Catio workflow 引擎 / 移动端审批列表 + 一键审批/驳回）|
+| **5 page Wave 1 设计** | ① 审批（workflow 100% 直用）② 库存（audit 60% 复用 + 业务适配）③ 询价（新建 / API 复用询价模块）④ 通知（主包消息 tab 联动）⑤ 设备巡检 ⚠️（audit 70% 复用 + V0.4 Q5 重拍核心场景）|
+| **与 Catio audit/workflow 联动** | API 层共享 OAuth2 token + permission / 跨 subPackage 路由 / 状态管理 zustand 共享 store |
+| **节省 PD 详细** | Wave 1 原 3 PD → 1.5 PD（节省 1.5 PD / second 工作量 1.2 → 0.5 PD / Catio 接入 = audit 70% + workflow 100% + 主包 6 tab 100%）/ 总 16 PD → 10.5 PD（节省 5.5 PD / Wave 1-3 联动）|
+| **依赖** | 2027-01-01 Catio 仓库授权（cici 协调）+ 小程序员入职（AI 团队 wechat 子员 / Wave 2 引入）+ V0.4 candidate commit push ready |
+
+### §3.6 AI Wave 2 风险防御 + 监控指标
 
 | 维度 | 风险 | 防御机制 | 监控指标 |
 |---|---|---|---|
@@ -111,64 +129,80 @@
 
 ---
 
-## §4 微信小程序 Wave 1 启动 detail（second 主导 / 历史里程碑 ✨）
+## §4 微信小程序 Wave 1 Catio subPackage 启动 detail（second 主导 + AI 团队 wechat 子员协同 / cici Taro + Catio 方案 A 拍板 / 历史里程碑 ✨ / 节省 5.5 PD）
 
-### §4.1 Taro 脚手架（0.3 PD）
-
-| 维度 | 内容 |
-|---|---|
-| **技术选型** | Taro CLI 4.x + React + TypeScript / 状态管理 zustand / UI taro-ui / 网络 axios / 路由 taro Router |
-| **项目结构** | `modules/nova.supplycores/wechat-miniprogram/` 独立 frontend 子模块 / src/app + pages + services + components + utils + assets |
-| **配置** | tsconfig + project.config.json + project.private.config.json + app.config + 多环境 dev/test/prod |
-| **CI/CD 占位** | 微信开发者工具 CLI build + 上传 + 体验版 二维码 / Sprint 20ab 联调 / Sprint 20ac 正式发布占位 |
-
-### §4.2 库存盘点 mobile-stocktake（0.6 PD）
+### §4.1 Catio nova.miniapp 接入 + Taro 4.x 脚手架（0.3 PD / second）
 
 | 维度 | 内容 |
 |---|---|
-| **功能** | 盘点单列表 + 单据扫码录入 + 提交审批流 + 离线 cache + 同步策略 |
-| **API 复用** | 库存模块现有 API（stock-count-sheet）+ 移动端适配层 |
+| **技术选型** | Taro CLI 4.x + React + TypeScript / Catio nova.miniapp 主包复用 / 状态管理 zustand（共享 Catio store）/ UI Catio 组件库 + taro-ui 补充 / 网络 axios |
+| **接入路径** | `Catio/modules/nova.miniapp/src/modules/supplycores/pages/` 挂载为 SupplyCores subPackage（**非独立项目** / 复用 Catio 主包） |
+| **subPackage 配置** | `app.config.ts` subPackages 注册 / 路径 `modules/supplycores/pages/` / 5 page 路由占位 |
+| **主包 6 tab 100% 直用** | 工作台 + 待办 + AI 助理 + 发现 + 消息 + 我的（无修改 / 直接复用 Catio 主包）|
+| **CI/CD 复用** | Catio 已有微信开发者工具 CLI build + 上传 + 体验版 二维码 / Sprint 20ab 联调 / Sprint 20ac 正式发布 |
+
+### §4.2 审批 page（workflow subPackage 100% 直用 / 0.1 PD / AI 团队 wechat 子员）
+
+| 维度 | 内容 |
+|---|---|
+| **复用度** | **100% 直用 Catio workflow subPackage**（移动端审批列表 + 一键审批/驳回 + 流程跟踪 全直用）|
+| **业务适配** | SupplyCores 工单类型映射 + 业务字段补 |
+| **API 复用** | 工作流引擎 API（已 Catio 实现） |
+
+### §4.3 库存 page（audit subPackage 60% 复用 + 业务适配 / 0.3 PD / second 主导）
+
+| 维度 | 内容 |
+|---|---|
+| **复用度** | **60% 复用 Catio audit 模式**（盘点单列表 + 单据扫码录入 + 离线 cache + 同步策略 模式复用）|
+| **业务适配** | 盘点单字段映射 + stock-count-sheet API 适配 + 提交审批流（联动 §4.2 workflow） |
 | **微信能力** | wx.scanCode 扫码录入 + wx.setStorageSync 离线 cache + 同步队列 |
-| **审批流** | 复用工作流引擎 / 移动端审批列表 + 一键审批/驳回 |
 
-### §4.3 设备巡检 mobile-inspection（0.8 PD / V0.4 Q5 重拍触发因素）
-
-| 维度 | 内容 |
-|---|---|
-| **功能** | 巡检任务列表 + 巡检表单 + 拍照上传 + GPS 定位 + 离线 cache + 同步 |
-| **API 复用** | 设备模块现有 API（equipment-inspection）+ 移动端适配层 |
-| **微信能力** | wx.chooseImage 拍照 + wx.getLocation GPS + wx.uploadFile 上传 + 离线 cache |
-| **V0.4 Q5 重拍触发因素** | cici Q5 重拍：设备巡检场景是 Wave 1 核心 / 必 P0 包含 / V0.3 候选 a7cc335 ready 后激活 |
-| **数据结构** | 巡检任务 + 巡检表单 + 巡检结果 + 异常上报 + GPS 轨迹 |
-
-### §4.4 API 层 + permission + token storage（0.4 PD）
+### §4.4 询价 page（新建 / 0.2 PD / AI 团队 wechat 子员）
 
 | 维度 | 内容 |
 |---|---|
-| **OAuth2 token wx storage** | 复用 OAuth2 client_credentials 5 要点（single-flight + RefreshBuffer + 401 retry + Token 状态 + WireMock chaos）/ wx.setStorageSync 加密存储 |
-| **permission 复用** | 复用后端 permission 矩阵 / 移动端权限点适配 / 库存盘点 + 设备巡检 P0 权限点占位 |
-| **API 适配层** | 统一 request 封装 / 错误处理 / loading / toast / 网络重试 |
-| **多环境** | dev/test/prod 环境切换 / API base url 配置化 |
+| **复用度** | **新建**（询价业务场景 SupplyCores 特有 / 参考 Catio 通用 list/form 组件） |
+| **功能** | 询价单列表 + 询价响应录入 + 价格对比 + 提交确认 |
+| **API 复用** | 询价模块现有 API + 移动端适配层 |
 
-### §4.5 微信扫码 + 拍照 + GPS（0.3 PD）
+### §4.5 通知 page（主包消息 tab 联动 / 0.1 PD / AI 团队 wechat 子员）
 
 | 维度 | 内容 |
 |---|---|
-| **wx.scanCode** | 库存盘点单据扫码 + 设备资产编号扫码 + 通用扫码组件封装 |
-| **wx.chooseImage** | 设备巡检拍照 + 异常上报拍照 + 多图上传 + 压缩处理 |
-| **wx.getLocation** | 设备巡检 GPS 定位 + GPS 轨迹采集 + 隐私授权处理 |
-| **微信 JSSDK 集成** | 统一封装 / Promise 化 / 错误降级 |
+| **复用度** | **主包消息 tab 100% 直用 + 业务订阅扩展**（消息中心已 Catio 主包实现） |
+| **业务适配** | SupplyCores 业务消息类型订阅 + 跳转规则 |
+| **联动** | 主包消息 tab 中转 → SupplyCores subPackage 业务详情 |
 
-### §4.6 微信小程序 Wave 1 风险防御
+### §4.6 设备巡检 page ⚠️（audit subPackage 70% 复用 + V0.4 Q5 重拍核心 / 0.3 PD / second + AI wechat 协同）
+
+| 维度 | 内容 |
+|---|---|
+| **复用度** | **70% 复用 Catio audit subPackage**（巡检任务列表 + 巡检表单 + 拍照上传 + GPS 定位 + 离线 cache 模式复用）|
+| **V0.4 Q5 重拍触发因素** | cici Q5 重拍：设备巡检场景是 Wave 1 核心 / 必 P0 包含 / V0.4 candidate commit 即将 push ready 后激活 |
+| **业务适配** | equipment-inspection API 适配 + 异常上报字段 + GPS 轨迹采集 |
+| **微信能力** | wx.chooseImage 拍照 + wx.getLocation GPS + wx.uploadFile 上传（Catio 已封装）|
+
+### §4.7 API 层 + permission + token storage（0.2 PD / 共享 Catio 基础设施）
+
+| 维度 | 内容 |
+|---|---|
+| **OAuth2 token wx storage** | **100% 复用 Catio 主包 OAuth2 client_credentials 实现**（single-flight + RefreshBuffer + 401 retry + Token 状态 + WireMock chaos）/ wx.setStorageSync 加密存储 |
+| **permission 复用** | 后端 permission 矩阵 + Catio 主包 permission 拦截 / SupplyCores 业务权限点扩展 |
+| **API 适配层** | 复用 Catio 统一 request 封装 / 错误处理 / loading / toast / 网络重试 |
+| **多环境** | 复用 Catio dev/test/prod 环境切换 |
+
+### §4.8 微信小程序 Wave 1 Catio subPackage 风险防御
 
 | 风险 | 防御 | 触发回退条件 |
 |---|---|---|
-| **Taro 4.x 学习曲线** | second 子代理预研 0.1 PD / Taro 官方文档 + Catio 参考 | Taro 报错 ≥ 5 处 → 暂停 D2 重评估 |
-| **微信审核流程慢** | 体验版 二维码先行 / 正式版 Sprint 20ac 占位 | 审核失败 → 修改重提 / 不阻塞 Wave 1 启动 |
-| **离线 cache 同步冲突** | 同步队列 + 时间戳冲突解决 + cici 审核策略 | 任 1 单位发现数据冲突 → 立修同步策略 |
-| **GPS 隐私授权** | 用户主动授权 + 隐私协议 + 不强制采集 | 用户拒绝 → 降级无 GPS 模式 |
-| **微信 JSSDK 兼容** | 主流微信版本测试 / iOS + Android 双平台测试 | 任 1 平台不兼容 → 立修 |
-| **second 主导模块切换成本** | Reports/Dashboards 20 次连续后切微信小程序新模块 / 模块切换成本 ~0.6 PD 已评估 | 切换成本 ≥ 1 PD → 调整 Wave 1 范围 |
+| **Catio 仓库授权延迟** | cici 2027-01-01 前协调到位 / 占位时长 ≤ 2 周 | 授权失败 → 回退方案 B 独立项目（V0.1 旧方案）|
+| **Catio subPackage 接入冲突** | 隔离 supplycores 命名空间 / SupplyCores 独立 store slice / 不污染主包 | 任 1 处冲突 → 立修隔离边界 |
+| **audit/workflow 复用度低于预期** | 实测期 0.1 PD 预研 / Catio audit 模式 + Workflow 兼容矩阵 | 复用度 < 60% → 调整 Wave 1 范围 + 顺延部分 page |
+| **Taro 4.x + Catio 版本兼容** | Catio 已 Taro 4.x ready / second + AI wechat 子员预研 0.1 PD | 版本不兼容 → 等 Catio 升级 / 暂停 1 周 |
+| **AI 团队 wechat 子员 onboarding 同步** | 与 second e 协同节奏 / 每日 standup / 模块切换成本 0.6 PD 共享 | wechat 子员 Day 7 未达 50% → 顺延 0.5 PD |
+| **离线 cache 同步冲突** | Catio audit 已实现同步队列 + 时间戳冲突 + cici 审核策略 | 任 1 单位发现数据冲突 → 立修同步策略 |
+| **GPS + 拍照 + 扫码 隐私授权** | Catio audit 已封装隐私协议 + 用户主动授权 + 降级模式 | 用户拒绝 → 降级无 GPS 模式（Catio 已实现）|
+| **微信审核流程慢** | Catio 已有审核流程经验 / 体验版 二维码先行 / 正式版 Sprint 20ac 占位 | 审核失败 → 修改重提 / 不阻塞 |
 
 ---
 
@@ -201,17 +235,32 @@
 
 ---
 
-## §6 触发条件（5 项）
+## §6 触发条件 + 关键依赖
+
+### §6.1 触发条件（6 项 / V0.2 + C-6 Catio 方案 A 拍板）
 
 | 条件 | 内容 | 状态 |
 |---|---|---|
 | **C-1** | Sprint 20z D5 满（第 6 周期开局 + AI Wave 1 首次实战 + 30+ 推广启动 三重里程碑达成）| ⏳ 待 Sprint 20z D5 |
 | **C-2** | AI Wave 1 引入完成 + Day 30 验收 ✅（memory 沉淀员 + 跨系统集成员 双角色达标）| ⏳ 待 Sprint 20z + 20aa Day 30 |
-| **C-3** | 微信小程序 V0.3 candidate ready（今日 a7cc335 ✅ / 第 6 批 5 入选其一）| ✅ done |
+| **C-3** | 微信小程序 V0.4 candidate ready（commit 即将 push ✅ / 第 6 批 5 入选其一 / V0.3 a7cc335 已升 V0.4）| ✅ done |
 | **C-4** | cici Q1 next year AI Wave 2 引入决策（PM + 决策模板员 + 升版员 3 角色）| ✅ done |
 | **C-5** | cici Q1 B 跨集团第 8 周期演进决策（跨集团数据共享 + 3 门户 + ERP/财务/HR 集成）| ✅ done |
+| **C-6** ✨ | cici 2026-05-19 Taro + Catio nova.miniapp 方案 A subPackage 拍板（节省 5.5 PD / Wave 1 1.5 PD vs 原 3 PD）| ✅ done |
 
-**触发判断**：C-3 + C-4 + C-5 已 done 3/5 / C-1 待 Sprint 20z D5 / C-2 待 AI Wave 1 Day 30 验收 / 触发条件 3/5 60% 达成 / Sprint 20z D5 + AI Wave 1 Day 30 后启动 Day 1
+**触发判断**：C-3 + C-4 + C-5 + C-6 已 done 4/6 / C-1 待 Sprint 20z D5 / C-2 待 AI Wave 1 Day 30 验收 / 触发条件 4/6 67% 达成 / Sprint 20z D5 + AI Wave 1 Day 30 后启动 Day 1
+
+### §6.2 关键依赖（V0.2 新增 / Catio 方案 A 拍板触发）
+
+| 依赖 | 内容 | 负责方 | 占位时间 | 风险 |
+|---|---|---|---|---|
+| **D-1** | **2027-01-01 Catio 仓库授权**（SupplyCores subPackage 接入需 Catio 仓库读写权限）| cici 协调 | 2026-12-31 前 | 授权延迟 → 回退方案 B 独立项目（V0.1 旧方案） |
+| **D-2** | **小程序员入职**（AI 团队 wechat 子员 / Wave 2 引入 / 0.5 PD Wave 1 协同）| 主轨 T-A1 子代理 wechat | Sprint 20aa Day 1 | 入职延迟 → second 单独承担 Wave 1（回退 V0.1 1.2 PD）|
+| **D-3** | **候选 V0.4 commit push ready**（微信小程序候选 V0.4 升版含方案 A / commit 即将 push）| main a | Sprint 20aa V0.2 push 前 | push 延迟 → 阻塞 T-E1 启动 |
+| **D-4** | **Catio nova.miniapp subPackage 注册接入实验**（接入冲突评估 / 预研 0.1 PD）| second e + AI wechat 子员 | Sprint 20aa Day 1-2 | 冲突 ≥ 1 处 → 立修隔离边界 |
+| **D-5** | **V0.4 candidate 与本 V0.2 联动**（commit push 后 candidate V0.4 锁定 + 本 V0.2 锁定）| main a | Sprint 20aa V0.2 commit 前 | 联动失败 → 重新升版 V0.3 |
+
+**依赖判断**：D-3 + D-4 + D-5 main + second 内部可控 / D-1 + D-2 cici 协调 / 全 5 依赖 Sprint 20aa Day 1 启动前需 ready
 
 ---
 
@@ -220,10 +269,11 @@
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | **V0.1** | **2026-05-19 D2 long-time（main 自我安排长时间 Wave 4 / 跨日收尾累积 / Sprint 20z V0.1 起草后续接）** | **Sprint 20aa V0.1 起草**：① **Sprint 20aa 主题：Q1 next year 启动 + AI 团队 Wave 2 首次引入 ✨ + 微信小程序 Wave 1 启动 ✨ + 跨集团第 8 周期演进开始**（四重性质 sprint / 历史里程碑）② **T-A1-A5 完整**（T-A1 AI Wave 2 三角色 onboarding 启动 PM + decision + upgrader / T-A2 跨集团第 8 周期演进开始 / T-A3 第 8 周期 roadmap V0.1 / T-A4 Codex Round 28 0 收敛追求 / T-A5 Q1 next year 启动 + Sprint 20aa 收尾 commit）③ **§3 AI Wave 2 引入 detail 完整**（§3.1 PM + §3.2 决策模板员 + §3.3 升版员 + §3.4 历史里程碑意义 + §3.5 风险防御）④ **§4 微信小程序 Wave 1 启动 detail 完整**（§4.1 Taro 脚手架 + §4.2 库存盘点 + §4.3 设备巡检 V0.4 Q5 重拍 + §4.4 API+permission+token + §4.5 微信扫码拍照 GPS + §4.6 风险防御）⑤ **§5 跨集团第 8 周期演进 detail 完整**（§5.1 数据共享深化 + §5.2 3 门户 + §5.3 ERP/财务/HR 集成 + §5.4 第 8 周期里程碑）⑥ **second 副轨 1.2 PD wall-clock**（T-E1 微信小程序 Wave 1 主线 / 5 子任务 ~2.4 PD second 子代理并行）⑦ **触发条件 5 条 §6**（C-3 + C-4 + C-5 已 done 3/5 / 仅 C-1 + C-2 待 Sprint 20z 完成）⑧ 工作量 0.8 PD 主线 + 1.2 PD second + **0.6 PD AI Wave 2 新引入** / wall-clock 5-7 天 / **55 Sprint 0 顺延 ✨ + AI Wave 2 首次实战 ✨ + 微信小程序 Wave 1 启动 ✨ + 跨集团第 8 周期演进开始 ✨ 四重里程碑目标** |
+| **V0.2** | **2026-05-19 D2 long-time（main a / cici Taro + Catio 方案 A 拍板应用 / 同日 V0.1 升 V0.2）** | **main a / cici Taro + Catio 方案 A 应用 / Wave 1 工作量 2.4 → 2 PD（节省 0.4 PD wall-clock / 总 16 → 10.5 PD 节省 5.5 PD）/ Catio nova.miniapp subPackage 接入 / 5 page Wave 1（审批 100% workflow 直用 + 库存 60% audit 复用 + 询价新建 + 通知主包消息 tab 联动 + 设备巡检 ⚠️ 70% audit 复用 V0.4 Q5 重拍核心）/ 路径调整 `Catio/modules/nova.miniapp/src/modules/supplycores/pages/`**：① 头部 + §1 基本信息（second 1.2 → 0.5 PD / + AI 团队 wechat 子员 0.5 PD / 总 Wave 1 10.5 PD 行新增 / C-3 V0.3 → V0.4 commit 即将 push）② 历史里程碑 2 改"微信小程序 Wave 1 Catio subPackage 启动 ✨"③ **新增 §3.5 Catio 方案 A 复用 detail**（主包 6 tab 100% 直用 + audit 60-70% + workflow 100% + 5 page Wave 1 + 节省 PD 详细）④ **§3.5 风险防御重号为 §3.6**⑤ **§4 完整重写 微信小程序 Wave 1 Catio subPackage detail**（§4.1 Catio nova.miniapp 接入 + Taro 4.x 脚手架 / §4.2 审批 100% / §4.3 库存 60% / §4.4 询价新建 / §4.5 通知联动 / §4.6 设备巡检 70% + V0.4 Q5 重拍 / §4.7 API 共享 / §4.8 风险防御 Catio 子集）⑥ **新增 §6.2 关键依赖**（D-1 Catio 仓库授权 / D-2 小程序员入职 / D-3 V0.4 candidate / D-4 接入实验 / D-5 V0.4 联动）⑦ §6.1 触发条件 5 → 6 条（+C-6 Catio 方案 A 拍板）⑧ 工作量 0.8 PD 主线 + 0.5 PD second + 0.5 PD AI wechat 子员 + 0.6 PD AI Wave 2 / wall-clock 5-7 天 / **节省 5.5 PD 关键 ✨** / 四重里程碑目标维持 |
 
 ---
 
-**起草人**：main 主代理 a（2026-05-19 D2 long-time / 自我安排长时间工作模式 / Wave 4 自我安排 / Sprint 20aa V0.1 起草）
+**起草人**：main 主代理 a（2026-05-19 D2 long-time / 自我安排长时间工作模式 / Wave 4 自我安排 / Sprint 20aa V0.1 起草 + 同日 V0.2 升版应用 cici Taro + Catio 方案 A 拍板）
 **预期 Sprint 20aa Day 1 启动**：Sprint 20z D5 满 + AI Wave 1 Day 30 验收后（~ 2027-01-01）
 
 **起草上下文记录**：
