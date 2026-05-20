@@ -113,7 +113,63 @@ for fname, sheets in expected.items():
 PY
 ```
 
-### 1.6 何时**不**用脚本（合理保留手工/inline）
+### 1.6 打包发外（A 包）
+
+需要把模板发给阜矿原系统工程师时，跑：
+
+```bash
+bash scripts/build_template_package.sh                  # 实际打包到 dist/
+bash scripts/build_template_package.sh --dry-run        # 只列文件清单不打包
+bash scripts/build_template_package.sh --version V0.3   # 自定义版本号
+```
+
+包内结构（**用 Python zipfile 模块强制 UTF-8 文件名**，Windows 解压不乱码）：
+
+```
+dist/数据采集模板A包-V0.2.8.zip
+└── 数据采集模板A包-V0.2.8/
+    ├── README.txt          自动生成；含当前版本相比上次发包的关键增强项
+    ├── 模板/                7 份 xlsx（01-07）
+    ├── 用法说明/            1 份 docx（V0.1）
+    └── 对照清单/            4 份 docx（02/03/04/06）
+```
+
+发包前检查：
+- xlsx 已 `bash scripts/regenerate_templates.sh` 重建到当前状态
+- docx 已 `python3 scripts/convert_md_to_doc.py` 转换到最新
+- `dist/` 在 `.gitignore` 里（不入 git，只作为本地构建产物）
+
+### 1.7 打包发外（B 包：原系统迁移方案）
+
+A 包是"工具"，B 包是"指导"——两者必须**配套发出**，原系统工程师才能写得出 SQL。
+
+```bash
+bash scripts/build_migration_package.sh                  # 实际打包到 dist/
+bash scripts/build_migration_package.sh --dry-run        # 只列文件清单不打包
+bash scripts/build_migration_package.sh --version V0.3   # 自定义版本号
+```
+
+包内结构（B-core 7 文件 / 用 Python zipfile 模块强制 UTF-8 文件名）：
+
+```
+dist/原系统迁移方案B包-V0.2.8.zip
+└── 原系统迁移方案B包-V0.2.8/
+    ├── README.txt                自动生成；含与 A 包关系 + 推荐阅读路径
+    ├── 01-主方案/                 必读：原系统迁移方案-V0.1.docx
+    ├── 02-物料分类规范/           写 02 SQL 前必读：基线 + 映射指南
+    └── 03-对照清单/               4 份 SQL 字段对照（02/03/04/06）
+```
+
+**A vs B 边界**（也写在 B 包 README.txt 里给收件方看）：
+
+| 包 | 定位 | 主体 | 工作流位置 |
+|---|---|---|---|
+| A 包 | 工具 | 7 xlsx + 用法 + 对照清单副本 | 写 SQL 时对照表头 / 局部小表手填 / 烟雾测试 |
+| B 包 | 指导 | 迁移方案 + 编码规范 + 对照清单 | **先读 B 包搞清方案**，再用 A 包对照表头 |
+
+> 对照清单 ×4 两包都带一份——B 包独立自洽，收件方解压一个包不用对照另一个包。
+
+### 1.8 何时**不**用脚本（合理保留手工/inline）
 
 | 操作 | 实现方式 | 为何不脚本化 |
 |---|---|---|
@@ -161,8 +217,10 @@ find docs/招标 -name "*.md" -exec python3 scripts/convert_md_to_doc.py {} \;
 | **V0.2.5** | **formula1 不带 `=` 的关键 bug 修复** | **必读教训**（§1.4） |
 | V0.2.4 / V0.2.6 / V0.2.7 | 附录 / 批注 / DV 分别脚本化补齐 | 全量脚本化完成 |
 | V0.2.8 | 本 README + regenerate_templates.sh 一键脚本 | 知识沉淀完成 |
+| V0.2.9 | build_template_package.sh 一键打 A 包发外（含包内 README + 中文文件名 UTF-8） | 发包流程脚本化 |
+| V0.2.10 | build_migration_package.sh 一键打 B 包发外（迁移方案 + 物料分类规范 + 4 对照清单） | A/B 双包配套，工程师有指导也有工具 |
 
 ---
 
 **Maintained**: main 主代理 a
-**Last updated**: 2026-05-20 / V0.2.8
+**Last updated**: 2026-05-20 / V0.2.10

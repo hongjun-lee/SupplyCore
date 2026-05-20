@@ -18,3 +18,6 @@ MEMORY.md
 # Word 输出目录（由 md 通过 scripts/convert_md_to_doc.py 生成）
 word/
 docs/**/word/
+
+# 模板打包输出目录（由 scripts/build_template_package.sh 生成）
+dist/
