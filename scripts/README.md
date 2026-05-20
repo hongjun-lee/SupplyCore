@@ -113,35 +113,54 @@ for fname, sheets in expected.items():
 PY
 ```
 
-### 1.6 打包发外（A 包）
+### 1.6 打包发外（业务方手填包 = A 包重制 V0.3.0）
 
-需要把模板发给阜矿原系统工程师时，跑：
+历史背景：V0.2.x 时 A 包定位是"7 xlsx + 用法 + 对照清单 → 发原系统工程师"，
+V0.2.11 B 包升级一站式后工程师场景由 B 包覆盖，**A 包重制为"业务方手填包" V0.3.0**：
+受众改物资公司业务方，内容只留业务方真正手填的 5 个 xlsx + 1 业务方填报指引。
 
 ```bash
 bash scripts/build_template_package.sh                  # 实际打包到 dist/
 bash scripts/build_template_package.sh --dry-run        # 只列文件清单不打包
-bash scripts/build_template_package.sh --version V0.3   # 自定义版本号
+bash scripts/build_template_package.sh --version V0.3.1 # 自定义版本号（默认 V0.3.0）
 ```
 
 包内结构（**用 Python zipfile 模块强制 UTF-8 文件名**，Windows 解压不乱码）：
 
 ```
-dist/数据采集模板A包-V0.2.8.zip
-└── 数据采集模板A包-V0.2.8/
-    ├── README.txt          自动生成；含当前版本相比上次发包的关键增强项
-    ├── 模板/                7 份 xlsx（01-07）
-    ├── 用法说明/            1 份 docx（V0.1）
-    └── 对照清单/            4 份 docx（02/03/04/06）
+dist/业务方手填包-V0.3.0.zip
+└── 业务方手填包-V0.3.0/
+    ├── README.txt                       自动生成；4 手填场景速查 + 与 staging 调整的关系
+    ├── 业务方填报指引-V0.1.docx          ← 首先读这份（4 手填场景细则 + staging 边界）
+    ├── 01-组织与人员模板-V0.2.xlsx        场景 1：业务联系人补充
+    ├── 04-仓储基础数据模板-V0.2.xlsx      场景 2：货位实地补充
+    ├── 05-财务与NC映射模板-V0.2.xlsx      场景 3：NC 映射全量人工对照
+    ├── 06-期初库存模板-V0.2.xlsx          场景 4：物理盘点差异补录
+    └── 07-组织架构参考表-V0.2.xlsx        反查字典（只读 / 反查 org_code）
 ```
+
+**为什么 02/03 不在包里**：02 物料 / 03 供应商主体数据 100% 由原系统工程师 SQL 抽，
+业务方的工作是在 SupplyCore Web UI 的 **staging 调整窗口**（DataImportBatch 草稿态）
+重新归类 / 改属性 / 删行（参见迁移方案 §八-A.1）。本包只覆盖 SQL 抽不到的 4 个手填场景。
 
 发包前检查：
 - xlsx 已 `bash scripts/regenerate_templates.sh` 重建到当前状态
-- docx 已 `python3 scripts/convert_md_to_doc.py` 转换到最新
+- 业务方填报指引 docx 已 `python3 scripts/convert_md_to_doc.py docs/上线/业务方填报指引-V0.1.md` 转出
 - `dist/` 在 `.gitignore` 里（不入 git，只作为本地构建产物）
 
-### 1.7 打包发外（B 包：原系统迁移方案）
+**两个包的最终边界**：
 
-A 包是"工具"，B 包是"指导"——两者必须**配套发出**，原系统工程师才能写得出 SQL。
+| 包 | 受众 | 主体 | 工作流位置 |
+|---|---|---|---|
+| **业务方手填包**（A 包重制）| 物资公司业务方 | 5 xlsx + 1 填报指引 | 4 手填局部场景，配合 staging Web UI 调整 |
+| **原系统迁移方案 B 包** | 原系统工程师 | 7 docx + 7 xlsx + 1 用法 = 一站式 | 看完方案写 SQL 抽全量数据进 staging |
+
+两个包受众完全不重叠，工程师只下 B 包、业务方只下 A 包重制版即可。
+
+### 1.7 打包发外（B 包：原系统迁移方案 / 一站式）
+
+B 包是给原系统工程师的**一站式包**：指导文档 + SQL 字段对照 + Excel 模板实物全齐，
+工程师下载一个 zip 即可开工，**不需要再下业务方手填包**（两个包受众已划清，参见 §1.6 边界表）。
 
 ```bash
 bash scripts/build_migration_package.sh                  # 实际打包到 dist/
@@ -149,25 +168,23 @@ bash scripts/build_migration_package.sh --dry-run        # 只列文件清单不
 bash scripts/build_migration_package.sh --version V0.3   # 自定义版本号
 ```
 
-包内结构（B-core 7 文件 / 用 Python zipfile 模块强制 UTF-8 文件名）：
+包内结构（一站式 = 7 docx + 7 xlsx + 1 README，4 级目录按阅读/使用顺序编号）：
 
 ```
-dist/原系统迁移方案B包-V0.2.8.zip
-└── 原系统迁移方案B包-V0.2.8/
-    ├── README.txt                自动生成；含与 A 包关系 + 推荐阅读路径
+dist/原系统迁移方案B包-V0.2.9.zip
+└── 原系统迁移方案B包-V0.2.9/
+    ├── README.txt                自动生成；含定位 + 推荐阅读 5 步路径
     ├── 01-主方案/                 必读：原系统迁移方案-V0.1.docx
     ├── 02-物料分类规范/           写 02 SQL 前必读：基线 + 映射指南
-    └── 03-对照清单/               4 份 SQL 字段对照（02/03/04/06）
+    ├── 03-对照清单/               4 份 SQL 字段对照（02/03/04/06 / docx 版）
+    └── 04-Excel 模板/             schema 参考 + 小表手填 + 烟雾测试
+        ├── 用法说明.docx           xlsx 三种用法（schema 参考 / 局部手填 / 烟雾测试）
+        └── 7 份 xlsx (01-07)       （已含 V0.2.8 全部易用性增强）
 ```
 
-**A vs B 边界**（也写在 B 包 README.txt 里给收件方看）：
-
-| 包 | 定位 | 主体 | 工作流位置 |
-|---|---|---|---|
-| A 包 | 工具 | 7 xlsx + 用法 + 对照清单副本 | 写 SQL 时对照表头 / 局部小表手填 / 烟雾测试 |
-| B 包 | 指导 | 迁移方案 + 编码规范 + 对照清单 | **先读 B 包搞清方案**，再用 A 包对照表头 |
-
-> 对照清单 ×4 两包都带一份——B 包独立自洽，收件方解压一个包不用对照另一个包。
+> **xlsx 与对照清单的关系**：03/ 是字段对照 docx 版（结构化阅读），04/ 是 xlsx 实物版（写 SQL 时直接打开看真实表头 + 校验枚举 + 批注）。两者互补，B 包都带。
+>
+> **B 包独立自洽**：工程师拿到 B 包不需要任何额外文件，README 推荐 5 步阅读路径（30+15+10 min 读文档 → 按需写 SQL → 02 物资主数据首发）。
 
 ### 1.8 何时**不**用脚本（合理保留手工/inline）
 
@@ -219,8 +236,10 @@ find docs/招标 -name "*.md" -exec python3 scripts/convert_md_to_doc.py {} \;
 | V0.2.8 | 本 README + regenerate_templates.sh 一键脚本 | 知识沉淀完成 |
 | V0.2.9 | build_template_package.sh 一键打 A 包发外（含包内 README + 中文文件名 UTF-8） | 发包流程脚本化 |
 | V0.2.10 | build_migration_package.sh 一键打 B 包发外（迁移方案 + 物料分类规范 + 4 对照清单） | A/B 双包配套，工程师有指导也有工具 |
+| V0.2.11 | B 包升级为"原系统工程师一站式包"（追加 04-Excel 模板/ = 7 xlsx + 用法说明） | 工程师下载一个 zip 即可开工 |
+| **V0.2.12 / V0.3.0** | A 包重制为"业务方手填包" V0.3.0（5 xlsx + 1 业务方填报指引 / 去掉 02/03 + 对照清单 + 工程师用法） | 两个包受众完全不重叠，A/B 各自精准 |
 
 ---
 
 **Maintained**: main 主代理 a
-**Last updated**: 2026-05-20 / V0.2.10
+**Last updated**: 2026-05-20 / V0.2.12 / 业务方手填包 V0.3.0

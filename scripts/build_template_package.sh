@@ -1,32 +1,41 @@
 #!/bin/bash
-# build_template_package.sh — 数据采集模板 A 包构建脚本
+# build_template_package.sh — 业务方手填包构建脚本（A 包重制 V0.3.0）
 #
-# 把 7 份 xlsx 模板 + 1 份用法说明 + 4 份对照清单打成 zip，发给阜矿原系统工程师。
-# 配合 scripts/regenerate_templates.sh 使用：先重建 xlsx 当前状态，再打包发出。
+# 原"数据采集模板 A 包"V0.2.8 = 给原系统工程师的 7 xlsx + 用法 + 4 对照清单，
+# V0.2.11 后工程师场景由 B 包一站式覆盖，A 包重制为"业务方手填包"。
+#
+# 受众：物资公司 + 各厂矿物资部 / 仓储 / 财务 业务方接口人
+# 内容：5 份业务方真正手填的 xlsx (01/04/05/06 + 07 字典) + 1 业务方填报指引
+# 用途：覆盖 SQL 抽不到的 4 个手填局部场景（详见包内填报指引）
+#
+# 02/03 没有放进来 — 这两类 100% 由原系统 SQL 抽，业务方主战场是 staging Web UI 调整。
 #
 # 用法：
 #   bash scripts/build_template_package.sh                  # 实际打包
 #   bash scripts/build_template_package.sh --dry-run        # 列文件清单不打包
-#   bash scripts/build_template_package.sh --version V0.3   # 指定版本号（默认 V0.2.8）
-#   bash scripts/build_template_package.sh --out dist       # 指定输出目录（默认 dist）
+#   bash scripts/build_template_package.sh --version V0.3.1 # 自定义版本号（默认 V0.3.0）
+#   bash scripts/build_template_package.sh --out dist       # 自定义输出目录（默认 dist）
 #
 # 包内结构：
-#   数据采集模板A包-V0.2.8/
-#   ├── README.txt        本包说明 + 当前版本增强项 + V0.2.1 → V0.2.8 差异
-#   ├── 模板/             7 份 xlsx
-#   ├── 用法说明/         1 份 docx
-#   └── 对照清单/         4 份 docx
+#   业务方手填包-V0.3.0/
+#   ├── README.txt                  本包说明 + 4 手填场景速查 + 与 staging 调整的关系
+#   ├── 业务方填报指引-V0.1.docx     ← 首先读这份（4 手填场景细则 + staging 边界）
+#   ├── 01-组织与人员模板-V0.2.xlsx   ← 场景 1：业务联系人补充
+#   ├── 04-仓储基础数据模板-V0.2.xlsx ← 场景 2：货位实地补充
+#   ├── 05-财务与NC映射模板-V0.2.xlsx ← 场景 3：NC 映射全量人工对照
+#   ├── 06-期初库存模板-V0.2.xlsx     ← 场景 4：物理盘点差异补录
+#   └── 07-组织架构参考表-V0.2.xlsx   ← 反查字典：org_code（只读）
 #
 # 前置：
 #   - xlsx 已 bash scripts/regenerate_templates.sh 重建到当前状态
-#   - docx 已 python3 scripts/convert_md_to_doc.py 转换出最新版
+#   - 业务方填报指引 docx 已 python3 scripts/convert_md_to_doc.py 转出最新版
 
 set -eo pipefail
 
 cd "$(dirname "$0")/.."  # repo root
 
 # ============ 参数解析 ============
-VERSION="V0.2.8"
+VERSION="V0.3.0"
 OUT_DIR="dist"
 DRY_RUN=""
 while [ $# -gt 0 ]; do
@@ -43,7 +52,7 @@ while [ $# -gt 0 ]; do
 done
 
 DATE=$(date +%Y-%m-%d)
-PKG_NAME="数据采集模板A包-${VERSION}"
+PKG_NAME="业务方手填包-${VERSION}"
 ZIP_NAME="${PKG_NAME}.zip"
 WORK_DIR="${OUT_DIR}/${PKG_NAME}"
 
@@ -51,26 +60,18 @@ WORK_DIR="${OUT_DIR}/${PKG_NAME}"
 XLSX_SRC="docs/上线/word/数据采集模板-xlsx"
 DOCX_SRC="docs/上线/word"
 
+GUIDE_DOC="业务方填报指引-V0.1.docx"
 XLSX_FILES=(
   "01-组织与人员模板-V0.2.xlsx"
-  "02-物资主数据模板-V0.2.xlsx"
-  "03-供应商档案模板-V0.2.xlsx"
   "04-仓储基础数据模板-V0.2.xlsx"
   "05-财务与NC映射模板-V0.2.xlsx"
   "06-期初库存模板-V0.2.xlsx"
   "07-组织架构参考表-V0.2.xlsx"
 )
-USAGE_DOC="原系统迁移-Excel采集模板用法说明-V0.1.docx"
-COMPARE_DOCS=(
-  "原系统迁移-对照清单-02物资主数据-V0.1.docx"
-  "原系统迁移-对照清单-03供应商档案-V0.1.docx"
-  "原系统迁移-对照清单-04仓储基础-V0.1.docx"
-  "原系统迁移-对照清单-06期初库存-V0.1.docx"
-)
 
 # ============ 预检 ============
 echo "════════════════════════════════════════════════════════════"
-echo "  数据采集模板 A 包构建"
+echo "  业务方手填包构建"
 echo "  版本：${VERSION}   日期：${DATE}   输出：${OUT_DIR}/${ZIP_NAME}"
 echo "  ${DRY_RUN:+(dry-run 模式，不打包)}"
 echo "════════════════════════════════════════════════════════════"
@@ -78,28 +79,19 @@ echo
 
 missing=0
 echo "▸ [1/4] 文件清单预检"
+if [ -f "${DOCX_SRC}/${GUIDE_DOC}" ]; then
+  sz=$(ls -l "${DOCX_SRC}/${GUIDE_DOC}" | awk '{print $5}')
+  echo "    ✓ ${GUIDE_DOC}  (${sz} bytes)"
+else
+  echo "    ❌ 缺失：${DOCX_SRC}/${GUIDE_DOC}"
+  missing=$((missing + 1))
+fi
 for f in "${XLSX_FILES[@]}"; do
   if [ -f "${XLSX_SRC}/${f}" ]; then
     sz=$(ls -l "${XLSX_SRC}/${f}" | awk '{print $5}')
-    echo "    ✓ 模板/${f}  (${sz} bytes)"
+    echo "    ✓ ${f}  (${sz} bytes)"
   else
     echo "    ❌ 缺失：${XLSX_SRC}/${f}"
-    missing=$((missing + 1))
-  fi
-done
-if [ -f "${DOCX_SRC}/${USAGE_DOC}" ]; then
-  sz=$(ls -l "${DOCX_SRC}/${USAGE_DOC}" | awk '{print $5}')
-  echo "    ✓ 用法说明/${USAGE_DOC}  (${sz} bytes)"
-else
-  echo "    ❌ 缺失：${DOCX_SRC}/${USAGE_DOC}"
-  missing=$((missing + 1))
-fi
-for f in "${COMPARE_DOCS[@]}"; do
-  if [ -f "${DOCX_SRC}/${f}" ]; then
-    sz=$(ls -l "${DOCX_SRC}/${f}" | awk '{print $5}')
-    echo "    ✓ 对照清单/${f}  (${sz} bytes)"
-  else
-    echo "    ❌ 缺失：${DOCX_SRC}/${f}"
     missing=$((missing + 1))
   fi
 done
@@ -108,12 +100,12 @@ echo
 if [ $missing -gt 0 ]; then
   echo "❌ 共 ${missing} 个文件缺失，请补齐后重试。" >&2
   echo "  - xlsx 缺失：bash scripts/regenerate_templates.sh" >&2
-  echo "  - docx 缺失：python3 scripts/convert_md_to_doc.py <对应 md>" >&2
+  echo "  - docx 缺失：python3 scripts/convert_md_to_doc.py docs/上线/业务方填报指引-V0.1.md" >&2
   exit 4
 fi
 
 if [ -n "$DRY_RUN" ]; then
-  total_files=$((${#XLSX_FILES[@]} + 1 + ${#COMPARE_DOCS[@]} + 1))  # +1 README
+  total_files=$((1 + ${#XLSX_FILES[@]} + 1))  # +1 README
   echo "[dry-run] 预计打包 ${total_files} 个文件（含 1 个 README.txt 即时生成）→ ${OUT_DIR}/${ZIP_NAME}"
   exit 0
 fi
@@ -121,92 +113,96 @@ fi
 # ============ 准备工作目录 ============
 echo "▸ [2/4] 准备工作目录 ${WORK_DIR}"
 rm -rf "${WORK_DIR}"
-mkdir -p "${WORK_DIR}/模板" "${WORK_DIR}/用法说明" "${WORK_DIR}/对照清单"
+mkdir -p "${WORK_DIR}"
 
 # ============ 拷贝文件 ============
+cp "${DOCX_SRC}/${GUIDE_DOC}" "${WORK_DIR}/${GUIDE_DOC}"
 for f in "${XLSX_FILES[@]}"; do
-  cp "${XLSX_SRC}/${f}" "${WORK_DIR}/模板/${f}"
+  cp "${XLSX_SRC}/${f}" "${WORK_DIR}/${f}"
 done
-cp "${DOCX_SRC}/${USAGE_DOC}" "${WORK_DIR}/用法说明/${USAGE_DOC}"
-for f in "${COMPARE_DOCS[@]}"; do
-  cp "${DOCX_SRC}/${f}" "${WORK_DIR}/对照清单/${f}"
-done
-echo "    ✓ 7 xlsx + 1 用法说明 + 4 对照清单 已拷贝"
+echo "    ✓ 1 填报指引 + 5 xlsx 已拷贝（含 07 只读字典）"
 echo
 
 # ============ 生成包内 README.txt ============
 echo "▸ [3/4] 生成包内 README.txt"
 cat > "${WORK_DIR}/README.txt" <<EOF
 ═══════════════════════════════════════════════════════════════
-数据采集模板 A 包  ${VERSION}
+业务方手填包  ${VERSION}
 ═══════════════════════════════════════════════════════════════
 
-致：阜矿现有物资系统工程师
+致：物资公司 + 各厂矿物资部 / 仓储 / 财务 业务方接口人
 来自：网信办
 打包日期：${DATE}
+
+───────────────────────────────────────────────────────────────
+本包定位：仅覆盖 SQL 抽不到的 4 个手填局部场景
+───────────────────────────────────────────────────────────────
+
+  ⚠️ 重要：xlsx 手填只占你工作的 20%，主战场是 staging Web UI 调整！
+
+  02 物料 / 03 供应商 / 06 期初库存的主体数据由原系统工程师 SQL 抽
+  → 落 SupplyCore DataImportBatch 草稿态
+  → ⭐ 你在 staging Web UI 重新归类 / 改属性 / 删行 / 改单价（3-5 天）
+  → 你点"确认应用" → 进正式库
+
+  本包 5 份 xlsx 覆盖 SQL 抽不到的 4 个手填场景（详见填报指引 §二）。
+
+───────────────────────────────────────────────────────────────
+推荐阅读顺序
+───────────────────────────────────────────────────────────────
+
+  Step 1（15 min / 必读）打开 业务方填报指引-V0.1.docx
+                          §一 你在上线流程中的位置
+                          §二 4 个手填场景（每个场景填谁 / 填啥 / 回收方式）
+                          §三 staging 调整窗口（你的主战场）
+
+  Step 2（按需）找到你这次负责的手填场景，打开对应 xlsx：
+    场景 1：01-组织与人员模板    各厂矿物资部补"业务联系人"字段
+    场景 2：04-仓储基础数据      仓储 + 物资公司补"货位"实地数据
+    场景 3：05-财务与NC映射      财务 + 物资 + cici 全量纯人工对照（4 sheet）
+    场景 4：06-期初库存          物理盘点差异补录（小量在 Web UI / 大量本 xlsx）
+
+  Step 3（填表前必看）打开 07-组织架构参考表-V0.2.xlsx 的"组织架构"sheet
+                       反查你的单位 OrgCode（5 位编码 / 如 001.007.002 = 恒大煤矿）
 
 ───────────────────────────────────────────────────────────────
 本包包含
 ───────────────────────────────────────────────────────────────
 
-  📂 模板/                7 份 Excel 数据采集模板
-    01-组织与人员
-    02-物资主数据（V1.8 14+1 大类 / 95 二级分类 / 25 单位）
-    03-供应商档案
-    04-仓储基础数据
-    05-财务与NC映射
-    06-期初库存
-    07-组织架构参考表（只读字典，反查 org_code 用）
+  📄 业务方填报指引-V0.1.docx       ← 首先读这份
 
-  📂 用法说明/            1 份 Word
-    原系统迁移-Excel采集模板用法说明-V0.1.docx
-
-  📂 对照清单/            4 份 Word（02/03/04/06 SQL 取数对照）
-    （01/05/07 由 Nova 同步主导，不走原系统 SQL 迁移）
+  📊 5 份 xlsx（4 手填 + 1 字典）
+    01-组织与人员模板-V0.2.xlsx       场景 1：业务联系人补充
+    04-仓储基础数据模板-V0.2.xlsx     场景 2：货位实地补充
+                                       （xlsx 已加 4 处下拉验证）
+    05-财务与NC映射模板-V0.2.xlsx     场景 3：NC 映射全量人工对照
+                                       4 个 sheet 全部需填（第 5 个 sheet 仅参考）
+    06-期初库存模板-V0.2.xlsx         场景 4：物理盘点差异补录
+                                       （xlsx 已加 5 处下拉/校验：数量>0 / 日期≤TODAY / 状态枚举等）
+    07-组织架构参考表-V0.2.xlsx       反查字典（只读 / 反查 org_code 用）
 
 ───────────────────────────────────────────────────────────────
-${VERSION} 相比上次发包（V0.2.1）的关键增强 ★
+本包不含哪些（这些不需要你手填）
 ───────────────────────────────────────────────────────────────
 
-1. 【02】物料分类 sheet 已直接预填 V1.8 110 行权威基线
-   ─ 15 大类（HG/ZH/SB/BP/JD/YZ/GC/JZ/TF/HX/GJ/LB/BZ/BG + PS 保留）
-   ─ 95 个二级分类
-   ─ 高敏感行（HG/HX/YZ01）已标黄
-   ─ PS 排水材料 6 行灰底标 is_active=false（保留 / 暂停用）
-   你写 SQL 时直接对照本 sheet，不需要再查规范文档。
+  ❌ 02 物资主数据模板   → 原系统工程师 SQL 抽全量，你在 staging Web UI 调整分类/属性
+  ❌ 03 供应商档案模板   → 原系统工程师 SQL 抽全量，你在 staging Web UI 调整准入状态
+  ❌ 4 份对照清单 docx   → 那是给原系统工程师写 SQL 用的（在迁移方案 B 包里）
+  ❌ 迁移方案 / 编码规范 → 那是给原系统工程师的指导（在迁移方案 B 包里）
 
-2. 【02】计量单位 sheet 已直接预填 25 个标准单位
-   ─ 长度 4（M/MM/CM/KM）+ 重量 3（KG/G/T）+ 体积 3（L/ML/M3）
-   ─ 数量 15（件/个/套/台/张/块/根/卷/桶/包/盒/瓶/副/双/顶）
-   ─ 含换算系数（MM=0.001M / T=1000KG 等）
-
-3. 【02】物料主数据 sheet 的「计量单位」和「新分类编码」列
-   ★ 已加 Excel 下拉数据验证（覆盖 R2:R2000）
-   业务方录入时点击单元格 → 下拉箭头 → 从 25/95 个标准值中选
-   不在标准范围内的会被 Excel/WPS 拒绝录入。
-
-4. 【04/06】关键字段已加 Excel 同 sheet 数据验证（9 处）
-   04/仓库: 仓库类型(5项枚举) / 启用日期(≤TODAY)
-   04/库区: zone_type(5项枚举)
-   04/货位: location_status(4项枚举)
-   06/期初库存: 数量(>0) / 入库日期(≤TODAY) / 库存状态(4项枚举)
-                填报日期(TODAY±7) / 数据来源(3项枚举)
-
-5. 【02/04/06】必填字段加 R1 表头悬停批注（共 25 条）
-   每条批注 6 行：字段英文名 / 类型(长度) / ✅ 必填 / 校验说明 / 示例值 / ❌ 常见错误
-   鼠标悬停 R1 表头即可看，方便填报时即时查口径。
-
-6. 【01-07】全部 7 份 xlsx 的「说明」首页末尾追加
-   "附录：Sheet ↔ 数据表对照" 3 列表格
-   方便你写 SQL 时反查目标表名（如 物料主数据 ↔ Material）。
+  如需了解整体上线协作流程，参考 原系统迁移方案-V0.1.docx §八-A
+  （由 cici 牵头的全员宣讲会会讲到，这里不重复）
 
 ───────────────────────────────────────────────────────────────
-你能用本包做什么（见用法说明 §二）
+xlsx 已加的易用性增强（V0.2.8 状态）
 ───────────────────────────────────────────────────────────────
 
-  用法 1（最常用）目标 schema 参考 —— 写 SQL 时对照 xlsx 表头取数
-  用法 2 局部小表备选 —— 计量单位/资质等小表可直接填 xlsx 补
-  用法 3（推荐）连库前烟雾测试 —— 手填 10-30 行典型样本端到端验证
+  - 02 物料分类已预填 V1.8 110 行基线 + 25 标准计量单位
+    （02 不在本包但在 staging Web UI 看得到，分类下拉已就绪）
+  - 04 仓库类型 / 库区类型 / 货位状态 下拉验证
+  - 06 数量>0 / 入库日期≤TODAY / 库存状态/数据来源下拉
+  - 02/04/06 共 25 条 R1 表头悬停批注（字段英文名/类型/校验/示例/常见错误）
+  - 每份 xlsx 首页"说明" sheet 末尾"Sheet ↔ 数据表对照"附录
 
 ───────────────────────────────────────────────────────────────
 环境要求
@@ -220,9 +216,10 @@ ${VERSION} 相比上次发包（V0.2.1）的关键增强 ★
 反馈渠道
 ───────────────────────────────────────────────────────────────
 
-  填报问题 / schema 不一致 / 校验过严 等任何反馈请直接回邮件。
-  我们走同一条 POST /api/supply-cores/data-import/upload-and-validate
-  入 staging 验证，问题立刻闭环。
+  xlsx 字段不清楚 / 校验过严 / 示例不够     → 邮件给项目组（1 个工作日内回）
+  原系统抽的数据有错（漏抽/错抽/类型乱）    → 记《数据问题台账》触发 staging 重抽
+  staging Web UI 操作问题 / 批量功能需求    → 反馈给 cici 进 Sprint 评估
+  物理盘点新发现物料（原系统没有）          → 06 期初库存补行 + 反馈给项目组发 02 物料新增请求
 
 ═══════════════════════════════════════════════════════════════
 EOF
@@ -246,7 +243,6 @@ with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
             if fname == ".DS_Store":
                 continue
             full = os.path.join(root, fname)
-            # arcname 用相对路径，确保 zip 内目录从 pkg_name/ 起
             arc = os.path.relpath(full, out_dir)
             zf.write(full, arcname=arc)
 PY
@@ -276,5 +272,6 @@ echo
 
 echo "════════════════════════════════════════════════════════════"
 echo "  ✓ 打包完成：${OUT_DIR}/${ZIP_NAME}"
-echo "  下一步：复检包内容 → 通过 IM/邮件 发给原系统工程师"
+echo "  下一步：发给物资公司 + 各厂矿物资部接口人"
+echo "         B 包 (原系统迁移方案) 已并行发给原系统工程师"
 echo "════════════════════════════════════════════════════════════"
