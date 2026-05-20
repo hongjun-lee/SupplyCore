@@ -412,9 +412,13 @@ def add_material_dropdowns(ws_mat, cat_dropdown_last_row: int, unit_last_row: in
         if dv.type != "list" or not _dv_targets_our_columns(dv)
     ]
 
+    # Excel/WPS 要求 dataValidation 的 formula1 **不带前导 `=`**；
+    # 如果带了 `=`，xml 里会落成 `<formula1>=计量单位!...</formula1>`，
+    # Excel/WPS 解析失败 → 打开时静默丢弃 DV 甚至触发"修复"回退数据。
+    # 参考 openpyxl 文档：DataValidation.formula1 期望的是裸公式字符串。
     dv_unit = DataValidation(
         type="list",
-        formula1=f"=计量单位!$A$2:$A${unit_last_row}",
+        formula1=f"计量单位!$A$2:$A${unit_last_row}",
         allow_blank=True,
         showErrorMessage=True,
         errorTitle="计量单位无效",
@@ -428,7 +432,7 @@ def add_material_dropdowns(ws_mat, cat_dropdown_last_row: int, unit_last_row: in
 
     dv_cat = DataValidation(
         type="list",
-        formula1=f"=物料分类!$A$2:$A${cat_dropdown_last_row}",
+        formula1=f"物料分类!$A$2:$A${cat_dropdown_last_row}",
         allow_blank=True,
         showErrorMessage=True,
         errorTitle="分类编码无效",
@@ -513,8 +517,8 @@ def main() -> int:
     print(f"  ▸ 物料分类 sheet：写入 {expected_cat_rows} 行（{len(CATEGORIES_L1)} 大类 + {len(CATEGORIES_L2)} 二级）")
     print(f"  ▸ 计量单位 sheet：写入 {expected_unit_rows} 行")
     print(f"  ▸ 物料主数据 sheet：")
-    print(f"      F 列 unit 下拉范围      = 计量单位!$A$2:$A${1 + expected_unit_rows}")
-    print(f"      G 列 category 下拉范围  = 物料分类!$A$2:$A${cat_dropdown_last_row}")
+    print(f"      F 列 unit 下拉范围      = 计量单位!$A$2:$A${1 + expected_unit_rows}（formula1 不带前导 =）")
+    print(f"      G 列 category 下拉范围  = 物料分类!$A$2:$A${cat_dropdown_last_row}（formula1 不带前导 =）")
     print(f"      下拉覆盖行范围          = R2:R{DV_RANGE_END}")
     print()
 
